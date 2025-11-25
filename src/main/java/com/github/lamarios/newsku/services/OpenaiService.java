@@ -1,0 +1,126 @@
+package com.github.lamarios.newsku.services;
+
+import com.apptasticsoftware.rssreader.Enclosure;
+import com.apptasticsoftware.rssreader.Item;
+import com.github.lamarios.newsku.models.OpenAiFeedResponse;
+import com.openai.client.OpenAIClient;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.models.chat.completions.StructuredChatCompletionCreateParams;
+import com.openai.models.models.Model;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class OpenaiService {
+
+    private final static Logger logger = LogManager.getLogger();
+    private final String url;
+    private final String apiKey;
+    private final String model;
+
+    public OpenaiService(@Value("${OPENAI_URL}") String url, @Value("${OPENAI_API_KEY:}") String apiKey, @Value("${OPENAI_MODEL}") String model) {
+        this.url = url;
+        this.apiKey = apiKey;
+        this.model = model;
+
+
+        var models = getClient().models().list();
+        List<String> modelList = new ArrayList<>();
+        while (models.hasNextPage() || !models.data().isEmpty()) {
+            modelList.addAll(models.data().stream().map(Model::id).toList());
+            if (models.hasNextPage()) {
+                models = models.nextPage();
+            } else {
+                break;
+            }
+        }
+
+        logger.info("Available models: {}", String.join(",", modelList));
+        if (!modelList.contains(model)) {
+            throw new RuntimeException("Model " + model + " not available");
+        }
+    }
+
+    private OpenAIClient getClient() {
+        var client = OpenAIOkHttpClient.builder().baseUrl(url)
+                .checkJacksonVersionCompatibility(false);
+
+        if (apiKey != null && !apiKey.trim().isBlank()) {
+            client = client.apiKey(apiKey);
+
+        }
+
+        client.timeout(Duration.ofMinutes(2));
+
+        return client.build();
+    }
+
+    public Optional<OpenAiFeedResponse> processFeedItem(Item item) {
+
+        var start = System.currentTimeMillis();
+        String prompt = """
+                Your task is to identify is this news item is important or not
+                you will rate the importance from 0 to a 100
+                also you will try to figure out if this feed item is an ad or not
+                
+                You will use the name and description of the source to understand what an important news is for a user subscribing to this source.
+                if a news has a media it should be ranked slightly higher.
+                
+                If there is no media, you will also extract an image url from the content or description only if you can find one.
+                You will add the reason of your importance scoring in the reasoning field
+                
+                
+                Here is the news item:
+                
+                title: %s
+                content: %s
+                description: %s
+                media: %s
+                
+                source:
+                title: %s
+                description: %s
+                
+                
+                """.formatted(item.getTitle().orElse("no title"), item.getContent()
+                        .orElse("no content"), item.getDescription()
+                        .orElse("no description"),
+                item.getEnclosure().map(Enclosure::getType).orElse("no media"),
+                item.getChannel().getTitle(), item.getChannel().getDescription());
+
+
+/*
+        System.out.printf("""
+                GUID: %s
+                =====================================
+                %s
+                """, item.getGuid(), prompt);
+*/
+
+        StructuredChatCompletionCreateParams<OpenAiFeedResponse> params = ChatCompletionCreateParams.builder()
+                .addUserMessage(prompt)
+                .model(model)
+                .responseFormat(OpenAiFeedResponse.class)
+                .build();
+
+        List<OpenAiFeedResponse> analysis = getClient().chat().completions().create(params).choices().stream()
+                .flatMap(choice -> choice.message().content().stream())
+                .toList();
+
+
+        Optional<OpenAiFeedResponse> first = analysis.stream().findFirst();
+        first.ifPresent(openAiFeedResponse -> logger.info("Analysis results for feed item: {}:\nimportance: {}\npossible ad: {}\nreasoning: {}\ntime: {}s", item.getGuid(), openAiFeedResponse
+                .importance(), openAiFeedResponse.possibleAd(), openAiFeedResponse.reasoning(), (System.currentTimeMillis() - start) / 1000));
+        return first;
+    }
+}

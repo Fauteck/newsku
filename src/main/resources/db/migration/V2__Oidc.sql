@@ -1,0 +1,1 @@
+alter table users add column oidc_sub text null;
