@@ -37,7 +37,7 @@ public class FeedController {
     }
 
     @PutMapping
-    public Feed addFeed(String url) throws SQLException, IOException {
+    public Feed addFeed(@RequestBody String url) throws SQLException, IOException {
         var feed = feedService.addFeed(url);
         feedItemService.refreshFeed(feed);
         return feed;

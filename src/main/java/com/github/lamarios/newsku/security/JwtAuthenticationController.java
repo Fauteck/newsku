@@ -57,7 +57,7 @@ public class JwtAuthenticationController {
     }
 
     @PostMapping("/login")
-    public String login(UserCredentials credentials) throws Exception {
+    public String login(@RequestBody UserCredentials credentials) throws Exception {
         authenticate(credentials.username(), credentials.password());
 
         UserDetails userDetails = loadUserByUsername(credentials.username(), null);
