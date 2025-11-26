@@ -10,7 +10,6 @@ import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:material_loading_indicator/loading_indicator.dart';
 
@@ -20,14 +19,6 @@ final double feedItemBorderRadius = 8;
 @RoutePage()
 class FeedScreen extends StatelessWidget {
   const FeedScreen({super.key});
-
-  /*
-  SliverPersistentHeader getDateHeader(DateTimeRange range, TimeBlock timeBlock) {
-    var dateToShow = _df.format(range.end);
-    return SliverPersistentHeader(pinned: true, floating: false, delegate: DateBareDelegate(text: dateToShow));
-    // return SliverAppBar(pinned: true, snap: false, floating: false, title: Text(dateToShow));
-  }
-*/
 
   SliverList? getHeadlines(TimeBlockFeed timeBlockFeed) {
     if (timeBlockFeed.headLineListCount > 0) {
@@ -42,12 +33,11 @@ class FeedScreen extends StatelessWidget {
     }
   }
 
-  int gridSize(BuildContext context) {
-    return 1;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
+
     final breakPoint = BreakPoint.get(context);
 
     return Center(
@@ -69,7 +59,7 @@ class FeedScreen extends StatelessWidget {
                           slivers: [
                             ...state.items.keys.expand((value) {
                               var feed = state.items[value];
-                              if (feed != null) {
+                              if (feed != null && feed.itemCount > 0) {
                                 var headlines = breakPoint != .mobile ? getHeadlines(feed) : null;
 
                                 var notableNews = List<FeedItem>.from(feed.notableNews);
@@ -118,10 +108,25 @@ class FeedScreen extends StatelessWidget {
                                   ),
                                 ];
                               } else {
-                                return <Widget>[];
+                                return [
+                                  SliverStickyHeader.builder(
+                                    builder: (context, state) => DateBar(date: value.end, isPinned: state.isPinned, isFirst: true),
+                                    sliver: SliverToBoxAdapter(
+                                      child: SizedBox(height: 500, child: Column(
+                                          mainAxisAlignment: .center,
+                                          spacing: 24,
+                                          children: [
+                                            Icon(Icons.newspaper, size: 50, color: colors.onSurface,),
+                                            Text('No news',style: textTheme.titleLarge,)])),
+                                    ),
+                                  ),
+                                ];
                               }
                             }),
-                            if (state.loading) SliverToBoxAdapter(child: Center(child: SizedBox(width: 50, height: 50, child: LoadingIndicator()))),
+                            if (state.loading)
+                              SliverToBoxAdapter(
+                                child: Center(child: SizedBox(width: 50, height: 50, child: LoadingIndicator())),
+                              ),
                           ],
                         ),
                       ),

@@ -1,7 +1,5 @@
 import 'package:app/feed/models/feed_item.dart';
 
-
-
 class TimeBlockFeed {
   /// for the highest ranked news if any importance >= 90
   FeedItem? mainHeadline;
@@ -15,19 +13,31 @@ class TimeBlockFeed {
   /// the rest of the stuff
   List<FeedItem> others = [];
 
-  int get headLineListCount {
+  int get itemCount {
     var total = 0;
 
-    if(mainHeadline != null){
+    if (mainHeadline != null) {
       total++;
     }
 
-    if(headlines.isNotEmpty){
+    total += headlines.length;
+    total += notableNews.length;
+    total += others.length;
+
+    return total;
+  }
+
+  int get headLineListCount {
+    var total = 0;
+
+    if (mainHeadline != null) {
+      total++;
+    }
+
+    if (headlines.isNotEmpty) {
       total++;
     }
 
     return total;
-
-
   }
 }

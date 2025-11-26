@@ -57,9 +57,11 @@ class MainFeedCubit extends Cubit<MainFeedState> {
 
     feed.others = data;
 
+/*
     feed.headlines.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
     feed.notableNews.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
     feed.others.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
+*/
 
     var map = Map<DateTimeRange, TimeBlockFeed>.from(state.items);
     map[key] = feed;
