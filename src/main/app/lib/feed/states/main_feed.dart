@@ -4,7 +4,7 @@ import 'package:app/feed/models/time_block_feed.dart';
 import 'package:app/feed/services/feed_service.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
-import 'package:easy_debounce/easy_debounce.dart';
+import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -12,15 +12,24 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'main_feed.freezed.dart';
 
 class MainFeedCubit extends Cubit<MainFeedState> {
-  final ScrollController scrollController = ScrollController(initialScrollOffset: -100,keepScrollOffset: false);
+  final ScrollController scrollController = ScrollController();
 
   MainFeedCubit(super.initialState) {
-    getFeed();
+    init();
+  }
+
+  Future<void> init() async {
     scrollController.addListener(() {
-      if (scrollController.position.pixels > scrollController.position.maxScrollExtent * 0.8 && !state.loading) {
-        EasyDebounce.debounce('load-feed', Duration(milliseconds: 500), getFeed);
+      if (scrollController.position.pixels > scrollController.position.maxScrollExtent * 0.95 && !state.loading) {
+        EasyThrottle.throttle('load-feed', Duration(seconds: 1), () {
+          if (!state.loading) {
+            getFeed();
+          }
+        });
       }
     });
+    await getFeed();
+    scrollController.jumpTo(-50);
   }
 
   @override
@@ -57,7 +66,7 @@ class MainFeedCubit extends Cubit<MainFeedState> {
 
     feed.others = data;
 
-/*
+    /*
     feed.headlines.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
     feed.notableNews.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
     feed.others.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
