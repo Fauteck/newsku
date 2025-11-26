@@ -9,6 +9,7 @@ late final _appRouter;
 final getIt = GetIt.instance;
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   var identityCubit = IdentityCubit(IdentityState());
   await identityCubit.init();
   getIt.registerSingleton<IdentityCubit>(identityCubit);
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
         title: 'NewsKu',
         routerConfig: _appRouter.config(),
         darkTheme: ThemeData(
-          colorScheme: .fromSeed(seedColor: Colors.orange, brightness: Brightness.dark),
+          colorScheme: .fromSeed(seedColor: Colors.orange, brightness: Brightness.dark, surface: Color.fromARGB(255, 17, 18, 20), surfaceContainerHigh: Color.fromARGB(255, 35, 36, 40) ),
         ),
         theme: ThemeData(
           // This is the theme of your application.
@@ -48,7 +49,7 @@ class MyApp extends StatelessWidget {
           //
           // This works for code too, not just values: Most code changes can be
           // tested with just a hot reload.
-          colorScheme: .fromSeed(seedColor: Colors.orange),
+          colorScheme: .fromSeed(seedColor: Colors.orange, surface: Colors.white, surfaceContainerHigh: Color.fromARGB(255, 233, 234, 237)),
         ),
       ),
     );

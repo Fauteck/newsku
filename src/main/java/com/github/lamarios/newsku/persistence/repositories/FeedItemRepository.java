@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface FeedItemRepository extends JpaRepository<FeedItem, String> {
@@ -16,4 +17,6 @@ public interface FeedItemRepository extends JpaRepository<FeedItem, String> {
 
     @Query("select i from FeedItem i where i.timeCreated > :from and i.timeCreated <= :to and i.feed in :feeds")
     Page<FeedItem> findallByTimeAndFeeds(@Param("from") long from, @Param("to") long to, @Param("feeds") List<Feed> feeds, Pageable pageable);
+
+    List<FeedItem> findFirstByIdAndFeedIn(String id, Collection<Feed> feeds);
 }

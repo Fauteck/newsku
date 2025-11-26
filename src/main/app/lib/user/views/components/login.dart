@@ -19,14 +19,6 @@ class LoginScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerHigh,
         borderRadius: .circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: Offset(0, 3), // changes position of shadow
-          ),
-        ],
       ),
       child: Row(
         crossAxisAlignment: .stretch,

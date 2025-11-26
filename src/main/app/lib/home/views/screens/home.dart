@@ -13,6 +13,8 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        scrolledUnderElevation: 0,
         leadingWidth: 150,
         leading: ClipPath(
           clipper: FancySide(),

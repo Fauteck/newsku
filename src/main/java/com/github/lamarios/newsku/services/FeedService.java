@@ -87,4 +87,8 @@ public class FeedService {
         }
         return false;
     }
+
+    public Feed getFeed(String id) {
+        return feedRepository.findFirstByIdAndUser(id, userService.getCurrentUser());
+    }
 }

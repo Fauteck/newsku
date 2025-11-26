@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MainFeedState {
 
- Paginated<FeedItem> get items; bool get loading;
+ DateTime get currentTime; TimeBlock get timeBlock; bool get loading; Map<DateTimeRange, TimeBlockFeed> get items;
 /// Create a copy of MainFeedState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $MainFeedStateCopyWith<MainFeedState> get copyWith => _$MainFeedStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MainFeedState&&(identical(other.items, items) || other.items == items)&&(identical(other.loading, loading) || other.loading == loading));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MainFeedState&&(identical(other.currentTime, currentTime) || other.currentTime == currentTime)&&(identical(other.timeBlock, timeBlock) || other.timeBlock == timeBlock)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other.items, items));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,items,loading);
+int get hashCode => Object.hash(runtimeType,currentTime,timeBlock,loading,const DeepCollectionEquality().hash(items));
 
 @override
 String toString() {
-  return 'MainFeedState(items: $items, loading: $loading)';
+  return 'MainFeedState(currentTime: $currentTime, timeBlock: $timeBlock, loading: $loading, items: $items)';
 }
 
 
@@ -45,11 +45,11 @@ abstract mixin class $MainFeedStateCopyWith<$Res>  {
   factory $MainFeedStateCopyWith(MainFeedState value, $Res Function(MainFeedState) _then) = _$MainFeedStateCopyWithImpl;
 @useResult
 $Res call({
- Paginated<FeedItem> items, bool loading
+ DateTime currentTime, TimeBlock timeBlock, bool loading, Map<DateTimeRange, TimeBlockFeed> items
 });
 
 
-$PaginatedCopyWith<FeedItem, $Res> get items;
+
 
 }
 /// @nodoc
@@ -62,23 +62,16 @@ class _$MainFeedStateCopyWithImpl<$Res>
 
 /// Create a copy of MainFeedState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? items = null,Object? loading = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? currentTime = null,Object? timeBlock = null,Object? loading = null,Object? items = null,}) {
   return _then(_self.copyWith(
-items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
-as Paginated<FeedItem>,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
-as bool,
+currentTime: null == currentTime ? _self.currentTime : currentTime // ignore: cast_nullable_to_non_nullable
+as DateTime,timeBlock: null == timeBlock ? _self.timeBlock : timeBlock // ignore: cast_nullable_to_non_nullable
+as TimeBlock,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
+as bool,items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
+as Map<DateTimeRange, TimeBlockFeed>,
   ));
 }
-/// Create a copy of MainFeedState
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$PaginatedCopyWith<FeedItem, $Res> get items {
-  
-  return $PaginatedCopyWith<FeedItem, $Res>(_self.items, (value) {
-    return _then(_self.copyWith(items: value));
-  });
-}
+
 }
 
 
@@ -157,10 +150,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Paginated<FeedItem> items,  bool loading)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( DateTime currentTime,  TimeBlock timeBlock,  bool loading,  Map<DateTimeRange, TimeBlockFeed> items)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MainFeedState() when $default != null:
-return $default(_that.items,_that.loading);case _:
+return $default(_that.currentTime,_that.timeBlock,_that.loading,_that.items);case _:
   return orElse();
 
 }
@@ -178,10 +171,10 @@ return $default(_that.items,_that.loading);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Paginated<FeedItem> items,  bool loading)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( DateTime currentTime,  TimeBlock timeBlock,  bool loading,  Map<DateTimeRange, TimeBlockFeed> items)  $default,) {final _that = this;
 switch (_that) {
 case _MainFeedState():
-return $default(_that.items,_that.loading);}
+return $default(_that.currentTime,_that.timeBlock,_that.loading,_that.items);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -195,10 +188,10 @@ return $default(_that.items,_that.loading);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Paginated<FeedItem> items,  bool loading)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( DateTime currentTime,  TimeBlock timeBlock,  bool loading,  Map<DateTimeRange, TimeBlockFeed> items)?  $default,) {final _that = this;
 switch (_that) {
 case _MainFeedState() when $default != null:
-return $default(_that.items,_that.loading);case _:
+return $default(_that.currentTime,_that.timeBlock,_that.loading,_that.items);case _:
   return null;
 
 }
@@ -210,11 +203,19 @@ return $default(_that.items,_that.loading);case _:
 
 
 class _MainFeedState implements MainFeedState {
-  const _MainFeedState({this.items = const Paginated<FeedItem>(), this.loading = true});
+  const _MainFeedState({required this.currentTime, this.timeBlock = TimeBlock.one_day, this.loading = true, final  Map<DateTimeRange, TimeBlockFeed> items = const {}}): _items = items;
   
 
-@override@JsonKey() final  Paginated<FeedItem> items;
+@override final  DateTime currentTime;
+@override@JsonKey() final  TimeBlock timeBlock;
 @override@JsonKey() final  bool loading;
+ final  Map<DateTimeRange, TimeBlockFeed> _items;
+@override@JsonKey() Map<DateTimeRange, TimeBlockFeed> get items {
+  if (_items is EqualUnmodifiableMapView) return _items;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_items);
+}
+
 
 /// Create a copy of MainFeedState
 /// with the given fields replaced by the non-null parameter values.
@@ -226,16 +227,16 @@ _$MainFeedStateCopyWith<_MainFeedState> get copyWith => __$MainFeedStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MainFeedState&&(identical(other.items, items) || other.items == items)&&(identical(other.loading, loading) || other.loading == loading));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MainFeedState&&(identical(other.currentTime, currentTime) || other.currentTime == currentTime)&&(identical(other.timeBlock, timeBlock) || other.timeBlock == timeBlock)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other._items, _items));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,items,loading);
+int get hashCode => Object.hash(runtimeType,currentTime,timeBlock,loading,const DeepCollectionEquality().hash(_items));
 
 @override
 String toString() {
-  return 'MainFeedState(items: $items, loading: $loading)';
+  return 'MainFeedState(currentTime: $currentTime, timeBlock: $timeBlock, loading: $loading, items: $items)';
 }
 
 
@@ -246,11 +247,11 @@ abstract mixin class _$MainFeedStateCopyWith<$Res> implements $MainFeedStateCopy
   factory _$MainFeedStateCopyWith(_MainFeedState value, $Res Function(_MainFeedState) _then) = __$MainFeedStateCopyWithImpl;
 @override @useResult
 $Res call({
- Paginated<FeedItem> items, bool loading
+ DateTime currentTime, TimeBlock timeBlock, bool loading, Map<DateTimeRange, TimeBlockFeed> items
 });
 
 
-@override $PaginatedCopyWith<FeedItem, $Res> get items;
+
 
 }
 /// @nodoc
@@ -263,24 +264,17 @@ class __$MainFeedStateCopyWithImpl<$Res>
 
 /// Create a copy of MainFeedState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? items = null,Object? loading = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? currentTime = null,Object? timeBlock = null,Object? loading = null,Object? items = null,}) {
   return _then(_MainFeedState(
-items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
-as Paginated<FeedItem>,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
-as bool,
+currentTime: null == currentTime ? _self.currentTime : currentTime // ignore: cast_nullable_to_non_nullable
+as DateTime,timeBlock: null == timeBlock ? _self.timeBlock : timeBlock // ignore: cast_nullable_to_non_nullable
+as TimeBlock,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
+as bool,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
+as Map<DateTimeRange, TimeBlockFeed>,
   ));
 }
 
-/// Create a copy of MainFeedState
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$PaginatedCopyWith<FeedItem, $Res> get items {
-  
-  return $PaginatedCopyWith<FeedItem, $Res>(_self.items, (value) {
-    return _then(_self.copyWith(items: value));
-  });
-}
+
 }
 
 // dart format on

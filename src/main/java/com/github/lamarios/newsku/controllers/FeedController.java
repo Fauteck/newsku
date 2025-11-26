@@ -6,9 +6,15 @@ import com.github.lamarios.newsku.services.FeedService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -47,4 +53,31 @@ public class FeedController {
     public boolean deleteFeed(@PathVariable String id) throws SQLException {
 return feedService.deleteFeed(id);
     }
+
+    @GetMapping("/{id}/image")
+    public ResponseEntity<byte[]> getFeedImage(@PathVariable String id) throws IOException, SQLException {
+
+        Feed item = feedService.getFeed(id);
+
+        if(item  == null || item.getImage() == null || item.getImage().isBlank()){
+            return ResponseEntity.status(404).build();
+        }
+
+        // Fetch from remote URL
+        try (InputStream in = new URL(item.getImage()).openStream()) {
+            byte[] imageBytes = in.readAllBytes();
+
+            // Guess content type
+            String contentType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(imageBytes));
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            return ResponseEntity
+                    .ok()
+                    .header(HttpHeaders.CONTENT_TYPE, contentType)
+                    .body(imageBytes);
+        }
+    }
+
 }

@@ -100,4 +100,12 @@ public class FeedItemService {
 
         return feedItemRepository.findallByTimeAndFeeds(from, to, feeds, PageRequest.of(page, pageSize, Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "importance"), new Sort.Order(Sort.Direction.DESC, "timeCreated")))));
     }
+
+    @Transactional(readOnly = true)
+    public FeedItem getItem(String id) throws SQLException {
+
+        List<Feed> feeds = feedService.getFeeds();
+
+        return feedItemRepository.findFirstByIdAndFeedIn(id, feeds).stream().findFirst().orElse(null);
+    }
 }

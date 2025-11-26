@@ -15,4 +15,5 @@ public interface FeedRepository extends JpaRepository<Feed, UUID> {
 
     Feed getFirstById(String id);
 
+    Feed findFirstByIdAndUser(String id, User user);
 }
