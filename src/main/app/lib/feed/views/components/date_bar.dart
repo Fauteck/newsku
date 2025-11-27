@@ -22,25 +22,21 @@ class DateBar extends StatelessWidget {
       return SizedBox.shrink();
     }
     return SingleMotionBuilder(
-      motion: MaterialSpringMotion.expressiveEffectsDefault(),
+      motion: MaterialSpringMotion.expressiveSpatialDefault(),
       from: 0,
       value: isPinned ? 0 : 1,
       builder: (context, value, child) => Container(
         decoration: BoxDecoration(color: colors.surface),
-        padding: .symmetric(vertical: lerpDouble(8, 64, value.clamp(0, 1))!),
+        padding: .symmetric(vertical: lerpDouble(8, 40, value.clamp(0, 1))!),
         child: Row(
           mainAxisSize: .max,
           children: [
+            Expanded(flex: 1, child: Divider(thickness: lerpDouble(1, 3, value))),
             Expanded(
-              child: Column(
-                crossAxisAlignment: .center,
-                spacing: lerpDouble(0, 8, value)!,
-                children: [
-                  Text(_df.format(date), style: textTheme.bodyLarge?.copyWith(fontSize: lerpDouble(13, 35, value))),
-                  Center(child: SizedBox(width: lerpDouble(0, 500, value), height: lerpDouble(0, 3, value), child: Divider(thickness: 3)))
-                ],
-              ),
+              flex: 3,
+              child: Text(_df.format(date), textAlign: .center, style: textTheme.bodyLarge?.copyWith(fontSize: lerpDouble(13, 35, value))),
             ),
+            Expanded(flex: 1, child: Divider(thickness: lerpDouble(1, 3, value))),
           ],
         ),
       ),

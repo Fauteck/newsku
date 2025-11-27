@@ -7,6 +7,7 @@ import 'package:get_it/get_it.dart';
 late final _appRouter;
 
 final getIt = GetIt.instance;
+final Color seedColor = Colors.deepOrange;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
         title: 'NewsKu',
         routerConfig: _appRouter.config(),
         darkTheme: ThemeData(
-          colorScheme: .fromSeed(seedColor: Colors.orange, brightness: Brightness.dark, surface: Color.fromARGB(255, 17, 18, 20), surfaceContainerHigh: Color.fromARGB(255, 35, 36, 40) ),
+          colorScheme: .fromSeed(seedColor: seedColor, brightness: Brightness.dark, surface: Color.fromARGB(255, 17, 18, 20), surfaceContainerHigh: Color.fromARGB(255, 35, 36, 40) , onSurface: Colors.white),
         ),
         theme: ThemeData(
           // This is the theme of your application.
@@ -49,7 +50,7 @@ class MyApp extends StatelessWidget {
           //
           // This works for code too, not just values: Most code changes can be
           // tested with just a hot reload.
-          colorScheme: .fromSeed(seedColor: Colors.orange, surface: Colors.white, surfaceContainerHigh: Color.fromARGB(255, 233, 234, 237)),
+          colorScheme: .fromSeed(seedColor: seedColor, surface: Colors.white, surfaceContainerHigh: Color.fromARGB(255, 233, 234, 237), onSurface: Colors.black ),
         ),
       ),
     );

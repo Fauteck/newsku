@@ -1,3 +1,5 @@
+import 'package:app/identity/states/identity.dart';
+import 'package:app/main.dart';
 import 'package:http/http.dart';
 import 'package:http/http.dart' as Preferences;
 import 'package:logging/logging.dart';
@@ -7,6 +9,8 @@ final _log = Logger('BaseService');
 
 abstract class BaseService {
   String get url;
+
+  const BaseService();
 
   Future<String?> get token async {
     var token = (await SharedPreferences.getInstance()).getString('token');
@@ -31,6 +35,7 @@ abstract class BaseService {
     final serverUrl = this.url;
 
     if (serverUrl.isEmpty) {
+      getIt.get<IdentityCubit>().logout();
       throw Exception("No server url, going back to login screen");
     }
 
@@ -69,7 +74,7 @@ abstract class BaseService {
       case 200:
         return;
       case 401:
-        // logout();
+        getIt.get<IdentityCubit>().logout();
         throw Exception("Couldn't execute request, unauthorized}");
       default:
         throw Exception("Couldn't execute request ${statusCode} -> ${body}");

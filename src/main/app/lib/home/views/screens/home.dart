@@ -1,3 +1,6 @@
+import 'package:app/identity/states/identity.dart';
+import 'package:app/identity/views/components/logout_listener.dart';
+import 'package:app/main.dart';
 import 'package:app/user/views/components/fancy_side.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
@@ -11,23 +14,8 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leadingWidth: 150,
-        leading: ClipPath(
-          clipper: FancySide(),
-          child: Container(
-            decoration: BoxDecoration(color: colors.primaryContainer),
-            child: Padding(
-              padding: .only(left: 24),
-              child: Align(alignment: .centerLeft, child: Icon(Icons.newspaper)),
-            ),
-          ),
-        ),
-      ),
-      body: AutoRouter(),
+    return LogoutListener(
+      child: Scaffold(body: SafeArea(bottom: false, child: AutoRouter())),
     );
   }
 }

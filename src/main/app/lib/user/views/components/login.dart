@@ -1,4 +1,5 @@
 import 'package:app/config/models/config.dart';
+import 'package:app/main.dart';
 import 'package:app/user/views/components/fancy_side.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
@@ -27,7 +28,7 @@ class LoginScreen extends StatelessWidget {
             clipper: FancySide(),
             child: Container(
               alignment: Alignment.center,
-              decoration: BoxDecoration(shape: BoxShape.rectangle, color: colors.primaryContainer, borderRadius: .circular(30)),
+              decoration: BoxDecoration(shape: BoxShape.rectangle, color: seedColor, borderRadius: .circular(30)),
               width: 250,
               height: 200,
               child: Padding(

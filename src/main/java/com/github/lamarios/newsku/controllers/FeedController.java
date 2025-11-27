@@ -5,18 +5,23 @@ import com.github.lamarios.newsku.services.FeedItemService;
 import com.github.lamarios.newsku.services.FeedService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
+
+import static com.github.lamarios.newsku.controllers.FeedItemController.serveFile;
 
 @RestController
 @RequestMapping("/api/feeds")
@@ -25,11 +30,14 @@ import java.util.List;
 public class FeedController {
     private final FeedService feedService;
     private final FeedItemService feedItemService;
+    private final Path tempDir;
+    private final Logger log = LogManager.getLogger();
 
     @Autowired
-    public FeedController(FeedService feedService, FeedItemService feedItemService) {
+    public FeedController(FeedService feedService, FeedItemService feedItemService) throws IOException {
         this.feedService = feedService;
         this.feedItemService = feedItemService;
+        this.tempDir = Files.createTempDirectory("newsku-feed-images");
     }
 
     @GetMapping
@@ -51,7 +59,7 @@ public class FeedController {
 
     @DeleteMapping("{id}")
     public boolean deleteFeed(@PathVariable String id) throws SQLException {
-return feedService.deleteFeed(id);
+        return feedService.deleteFeed(id);
     }
 
     @GetMapping("/{id}/image")
@@ -59,25 +67,27 @@ return feedService.deleteFeed(id);
 
         Feed item = feedService.getFeed(id);
 
-        if(item  == null || item.getImage() == null || item.getImage().isBlank()){
+        if (item == null || item.getImage() == null || item.getImage().isBlank()) {
             return ResponseEntity.status(404).build();
         }
 
-        // Fetch from remote URL
-        try (InputStream in = new URL(item.getImage()).openStream()) {
-            byte[] imageBytes = in.readAllBytes();
+        var filePath = tempDir.resolve(id);
 
-            // Guess content type
-            String contentType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(imageBytes));
-            if (contentType == null) {
-                contentType = "application/octet-stream";
+        if (!filePath.toFile().exists()) {
+            log.info("File doesn't exist in cache, caching it...");
+            try (InputStream in = new URL(item.getImage()).openStream()) {
+                byte[] imageBytes = in.readAllBytes();
+
+                Files.write(filePath, imageBytes);
+                // Guess content type
             }
-
-            return ResponseEntity
-                    .ok()
-                    .header(HttpHeaders.CONTENT_TYPE, contentType)
-                    .body(imageBytes);
+        }else{
+            log.info("Serving from cache");
         }
+
+
+        // Fetch from remote URL
+        return serveFile(filePath);
     }
 
 }

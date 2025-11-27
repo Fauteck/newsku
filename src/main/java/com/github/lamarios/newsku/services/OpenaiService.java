@@ -70,32 +70,27 @@ public class OpenaiService {
         var start = System.currentTimeMillis();
         String prompt = """
                 Your task is to identify is this news item is important or not
-                you will rate the importance from 0 to a 100
+                you will rate the importance from 0 to a 100, 100 being the most important, be very granular in the rating
+                Keep in mind that this is a ranking system for a RSS feed reader so the user might have 100s of news on a daily basis so do not be too eager on overrating news
                 also you will try to figure out if this feed item is an ad or not
                 
-                You will use the name and description of the source to understand what an important news is for a user subscribing to this source.
-                if a news has a media it should be ranked slightly higher.
-                
-                If there is no media, you will also extract an image url from the content or description only if you can find one.
-                You will add the reason of your importance scoring in the reasoning field
-                
+                You will use the name and description of the source to understand what an important news is for a user
+                if a news has a picture it should be ranked slightly higher.
                 
                 Here is the news item:
                 
                 title: %s
                 content: %s
-                description: %s
                 media: %s
                 
-                source:
-                title: %s
-                description: %s
                 
-                
-                """.formatted(item.getTitle().orElse("no title"), item.getContent()
-                        .orElse("no content"), item.getDescription()
-                        .orElse("no description"),
-                item.getEnclosure().map(Enclosure::getType).orElse("no media"),
+                """.formatted(item.getTitle().orElse("no title"), item.getDescription()
+                        .filter(s -> !s.isBlank())
+                        .orElse(item.getContent().orElse("no content")),
+                item.getEnclosure()
+                        .filter(enclosure -> enclosure.getType().contains("image"))
+                        .map(Enclosure::getUrl)
+                        .orElse("no media"),
                 item.getChannel().getTitle(), item.getChannel().getDescription());
 
 

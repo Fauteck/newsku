@@ -1,4 +1,5 @@
 import 'package:app/config/models/config.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,6 +19,15 @@ class IdentityCubit extends Cubit<IdentityState> {
     var token = prefs.getString('token');
     var server = prefs.getString('server');
 
+    if (kIsWeb && !kDebugMode) {
+      Uri base = Uri.base;
+      server = '${base.scheme}://${base.host}';
+
+      if (base.port != 80 && base.port != 443) {
+        server += ':${base.port}';
+      }
+    }
+
     emit(state.copyWith(serverUrl: server, token: token));
   }
 
@@ -26,6 +36,7 @@ class IdentityCubit extends Cubit<IdentityState> {
   }
 
   Future<void> logout() async {
+    print('LOGGING OUT');
     var prefs = await SharedPreferences.getInstance();
     prefs.remove('token');
     prefs.remove('server');
@@ -43,4 +54,10 @@ class IdentityCubit extends Cubit<IdentityState> {
 @freezed
 sealed class IdentityState with _$IdentityState {
   const factory IdentityState({String? token, String? serverUrl, Config? config}) = _IdentityState;
+
+  const IdentityState._();
+
+  bool get isLoggedIn {
+    return serverUrl != null && token != null && !JwtDecoder.isExpired(token ?? '');
+  }
 }

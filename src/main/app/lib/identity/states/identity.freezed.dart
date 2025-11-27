@@ -12,7 +12,7 @@ part of 'identity.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$IdentityState {
+mixin _$IdentityState implements DiagnosticableTreeMixin {
 
  String? get token; String? get serverUrl; Config? get config;
 /// Create a copy of IdentityState
@@ -22,6 +22,12 @@ mixin _$IdentityState {
 $IdentityStateCopyWith<IdentityState> get copyWith => _$IdentityStateCopyWithImpl<IdentityState>(this as IdentityState, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'IdentityState'))
+    ..add(DiagnosticsProperty('token', token))..add(DiagnosticsProperty('serverUrl', serverUrl))..add(DiagnosticsProperty('config', config));
+}
 
 @override
 bool operator ==(Object other) {
@@ -33,7 +39,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,token,serverUrl,config);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'IdentityState(token: $token, serverUrl: $serverUrl, config: $config)';
 }
 
@@ -213,8 +219,8 @@ return $default(_that.token,_that.serverUrl,_that.config);case _:
 /// @nodoc
 
 
-class _IdentityState implements IdentityState {
-  const _IdentityState({this.token, this.serverUrl, this.config});
+class _IdentityState extends IdentityState with DiagnosticableTreeMixin {
+  const _IdentityState({this.token, this.serverUrl, this.config}): super._();
   
 
 @override final  String? token;
@@ -228,6 +234,12 @@ class _IdentityState implements IdentityState {
 _$IdentityStateCopyWith<_IdentityState> get copyWith => __$IdentityStateCopyWithImpl<_IdentityState>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'IdentityState'))
+    ..add(DiagnosticsProperty('token', token))..add(DiagnosticsProperty('serverUrl', serverUrl))..add(DiagnosticsProperty('config', config));
+}
 
 @override
 bool operator ==(Object other) {
@@ -239,7 +251,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,token,serverUrl,config);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'IdentityState(token: $token, serverUrl: $serverUrl, config: $config)';
 }
 

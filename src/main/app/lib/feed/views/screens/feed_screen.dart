@@ -5,11 +5,16 @@ import 'package:app/feed/views/components/date_bar.dart';
 import 'package:app/feed/views/components/main_headline.dart';
 import 'package:app/feed/views/components/notable_news.dart';
 import 'package:app/feed/views/components/simple_news.dart';
+import 'package:app/main.dart';
+import 'package:app/router.dart';
+import 'package:app/user/views/components/fancy_side.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:material_loading_indicator/loading_indicator.dart';
 
@@ -53,10 +58,37 @@ class FeedScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Padding(
-                        padding: .symmetric(horizontal: 16),
+                        padding: .symmetric(horizontal: 0),
                         child: CustomScrollView(
                           controller: cubit.scrollController,
                           slivers: [
+                            SliverAppBar(
+                              floating: true,
+                              snap: true,
+                              elevation: 0,
+                              scrolledUnderElevation: 0,
+                              leadingWidth: 150,
+                              title: Row(
+                                children: [
+                                  Text('news'),
+                                  Text('ku', style: TextStyle(color: seedColor),)
+                                ],
+                              ),
+                              leading: ClipPath(
+                                clipper: FancySide(),
+                                child: Container(
+                                  decoration: BoxDecoration(color: seedColor),
+                                  child: Padding(
+                                    padding: .only(left: 24),
+                                    child: Align(alignment: .centerLeft, child: Icon(Icons.newspaper)),
+                                  ),
+                                ),
+                              ),
+                              actions: [
+                                IconButton(onPressed: () => AutoRouter.of(context).push(SettingsRoute()), icon: Icon(Icons.settings))
+                              ],
+
+                            ),
                             ...state.items.keys.expand((value) {
                               var feed = state.items[value];
                               if (feed != null && feed.itemCount > 0) {
@@ -76,48 +108,73 @@ class FeedScreen extends StatelessWidget {
                                 return [
                                   // getDateHeader(value, state.timeBlock),
                                   if (headlines != null)
-                                    SliverStickyHeader.builder(
-                                      builder: (context, state) => DateBar(date: value.end, isPinned: state.isPinned, isFirst: true),
+                                    SliverPadding(
+                                      padding: .symmetric(horizontal: 16),
+                                      sliver: SliverStickyHeader.builder(
+                                        builder: (context, state) => DateBar(date: value.end, isPinned: state.isPinned, isFirst: true),
 
-                                      sliver: headlines,
+                                        sliver: headlines,
+                                      ),
                                     ),
                                   if (notableNews.isNotEmpty)
-                                    SliverStickyHeader.builder(
-                                      builder: (context, state) => DateBar(date: value.end, isPinned: state.isPinned, isFirst: headlines == null),
-                                      sliver: SliverGrid.builder(
-                                        itemCount: notableNews.length,
-                                        itemBuilder: (context, index) => NotableNews(key: ValueKey(notableNews[index]), item: notableNews[index]),
-                                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: switch (breakPoint) {
-                                            .mobile => 1,
-                                            .tablet => 2,
-                                            _ => 3,
-                                          },
-                                          crossAxisSpacing: 16,
-                                          mainAxisSpacing: 16,
-                                          mainAxisExtent: 450,
+                                    SliverPadding(
+                                      padding: .symmetric(horizontal: 16),
+                                      sliver: SliverStickyHeader.builder(
+                                        builder: (context, state) => DateBar(date: value.end, isPinned: state.isPinned, isFirst: headlines == null),
+                                        sliver: SliverGrid.builder(
+                                          itemCount: notableNews.length,
+                                          itemBuilder: (context, index) => NotableNews(key: ValueKey(notableNews[index]), item: notableNews[index]),
+                                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: switch (breakPoint) {
+                                              .mobile => 1,
+                                              .tablet => 2,
+                                              _ => 3,
+                                            },
+                                            crossAxisSpacing: 16,
+                                            mainAxisSpacing: 16,
+                                            mainAxisExtent: 450,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  SliverStickyHeader.builder(
-                                    builder: (context, state) => DateBar(date: value.end, isPinned: state.isPinned, isFirst: headlines == null && notableNews.isEmpty),
-                                    sliver: SliverList.builder(
-                                      itemCount: feed.others.length,
-                                      itemBuilder: (context, index) => SimpleNews(key: ValueKey(feed.others[index]), item: feed.others[index]),
+                                  if (feed.others.isNotEmpty) ...[
+                                    SliverPadding(
+                                      padding: .symmetric(horizontal: 16, vertical: 16),
+                                      sliver: SliverStickyHeader.builder(
+                                        builder: (context, state) => DateBar(date: value.end, isPinned: state.isPinned, isFirst: headlines == null && notableNews.isEmpty),
+                                        sliver: SliverGrid.builder(
+                                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: switch (breakPoint) {
+                                              .mobile => 1,
+                                              _ => 2,
+                                            },
+                                            mainAxisExtent: 120,
+                                            mainAxisSpacing: 16,
+                                            crossAxisSpacing: 16,
+                                          ),
+                                          itemCount: feed.others.length,
+                                          itemBuilder: (context, index) => SimpleNews(key: ValueKey(feed.others[index]), item: feed.others[index]),
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                 ];
                               } else {
                                 return [
                                   SliverStickyHeader.builder(
                                     builder: (context, state) => DateBar(date: value.end, isPinned: state.isPinned, isFirst: true),
                                     sliver: SliverToBoxAdapter(
-                                      child: SizedBox(height: 500, child: Column(
+                                      child: SizedBox(
+                                        height: 500,
+                                        child: Column(
                                           mainAxisAlignment: .center,
                                           spacing: 24,
                                           children: [
-                                            Icon(Icons.newspaper, size: 50, color: colors.onSurface,),
-                                            Text('No news',style: textTheme.titleLarge,)])),
+                                            Icon(Icons.newspaper, size: 50, color: colors.onSurface),
+                                            Text('No news', style: textTheme.titleLarge),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ];

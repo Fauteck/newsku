@@ -4,6 +4,9 @@ import com.github.lamarios.newsku.persistence.entities.FeedItem;
 import com.github.lamarios.newsku.services.FeedItemService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.domain.Page;
@@ -12,10 +15,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.InvalidParameterException;
 import java.sql.SQLException;
 import java.util.List;
@@ -26,10 +32,13 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class FeedItemController {
     private final FeedItemService feedItemService;
+    private final Logger log = LogManager.getLogger();
+    private final Path tempDir;
 
     @Autowired
-    public FeedItemController(FeedItemService feedItemService) {
+    public FeedItemController(FeedItemService feedItemService) throws IOException {
         this.feedItemService = feedItemService;
+        this.tempDir = Files.createTempDirectory("newsku-feed-item-images-");
     }
 
     @GetMapping
@@ -45,12 +54,31 @@ public class FeedItemController {
 
         var item = feedItemService.getItem(id);
 
-        if(item  == null || item.getImageUrl() == null || item.getImageUrl().isBlank()){
+        if (item == null || item.getImageUrl() == null || item.getImageUrl().isBlank()) {
             return ResponseEntity.status(404).build();
         }
 
+        var filePath = tempDir.resolve(id);
+
+        if (!filePath.toFile().exists()) {
+            log.info("File doesn't exist in cache, caching it...");
+            try (InputStream in = new URL(item.getImageUrl()).openStream()) {
+                byte[] imageBytes = in.readAllBytes();
+
+                Files.write(filePath, imageBytes);
+                // Guess content type
+            }
+        } else {
+            log.info("Serving from cache");
+        }
+
+
         // Fetch from remote URL
-        try (InputStream in = new URL(item.getImageUrl()).openStream()) {
+        return serveFile(filePath);
+    }
+
+    public static ResponseEntity<byte[]> serveFile(Path filePath) throws IOException {
+        try (InputStream in = new FileInputStream(filePath.toFile())) {
             byte[] imageBytes = in.readAllBytes();
 
             // Guess content type

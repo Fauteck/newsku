@@ -59,7 +59,11 @@ class ItemContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(stripHtmlTags(item.description ?? item.content ?? ''), maxLines: maxLines, style: style, overflow: overflow,)
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+
+    return Text(stripHtmlTags(item.description ?? item.content ?? ''), maxLines: maxLines, style: (style ?? textTheme.bodyMedium)?.copyWith(color: colors.secondary), overflow: overflow,)
     /* return ClipRect(
       child: HtmlWidget(
 

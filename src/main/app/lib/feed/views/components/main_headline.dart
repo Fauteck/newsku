@@ -1,5 +1,6 @@
 import 'package:app/feed/models/feed_item.dart';
 import 'package:app/feed/models/time_block_feed.dart';
+import 'package:app/feed/views/components/clickable_feed_item.dart';
 import 'package:app/feed/views/components/feed_image.dart';
 import 'package:app/feed/views/components/feed_item_image.dart';
 import 'package:app/feed/views/components/info_bar.dart';
@@ -62,37 +63,40 @@ class MainHeadline extends StatelessWidget {
               spacing: 24,
               children: feed.headlines.indexed
                   .map(
-                    (e) => Column(
-                      children: [
-                        Row(
-                          spacing: 24,
-                          children: [
-                            FeedItemImage(
-                              item: e.$2,
-                              width: _roundImageSize,
-                              height: _roundImageSize,
-                              borderRadius: .circular(_roundImageSize),
-                              border: .all(color: colors.tertiary, width: 5),
-                            ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: .stretch,
-                                children: [
-                                  Text(e.$2.title ?? '', style: textTheme.headlineMedium, maxLines: 2, overflow: .ellipsis),
-                                  InfoBar(item: e.$2),
-                                ],
+                    (e) => ClickableFeedItem(
+                      item: e.$2,
+                      child: Column(
+                        children: [
+                          Row(
+                            spacing: 24,
+                            children: [
+                              FeedItemImage(
+                                item: e.$2,
+                                width: _roundImageSize,
+                                height: _roundImageSize,
+                                borderRadius: .circular(_roundImageSize),
+                                border: .all(color: colors.tertiary, width: 5),
                               ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: .stretch,
+                                  children: [
+                                    Text(e.$2.title ?? '', style: textTheme.headlineMedium, maxLines: 2, overflow: .ellipsis),
+                                    InfoBar(item: e.$2),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (e.$1 < feed.headlines.length - 1) ...[
+                            Gap(24),
+                            Align(
+                              alignment: .center,
+                              child: SizedBox(width: 200, child: Divider(indent: 16, thickness: 3, radius: .circular(20))),
                             ),
                           ],
-                        ),
-                        if (e.$1 < feed.headlines.length - 1) ...[
-                          Gap(24),
-                          Align(
-                            alignment: .centerLeft,
-                            child: SizedBox(width: 200, child: Divider(indent: 16, thickness: 3, radius: .circular(20))),
-                          ),
                         ],
-                      ],
+                      ),
                     ),
                   )
                   .toList(),
@@ -100,18 +104,21 @@ class MainHeadline extends StatelessWidget {
           ),
           if (feed.mainHeadline != null)
             Expanded(
-              child: SizedBox(
-                height: 300,
-                child: Column(
-                  crossAxisAlignment: .stretch,
-                  mainAxisAlignment: .start,
-                  spacing: 24,
-                  children: [
-                    FeedItemImage(item: feed.mainHeadline!, height: 200, borderRadius: .circular(feedItemBorderRadius),),
-                    Text(feed.mainHeadline?.title ?? '', style: textTheme.headlineLarge),
-                    Expanded(child: ItemContent(item: feed.mainHeadline!)),
-                    InfoBar(item: feed.mainHeadline!),
-                  ],
+              child: ClickableFeedItem(
+                item: feed.mainHeadline!,
+                child: SizedBox(
+                  height: 300,
+                  child: Column(
+                    crossAxisAlignment: .stretch,
+                    mainAxisAlignment: .start,
+                    spacing: 24,
+                    children: [
+                      FeedItemImage(item: feed.mainHeadline!, height: 200, borderRadius: .circular(feedItemBorderRadius),),
+                      Text(feed.mainHeadline?.title ?? '', style: textTheme.headlineLarge, maxLines: 3, overflow: .ellipsis,),
+                      Expanded(child: ItemContent(item: feed.mainHeadline!, maxLines: 2, overflow: .ellipsis)),
+                      InfoBar(item: feed.mainHeadline!),
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -27,6 +27,46 @@ class FeedRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [FeedsSettingsTab]
+class FeedsSettingsRoute extends PageRouteInfo<void> {
+  const FeedsSettingsRoute({List<PageRouteInfo>? children})
+    : super(
+        FeedsSettingsRoute.name,
+        initialChildren: children,
+        argsEquality: false,
+      );
+
+  static const String name = 'FeedsSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const FeedsSettingsTab();
+    },
+  );
+}
+
+/// generated route for
+/// [GeneralSettingsTab]
+class GeneralSettingsRoute extends PageRouteInfo<void> {
+  const GeneralSettingsRoute({List<PageRouteInfo>? children})
+    : super(
+        GeneralSettingsRoute.name,
+        initialChildren: children,
+        argsEquality: false,
+      );
+
+  static const String name = 'GeneralSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const GeneralSettingsTab();
+    },
+  );
+}
+
+/// generated route for
 /// [HomeScreen]
 class HomeRoute extends PageRouteInfo<void> {
   const HomeRoute({List<PageRouteInfo>? children})
@@ -137,6 +177,22 @@ class ServerUrlRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const ServerUrlScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [SettingsScreen]
+class SettingsRoute extends PageRouteInfo<void> {
+  const SettingsRoute({List<PageRouteInfo>? children})
+    : super(SettingsRoute.name, initialChildren: children, argsEquality: false);
+
+  static const String name = 'SettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const SettingsScreen();
     },
   );
 }

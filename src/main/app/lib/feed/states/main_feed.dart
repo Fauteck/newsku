@@ -47,30 +47,32 @@ class MainFeedCubit extends Cubit<MainFeedState> {
 
     var key = DateTimeRange(start: from, end: now);
 
-    var data = List<FeedItem>.from(await service.getFeed(page: 0, pageSize: 50, from: from.millisecondsSinceEpoch, to: now.millisecondsSinceEpoch).then((value) => value.content));
+    var data = List<FeedItem>.from(await service.getFeedItems(page: 0, pageSize: 50, from: from.millisecondsSinceEpoch, to: now.millisecondsSinceEpoch).then((value) => value.content));
 
     // we need to sort the data into the headlines and stuff
     var feed = TimeBlockFeed();
 
-    // the data comes sorted by rank, date desc
-    feed.mainHeadline = data.where((element) => element.importance >= 90).firstOrNull;
-    if (feed.mainHeadline != null) {
-      data.remove(feed.mainHeadline);
+    if(data.isNotEmpty) {
+      // the data comes sorted by rank, date desc
+      feed.mainHeadline = data.removeAt(0);
     }
 
-    feed.headlines = data.where((element) => element.importance >= 80).take(3).toList();
-    feed.headlines.forEach((element) => data.remove(element));
+    // 3 headlines
+    for (var i = 0; i < 3; i++) {
 
-    feed.notableNews = data.where((element) => element.importance >= 60).take(6).toList();
-    feed.notableNews.forEach((element) => data.remove(element));
+      if(data.isNotEmpty) {
+        feed.headlines.add(data.removeAt(0));
+      }
+    }
+
+    // 6 notable news
+    for (var i = 0; i < 6; i++) {
+      if(data.isNotEmpty) {
+        feed.notableNews.add(data.removeAt(0));
+      }
+    }
 
     feed.others = data;
-
-    /*
-    feed.headlines.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
-    feed.notableNews.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
-    feed.others.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
-*/
 
     var map = Map<DateTimeRange, TimeBlockFeed>.from(state.items);
     map[key] = feed;

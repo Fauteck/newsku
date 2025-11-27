@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 class ImagePlaceholder extends StatelessWidget {
   final double? height;
   final double? width;
+  final IconData? icon;
+  final double? iconSize;
 
-  const ImagePlaceholder({super.key, this.height, this.width});
+  const ImagePlaceholder({super.key, this.height, this.width, this.icon, this.iconSize});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +15,7 @@ class ImagePlaceholder extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(color: colors.secondaryContainer),
-      child: Center(child: Icon(Icons.image_outlined, color: colors.onSecondaryContainer.withValues(alpha: 0.5),),),
+      child: Center(child: Icon(icon ?? Icons.image_outlined, size: iconSize, color: colors.onSecondaryContainer.withValues(alpha: 0.5),),),
     );
   }
 }

@@ -1,5 +1,7 @@
 import 'package:app/feed/views/screens/feed_screen.dart';
 import 'package:app/home/views/screens/home.dart';
+import 'package:app/settings/views/components/feeds.dart';
+import 'package:app/settings/views/screens/settings.dart';
 import 'package:app/user/views/components/login.dart';
 import 'package:app/user/views/components/login_form.dart';
 import 'package:app/user/views/components/server_url.dart';
@@ -8,6 +10,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 
 import 'config/models/config.dart';
+import 'settings/views/components/general.dart';
 
 part 'router.gr.dart';
 
@@ -24,6 +27,10 @@ class AppRouter extends RootStackRouter {
       initial: loggedInOnStart,
       children: [AutoRoute(page: FeedRoute.page, initial: true)],
     ),
+    AutoRoute(page: SettingsRoute.page, children: [
+      AutoRoute(page: FeedsSettingsRoute.page, initial: true),
+      AutoRoute(page: GeneralSettingsRoute.page)
+    ]),
     AutoRoute(
       page: LandingRoute.page,
       initial: !loggedInOnStart,
