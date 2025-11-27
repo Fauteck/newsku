@@ -44,8 +44,10 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       - name: Decode and write keystore file
+        # to crate the base64, use cat <file> | base64 -w 0
         run: echo ${{ secrets.ANDROID_KEYSTORE_BASE64 }} | base64 --decode > /tmp/keystore.jks
       - name: Decode and write Service account file
+        # to crate the base64, use cat <file> | base64 -w 0
         run: echo ${{ secrets.GOOGLE_SERVICE_ACCOUNT }} | base64 --decode > /tmp/service-account.json
 
       - name: Create key.properties file
