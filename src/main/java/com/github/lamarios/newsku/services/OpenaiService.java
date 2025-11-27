@@ -74,9 +74,8 @@ public class OpenaiService {
                 Keep in mind that this is a ranking system for a RSS feed reader so the user might have 100s of news on a daily basis so do not be too eager on overrating news
                 also you will try to figure out if this feed item is an ad or not
                 
-                You will use the name and description of the source to understand what an important news is for a user
-                if a news has a picture it should be ranked slightly higher.
-                
+                You will use the name and description of the source to understand what an important news is for a user.
+                                
                 Here is the news item:
                 
                 title: %s
