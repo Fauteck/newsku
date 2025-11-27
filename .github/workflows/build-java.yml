@@ -85,7 +85,7 @@ jobs:
           context: .
           platforms: linux/amd64, linux/arm64
           push: true
-          file: docker/Dockerfile.lite
+          file: docker/Dockerfile
           tags: ${{ secrets.DOCKER_USERNAME }}/newsku:${{ github.sha }}
 
       - name: Build and push Docker image (Release)
