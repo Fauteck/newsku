@@ -75,22 +75,15 @@ public class OpenaiService {
                 also you will try to figure out if this feed item is an ad or not
                 
                 You will use the name and description of the source to understand what an important news is for a user.
-                                
+
                 Here is the news item:
                 
                 title: %s
-                content: %s
-                media: %s
-                
+                content: %s                
                 
                 """.formatted(item.getTitle().orElse("no title"), item.getDescription()
                         .filter(s -> !s.isBlank())
-                        .orElse(item.getContent().orElse("no content")),
-                item.getEnclosure()
-                        .filter(enclosure -> enclosure.getType().contains("image"))
-                        .map(Enclosure::getUrl)
-                        .orElse("no media"),
-                item.getChannel().getTitle(), item.getChannel().getDescription());
+                        .orElse(item.getContent().orElse("no content")));
 
 
 /*
