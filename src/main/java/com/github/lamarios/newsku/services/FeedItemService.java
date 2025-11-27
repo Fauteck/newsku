@@ -56,7 +56,15 @@ public class FeedItemService {
             logger.info("Refreshing feed {}", feed.getId());
             RssReader reader;
             reader = new RssReader();
-            List<Item> items = reader.addFeedFilter(new InvalidXmlCharacterFilter())
+            List<Item> items = reader
+                    .addFeedFilter(new InvalidXmlCharacterFilter())
+                    .addItemExtension("media:thumbnail","url",(item, s) -> {
+                        System.out.println(s);
+                        Enclosure enclosure = new Enclosure();
+                        enclosure.setType("image");
+                        enclosure.setUrl(s);
+                        item.addEnclosure(enclosure);
+                    } )
                     .read(feed.getUrl())
                     .sorted()
                     .filter(item -> item.getGuid().isPresent())
