@@ -24,7 +24,7 @@ class ClickableFeedItem extends StatelessWidget {
 
           child: SingleMotionBuilder(
             motion: MaterialSpringMotion.expressiveSpatialDefault(),
-            from: 0.9,
+            from: 1,
             value: hovered ? 1.02 : 1,
             builder: (context, value, child) => Opacity(
                 opacity: value.clamp(0, 1),
