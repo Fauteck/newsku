@@ -17,9 +17,11 @@ public class TransactionHelper {
             runnable.run();
             transactionManager.commit(status);
         } catch (Exception e) {
-            transactionManager.rollback(status);
+            if (!status.isCompleted()) {
+                transactionManager.rollback(status);
+                log.error("Failed to run operation within a transaction, rolling back", e);
+            }
             // handle exception
-            log.error("Failed to run operation within a transaction, rolling back", e);
             throw e;
         }
     }

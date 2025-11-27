@@ -71,48 +71,59 @@ public class FeedItemService {
                     .toList();
 
             for (Item item : items) {
-                TransactionHelper.doInNewTransaction(transactionManager, false, () -> {
-                    if (item.getLink().isEmpty()) {
-                        return;
-                    }
-
-                    try {
-                        var existingFeed = feedItemRepository.getFirstByGuid(item.getGuid().get());
-
-                        Optional<String> image = item.getEnclosure()
-                                .filter(e -> e.getType().contains("image"))
-                                .map(Enclosure::getUrl);
-
-                        String imageUrl = image.orElse(getImageUrl(item));
-
-                        if (existingFeed != null) {
-                            logger.info("Feed {} already processed", item.getGuid().get());
+                try {
+                    TransactionHelper.doInNewTransaction(transactionManager, false, () -> {
+                        if (item.getGuid().isEmpty()) {
                             return;
                         }
 
-                        var analysis = openaiService.processFeedItem(item);
-                        if (analysis.isPresent()) {
+                        try {
+                            var existingFeed = feedItemRepository.getFirstByGuid(item.getGuid().get());
 
-                            FeedItem newItem = new FeedItem();
-                            newItem.setId(UUID.randomUUID().toString());
-                            newItem.setFeed(feed);
-                            newItem.setGuid(item.getLink().get());
-                            newItem.setDescription(item.getDescription().orElse(null));
-                            newItem.setTitle(item.getTitle().orElse(null));
-                            newItem.setContent(item.getContent().orElse(null));
-                            newItem.setImportance(analysis.get().importance());
-                            newItem.setReasoning(analysis.get().reasoning());
-                            newItem.setImageUrl(imageUrl);
-                            newItem.setTimeCreated(item.getPubDateZonedDateTime()
-                                    .map(zonedDateTime -> zonedDateTime.toInstant().toEpochMilli())
-                                    .orElse(System.currentTimeMillis()));
+                            Optional<String> image = item.getEnclosure()
+                                    .filter(e -> e.getType().contains("image"))
+                                    .map(Enclosure::getUrl);
 
-                            feedItemRepository.save(newItem);
+                            String imageUrl = image.orElse(getImageUrl(item));
+
+                            if (existingFeed != null) {
+                                // TODO: remove when stuff is stable
+                                if (imageUrl != null && !imageUrl.isEmpty() && !imageUrl.equals(existingFeed.getImageUrl())) {
+                                    existingFeed.setImageUrl(imageUrl);
+                                    feedItemRepository.save(existingFeed);
+                                }
+                                logger.info("Feed {} already processed", item.getGuid().get());
+                                return;
+                            }
+
+                            var analysis = openaiService.processFeedItem(item);
+                            if (analysis.isPresent()) {
+
+                                FeedItem newItem = new FeedItem();
+                                newItem.setId(UUID.randomUUID().toString());
+                                newItem.setFeed(feed);
+                                newItem.setUrl(item.getLink().orElse(null));
+                                newItem.setGuid(item.getGuid().get());
+                                newItem.setDescription(item.getDescription().orElse(null));
+                                newItem.setTitle(item.getTitle().orElse(null));
+                                newItem.setContent(item.getContent().orElse(null));
+                                newItem.setImportance(analysis.get().importance());
+                                newItem.setReasoning(analysis.get().reasoning());
+                                newItem.setImageUrl(imageUrl);
+                                newItem.setTimeCreated(item.getPubDateZonedDateTime()
+                                        .map(zonedDateTime -> zonedDateTime.toInstant().toEpochMilli())
+                                        .orElse(System.currentTimeMillis()));
+
+                                feedItemRepository.save(newItem);
+                            }
+                        } catch (Exception e) {
+                            logger.error("Couldn't parse feed item: {}", item.getGuid(), e);
+                            throw e;
                         }
-                    } catch (Exception e) {
-                        logger.error("Couldn't parse feed item: {}", item.getGuid(), e);
-                    }
-                });
+                    });
+                } catch (Exception e) {
+                    logger.error("Couldn't parse feed item: {}, top level catch", item.getGuid(), e);
+                }
             }
         } catch (Exception e) {
             logger.error("Couldn't parse feed: {}", feed.getUrl(), e);

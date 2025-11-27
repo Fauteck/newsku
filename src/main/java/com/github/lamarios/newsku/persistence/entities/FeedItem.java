@@ -15,6 +15,7 @@ public class FeedItem {
     private String reasoning;
     private String imageUrl;
     private int importance;
+    private String url;
     @Column(name = "timecreated")
     private long timeCreated;
 
@@ -100,5 +101,13 @@ public class FeedItem {
 
     public void setTimeCreated(long timecreated) {
         this.timeCreated = timecreated;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

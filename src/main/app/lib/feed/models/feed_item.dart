@@ -11,6 +11,7 @@ sealed class FeedItem with _$FeedItem {
     String? id,
     String? guid,
     String? title,
+    String? url,
     String? description,
     String? content,
     String? reasoning,

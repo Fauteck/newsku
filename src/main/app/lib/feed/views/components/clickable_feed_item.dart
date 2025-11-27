@@ -29,7 +29,7 @@ class ClickableFeedItem extends StatelessWidget {
             builder: (context, value, child) => Opacity(
                 opacity: value.clamp(0, 1),
                 child: Transform.scale(scale: value, child: child)),
-            child: GestureDetector(onTap: () => launchUrl(Uri.parse(item.guid!)), child: child),
+            child: GestureDetector(onTap: () => launchUrl(Uri.parse(item.url!)), child: child),
           ),
         );
       },

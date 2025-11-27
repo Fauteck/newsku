@@ -71,7 +71,7 @@ class FeedScreen extends StatelessWidget {
                               title: Row(
                                 children: [
                                   Text('news'),
-                                  Text('ku', style: TextStyle(color: seedColor),)
+                                  Text('ku', style: TextStyle(color: seedColor)),
                                 ],
                               ),
                               leading: ClipPath(
@@ -85,9 +85,9 @@ class FeedScreen extends StatelessWidget {
                                 ),
                               ),
                               actions: [
+                                IconButton(onPressed: () => cubit.refresh(), icon: Icon(Icons.refresh)),
                                 IconButton(onPressed: () => AutoRouter.of(context).push(SettingsRoute()), icon: Icon(Icons.settings))
                               ],
-
                             ),
                             ...state.items.keys.expand((value) {
                               var feed = state.items[value];
@@ -183,6 +183,12 @@ class FeedScreen extends StatelessWidget {
                             if (state.loading)
                               SliverToBoxAdapter(
                                 child: Center(child: SizedBox(width: 50, height: 50, child: LoadingIndicator())),
+                              )
+                            else
+                              SliverToBoxAdapter(
+                                child: Center(
+                                  child: FilledButton.tonalIcon(onPressed: () => cubit.getFeed(), label: Text('Load more'), icon: Icon(Icons.expand_more)),
+                                ),
                               ),
                           ],
                         ),

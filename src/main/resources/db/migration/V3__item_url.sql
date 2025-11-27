@@ -1,0 +1,1 @@
+alter table feed_items add column url text null;

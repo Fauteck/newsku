@@ -52,22 +52,21 @@ class MainFeedCubit extends Cubit<MainFeedState> {
     // we need to sort the data into the headlines and stuff
     var feed = TimeBlockFeed();
 
-    if(data.isNotEmpty) {
+    if (data.isNotEmpty) {
       // the data comes sorted by rank, date desc
       feed.mainHeadline = data.removeAt(0);
     }
 
     // 3 headlines
     for (var i = 0; i < 3; i++) {
-
-      if(data.isNotEmpty) {
+      if (data.isNotEmpty) {
         feed.headlines.add(data.removeAt(0));
       }
     }
 
     // 6 notable news
     for (var i = 0; i < 6; i++) {
-      if(data.isNotEmpty) {
+      if (data.isNotEmpty) {
         feed.notableNews.add(data.removeAt(0));
       }
     }
@@ -78,6 +77,15 @@ class MainFeedCubit extends Cubit<MainFeedState> {
     map[key] = feed;
 
     emit(state.copyWith(loading: false, items: map, currentTime: from));
+  }
+
+  Future<void> refresh() async {
+    emit(state.copyWith(currentTime: DateTime.now().copyWith(hour: 23, minute: 59, second: 59, millisecond: 999), items: {}));
+    // loading 3 to have a minimum of things to see
+    await getFeed();
+    await getFeed();
+    await getFeed();
+
   }
 }
 
