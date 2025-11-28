@@ -1,4 +1,5 @@
 import 'package:app/config/models/config.dart';
+import 'package:app/user/services/server_url_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -28,7 +29,12 @@ class IdentityCubit extends Cubit<IdentityState> {
       }
     }
 
-    emit(state.copyWith(serverUrl: server, token: token));
+    Config? serverConfig;
+    if (server != null) {
+      serverConfig = await ServerUrlService(server).getConfig();
+    }
+
+    emit(state.copyWith(serverUrl: server, token: token, config: serverConfig));
   }
 
   void setUrl(String? serverUrl, {Config? config}) {

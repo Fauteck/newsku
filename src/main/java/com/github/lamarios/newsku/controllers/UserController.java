@@ -6,10 +6,7 @@ import com.github.lamarios.newsku.services.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 
@@ -29,6 +26,11 @@ public class UserController {
     @PostMapping
     public User updateUser(@RequestBody User user) throws SQLException {
         return userService.updateSelf(user);
+    }
+
+    @GetMapping
+    public User getCurrentUser(){
+        return userService.getCurrentUser();
     }
 
 }

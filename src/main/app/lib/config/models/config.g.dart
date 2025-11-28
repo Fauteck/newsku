@@ -11,9 +11,11 @@ _Config _$ConfigFromJson(Map<String, dynamic> json) => _Config(
   oidcConfig: json['oidcConfig'] == null
       ? null
       : OidcConfig.fromJson(json['oidcConfig'] as Map<String, dynamic>),
+  announcement: json['announcement'] as String? ?? "",
 );
 
 Map<String, dynamic> _$ConfigToJson(_Config instance) => <String, dynamic>{
   'allowSignup': instance.allowSignup,
   'oidcConfig': instance.oidcConfig,
+  'announcement': instance.announcement,
 };

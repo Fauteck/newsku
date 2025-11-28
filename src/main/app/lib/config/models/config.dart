@@ -6,7 +6,7 @@ part 'config.g.dart';
 
 @freezed
 sealed class Config with _$Config {
-  const factory Config({required bool allowSignup, OidcConfig? oidcConfig}) = _Config;
+  const factory Config({required bool allowSignup, OidcConfig? oidcConfig, @Default("") String announcement}) = _Config;
 
   factory Config.fromJson(Map<String, Object?> json) => _$ConfigFromJson(json);
 }

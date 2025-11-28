@@ -11,6 +11,7 @@ import 'package:flutter/foundation.dart';
 
 import 'config/models/config.dart';
 import 'settings/views/components/general.dart';
+import 'user/views/components/signup_form.dart';
 
 part 'router.gr.dart';
 
@@ -27,10 +28,13 @@ class AppRouter extends RootStackRouter {
       initial: loggedInOnStart,
       children: [AutoRoute(page: FeedRoute.page, initial: true)],
     ),
-    AutoRoute(page: SettingsRoute.page, children: [
-      AutoRoute(page: FeedsSettingsRoute.page, initial: true),
-      AutoRoute(page: GeneralSettingsRoute.page)
-    ]),
+    AutoRoute(
+      page: SettingsRoute.page,
+      children: [
+        AutoRoute(page: FeedsSettingsRoute.page, initial: true),
+        AutoRoute(page: GeneralSettingsRoute.page),
+      ],
+    ),
     AutoRoute(
       page: LandingRoute.page,
       initial: !loggedInOnStart,
@@ -39,7 +43,10 @@ class AppRouter extends RootStackRouter {
         AutoRoute(
           page: LoginRoute.page,
           initial: kIsWeb && !kDebugMode,
-          children: [AutoRoute(page: LoginFormRoute.page, initial: true)],
+          children: [
+            AutoRoute(page: LoginFormRoute.page, initial: true),
+            AutoRoute(page: SignupFormRoute.page),
+          ],
         ),
       ],
     ),

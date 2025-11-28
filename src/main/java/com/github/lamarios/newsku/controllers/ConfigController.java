@@ -11,19 +11,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/config")
-@Tag(name="misc")
+@Tag(name = "misc")
 public class ConfigController {
     private final OidcService oidcService;
     private final boolean allowSignUp;
+    private final String announcement;
+
     @Autowired
-    public ConfigController(OidcService oidcService, @Value("${ALLOW_SIGNUP:0}")boolean allowSignUp) {
+    public ConfigController(OidcService oidcService, @Value("${ALLOW_SIGNUP:0}") boolean allowSignUp, @Value("${ANNOUNCEMENT:}") String announcement) {
         this.oidcService = oidcService;
         this.allowSignUp = allowSignUp;
+        this.announcement = announcement;
     }
 
     @GetMapping
     public AppConfig getConfig() {
         AppConfig config = new AppConfig();
+        config.setAnnouncement(announcement);
         config.setAllowSignup(allowSignUp);
 
         if (oidcService.getOidcDiscoveryUrl() != null) {

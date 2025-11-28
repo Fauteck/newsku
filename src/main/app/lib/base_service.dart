@@ -15,7 +15,6 @@ abstract class BaseService {
   Future<String?> get token async {
     var token = (await SharedPreferences.getInstance()).getString('token');
 
-
     return token;
   }
 
@@ -65,16 +64,18 @@ abstract class BaseService {
     return Uri.parse(url);
   }
 
-  void processResponse(Response response) {
-    _processStatusCode(response.statusCode, response.body);
+  void processResponse(Response response, {bool logoutOn401 = true}) {
+    _processStatusCode(response.statusCode, body: response.body, logoutOn401: logoutOn401);
   }
 
-  void _processStatusCode(int statusCode, [String? body]) {
+  void _processStatusCode(int statusCode, {bool logoutOn401 = true, String? body}) {
     switch (statusCode) {
       case 200:
         return;
       case 401:
-        getIt.get<IdentityCubit>().logout();
+        if (logoutOn401) {
+          getIt.get<IdentityCubit>().logout();
+        }
         throw Exception("Couldn't execute request, unauthorized}");
       default:
         throw Exception("Couldn't execute request ${statusCode} -> ${body}");

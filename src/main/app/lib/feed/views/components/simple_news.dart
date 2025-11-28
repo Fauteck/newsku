@@ -52,9 +52,9 @@ class SimpleNews extends StatelessWidget {
               item: item,
               borderRadius: .horizontal(right: .circular(feedItemBorderRadius)),
               width: switch (BreakPoint.get(context)) {
-                .mobile => 70,
-                .tablet => 100,
-                _ => 120,
+                .mobile => 20,
+                .tablet => 50,
+                _ => 70,
               },
             ),
           ],

@@ -8,7 +8,6 @@ import com.github.lamarios.newsku.persistence.entities.Feed;
 import com.github.lamarios.newsku.persistence.entities.FeedItem;
 import com.github.lamarios.newsku.persistence.repositories.FeedItemRepository;
 import com.github.lamarios.newsku.utils.TransactionHelper;
-import com.openai.models.beta.threads.messages.ImageUrl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -32,7 +31,7 @@ import java.util.concurrent.Executors;
 public class FeedItemService {
     private final static Logger logger = LogManager.getLogger();
     private final FeedService feedService;
-    private ExecutorService exec = Executors.newSingleThreadExecutor();
+    private final ExecutorService exec = Executors.newSingleThreadExecutor();
 
     private final FeedItemRepository feedItemRepository;
 
@@ -58,13 +57,13 @@ public class FeedItemService {
             reader = new RssReader();
             List<Item> items = reader
                     .addFeedFilter(new InvalidXmlCharacterFilter())
-                    .addItemExtension("media:thumbnail","url",(item, s) -> {
+                    .addItemExtension("media:thumbnail", "url", (item, s) -> {
                         System.out.println(s);
                         Enclosure enclosure = new Enclosure();
                         enclosure.setType("image");
                         enclosure.setUrl(s);
                         item.addEnclosure(enclosure);
-                    } )
+                    })
                     .read(feed.getUrl())
                     .sorted()
                     .filter(item -> item.getGuid().isPresent())
@@ -96,7 +95,7 @@ public class FeedItemService {
                                 return;
                             }
 
-                            var analysis = openaiService.processFeedItem(item);
+                            var analysis = openaiService.processFeedItem(item, feed.getUser());
                             if (analysis.isPresent()) {
 
                                 FeedItem newItem = new FeedItem();

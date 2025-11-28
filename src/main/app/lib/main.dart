@@ -26,14 +26,25 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
+    final inputTheme = InputDecorationThemeData(border: OutlineInputBorder());
+
     return MultiBlocProvider(
       providers: [BlocProvider(create: (context) => getIt.get<IdentityCubit>())],
       child: MaterialApp.router(
         title: 'NewsKu',
         routerConfig: _appRouter.config(),
         darkTheme: ThemeData(
-          colorScheme: .fromSeed(seedColor: seedColor, brightness: Brightness.dark, surface: Color.fromARGB(255, 17, 18, 20), surfaceContainerHigh: Color.fromARGB(255, 35, 36, 40) , onSurface: Colors.white),
+          colorScheme: .fromSeed(
+            seedColor: seedColor,
+            brightness: Brightness.dark,
+            surface: Color.fromARGB(255, 17, 18, 20),
+            surfaceContainerHigh: Color.fromARGB(255, 35, 36, 40),
+            onSurface: Colors.white,
+          ),
+          inputDecorationTheme: inputTheme
         ),
+
         theme: ThemeData(
           // This is the theme of your application.
           //
@@ -50,7 +61,8 @@ class MyApp extends StatelessWidget {
           //
           // This works for code too, not just values: Most code changes can be
           // tested with just a hot reload.
-          colorScheme: .fromSeed(seedColor: seedColor, surface: Colors.white, surfaceContainerHigh: Color.fromARGB(255, 233, 234, 237), onSurface: Colors.black ),
+          inputDecorationTheme: inputTheme,
+          colorScheme: .fromSeed(seedColor: seedColor, surface: Colors.white, surfaceContainerHigh: Color.fromARGB(255, 233, 234, 237), onSurface: Colors.black),
         ),
       ),
     );

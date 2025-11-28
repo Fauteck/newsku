@@ -1,0 +1,79 @@
+import 'package:app/user/models/user.dart';
+import 'package:app/user/services/user_service.dart';
+import 'package:app/utils/models/with_error.dart';
+import 'package:app/utils/utils.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'general.freezed.dart';
+
+class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
+  final TextEditingController preferenceController = TextEditingController(text: '');
+  final TextEditingController password = TextEditingController(text: '');
+  final TextEditingController repeatPassword = TextEditingController(text: '');
+
+  GeneralSettingsCubit(super.initialState) {
+    getUser();
+
+    password.addListener(() => emit(state.copyWith(password: password.value.text)));
+    repeatPassword.addListener(() => emit(state.copyWith(repeatPassword: repeatPassword.value.text)));
+  }
+
+  @override
+  close() async {
+    preferenceController.dispose();
+    password.dispose();
+    repeatPassword.dispose();
+    super.close();
+  }
+
+  Future<void> getUser() async {
+    try {
+      emit(state.copyWith(loading: true));
+      final user = await UserService(serverUrl!).getUser();
+      print('user: ${user}');
+      emit(state.copyWith(user: user));
+      preferenceController.text = user.feedItemPreference ?? '';
+    } catch (e, s) {
+      emit(state.copyWith(error: e, stackTrace: s));
+    } finally {
+      emit(state.copyWith(loading: false));
+    }
+  }
+
+  Future<void> updateUser() async {
+    try {
+      emit(state.copyWith(loading: true));
+      await UserService(serverUrl!).updateUser(state.user!);
+    } catch (e, s) {
+      emit(state.copyWith(error: e, stackTrace: s));
+    } finally {
+      emit(state.copyWith(loading: false));
+    }
+  }
+
+  Future<void> resetPassword() async {
+    if (state.user != null) {
+      emit(state.copyWith.user!(password: password.value.text));
+      await updateUser();
+      emit(state.copyWith(password: '', repeatPassword: ''));
+      repeatPassword.text = '';
+      password.text = '';
+    }
+  }
+
+  Future<void> setAiPreferences() async {
+    if (state.user != null) {
+      emit(state.copyWith.user!(feedItemPreference: preferenceController.value.text));
+      await updateUser();
+    }
+  }
+}
+
+@freezed
+sealed class GeneralSettingsState with _$GeneralSettingsState implements WithError {
+  @Implements<WithError>()
+  const factory GeneralSettingsState({User? user, @Default(true) bool loading, dynamic error, StackTrace? stackTrace, @Default('') String password, @Default('') String repeatPassword}) =
+      _GeneralSettingsState;
+}

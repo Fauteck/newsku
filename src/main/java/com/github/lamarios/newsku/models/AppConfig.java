@@ -3,6 +3,15 @@ package com.github.lamarios.newsku.models;
 public class AppConfig {
     private boolean allowSignup;
     private OIDCConfig oidcConfig;
+    private String announcement;
+
+    public String getAnnouncement() {
+        return announcement;
+    }
+
+    public void setAnnouncement(String announcement) {
+        this.announcement = announcement;
+    }
 
     public OIDCConfig getOidcConfig() {
         return oidcConfig;

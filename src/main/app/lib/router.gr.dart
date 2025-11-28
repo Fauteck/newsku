@@ -120,45 +120,18 @@ class LoginFormRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [LoginScreen]
-class LoginRoute extends PageRouteInfo<LoginRouteArgs> {
-  LoginRoute({
-    Key? key,
-    String? url,
-    Config? config,
-    List<PageRouteInfo>? children,
-  }) : super(
-         LoginRoute.name,
-         args: LoginRouteArgs(key: key, url: url, config: config),
-         initialChildren: children,
-         argsEquality: false,
-       );
+class LoginRoute extends PageRouteInfo<void> {
+  const LoginRoute({List<PageRouteInfo>? children})
+    : super(LoginRoute.name, initialChildren: children, argsEquality: false);
 
   static const String name = 'LoginRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<LoginRouteArgs>(
-        orElse: () => const LoginRouteArgs(),
-      );
-      return LoginScreen(key: args.key, url: args.url, config: args.config);
+      return const LoginScreen();
     },
   );
-}
-
-class LoginRouteArgs {
-  const LoginRouteArgs({this.key, this.url, this.config});
-
-  final Key? key;
-
-  final String? url;
-
-  final Config? config;
-
-  @override
-  String toString() {
-    return 'LoginRouteArgs{key: $key, url: $url, config: $config}';
-  }
 }
 
 /// generated route for
@@ -193,6 +166,26 @@ class SettingsRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const SettingsScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [SignupFormScreen]
+class SignupFormRoute extends PageRouteInfo<void> {
+  const SignupFormRoute({List<PageRouteInfo>? children})
+    : super(
+        SignupFormRoute.name,
+        initialChildren: children,
+        argsEquality: false,
+      );
+
+  static const String name = 'SignupFormRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const SignupFormScreen();
     },
   );
 }

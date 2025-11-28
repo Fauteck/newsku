@@ -36,7 +36,7 @@ class InfoBar extends StatelessWidget {
             children: [
               Tooltip(
                 message: item.reasoning,
-                child: Row(spacing: 4, children: [Icon(Icons.label_important_outline, size: 15), Text(item.importance.toStringAsFixed(0))]),
+                child: Row(spacing: 4, children: [Icon(Icons.label_important_outline, size: 12), Text(item.importance.toStringAsFixed(0), style: textTheme.labelSmall,)]),
               ),
             ],
           ),

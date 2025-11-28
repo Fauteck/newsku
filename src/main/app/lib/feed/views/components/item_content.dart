@@ -21,16 +21,10 @@ class ItemContent extends StatelessWidget {
     html = html.replaceAll(RegExp(r'<[^>]+>'), '');
 
     // Numeric decimal entities &#1234;
-    html = html.replaceAllMapped(
-      RegExp(r'&#(\d+);'),
-          (m) => String.fromCharCode(int.parse(m.group(1)!)),
-    );
+    html = html.replaceAllMapped(RegExp(r'&#(\d+);'), (m) => String.fromCharCode(int.parse(m.group(1)!)));
 
     // Numeric hex entities &#x1F600;
-    html = html.replaceAllMapped(
-      RegExp(r'&#x([A-Fa-f0-9]+);'),
-          (m) => String.fromCharCode(int.parse(m.group(1)!, radix: 16)),
-    );
+    html = html.replaceAllMapped(RegExp(r'&#x([A-Fa-f0-9]+);'), (m) => String.fromCharCode(int.parse(m.group(1)!, radix: 16)));
 
     // Common named entities
     const entityMap = {
@@ -56,14 +50,17 @@ class ItemContent extends StatelessWidget {
     return HtmlUnescape().convert(html.trim());
   }
 
-
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-
-    return Text(stripHtmlTags(item.description ?? item.content ?? ''), maxLines: maxLines, style: (style ?? textTheme.bodyMedium)?.copyWith(color: colors.secondary), overflow: overflow,)
+    return Text(
+      stripHtmlTags(item.description ?? item.content ?? ''),
+      maxLines: maxLines,
+      style: (style ?? textTheme.bodyMedium)?.copyWith(color: colors.secondary, height: 1.3),
+      overflow: overflow,
+    )
     /* return ClipRect(
       child: HtmlWidget(
 
@@ -78,6 +75,7 @@ class ItemContent extends StatelessWidget {
           return null;
         },
       ),
-    )*/;
+    )*/
+    ;
   }
 }

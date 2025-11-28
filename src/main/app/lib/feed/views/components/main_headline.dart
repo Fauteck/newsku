@@ -29,7 +29,6 @@ class MainHeadline extends StatelessWidget {
       decoration: BoxDecoration(color: colors.surfaceContainerHigh,
       borderRadius: .circular(feedItemBorderRadius)
       ),
-      margin: .only(bottom: 16),
       padding: .all(16),
       child: Row(
         spacing: 24,
@@ -52,7 +51,7 @@ class MainHeadline extends StatelessWidget {
                       spacing: 8,
                       children: [
                         Icon(Icons.star, color: colors.onTertiary,),
-                        Text('Top Stories', style: textTheme.bodyLarge?.copyWith(fontSize: 25, color: colors.onTertiary, fontWeight: .bold),),
+                        Text('Top Stories', style: textTheme.bodyLarge?.copyWith(fontSize: 25, color: colors.onTertiary),),
                       ],
                     )),
               ),
@@ -81,7 +80,7 @@ class MainHeadline extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: .stretch,
                                   children: [
-                                    Text(e.$2.title ?? '', style: textTheme.headlineMedium, maxLines: 2, overflow: .ellipsis),
+                                    Text(e.$2.title ?? '', style: textTheme.headlineMedium?.copyWith(height: 1.4), maxLines: 2, overflow: .ellipsis),
                                     InfoBar(item: e.$2),
                                   ],
                                 ),
@@ -114,7 +113,7 @@ class MainHeadline extends StatelessWidget {
                     spacing: 24,
                     children: [
                       FeedItemImage(item: feed.mainHeadline!, height: 200, borderRadius: .circular(feedItemBorderRadius),),
-                      Text(feed.mainHeadline?.title ?? '', style: textTheme.headlineLarge, maxLines: 3, overflow: .ellipsis,),
+                      Text(feed.mainHeadline?.title ?? '', style: textTheme.headlineLarge?.copyWith(height: 1.4), maxLines: 3, overflow: .ellipsis,),
                       Expanded(child: ItemContent(item: feed.mainHeadline!, maxLines: 2, overflow: .ellipsis)),
                       InfoBar(item: feed.mainHeadline!),
                     ],

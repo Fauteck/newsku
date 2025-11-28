@@ -16,7 +16,6 @@ class ServerUrlService extends BaseService {
 
     processResponse(response);
     Map<String, dynamic> json = jsonDecode(response.body);
-
     return Config.fromJson(json);
   }
 }

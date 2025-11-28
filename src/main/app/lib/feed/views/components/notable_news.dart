@@ -47,7 +47,7 @@ class NotableNews extends StatelessWidget {
                   crossAxisAlignment: .stretch,
                   spacing: 8,
                   children: [
-                    Text(item.title ?? '', style: textTheme.headlineSmall, maxLines: 3,overflow: .ellipsis,),
+                    Text(item.title ?? '', style: textTheme.headlineSmall?.copyWith(height: 1.4), maxLines: 3,overflow: .ellipsis,),
                     // Expanded(child: Text(item.description ?? item.content ?? '', maxLines: 3,)),
                     Expanded(
                       child: ItemContent(item: item, maxLines: 4, overflow: .ellipsis,),

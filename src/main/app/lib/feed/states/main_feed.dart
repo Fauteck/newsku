@@ -20,6 +20,11 @@ class MainFeedCubit extends Cubit<MainFeedState> {
 
   Future<void> init() async {
     scrollController.addListener(() {
+      if (!state.hasScrolled && scrollController.position.pixels > 0) {
+        emit(state.copyWith(hasScrolled: true));
+      } else if (state.hasScrolled && scrollController.position.pixels == 0) {
+        emit(state.copyWith(hasScrolled: false));
+      }
       if (scrollController.position.pixels > scrollController.position.maxScrollExtent * 0.95 && !state.loading) {
         EasyThrottle.throttle('load-feed', Duration(seconds: 1), () {
           if (!state.loading) {
@@ -28,8 +33,7 @@ class MainFeedCubit extends Cubit<MainFeedState> {
         });
       }
     });
-    await getFeed();
-    scrollController.jumpTo(-50);
+    getFeed();
   }
 
   @override
@@ -85,12 +89,16 @@ class MainFeedCubit extends Cubit<MainFeedState> {
     await getFeed();
     await getFeed();
     await getFeed();
-
   }
 }
 
 @freezed
 sealed class MainFeedState with _$MainFeedState {
-  const factory MainFeedState({required DateTime currentTime, @Default(TimeBlock.one_day) TimeBlock timeBlock, @Default(true) bool loading, @Default({}) Map<DateTimeRange, TimeBlockFeed> items}) =
-      _MainFeedState;
+  const factory MainFeedState({
+    @Default(false) bool hasScrolled,
+    required DateTime currentTime,
+    @Default(TimeBlock.one_day) TimeBlock timeBlock,
+    @Default(true) bool loading,
+    @Default({}) Map<DateTimeRange, TimeBlockFeed> items,
+  }) = _MainFeedState;
 }

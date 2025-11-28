@@ -8,17 +8,23 @@ class LandingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-
-    },);
     return Scaffold(
       body: Center(
-        child: SizedBox(
-          width: 550,
-          height: 300,
-          child: AutoRouter(clipBehavior: Clip.none,),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 500),
+          child: Center(
+            child: Padding(
+              padding: .symmetric(horizontal: 36),
+              child: Column(
+                crossAxisAlignment: .center,
+                mainAxisAlignment: .center,
+                children: [Center(child: AutoRouter(
+                  clipBehavior: .none,
+
+                ))],
+              ),
+            ),
+          ),
         ),
       ),
     );

@@ -1,8 +1,8 @@
 package com.github.lamarios.newsku.services;
 
-import com.apptasticsoftware.rssreader.Enclosure;
 import com.apptasticsoftware.rssreader.Item;
 import com.github.lamarios.newsku.models.OpenAiFeedResponse;
+import com.github.lamarios.newsku.persistence.entities.User;
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
@@ -10,10 +10,8 @@ import com.openai.models.chat.completions.StructuredChatCompletionCreateParams;
 import com.openai.models.models.Model;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StopWatch;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -65,7 +63,7 @@ public class OpenaiService {
         return client.build();
     }
 
-    public Optional<OpenAiFeedResponse> processFeedItem(Item item) {
+    public Optional<OpenAiFeedResponse> processFeedItem(Item item, User user) {
 
         var start = System.currentTimeMillis();
         String prompt = """
@@ -75,13 +73,16 @@ public class OpenaiService {
                 also you will try to figure out if this feed item is an ad or not
                 
                 You will use the name and description of the source to understand what an important news is for a user.
+                
+                The user has the following preferences. You will refer to it to figure out how to rate a news item:
+                %s
 
                 Here is the news item:
                 
                 title: %s
-                content: %s                
+                content: %s
                 
-                """.formatted(item.getTitle().orElse("no title"), item.getDescription()
+                """.formatted(Optional.ofNullable(user.getFeedItemPreference()).filter(s -> !s.isBlank()).orElse("The user has no particular preferences"), item.getTitle().orElse("no title"), item.getDescription()
                         .filter(s -> !s.isBlank())
                         .orElse(item.getContent().orElse("no content")));
 
