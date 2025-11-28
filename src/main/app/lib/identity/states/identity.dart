@@ -42,10 +42,11 @@ class IdentityCubit extends Cubit<IdentityState> {
   }
 
   Future<void> logout() async {
-    print('LOGGING OUT');
     var prefs = await SharedPreferences.getInstance();
     prefs.remove('token');
-    prefs.remove('server');
+    if(!kIsWeb || kDebugMode ) {
+      prefs.remove('server');
+    }
     emit(state.copyWith(serverUrl: null, token: null));
   }
 
