@@ -33,7 +33,7 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
       emit(state.copyWith(loading: true));
       final user = await UserService(serverUrl!).getUser();
       print('user: ${user}');
-      emit(state.copyWith(user: user));
+      emit(state.copyWith(user: user, minimumImportance: user.minimumImportance));
       preferenceController.text = user.feedItemPreference ?? '';
     } catch (e, s) {
       emit(state.copyWith(error: e, stackTrace: s));
@@ -69,11 +69,22 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
       await updateUser();
     }
   }
+
+  void setImportance(double value) {
+    emit(state.copyWith(minimumImportance: value.toInt()));
+  }
+
+  Future<void> saveImportance() async {
+    if (state.user != null) {
+      emit(state.copyWith.user!(minimumImportance: state.minimumImportance));
+      await updateUser();
+    }
+  }
 }
 
 @freezed
 sealed class GeneralSettingsState with _$GeneralSettingsState implements WithError {
   @Implements<WithError>()
-  const factory GeneralSettingsState({User? user, @Default(true) bool loading, dynamic error, StackTrace? stackTrace, @Default('') String password, @Default('') String repeatPassword}) =
+  const factory GeneralSettingsState({User? user, @Default(true) bool loading, dynamic error, StackTrace? stackTrace, @Default('') String password, @Default('') String repeatPassword, @Default(0) int minimumImportance}) =
       _GeneralSettingsState;
 }

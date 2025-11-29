@@ -15,8 +15,8 @@ public interface FeedItemRepository extends JpaRepository<FeedItem, String> {
     FeedItem getFirstByGuid(String guid);
 
 
-    @Query("select i from FeedItem i where i.timeCreated > :from and i.timeCreated <= :to and i.feed in :feeds")
-    Page<FeedItem> findallByTimeAndFeeds(@Param("from") long from, @Param("to") long to, @Param("feeds") List<Feed> feeds, Pageable pageable);
+    @Query("select i from FeedItem i where i.feed in :feeds and i.importance >= :minImportance and i.timeCreated > :from and i.timeCreated <= :to")
+    Page<FeedItem> findallByTimeAndFeeds(@Param("minImportance") int minImportance, @Param("from") long from, @Param("to") long to, @Param("feeds") List<Feed> feeds, Pageable pageable);
 
     List<FeedItem> findFirstByIdAndFeedIn(String id, Collection<Feed> feeds);
 }

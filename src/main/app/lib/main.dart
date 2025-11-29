@@ -1,8 +1,10 @@
 import 'package:app/identity/states/identity.dart';
 import 'package:app/router.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 
 late final _appRouter;
 
@@ -10,6 +12,10 @@ final getIt = GetIt.instance;
 final Color seedColor = Colors.deepOrange;
 
 Future<void> main() async {
+  Logger.root.level = kDebugMode ? Level.ALL : Level.INFO;
+  Logger.root.onRecord.listen((record) {
+    print('${record.level.name}: ${record.time}: ${record.message}');
+  });
   WidgetsFlutterBinding.ensureInitialized();
   var identityCubit = IdentityCubit(IdentityState());
   await identityCubit.init();

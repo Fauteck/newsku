@@ -1,0 +1,1 @@
+alter table users add column minimum_importance int not null default 0;

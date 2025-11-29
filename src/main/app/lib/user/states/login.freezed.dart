@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LoginState {
 
- bool get loading; bool get failedLogin; String get username; String get password;
+ bool get loading; bool get failedLogin; String get username; String get password; dynamic get error; StackTrace? get stackTrace;
 /// Create a copy of LoginState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $LoginStateCopyWith<LoginState> get copyWith => _$LoginStateCopyWithImpl<LoginSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginState&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.failedLogin, failedLogin) || other.failedLogin == failedLogin)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginState&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.failedLogin, failedLogin) || other.failedLogin == failedLogin)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loading,failedLogin,username,password);
+int get hashCode => Object.hash(runtimeType,loading,failedLogin,username,password,const DeepCollectionEquality().hash(error),stackTrace);
 
 @override
 String toString() {
-  return 'LoginState(loading: $loading, failedLogin: $failedLogin, username: $username, password: $password)';
+  return 'LoginState(loading: $loading, failedLogin: $failedLogin, username: $username, password: $password, error: $error, stackTrace: $stackTrace)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $LoginStateCopyWith<$Res>  {
   factory $LoginStateCopyWith(LoginState value, $Res Function(LoginState) _then) = _$LoginStateCopyWithImpl;
 @useResult
 $Res call({
- bool loading, bool failedLogin, String username, String password
+ bool loading, bool failedLogin, String username, String password, dynamic error, StackTrace? stackTrace
 });
 
 
@@ -62,13 +62,15 @@ class _$LoginStateCopyWithImpl<$Res>
 
 /// Create a copy of LoginState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? loading = null,Object? failedLogin = null,Object? username = null,Object? password = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? loading = null,Object? failedLogin = null,Object? username = null,Object? password = null,Object? error = freezed,Object? stackTrace = freezed,}) {
   return _then(_self.copyWith(
 loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,failedLogin: null == failedLogin ? _self.failedLogin : failedLogin // ignore: cast_nullable_to_non_nullable
 as bool,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
-as String,
+as String,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as dynamic,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
+as StackTrace?,
   ));
 }
 
@@ -150,10 +152,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool loading,  bool failedLogin,  String username,  String password)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool loading,  bool failedLogin,  String username,  String password,  dynamic error,  StackTrace? stackTrace)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LoginState() when $default != null:
-return $default(_that.loading,_that.failedLogin,_that.username,_that.password);case _:
+return $default(_that.loading,_that.failedLogin,_that.username,_that.password,_that.error,_that.stackTrace);case _:
   return orElse();
 
 }
@@ -171,10 +173,10 @@ return $default(_that.loading,_that.failedLogin,_that.username,_that.password);c
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool loading,  bool failedLogin,  String username,  String password)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool loading,  bool failedLogin,  String username,  String password,  dynamic error,  StackTrace? stackTrace)  $default,) {final _that = this;
 switch (_that) {
 case _LoginState():
-return $default(_that.loading,_that.failedLogin,_that.username,_that.password);}
+return $default(_that.loading,_that.failedLogin,_that.username,_that.password,_that.error,_that.stackTrace);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -188,10 +190,10 @@ return $default(_that.loading,_that.failedLogin,_that.username,_that.password);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool loading,  bool failedLogin,  String username,  String password)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool loading,  bool failedLogin,  String username,  String password,  dynamic error,  StackTrace? stackTrace)?  $default,) {final _that = this;
 switch (_that) {
 case _LoginState() when $default != null:
-return $default(_that.loading,_that.failedLogin,_that.username,_that.password);case _:
+return $default(_that.loading,_that.failedLogin,_that.username,_that.password,_that.error,_that.stackTrace);case _:
   return null;
 
 }
@@ -202,14 +204,16 @@ return $default(_that.loading,_that.failedLogin,_that.username,_that.password);c
 /// @nodoc
 
 
-class _LoginState implements LoginState {
-  const _LoginState({this.loading = false, this.failedLogin = false, this.username = "", this.password = ""});
+class _LoginState implements LoginState, WithError {
+  const _LoginState({this.loading = false, this.failedLogin = false, this.username = "", this.password = "", this.error, this.stackTrace});
   
 
 @override@JsonKey() final  bool loading;
 @override@JsonKey() final  bool failedLogin;
 @override@JsonKey() final  String username;
 @override@JsonKey() final  String password;
+@override final  dynamic error;
+@override final  StackTrace? stackTrace;
 
 /// Create a copy of LoginState
 /// with the given fields replaced by the non-null parameter values.
@@ -221,16 +225,16 @@ _$LoginStateCopyWith<_LoginState> get copyWith => __$LoginStateCopyWithImpl<_Log
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LoginState&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.failedLogin, failedLogin) || other.failedLogin == failedLogin)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LoginState&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.failedLogin, failedLogin) || other.failedLogin == failedLogin)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loading,failedLogin,username,password);
+int get hashCode => Object.hash(runtimeType,loading,failedLogin,username,password,const DeepCollectionEquality().hash(error),stackTrace);
 
 @override
 String toString() {
-  return 'LoginState(loading: $loading, failedLogin: $failedLogin, username: $username, password: $password)';
+  return 'LoginState(loading: $loading, failedLogin: $failedLogin, username: $username, password: $password, error: $error, stackTrace: $stackTrace)';
 }
 
 
@@ -241,7 +245,7 @@ abstract mixin class _$LoginStateCopyWith<$Res> implements $LoginStateCopyWith<$
   factory _$LoginStateCopyWith(_LoginState value, $Res Function(_LoginState) _then) = __$LoginStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool loading, bool failedLogin, String username, String password
+ bool loading, bool failedLogin, String username, String password, dynamic error, StackTrace? stackTrace
 });
 
 
@@ -258,13 +262,15 @@ class __$LoginStateCopyWithImpl<$Res>
 
 /// Create a copy of LoginState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? loading = null,Object? failedLogin = null,Object? username = null,Object? password = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? loading = null,Object? failedLogin = null,Object? username = null,Object? password = null,Object? error = freezed,Object? stackTrace = freezed,}) {
   return _then(_LoginState(
 loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,failedLogin: null == failedLogin ? _self.failedLogin : failedLogin // ignore: cast_nullable_to_non_nullable
 as bool,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
-as String,
+as String,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as dynamic,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
+as StackTrace?,
   ));
 }
 

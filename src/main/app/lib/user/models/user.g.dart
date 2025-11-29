@@ -13,6 +13,7 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
   email: json['email'] as String?,
   feedItemPreference: json['feedItemPreference'] as String?,
   oidcSub: json['oidcSub'] as String?,
+  minimumImportance: (json['minimumImportance'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
@@ -22,4 +23,5 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'email': instance.email,
   'feedItemPreference': instance.feedItemPreference,
   'oidcSub': instance.oidcSub,
+  'minimumImportance': instance.minimumImportance,
 };

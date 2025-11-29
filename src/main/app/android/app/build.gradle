@@ -47,10 +47,10 @@ if(tag != null) {
 
 
 print flutterVersionName
-        print ":"
+print ":"
 println buildNumber
 
-        def keystoreProperties = new Properties()
+def keystoreProperties = new Properties()
 def keystorePropertiesFile = file(keyFile)
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
@@ -81,11 +81,11 @@ android {
     defaultConfig {
         applicationId "com.github.lamarios.newsku"
         minSdkVersion flutter.minSdkVersion
-                targetSdkVersion 36
+        targetSdkVersion 36
         versionCode buildNumber
-                versionName flutterVersionName
-                manifestPlaceholders += [
-            'appAuthRedirectScheme': 'com.github.lamarios.newsku' // for oidc flutter dependency
+        versionName flutterVersionName
+        manifestPlaceholders += [
+                'appAuthRedirectScheme': 'com.github.lamarios.newsku' // for oidc flutter dependency
         ]
     }
 

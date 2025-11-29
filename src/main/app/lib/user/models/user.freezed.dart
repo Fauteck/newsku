@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$User {
 
- String? get id; String? get username; String? get password; String? get email; String? get feedItemPreference; String? get oidcSub;
+ String? get id; String? get username; String? get password; String? get email; String? get feedItemPreference; String? get oidcSub; int get minimumImportance;
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $UserCopyWith<User> get copyWith => _$UserCopyWithImpl<User>(this as User, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&(identical(other.email, email) || other.email == email)&&(identical(other.feedItemPreference, feedItemPreference) || other.feedItemPreference == feedItemPreference)&&(identical(other.oidcSub, oidcSub) || other.oidcSub == oidcSub));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&(identical(other.email, email) || other.email == email)&&(identical(other.feedItemPreference, feedItemPreference) || other.feedItemPreference == feedItemPreference)&&(identical(other.oidcSub, oidcSub) || other.oidcSub == oidcSub)&&(identical(other.minimumImportance, minimumImportance) || other.minimumImportance == minimumImportance));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,username,password,email,feedItemPreference,oidcSub);
+int get hashCode => Object.hash(runtimeType,id,username,password,email,feedItemPreference,oidcSub,minimumImportance);
 
 @override
 String toString() {
-  return 'User(id: $id, username: $username, password: $password, email: $email, feedItemPreference: $feedItemPreference, oidcSub: $oidcSub)';
+  return 'User(id: $id, username: $username, password: $password, email: $email, feedItemPreference: $feedItemPreference, oidcSub: $oidcSub, minimumImportance: $minimumImportance)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $UserCopyWith<$Res>  {
   factory $UserCopyWith(User value, $Res Function(User) _then) = _$UserCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? username, String? password, String? email, String? feedItemPreference, String? oidcSub
+ String? id, String? username, String? password, String? email, String? feedItemPreference, String? oidcSub, int minimumImportance
 });
 
 
@@ -65,7 +65,7 @@ class _$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? username = freezed,Object? password = freezed,Object? email = freezed,Object? feedItemPreference = freezed,Object? oidcSub = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? username = freezed,Object? password = freezed,Object? email = freezed,Object? feedItemPreference = freezed,Object? oidcSub = freezed,Object? minimumImportance = null,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,username: freezed == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
@@ -73,7 +73,8 @@ as String?,password: freezed == password ? _self.password : password // ignore: 
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String?,feedItemPreference: freezed == feedItemPreference ? _self.feedItemPreference : feedItemPreference // ignore: cast_nullable_to_non_nullable
 as String?,oidcSub: freezed == oidcSub ? _self.oidcSub : oidcSub // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,minimumImportance: null == minimumImportance ? _self.minimumImportance : minimumImportance // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? username,  String? password,  String? email,  String? feedItemPreference,  String? oidcSub)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? username,  String? password,  String? email,  String? feedItemPreference,  String? oidcSub,  int minimumImportance)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.id,_that.username,_that.password,_that.email,_that.feedItemPreference,_that.oidcSub);case _:
+return $default(_that.id,_that.username,_that.password,_that.email,_that.feedItemPreference,_that.oidcSub,_that.minimumImportance);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.id,_that.username,_that.password,_that.email,_that.feedIte
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? username,  String? password,  String? email,  String? feedItemPreference,  String? oidcSub)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? username,  String? password,  String? email,  String? feedItemPreference,  String? oidcSub,  int minimumImportance)  $default,) {final _that = this;
 switch (_that) {
 case _User():
-return $default(_that.id,_that.username,_that.password,_that.email,_that.feedItemPreference,_that.oidcSub);}
+return $default(_that.id,_that.username,_that.password,_that.email,_that.feedItemPreference,_that.oidcSub,_that.minimumImportance);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -193,10 +194,10 @@ return $default(_that.id,_that.username,_that.password,_that.email,_that.feedIte
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? username,  String? password,  String? email,  String? feedItemPreference,  String? oidcSub)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? username,  String? password,  String? email,  String? feedItemPreference,  String? oidcSub,  int minimumImportance)?  $default,) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.id,_that.username,_that.password,_that.email,_that.feedItemPreference,_that.oidcSub);case _:
+return $default(_that.id,_that.username,_that.password,_that.email,_that.feedItemPreference,_that.oidcSub,_that.minimumImportance);case _:
   return null;
 
 }
@@ -208,7 +209,7 @@ return $default(_that.id,_that.username,_that.password,_that.email,_that.feedIte
 @JsonSerializable()
 
 class _User implements User {
-  const _User({this.id, this.username, this.password, this.email, this.feedItemPreference, this.oidcSub});
+  const _User({this.id, this.username, this.password, this.email, this.feedItemPreference, this.oidcSub, this.minimumImportance = 0});
   factory _User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
 @override final  String? id;
@@ -217,6 +218,7 @@ class _User implements User {
 @override final  String? email;
 @override final  String? feedItemPreference;
 @override final  String? oidcSub;
+@override@JsonKey() final  int minimumImportance;
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +233,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&(identical(other.email, email) || other.email == email)&&(identical(other.feedItemPreference, feedItemPreference) || other.feedItemPreference == feedItemPreference)&&(identical(other.oidcSub, oidcSub) || other.oidcSub == oidcSub));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&(identical(other.email, email) || other.email == email)&&(identical(other.feedItemPreference, feedItemPreference) || other.feedItemPreference == feedItemPreference)&&(identical(other.oidcSub, oidcSub) || other.oidcSub == oidcSub)&&(identical(other.minimumImportance, minimumImportance) || other.minimumImportance == minimumImportance));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,username,password,email,feedItemPreference,oidcSub);
+int get hashCode => Object.hash(runtimeType,id,username,password,email,feedItemPreference,oidcSub,minimumImportance);
 
 @override
 String toString() {
-  return 'User(id: $id, username: $username, password: $password, email: $email, feedItemPreference: $feedItemPreference, oidcSub: $oidcSub)';
+  return 'User(id: $id, username: $username, password: $password, email: $email, feedItemPreference: $feedItemPreference, oidcSub: $oidcSub, minimumImportance: $minimumImportance)';
 }
 
 
@@ -251,7 +253,7 @@ abstract mixin class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
   factory _$UserCopyWith(_User value, $Res Function(_User) _then) = __$UserCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? username, String? password, String? email, String? feedItemPreference, String? oidcSub
+ String? id, String? username, String? password, String? email, String? feedItemPreference, String? oidcSub, int minimumImportance
 });
 
 
@@ -268,7 +270,7 @@ class __$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? username = freezed,Object? password = freezed,Object? email = freezed,Object? feedItemPreference = freezed,Object? oidcSub = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? username = freezed,Object? password = freezed,Object? email = freezed,Object? feedItemPreference = freezed,Object? oidcSub = freezed,Object? minimumImportance = null,}) {
   return _then(_User(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,username: freezed == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
@@ -276,7 +278,8 @@ as String?,password: freezed == password ? _self.password : password // ignore: 
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String?,feedItemPreference: freezed == feedItemPreference ? _self.feedItemPreference : feedItemPreference // ignore: cast_nullable_to_non_nullable
 as String?,oidcSub: freezed == oidcSub ? _self.oidcSub : oidcSub // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,minimumImportance: null == minimumImportance ? _self.minimumImportance : minimumImportance // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

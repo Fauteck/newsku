@@ -23,6 +23,8 @@ public class User {
     private String feedItemPreference;
     @Column(name = "oidc_sub")
     private String oidcSub;
+    @Column(name = "minimum_importance")
+    private int minimumImportance;
 
     public String getId() {
         return id;
@@ -70,5 +72,13 @@ public class User {
 
     public void setOidcSub(String oidcSub) {
         this.oidcSub = oidcSub;
+    }
+
+    public int getMinimumImportance() {
+        return minimumImportance;
+    }
+
+    public void setMinimumImportance(int minimumImportance) {
+        this.minimumImportance = minimumImportance;
     }
 }

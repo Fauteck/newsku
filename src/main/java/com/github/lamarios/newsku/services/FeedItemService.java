@@ -7,7 +7,9 @@ import com.apptasticsoftware.rssreader.filter.InvalidXmlCharacterFilter;
 import com.github.lamarios.newsku.persistence.entities.Feed;
 import com.github.lamarios.newsku.persistence.entities.FeedItem;
 import com.github.lamarios.newsku.persistence.repositories.FeedItemRepository;
+import com.github.lamarios.newsku.persistence.repositories.FeedRepository;
 import com.github.lamarios.newsku.utils.TransactionHelper;
+import jakarta.persistence.EntityManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -37,13 +39,19 @@ public class FeedItemService {
 
     private final PlatformTransactionManager transactionManager;
     private final OpenaiService openaiService;
+    private final UserService userService;
+    private final EntityManager entityManager;
+    private final FeedRepository feedRepository;
 
     @Autowired
-    public FeedItemService(FeedItemRepository feedItemRepository, PlatformTransactionManager transactionManager, OpenaiService openaiService, FeedService feedService) {
+    public FeedItemService(FeedItemRepository feedItemRepository, PlatformTransactionManager transactionManager, OpenaiService openaiService, FeedService feedService, UserService userService, EntityManager entityManager, FeedRepository feedRepository) {
         this.feedItemRepository = feedItemRepository;
         this.transactionManager = transactionManager;
         this.openaiService = openaiService;
         this.feedService = feedService;
+        this.userService = userService;
+        this.entityManager = entityManager;
+        this.feedRepository = feedRepository;
     }
 
     public void refreshFeed(Feed feed) {
@@ -148,8 +156,20 @@ public class FeedItemService {
     public Page<FeedItem> getItems(Long from, Long to, int page, int pageSize) throws SQLException {
 
         List<Feed> feeds = feedService.getFeeds();
+        var user = userService.getCurrentUser();
 
-        return feedItemRepository.findallByTimeAndFeeds(from, to, feeds, PageRequest.of(page, pageSize, Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "importance"), new Sort.Order(Sort.Direction.DESC, "timeCreated")))));
+        return feedItemRepository.findallByTimeAndFeeds(user.getMinimumImportance(), from, to, feeds, PageRequest.of(page, pageSize, Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "importance"), new Sort.Order(Sort.Direction.DESC, "timeCreated")))));
+    }
+
+    @Transactional(readOnly = true)
+    public List<FeedItem> search(String query, int page, int pageSize) {
+        var feeds = feedRepository.getFeedsByUser(userService.getCurrentUser());
+        return entityManager.createNativeQuery(String.format("select * from feed_items where search_terms @@ websearch_to_tsquery(:textQuery) and feed_id in :feeds limit :pageSize offset :page"), FeedItem.class)
+                .setParameter("textQuery", query)
+                .setParameter("feeds", feeds.stream().map(Feed::getId).toList())
+                .setParameter("pageSize", pageSize)
+                .setParameter("page", page*pageSize)
+                .getResultList();
     }
 
     @Transactional(readOnly = true)

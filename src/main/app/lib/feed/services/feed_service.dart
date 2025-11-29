@@ -53,4 +53,16 @@ class FeedService extends BaseService {
 
     return Paginated<FeedItem>.fromJson(json, (feedItem) => FeedItem.fromJson(feedItem as Map<String, dynamic>));
   }
+
+  Future<List<FeedItem>> search({required String query, int page = 0, int pageSize = 100}) async {
+    var uri = await formatUrl('/api/search', query: {'page': page, 'pageSize': pageSize, 'query': query});
+
+    var response = await http.get(uri, headers: await headers);
+
+    processResponse(response);
+
+    Iterable json = jsonDecode(response.body);
+
+    return json.map((e) => FeedItem.fromJson(e as Map<String, dynamic>)).toList();
+  }
 }

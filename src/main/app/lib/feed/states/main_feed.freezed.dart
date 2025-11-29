@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MainFeedState {
 
- bool get hasScrolled; DateTime get currentTime; TimeBlock get timeBlock; bool get loading; Map<DateTimeRange, TimeBlockFeed> get items;
+ bool get hasScrolled; DateTime get currentTime; TimeBlock get timeBlock; bool get loading; Map<DateTimeRange, TimeBlockFeed> get items; bool get searchMode; String get searchTerms; List<FeedItem> get searchResults; int get searchPage;
 /// Create a copy of MainFeedState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $MainFeedStateCopyWith<MainFeedState> get copyWith => _$MainFeedStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MainFeedState&&(identical(other.hasScrolled, hasScrolled) || other.hasScrolled == hasScrolled)&&(identical(other.currentTime, currentTime) || other.currentTime == currentTime)&&(identical(other.timeBlock, timeBlock) || other.timeBlock == timeBlock)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other.items, items));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MainFeedState&&(identical(other.hasScrolled, hasScrolled) || other.hasScrolled == hasScrolled)&&(identical(other.currentTime, currentTime) || other.currentTime == currentTime)&&(identical(other.timeBlock, timeBlock) || other.timeBlock == timeBlock)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.searchMode, searchMode) || other.searchMode == searchMode)&&(identical(other.searchTerms, searchTerms) || other.searchTerms == searchTerms)&&const DeepCollectionEquality().equals(other.searchResults, searchResults)&&(identical(other.searchPage, searchPage) || other.searchPage == searchPage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,hasScrolled,currentTime,timeBlock,loading,const DeepCollectionEquality().hash(items));
+int get hashCode => Object.hash(runtimeType,hasScrolled,currentTime,timeBlock,loading,const DeepCollectionEquality().hash(items),searchMode,searchTerms,const DeepCollectionEquality().hash(searchResults),searchPage);
 
 @override
 String toString() {
-  return 'MainFeedState(hasScrolled: $hasScrolled, currentTime: $currentTime, timeBlock: $timeBlock, loading: $loading, items: $items)';
+  return 'MainFeedState(hasScrolled: $hasScrolled, currentTime: $currentTime, timeBlock: $timeBlock, loading: $loading, items: $items, searchMode: $searchMode, searchTerms: $searchTerms, searchResults: $searchResults, searchPage: $searchPage)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $MainFeedStateCopyWith<$Res>  {
   factory $MainFeedStateCopyWith(MainFeedState value, $Res Function(MainFeedState) _then) = _$MainFeedStateCopyWithImpl;
 @useResult
 $Res call({
- bool hasScrolled, DateTime currentTime, TimeBlock timeBlock, bool loading, Map<DateTimeRange, TimeBlockFeed> items
+ bool hasScrolled, DateTime currentTime, TimeBlock timeBlock, bool loading, Map<DateTimeRange, TimeBlockFeed> items, bool searchMode, String searchTerms, List<FeedItem> searchResults, int searchPage
 });
 
 
@@ -62,14 +62,18 @@ class _$MainFeedStateCopyWithImpl<$Res>
 
 /// Create a copy of MainFeedState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? hasScrolled = null,Object? currentTime = null,Object? timeBlock = null,Object? loading = null,Object? items = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? hasScrolled = null,Object? currentTime = null,Object? timeBlock = null,Object? loading = null,Object? items = null,Object? searchMode = null,Object? searchTerms = null,Object? searchResults = null,Object? searchPage = null,}) {
   return _then(_self.copyWith(
 hasScrolled: null == hasScrolled ? _self.hasScrolled : hasScrolled // ignore: cast_nullable_to_non_nullable
 as bool,currentTime: null == currentTime ? _self.currentTime : currentTime // ignore: cast_nullable_to_non_nullable
 as DateTime,timeBlock: null == timeBlock ? _self.timeBlock : timeBlock // ignore: cast_nullable_to_non_nullable
 as TimeBlock,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
-as Map<DateTimeRange, TimeBlockFeed>,
+as Map<DateTimeRange, TimeBlockFeed>,searchMode: null == searchMode ? _self.searchMode : searchMode // ignore: cast_nullable_to_non_nullable
+as bool,searchTerms: null == searchTerms ? _self.searchTerms : searchTerms // ignore: cast_nullable_to_non_nullable
+as String,searchResults: null == searchResults ? _self.searchResults : searchResults // ignore: cast_nullable_to_non_nullable
+as List<FeedItem>,searchPage: null == searchPage ? _self.searchPage : searchPage // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
@@ -151,10 +155,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool hasScrolled,  DateTime currentTime,  TimeBlock timeBlock,  bool loading,  Map<DateTimeRange, TimeBlockFeed> items)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool hasScrolled,  DateTime currentTime,  TimeBlock timeBlock,  bool loading,  Map<DateTimeRange, TimeBlockFeed> items,  bool searchMode,  String searchTerms,  List<FeedItem> searchResults,  int searchPage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MainFeedState() when $default != null:
-return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loading,_that.items);case _:
+return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loading,_that.items,_that.searchMode,_that.searchTerms,_that.searchResults,_that.searchPage);case _:
   return orElse();
 
 }
@@ -172,10 +176,10 @@ return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loadin
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool hasScrolled,  DateTime currentTime,  TimeBlock timeBlock,  bool loading,  Map<DateTimeRange, TimeBlockFeed> items)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool hasScrolled,  DateTime currentTime,  TimeBlock timeBlock,  bool loading,  Map<DateTimeRange, TimeBlockFeed> items,  bool searchMode,  String searchTerms,  List<FeedItem> searchResults,  int searchPage)  $default,) {final _that = this;
 switch (_that) {
 case _MainFeedState():
-return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loading,_that.items);}
+return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loading,_that.items,_that.searchMode,_that.searchTerms,_that.searchResults,_that.searchPage);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -189,10 +193,10 @@ return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loadin
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool hasScrolled,  DateTime currentTime,  TimeBlock timeBlock,  bool loading,  Map<DateTimeRange, TimeBlockFeed> items)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool hasScrolled,  DateTime currentTime,  TimeBlock timeBlock,  bool loading,  Map<DateTimeRange, TimeBlockFeed> items,  bool searchMode,  String searchTerms,  List<FeedItem> searchResults,  int searchPage)?  $default,) {final _that = this;
 switch (_that) {
 case _MainFeedState() when $default != null:
-return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loading,_that.items);case _:
+return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loading,_that.items,_that.searchMode,_that.searchTerms,_that.searchResults,_that.searchPage);case _:
   return null;
 
 }
@@ -204,7 +208,7 @@ return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loadin
 
 
 class _MainFeedState implements MainFeedState {
-  const _MainFeedState({this.hasScrolled = false, required this.currentTime, this.timeBlock = TimeBlock.one_day, this.loading = true, final  Map<DateTimeRange, TimeBlockFeed> items = const {}}): _items = items;
+  const _MainFeedState({this.hasScrolled = false, required this.currentTime, this.timeBlock = TimeBlock.one_day, this.loading = true, final  Map<DateTimeRange, TimeBlockFeed> items = const {}, this.searchMode = false, this.searchTerms = '', final  List<FeedItem> searchResults = const [], this.searchPage = 0}): _items = items,_searchResults = searchResults;
   
 
 @override@JsonKey() final  bool hasScrolled;
@@ -218,6 +222,16 @@ class _MainFeedState implements MainFeedState {
   return EqualUnmodifiableMapView(_items);
 }
 
+@override@JsonKey() final  bool searchMode;
+@override@JsonKey() final  String searchTerms;
+ final  List<FeedItem> _searchResults;
+@override@JsonKey() List<FeedItem> get searchResults {
+  if (_searchResults is EqualUnmodifiableListView) return _searchResults;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_searchResults);
+}
+
+@override@JsonKey() final  int searchPage;
 
 /// Create a copy of MainFeedState
 /// with the given fields replaced by the non-null parameter values.
@@ -229,16 +243,16 @@ _$MainFeedStateCopyWith<_MainFeedState> get copyWith => __$MainFeedStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MainFeedState&&(identical(other.hasScrolled, hasScrolled) || other.hasScrolled == hasScrolled)&&(identical(other.currentTime, currentTime) || other.currentTime == currentTime)&&(identical(other.timeBlock, timeBlock) || other.timeBlock == timeBlock)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other._items, _items));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MainFeedState&&(identical(other.hasScrolled, hasScrolled) || other.hasScrolled == hasScrolled)&&(identical(other.currentTime, currentTime) || other.currentTime == currentTime)&&(identical(other.timeBlock, timeBlock) || other.timeBlock == timeBlock)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.searchMode, searchMode) || other.searchMode == searchMode)&&(identical(other.searchTerms, searchTerms) || other.searchTerms == searchTerms)&&const DeepCollectionEquality().equals(other._searchResults, _searchResults)&&(identical(other.searchPage, searchPage) || other.searchPage == searchPage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,hasScrolled,currentTime,timeBlock,loading,const DeepCollectionEquality().hash(_items));
+int get hashCode => Object.hash(runtimeType,hasScrolled,currentTime,timeBlock,loading,const DeepCollectionEquality().hash(_items),searchMode,searchTerms,const DeepCollectionEquality().hash(_searchResults),searchPage);
 
 @override
 String toString() {
-  return 'MainFeedState(hasScrolled: $hasScrolled, currentTime: $currentTime, timeBlock: $timeBlock, loading: $loading, items: $items)';
+  return 'MainFeedState(hasScrolled: $hasScrolled, currentTime: $currentTime, timeBlock: $timeBlock, loading: $loading, items: $items, searchMode: $searchMode, searchTerms: $searchTerms, searchResults: $searchResults, searchPage: $searchPage)';
 }
 
 
@@ -249,7 +263,7 @@ abstract mixin class _$MainFeedStateCopyWith<$Res> implements $MainFeedStateCopy
   factory _$MainFeedStateCopyWith(_MainFeedState value, $Res Function(_MainFeedState) _then) = __$MainFeedStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool hasScrolled, DateTime currentTime, TimeBlock timeBlock, bool loading, Map<DateTimeRange, TimeBlockFeed> items
+ bool hasScrolled, DateTime currentTime, TimeBlock timeBlock, bool loading, Map<DateTimeRange, TimeBlockFeed> items, bool searchMode, String searchTerms, List<FeedItem> searchResults, int searchPage
 });
 
 
@@ -266,14 +280,18 @@ class __$MainFeedStateCopyWithImpl<$Res>
 
 /// Create a copy of MainFeedState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? hasScrolled = null,Object? currentTime = null,Object? timeBlock = null,Object? loading = null,Object? items = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? hasScrolled = null,Object? currentTime = null,Object? timeBlock = null,Object? loading = null,Object? items = null,Object? searchMode = null,Object? searchTerms = null,Object? searchResults = null,Object? searchPage = null,}) {
   return _then(_MainFeedState(
 hasScrolled: null == hasScrolled ? _self.hasScrolled : hasScrolled // ignore: cast_nullable_to_non_nullable
 as bool,currentTime: null == currentTime ? _self.currentTime : currentTime // ignore: cast_nullable_to_non_nullable
 as DateTime,timeBlock: null == timeBlock ? _self.timeBlock : timeBlock // ignore: cast_nullable_to_non_nullable
 as TimeBlock,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
-as Map<DateTimeRange, TimeBlockFeed>,
+as Map<DateTimeRange, TimeBlockFeed>,searchMode: null == searchMode ? _self.searchMode : searchMode // ignore: cast_nullable_to_non_nullable
+as bool,searchTerms: null == searchTerms ? _self.searchTerms : searchTerms // ignore: cast_nullable_to_non_nullable
+as String,searchResults: null == searchResults ? _self._searchResults : searchResults // ignore: cast_nullable_to_non_nullable
+as List<FeedItem>,searchPage: null == searchPage ? _self.searchPage : searchPage // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
