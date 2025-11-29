@@ -57,7 +57,20 @@ class LoginFormScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (config?.oidcConfig != null) ...[Text('or'), FilledButton.tonal(onPressed: () => cubit.logInWithOidc(), child: Text('Log in with ${config?.oidcConfig?.name}'))],
+                  if (config?.oidcConfig != null) ...[
+                    Text('or'),
+                    FilledButton.tonal(
+                      onPressed: () async {
+                        final token = await cubit.logInWithOidc();
+
+                        if (context.mounted) {
+                          context.read<IdentityCubit>().setToken(token);
+                          AutoRouter.of(context).replaceAll([HomeRoute()]);
+                        }
+                      },
+                      child: Text('Log in with ${config?.oidcConfig?.name}'),
+                    ),
+                  ],
                 ],
               ),
             ),

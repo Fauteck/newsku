@@ -47,7 +47,7 @@ public class JwtAuthenticationController {
                 .getPayload();
         var subject = claims.getSubject();
 
-        var user = loadUserByUsername(subject, token);
+        var user = oidcLoadUser(subject, token);
         if (user != null) {
             return jwtTokenUtil.generateToken(user);
         } else {
@@ -83,13 +83,21 @@ public class JwtAuthenticationController {
 
     }
 
+    public UserDetails oidcLoadUser(String subscription, String accessToken) throws Exception {
+        Optional<User> user = oidcService.handleUserSub(subscription, accessToken);
+        return user
+                .map(u -> {
+                    List<GrantedAuthority> authorityList = new ArrayList<>();
+                    return new org.springframework.security.core.userdetails.User(u.getUsername(), u.getPassword(), authorityList);
+                })
+                .orElseThrow(() -> new UsernameNotFoundException("No user with subscription " + subscription));
+    }
+
     public UserDetails loadUserByUsername(String username, String accessToken) throws UsernameNotFoundException {
         try {
             Optional<User> user;
             if (username != null) {
                 user = userService.getUser(username);
-            } else if (oidcService.getParser() != null) {
-                user = oidcService.handleUserSub(username, accessToken);
             } else {
                 throw new Exception();
             }

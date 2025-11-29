@@ -14,6 +14,7 @@ import kong.unirest.core.GetRequest;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONObject;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +22,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.Random;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -139,8 +143,14 @@ public class OidcService implements ApplicationContextAware {
                     user.setOidcSub(sub);
                     return Optional.ofNullable(userService.updateUser(user));
                 } else if (autoSignUpUsers) {
+
+                    byte[] array = new byte[50]; // length is bounded by 7
+                    new Random().nextBytes(array);
+                    String generatedString = new String(array, StandardCharsets.UTF_8);
+
                     user = new User();
                     user.setOidcSub(sub);
+                    user.setPassword(RandomStringUtils.secure().nextAlphabetic(70));
                     user.setEmail(object.getString(oidcEmailClaim));
                     user.setUsername(object.getString(oidcPreferredUsernameClaim));
 

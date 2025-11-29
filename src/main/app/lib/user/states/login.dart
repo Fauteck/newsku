@@ -44,8 +44,7 @@ class LoginCubit extends Cubit<LoginState> {
     return user?.token.accessToken;
   }
 
-  Future<bool> logInWithOidc() async {
-
+  Future<String> logInWithOidc() async {
     try {
       var config = getIt.get<IdentityCubit>().state.config;
       if (config?.oidcConfig != null) {
@@ -58,14 +57,14 @@ class LoginCubit extends Cubit<LoginState> {
 
           // usernamePasswordCubit.setToken(url, token);
 
-          return true;
+          return token;
         }
       }
-      return false;
-    } catch (e,s) {
+      throw Error();
+    } catch (e, s) {
       emit(state.copyWith(error: e, stackTrace: s));
       // emit(state.copyWith(loginError: e.toString().replaceFirst("Exception: ", '')));
-      return false;
+      rethrow;
     }
   }
 
@@ -75,16 +74,14 @@ class LoginCubit extends Cubit<LoginState> {
 
       var basePort = Uri.base.port;
 
-      String webUrl = kIsWeb
-          ? '${Uri.base.scheme}://${Uri.base.host}${basePort != 80 && basePort != 443 ? ':$basePort' : ''}/redirect.html'
-          : '';
+      String webUrl = kIsWeb ? '${Uri.base.scheme}://${Uri.base.host}${basePort != 80 && basePort != 443 ? ':$basePort' : ''}/redirect.html' : '';
 
       _log.fine(config);
       var redirectUri = kIsWeb
-      // this url must be an actual html page.
-      // see the file in /web/redirect.html for an example.
-      //
-      // for debugging in flutter, you must run this app with --web-port 22433
+          // this url must be an actual html page.
+          // see the file in /web/redirect.html for an example.
+          //
+          // for debugging in flutter, you must run this app with --web-port 22433
           ? Uri.parse(webUrl)
           : Uri.parse('com.github.lamarios.newsku:/oidcRedirect');
       final manager = OidcUserManager.lazy(
@@ -93,14 +90,10 @@ class LoginCubit extends Cubit<LoginState> {
         store: OidcMemoryStore(),
         settings: OidcUserManagerSettings(
           postLogoutRedirectUri: redirectUri,
-          frontChannelLogoutUri: Uri(
-            path: webUrl,
-          ).replace(queryParameters: {...redirectUri.queryParameters, 'requestType': 'front-channel-logout'}),
+          frontChannelLogoutUri: Uri(path: webUrl).replace(queryParameters: {...redirectUri.queryParameters, 'requestType': 'front-channel-logout'}),
           scope: ["openid", 'profile', 'email'],
           redirectUri: redirectUri,
-          options: OidcPlatformSpecificOptions(
-            web: OidcPlatformSpecificOptions_Web(broadcastChannel: 'oidc_flutter_web/redirect'),
-          ),
+          options: OidcPlatformSpecificOptions(web: OidcPlatformSpecificOptions_Web(broadcastChannel: 'oidc_flutter_web/redirect')),
         ),
       );
 
@@ -122,7 +115,8 @@ class LoginCubit extends Cubit<LoginState> {
 }
 
 @freezed
-sealed class LoginState with _$LoginState implements WithError{
+sealed class LoginState with _$LoginState implements WithError {
   @Implements<WithError>()
-  const factory LoginState({@Default(false) bool loading, @Default(false) bool failedLogin, @Default("") String username, @Default("") String password, dynamic error, StackTrace? stackTrace}) = _LoginState;
+  const factory LoginState({@Default(false) bool loading, @Default(false) bool failedLogin, @Default("") String username, @Default("") String password, dynamic error, StackTrace? stackTrace}) =
+      _LoginState;
 }

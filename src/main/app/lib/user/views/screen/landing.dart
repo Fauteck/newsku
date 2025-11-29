@@ -9,19 +9,21 @@ class LandingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 500),
-          child: Center(
-            child: Padding(
-              padding: .symmetric(horizontal: 36),
-              child: Column(
-                crossAxisAlignment: .center,
-                mainAxisAlignment: .center,
-                children: [Center(child: AutoRouter(
-                  clipBehavior: .none,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 500),
+            child: Center(
+              child: Padding(
+                padding: .symmetric(horizontal: 36),
+                child: Column(
+                  crossAxisAlignment: .center,
+                  mainAxisAlignment: .center,
+                  children: [Center(child: AutoRouter(
+                    clipBehavior: .none,
 
-                ))],
+                  ))],
+                ),
               ),
             ),
           ),

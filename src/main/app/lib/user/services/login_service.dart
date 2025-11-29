@@ -27,7 +27,7 @@ class LoginService extends BaseService {
   Future<dynamic> loginWithOidcToken(String accessToken) async {
     final response = await http.get(
       await formatUrl('/oidc-login'),
-      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $accessToken'},
     );
 
     if (response.statusCode == 200) {
