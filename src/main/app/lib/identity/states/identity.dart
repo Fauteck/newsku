@@ -3,10 +3,14 @@ import 'package:app/user/services/server_url_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 part 'identity.freezed.dart';
+
+
+final _log = Logger('IdentityCubit');
 
 class IdentityCubit extends Cubit<IdentityState> {
   IdentityCubit(super.initialState);
@@ -29,9 +33,16 @@ class IdentityCubit extends Cubit<IdentityState> {
       }
     }
 
+
     Config? serverConfig;
     if (server != null) {
-      serverConfig = await ServerUrlService(server).getConfig();
+      try {
+        serverConfig = await ServerUrlService(server).getConfig();
+        server = null;
+        token = null;
+      }catch(e){
+        _log.severe('Failed to log config from server, logging out',e);
+      }
     }
 
     emit(state.copyWith(serverUrl: server, token: token, config: serverConfig));

@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FeedsSettingsState {
 
- List<Feed> get feeds; bool get loading;
+ List<Feed> get feeds; bool get loading; dynamic get error; StackTrace? get stackTrace;
 /// Create a copy of FeedsSettingsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $FeedsSettingsStateCopyWith<FeedsSettingsState> get copyWith => _$FeedsSettingsS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeedsSettingsState&&const DeepCollectionEquality().equals(other.feeds, feeds)&&(identical(other.loading, loading) || other.loading == loading));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeedsSettingsState&&const DeepCollectionEquality().equals(other.feeds, feeds)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(feeds),loading);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(feeds),loading,const DeepCollectionEquality().hash(error),stackTrace);
 
 @override
 String toString() {
-  return 'FeedsSettingsState(feeds: $feeds, loading: $loading)';
+  return 'FeedsSettingsState(feeds: $feeds, loading: $loading, error: $error, stackTrace: $stackTrace)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $FeedsSettingsStateCopyWith<$Res>  {
   factory $FeedsSettingsStateCopyWith(FeedsSettingsState value, $Res Function(FeedsSettingsState) _then) = _$FeedsSettingsStateCopyWithImpl;
 @useResult
 $Res call({
- List<Feed> feeds, bool loading
+ List<Feed> feeds, bool loading, dynamic error, StackTrace? stackTrace
 });
 
 
@@ -62,11 +62,13 @@ class _$FeedsSettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of FeedsSettingsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? feeds = null,Object? loading = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? feeds = null,Object? loading = null,Object? error = freezed,Object? stackTrace = freezed,}) {
   return _then(_self.copyWith(
 feeds: null == feeds ? _self.feeds : feeds // ignore: cast_nullable_to_non_nullable
 as List<Feed>,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as dynamic,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
+as StackTrace?,
   ));
 }
 
@@ -148,10 +150,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Feed> feeds,  bool loading)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Feed> feeds,  bool loading,  dynamic error,  StackTrace? stackTrace)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FeedsSettingsState() when $default != null:
-return $default(_that.feeds,_that.loading);case _:
+return $default(_that.feeds,_that.loading,_that.error,_that.stackTrace);case _:
   return orElse();
 
 }
@@ -169,10 +171,10 @@ return $default(_that.feeds,_that.loading);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Feed> feeds,  bool loading)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Feed> feeds,  bool loading,  dynamic error,  StackTrace? stackTrace)  $default,) {final _that = this;
 switch (_that) {
 case _FeedsSettingsState():
-return $default(_that.feeds,_that.loading);}
+return $default(_that.feeds,_that.loading,_that.error,_that.stackTrace);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -186,10 +188,10 @@ return $default(_that.feeds,_that.loading);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Feed> feeds,  bool loading)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Feed> feeds,  bool loading,  dynamic error,  StackTrace? stackTrace)?  $default,) {final _that = this;
 switch (_that) {
 case _FeedsSettingsState() when $default != null:
-return $default(_that.feeds,_that.loading);case _:
+return $default(_that.feeds,_that.loading,_that.error,_that.stackTrace);case _:
   return null;
 
 }
@@ -200,8 +202,8 @@ return $default(_that.feeds,_that.loading);case _:
 /// @nodoc
 
 
-class _FeedsSettingsState implements FeedsSettingsState {
-  const _FeedsSettingsState({final  List<Feed> feeds = const [], this.loading = true}): _feeds = feeds;
+class _FeedsSettingsState implements FeedsSettingsState, WithError {
+  const _FeedsSettingsState({final  List<Feed> feeds = const [], this.loading = true, this.error, this.stackTrace}): _feeds = feeds;
   
 
  final  List<Feed> _feeds;
@@ -212,6 +214,8 @@ class _FeedsSettingsState implements FeedsSettingsState {
 }
 
 @override@JsonKey() final  bool loading;
+@override final  dynamic error;
+@override final  StackTrace? stackTrace;
 
 /// Create a copy of FeedsSettingsState
 /// with the given fields replaced by the non-null parameter values.
@@ -223,16 +227,16 @@ _$FeedsSettingsStateCopyWith<_FeedsSettingsState> get copyWith => __$FeedsSettin
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeedsSettingsState&&const DeepCollectionEquality().equals(other._feeds, _feeds)&&(identical(other.loading, loading) || other.loading == loading));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeedsSettingsState&&const DeepCollectionEquality().equals(other._feeds, _feeds)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_feeds),loading);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_feeds),loading,const DeepCollectionEquality().hash(error),stackTrace);
 
 @override
 String toString() {
-  return 'FeedsSettingsState(feeds: $feeds, loading: $loading)';
+  return 'FeedsSettingsState(feeds: $feeds, loading: $loading, error: $error, stackTrace: $stackTrace)';
 }
 
 
@@ -243,7 +247,7 @@ abstract mixin class _$FeedsSettingsStateCopyWith<$Res> implements $FeedsSetting
   factory _$FeedsSettingsStateCopyWith(_FeedsSettingsState value, $Res Function(_FeedsSettingsState) _then) = __$FeedsSettingsStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<Feed> feeds, bool loading
+ List<Feed> feeds, bool loading, dynamic error, StackTrace? stackTrace
 });
 
 
@@ -260,11 +264,13 @@ class __$FeedsSettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of FeedsSettingsState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? feeds = null,Object? loading = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? feeds = null,Object? loading = null,Object? error = freezed,Object? stackTrace = freezed,}) {
   return _then(_FeedsSettingsState(
 feeds: null == feeds ? _self._feeds : feeds // ignore: cast_nullable_to_non_nullable
 as List<Feed>,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as dynamic,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
+as StackTrace?,
   ));
 }
 

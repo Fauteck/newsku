@@ -4,6 +4,7 @@ import 'package:app/feed/models/time_block_feed.dart';
 import 'package:app/feed/services/feed_service.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
+import 'package:app/utils/models/with_error.dart';
 import 'package:app/utils/utils.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:easy_debounce/easy_throttle.dart';
@@ -49,44 +50,49 @@ class MainFeedCubit extends Cubit<MainFeedState> {
   }
 
   Future<void> getFeed() async {
-    emit(state.copyWith(loading: true));
-    var service = FeedService(getIt.get<IdentityCubit>().state.serverUrl ?? '');
+    try {
+      emit(state.copyWith(loading: true));
+      var service = FeedService(getIt.get<IdentityCubit>().state.serverUrl ?? '');
 
-    final now = state.currentTime;
-    final from = now.add(-state.timeBlock.duration);
+      final now = state.currentTime;
+      final from = now.add(-state.timeBlock.duration);
 
-    var key = DateTimeRange(start: from, end: now);
+      var key = DateTimeRange(start: from, end: now);
 
-    var data = List<FeedItem>.from(await service.getFeedItems(page: 0, pageSize: 50, from: from.millisecondsSinceEpoch, to: now.millisecondsSinceEpoch).then((value) => value.content));
+      var data = List<FeedItem>.from(await service.getFeedItems(page: 0, pageSize: 50, from: from.millisecondsSinceEpoch, to: now.millisecondsSinceEpoch).then((value) => value.content));
 
-    // we need to sort the data into the headlines and stuff
-    var feed = TimeBlockFeed();
+      // we need to sort the data into the headlines and stuff
+      var feed = TimeBlockFeed();
 
-    if (data.isNotEmpty) {
-      // the data comes sorted by rank, date desc
-      feed.mainHeadline = data.removeAt(0);
-    }
-
-    // 3 headlines
-    for (var i = 0; i < 3; i++) {
       if (data.isNotEmpty) {
-        feed.headlines.add(data.removeAt(0));
+        // the data comes sorted by rank, date desc
+        feed.mainHeadline = data.removeAt(0);
       }
-    }
 
-    // 6 notable news
-    for (var i = 0; i < 6; i++) {
-      if (data.isNotEmpty) {
-        feed.notableNews.add(data.removeAt(0));
+      // 3 headlines
+      for (var i = 0; i < 3; i++) {
+        if (data.isNotEmpty) {
+          feed.headlines.add(data.removeAt(0));
+        }
       }
+
+      // 6 notable news
+      for (var i = 0; i < 6; i++) {
+        if (data.isNotEmpty) {
+          feed.notableNews.add(data.removeAt(0));
+        }
+      }
+
+      feed.others = data;
+
+      var map = Map<DateTimeRange, TimeBlockFeed>.from(state.items);
+      map[key] = feed;
+
+      emit(state.copyWith(loading: false, items: map, currentTime: from));
+    } catch (e, s) {
+      emit(state.copyWith(error: e, stackTrace: s, loading: false));
+      rethrow;
     }
-
-    feed.others = data;
-
-    var map = Map<DateTimeRange, TimeBlockFeed>.from(state.items);
-    map[key] = feed;
-
-    emit(state.copyWith(loading: false, items: map, currentTime: from));
   }
 
   void setSearch(bool enable) {
@@ -106,22 +112,32 @@ class MainFeedCubit extends Cubit<MainFeedState> {
   Future<void> search(String value) async {
     emit(state.copyWith(searchPage: 0, searchResults: []));
     EasyDebounce.debounce('search', Duration(milliseconds: 500), () async {
-      final results = await FeedService(serverUrl!).search(query: value, page: state.searchPage, pageSize: searchPageSize);
-      emit(state.copyWith(searchPage: 0, searchResults: results, searchTerms: value));
+      try {
+        final results = await FeedService(serverUrl!).search(query: value, page: state.searchPage, pageSize: searchPageSize);
+        emit(state.copyWith(searchPage: 0, searchResults: results, searchTerms: value));
+      } catch (e, s) {
+        emit(state.copyWith(error: e, stackTrace: s));
+      }
     });
   }
 
   Future<void> loadMoreSearchResults() async {
-    final page = state.searchPage + 1;
-    final results = await FeedService(serverUrl!).search(query: state.searchTerms, page: page, pageSize: searchPageSize);
-    final feeds = List<FeedItem>.from(state.searchResults);
-    feeds.addAll(results);
-    emit(state.copyWith(searchResults: feeds, searchPage: page));
+    try {
+      emit(state.copyWith(loading: true));
+      final page = state.searchPage + 1;
+      final results = await FeedService(serverUrl!).search(query: state.searchTerms, page: page, pageSize: searchPageSize);
+      final feeds = List<FeedItem>.from(state.searchResults);
+      feeds.addAll(results);
+      emit(state.copyWith(searchResults: feeds, searchPage: page, loading: false));
+    } catch (e, s) {
+      emit(state.copyWith(loading: false, error: e, stackTrace: s));
+    }
   }
 }
 
 @freezed
-sealed class MainFeedState with _$MainFeedState {
+sealed class MainFeedState with _$MainFeedState implements WithError {
+  @Implements<WithError>()
   const factory MainFeedState({
     @Default(false) bool hasScrolled,
     required DateTime currentTime,
@@ -132,5 +148,7 @@ sealed class MainFeedState with _$MainFeedState {
     @Default('') String searchTerms,
     @Default([]) List<FeedItem> searchResults,
     @Default(0) int searchPage,
+    dynamic error,
+    StackTrace? stackTrace,
   }) = _MainFeedState;
 }
