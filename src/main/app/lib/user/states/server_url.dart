@@ -17,9 +17,9 @@ class ServerUrlCubit extends Cubit<ServerUrlState> {
         var service = ServerUrlService(url);
         var config = await service.getConfig();
 
-        emit(state.copyWith(config: config));
-      } finally {
-        emit(state.copyWith(loading: false));
+        emit(state.copyWith(config: config, error: false, loading: false));
+      } catch (e) {
+        emit(state.copyWith(error: true, loading: false));
       }
     });
   }
@@ -27,5 +27,5 @@ class ServerUrlCubit extends Cubit<ServerUrlState> {
 
 @freezed
 sealed class ServerUrlState with _$ServerUrlState {
-  const factory ServerUrlState({String? serverUrl, @Default(false) bool loading, Config? config}) = _ServerUrlState;
+  const factory ServerUrlState({String? serverUrl, @Default(false) bool loading, Config? config, @Default(false) bool error}) = _ServerUrlState;
 }

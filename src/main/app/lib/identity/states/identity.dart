@@ -38,9 +38,9 @@ class IdentityCubit extends Cubit<IdentityState> {
     if (server != null) {
       try {
         serverConfig = await ServerUrlService(server).getConfig();
+      }catch(e){
         server = null;
         token = null;
-      }catch(e){
         _log.severe('Failed to log config from server, logging out',e);
       }
     }

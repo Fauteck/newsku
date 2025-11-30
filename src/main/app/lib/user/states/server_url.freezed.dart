@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ServerUrlState {
 
- String? get serverUrl; bool get loading; Config? get config;
+ String? get serverUrl; bool get loading; Config? get config; bool get error;
 /// Create a copy of ServerUrlState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $ServerUrlStateCopyWith<ServerUrlState> get copyWith => _$ServerUrlStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServerUrlState&&(identical(other.serverUrl, serverUrl) || other.serverUrl == serverUrl)&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.config, config) || other.config == config));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServerUrlState&&(identical(other.serverUrl, serverUrl) || other.serverUrl == serverUrl)&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.config, config) || other.config == config)&&(identical(other.error, error) || other.error == error));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,serverUrl,loading,config);
+int get hashCode => Object.hash(runtimeType,serverUrl,loading,config,error);
 
 @override
 String toString() {
-  return 'ServerUrlState(serverUrl: $serverUrl, loading: $loading, config: $config)';
+  return 'ServerUrlState(serverUrl: $serverUrl, loading: $loading, config: $config, error: $error)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $ServerUrlStateCopyWith<$Res>  {
   factory $ServerUrlStateCopyWith(ServerUrlState value, $Res Function(ServerUrlState) _then) = _$ServerUrlStateCopyWithImpl;
 @useResult
 $Res call({
- String? serverUrl, bool loading, Config? config
+ String? serverUrl, bool loading, Config? config, bool error
 });
 
 
@@ -62,12 +62,13 @@ class _$ServerUrlStateCopyWithImpl<$Res>
 
 /// Create a copy of ServerUrlState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? serverUrl = freezed,Object? loading = null,Object? config = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? serverUrl = freezed,Object? loading = null,Object? config = freezed,Object? error = null,}) {
   return _then(_self.copyWith(
 serverUrl: freezed == serverUrl ? _self.serverUrl : serverUrl // ignore: cast_nullable_to_non_nullable
 as String?,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,config: freezed == config ? _self.config : config // ignore: cast_nullable_to_non_nullable
-as Config?,
+as Config?,error: null == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 /// Create a copy of ServerUrlState
@@ -161,10 +162,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? serverUrl,  bool loading,  Config? config)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? serverUrl,  bool loading,  Config? config,  bool error)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ServerUrlState() when $default != null:
-return $default(_that.serverUrl,_that.loading,_that.config);case _:
+return $default(_that.serverUrl,_that.loading,_that.config,_that.error);case _:
   return orElse();
 
 }
@@ -182,10 +183,10 @@ return $default(_that.serverUrl,_that.loading,_that.config);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? serverUrl,  bool loading,  Config? config)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? serverUrl,  bool loading,  Config? config,  bool error)  $default,) {final _that = this;
 switch (_that) {
 case _ServerUrlState():
-return $default(_that.serverUrl,_that.loading,_that.config);}
+return $default(_that.serverUrl,_that.loading,_that.config,_that.error);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -199,10 +200,10 @@ return $default(_that.serverUrl,_that.loading,_that.config);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? serverUrl,  bool loading,  Config? config)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? serverUrl,  bool loading,  Config? config,  bool error)?  $default,) {final _that = this;
 switch (_that) {
 case _ServerUrlState() when $default != null:
-return $default(_that.serverUrl,_that.loading,_that.config);case _:
+return $default(_that.serverUrl,_that.loading,_that.config,_that.error);case _:
   return null;
 
 }
@@ -214,12 +215,13 @@ return $default(_that.serverUrl,_that.loading,_that.config);case _:
 
 
 class _ServerUrlState implements ServerUrlState {
-  const _ServerUrlState({this.serverUrl, this.loading = false, this.config});
+  const _ServerUrlState({this.serverUrl, this.loading = false, this.config, this.error = false});
   
 
 @override final  String? serverUrl;
 @override@JsonKey() final  bool loading;
 @override final  Config? config;
+@override@JsonKey() final  bool error;
 
 /// Create a copy of ServerUrlState
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +233,16 @@ _$ServerUrlStateCopyWith<_ServerUrlState> get copyWith => __$ServerUrlStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ServerUrlState&&(identical(other.serverUrl, serverUrl) || other.serverUrl == serverUrl)&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.config, config) || other.config == config));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ServerUrlState&&(identical(other.serverUrl, serverUrl) || other.serverUrl == serverUrl)&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.config, config) || other.config == config)&&(identical(other.error, error) || other.error == error));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,serverUrl,loading,config);
+int get hashCode => Object.hash(runtimeType,serverUrl,loading,config,error);
 
 @override
 String toString() {
-  return 'ServerUrlState(serverUrl: $serverUrl, loading: $loading, config: $config)';
+  return 'ServerUrlState(serverUrl: $serverUrl, loading: $loading, config: $config, error: $error)';
 }
 
 
@@ -251,7 +253,7 @@ abstract mixin class _$ServerUrlStateCopyWith<$Res> implements $ServerUrlStateCo
   factory _$ServerUrlStateCopyWith(_ServerUrlState value, $Res Function(_ServerUrlState) _then) = __$ServerUrlStateCopyWithImpl;
 @override @useResult
 $Res call({
- String? serverUrl, bool loading, Config? config
+ String? serverUrl, bool loading, Config? config, bool error
 });
 
 
@@ -268,12 +270,13 @@ class __$ServerUrlStateCopyWithImpl<$Res>
 
 /// Create a copy of ServerUrlState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? serverUrl = freezed,Object? loading = null,Object? config = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? serverUrl = freezed,Object? loading = null,Object? config = freezed,Object? error = null,}) {
   return _then(_ServerUrlState(
 serverUrl: freezed == serverUrl ? _self.serverUrl : serverUrl // ignore: cast_nullable_to_non_nullable
 as String?,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,config: freezed == config ? _self.config : config // ignore: cast_nullable_to_non_nullable
-as Config?,
+as Config?,error: null == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
