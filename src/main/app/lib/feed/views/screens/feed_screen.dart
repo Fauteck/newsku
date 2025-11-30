@@ -80,7 +80,7 @@ class FeedScreen extends StatelessWidget {
                                       scrolledUnderElevation: 0,
                                       leadingWidth: 150,
                                       title: AnimatedCrossFade(
-                                        firstChild: AppName(),
+                                        firstChild: AppName(style: textTheme.titleLarge,),
                                         secondChild: Row(
                                           children: [
                                             Expanded(
