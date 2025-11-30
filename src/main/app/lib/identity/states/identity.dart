@@ -9,7 +9,6 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 
 part 'identity.freezed.dart';
 
-
 final _log = Logger('IdentityCubit');
 
 class IdentityCubit extends Cubit<IdentityState> {
@@ -38,10 +37,10 @@ class IdentityCubit extends Cubit<IdentityState> {
     if (server != null) {
       try {
         serverConfig = await ServerUrlService(server).getConfig();
-      }catch(e){
+      } catch (e) {
         server = null;
         token = null;
-        _log.severe('Failed to log config from server, logging out',e);
+        _log.severe('Failed to log config from server, logging out', e);
       }
     }
 
@@ -55,10 +54,11 @@ class IdentityCubit extends Cubit<IdentityState> {
   Future<void> logout() async {
     var prefs = await SharedPreferences.getInstance();
     prefs.remove('token');
-    if(!kIsWeb || kDebugMode ) {
+    var removeServer = !kIsWeb || kDebugMode;
+    if (removeServer) {
       prefs.remove('server');
     }
-    emit(state.copyWith(serverUrl: null, token: null));
+    emit(state.copyWith(serverUrl: removeServer ? null : state.serverUrl, token: null));
   }
 
   Future<void> setToken(String token) async {

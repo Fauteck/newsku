@@ -1,11 +1,14 @@
 import 'package:app/feed/views/screens/feed_screen.dart';
 import 'package:app/home/views/screens/home.dart';
+import 'package:app/identity/states/identity.dart';
+import 'package:app/main.dart';
 import 'package:app/settings/views/components/feeds.dart';
 import 'package:app/settings/views/screens/settings.dart';
 import 'package:app/user/views/components/login.dart';
 import 'package:app/user/views/components/login_form.dart';
 import 'package:app/user/views/components/server_url.dart';
 import 'package:app/user/views/screen/landing.dart';
+import 'package:app/utils/utils.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 
@@ -21,15 +24,35 @@ class AppRouter extends RootStackRouter {
 
   AppRouter({required this.loggedInOnStart});
 
+  void loginRequired(NavigationResolver resolver, StackRouter router) {
+    if (getIt.get<IdentityCubit>().isLoggedIn) {
+      resolver.next(true);
+    } else {
+      resolver.redirectUntil(!kIsWeb || kDebugMode ? ServerUrlRoute() : LoginFormRoute(), replace: true);
+    }
+  }
+
+  void serverUrlRequired(NavigationResolver resolver, StackRouter router) {
+    if (serverUrl != null) {
+      resolver.next(true);
+    } else {
+      resolver.redirectUntil(ServerUrlRoute(), replace: true);
+    }
+  }
+
   @override
-  List<AutoRoute> get routes => [
-    AutoRoute(
+  List<AutoRoute> get routes {
+    var hasServerUrlSetup = !kIsWeb || kDebugMode;
+    return [
+    AutoRoute.guarded(
       page: HomeRoute.page,
       initial: loggedInOnStart,
       children: [AutoRoute(page: FeedRoute.page, initial: true)],
+      onNavigation: loginRequired,
     ),
-    AutoRoute(
+    AutoRoute.guarded(
       page: SettingsRoute.page,
+      onNavigation: loginRequired,
       children: [
         AutoRoute(page: FeedsSettingsRoute.page, initial: true),
         AutoRoute(page: GeneralSettingsRoute.page),
@@ -39,10 +62,11 @@ class AppRouter extends RootStackRouter {
       page: LandingRoute.page,
       initial: !loggedInOnStart,
       children: [
-        AutoRoute(page: ServerUrlRoute.page, initial: !kIsWeb || kDebugMode),
-        AutoRoute(
+        if(hasServerUrlSetup)AutoRoute(page: ServerUrlRoute.page, initial: hasServerUrlSetup),
+        AutoRoute.guarded(
+          onNavigation: serverUrlRequired,
           page: LoginRoute.page,
-          initial: kIsWeb && !kDebugMode,
+          initial: !hasServerUrlSetup,
           children: [
             AutoRoute(page: LoginFormRoute.page, initial: true),
             AutoRoute(page: SignupFormRoute.page),
@@ -51,6 +75,7 @@ class AppRouter extends RootStackRouter {
       ],
     ),
   ];
+  }
 
   /*
   @override

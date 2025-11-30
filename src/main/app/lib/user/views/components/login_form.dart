@@ -1,6 +1,7 @@
 import 'package:app/identity/states/identity.dart';
 import 'package:app/router.dart';
 import 'package:app/user/states/login.dart';
+import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
@@ -18,7 +19,7 @@ class LoginFormScreen extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return BlocProvider(
-      create: (context) => LoginCubit(LoginState(), serverUrl: context.read<IdentityCubit>().state.serverUrl!),
+      create: (context) => LoginCubit(LoginState(), serverUrl: serverUrl!),
       child: BlocBuilder<LoginCubit, LoginState>(
         builder: (context, state) {
           final cubit = context.read<LoginCubit>();
