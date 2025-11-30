@@ -27,6 +27,7 @@ class FeedsSettingsTab extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
+                        spacing: 8,
                         children: [
                           Expanded(
                             child: TextField(
