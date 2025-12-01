@@ -4,6 +4,7 @@ import 'package:app/config/models/config.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
 import 'package:app/user/views/components/fancy_side.dart';
+import 'package:app/utils/views/components/app_logo.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -65,7 +66,7 @@ class LoginScreen extends StatelessWidget {
                     color: seedColor,
                     borderRadius: .only(topLeft: .circular(30), topRight: .circular(30)),
                   ),
-                  child: Align(alignment: .center, child: Icon(Icons.newspaper, size: 70)),
+                  child: Align(alignment: .center, child: AppLogo(size: 70, color: colors.onSurface)),
                 ),
               ),
               Padding(

@@ -11,7 +11,7 @@ import 'package:logging/logging.dart';
 late final _appRouter;
 
 final getIt = GetIt.instance;
-final Color seedColor = Colors.deepOrange;
+const Color seedColor = Colors.deepOrange;
 
 Future<void> main() async {
   Logger.root.level = kDebugMode ? Level.ALL : Level.INFO;

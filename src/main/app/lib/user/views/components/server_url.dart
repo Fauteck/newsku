@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/router.dart';
 import 'package:app/user/states/server_url.dart';
+import 'package:app/utils/views/components/app_logo.dart';
 import 'package:app/utils/views/components/app_name.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
@@ -36,7 +37,15 @@ class ServerUrlScreen extends StatelessWidget {
                   builder: (context, value, child) => Opacity(opacity: value.clamp(0, 1), child: Transform.translate(
                       offset: Offset(0, lerpDouble(25, 0, value)!),
                       child: child),),
-                  child: AppName(style: textTheme.displayMedium, alignment: .center)),
+                  child: Row(
+                    crossAxisAlignment: .center,
+                    mainAxisAlignment: .center,
+                    spacing: 16,
+                    children: [
+                      AppLogo(size: 40,),
+                      AppName(style: textTheme.displayMedium, alignment: .center),
+                    ],
+                  )),
               Gap(32),
               Align(alignment: .centerLeft, child: Text('Server')),
               TextField(

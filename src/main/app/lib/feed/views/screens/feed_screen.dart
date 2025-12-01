@@ -12,6 +12,7 @@ import 'package:app/main.dart';
 import 'package:app/router.dart';
 import 'package:app/user/views/components/fancy_side.dart';
 import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/utils/views/components/app_logo.dart';
 import 'package:app/utils/views/components/app_name.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:auto_route/annotations.dart';
@@ -100,7 +101,7 @@ class FeedScreen extends StatelessWidget {
                                           decoration: BoxDecoration(color: seedColor),
                                           child: Padding(
                                             padding: .only(left: 24),
-                                            child: Align(alignment: .centerLeft, child: Icon(Icons.newspaper)),
+                                            child: Align(alignment: .centerLeft, child: AppLogo(color: colors.onSurface,size: 20,)),
                                           ),
                                         ),
                                       ),
