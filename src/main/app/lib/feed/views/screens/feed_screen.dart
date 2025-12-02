@@ -15,17 +15,15 @@ import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/views/components/app_logo.dart';
 import 'package:app/utils/views/components/app_name.dart';
 import 'package:app/utils/views/components/error_listener.dart';
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:material_loading_indicator/loading_indicator.dart';
 import 'package:motor/motor.dart';
 
-final articleDateFormat = DateFormat.yMMMMd().add_Hm();
+final articleDateFormat = DateFormat.Hm();
 final double feedItemBorderRadius = 8;
 
 @RoutePage()
