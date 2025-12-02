@@ -8,6 +8,7 @@ import 'package:app/feed/views/components/main_headline.dart';
 import 'package:app/feed/views/components/notable_news.dart';
 import 'package:app/feed/views/components/search_result.dart';
 import 'package:app/feed/views/components/simple_news.dart';
+import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
 import 'package:app/router.dart';
 import 'package:app/user/views/components/fancy_side.dart';
@@ -79,14 +80,16 @@ class FeedScreen extends StatelessWidget {
                                       scrolledUnderElevation: 0,
                                       leadingWidth: 150,
                                       title: AnimatedCrossFade(
-                                        firstChild: AppName(style: textTheme.titleLarge,),
+                                        firstChild: AppName(style: textTheme.titleLarge),
                                         secondChild: Row(
                                           children: [
                                             Expanded(
-                                              child: TextField(controller: cubit.searchController, autofocus: true, onChanged: (value) => cubit.search(value), decoration: InputDecoration(
-                                                border: UnderlineInputBorder(),
-                                                label: Text('Search')
-                                              ),),
+                                              child: TextField(
+                                                controller: cubit.searchController,
+                                                autofocus: true,
+                                                onChanged: (value) => cubit.search(value),
+                                                decoration: InputDecoration(border: UnderlineInputBorder(), label: Text('Search')),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -99,14 +102,18 @@ class FeedScreen extends StatelessWidget {
                                           decoration: BoxDecoration(color: seedColor),
                                           child: Padding(
                                             padding: .only(left: 24),
-                                            child: Align(alignment: .centerLeft, child: AppLogo(color: colors.onSurface,size: 20,)),
+                                            child: Align(
+                                              alignment: .centerLeft,
+                                              child: AppLogo(color: colors.onSurface, size: 20),
+                                            ),
                                           ),
                                         ),
                                       ),
                                       actions: [
                                         IconButton(onPressed: () => cubit.setSearch(!state.searchMode), icon: Icon(state.searchMode ? Icons.close : Icons.search)),
-                                        if(!state.searchMode)IconButton(onPressed: () => cubit.refresh(), icon: Icon(Icons.refresh)),
-                                        IconButton(onPressed: () => AutoRouter.of(context).push(SettingsRoute()).then((value) => cubit.refresh(),), icon: Icon(Icons.settings)),
+                                        if (!state.searchMode) IconButton(onPressed: () => cubit.refresh(), icon: Icon(Icons.refresh)),
+                                        if (!(context.read<IdentityCubit>().state.config?.demoMode ?? false))
+                                          IconButton(onPressed: () => AutoRouter.of(context).push(SettingsRoute()).then((value) => cubit.refresh()), icon: Icon(Icons.settings)),
                                       ],
                                     ),
                                     if (state.searchMode)
@@ -212,10 +219,14 @@ class FeedScreen extends StatelessWidget {
                                       SliverToBoxAdapter(
                                         child: Center(child: SizedBox(width: 50, height: 50, child: LoadingIndicator())),
                                       )
-                                    else if(!state.searchMode || (state.searchMode && state.searchResults.length == searchPageSize * (state.searchPage+1)) )
+                                    else if (!state.searchMode || (state.searchMode && state.searchResults.length == searchPageSize * (state.searchPage + 1)))
                                       SliverToBoxAdapter(
                                         child: Center(
-                                          child: FilledButton.tonalIcon(onPressed: () => state.searchMode ? cubit.loadMoreSearchResults() : cubit.getFeed(), label: Text('Load more'), icon: Icon(Icons.expand_more)),
+                                          child: FilledButton.tonalIcon(
+                                            onPressed: () => state.searchMode ? cubit.loadMoreSearchResults() : cubit.getFeed(),
+                                            label: Text('Load more'),
+                                            icon: Icon(Icons.expand_more),
+                                          ),
                                         ),
                                       ),
                                   ],

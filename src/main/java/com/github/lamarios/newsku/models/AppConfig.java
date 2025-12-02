@@ -4,6 +4,7 @@ public class AppConfig {
     private boolean allowSignup;
     private OIDCConfig oidcConfig;
     private String announcement;
+    private boolean demoMode;
 
     public String getAnnouncement() {
         return announcement;
@@ -27,5 +28,13 @@ public class AppConfig {
 
     public void setAllowSignup(boolean allowSignup) {
         this.allowSignup = allowSignup;
+    }
+
+    public boolean isDemoMode() {
+        return demoMode;
+    }
+
+    public void setDemoMode(boolean demoMode) {
+        this.demoMode = demoMode;
     }
 }

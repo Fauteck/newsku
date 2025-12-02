@@ -7,6 +7,7 @@ part of 'config.dart';
 // **************************************************************************
 
 _Config _$ConfigFromJson(Map<String, dynamic> json) => _Config(
+  demoMode: json['demoMode'] as bool? ?? false,
   allowSignup: json['allowSignup'] as bool,
   oidcConfig: json['oidcConfig'] == null
       ? null
@@ -15,6 +16,7 @@ _Config _$ConfigFromJson(Map<String, dynamic> json) => _Config(
 );
 
 Map<String, dynamic> _$ConfigToJson(_Config instance) => <String, dynamic>{
+  'demoMode': instance.demoMode,
   'allowSignup': instance.allowSignup,
   'oidcConfig': instance.oidcConfig,
   'announcement': instance.announcement,

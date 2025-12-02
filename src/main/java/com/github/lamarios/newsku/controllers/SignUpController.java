@@ -17,15 +17,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class SignUpController {
     private final UserService userService;
     private final boolean allowSignUp;
+    private final boolean demoMode;
 
     @Autowired
-    public SignUpController(UserService userService, @Value("${ALLOW_SIGNUP:0}") boolean allowSignUp) {
+    public SignUpController(UserService userService, @Value("${ALLOW_SIGNUP:0}") boolean allowSignUp, @Value("${DEMO_MODE:0}") boolean demoMode) {
         this.userService = userService;
         this.allowSignUp = allowSignUp;
+        this.demoMode = demoMode;
     }
 
     @PutMapping
-    public User signup(@RequestBody  User user) {
+    public User signup(@RequestBody  User user) throws java.nio.file.AccessDeniedException {
+        if(demoMode){
+            throw new AccessDeniedException("App in demoMode");
+        }
         if (allowSignUp) {
             return userService.createUser(user);
         } else {

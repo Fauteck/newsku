@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:app/base_service.dart';
 import 'package:app/feed/models/feed.dart';
@@ -64,5 +65,29 @@ class FeedService extends BaseService {
     Iterable json = jsonDecode(response.body);
 
     return json.map((e) => FeedItem.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  Future<Uint8List> exportFeeds() async {
+    var uri = await formatUrl('/api/feeds/export');
+
+    var response = await http.get(uri, headers: await headers);
+
+    processResponse(response);
+
+    return response.bodyBytes;
+  }
+
+  Future<List<Feed>> importFeeds(Uint8List bytes) async {
+    var uri = await formatUrl('/api/feeds/import');
+
+    var request = http.MultipartRequest('POST', uri)
+      ..headers.addAll(await headers)
+      ..files.add(http.MultipartFile.fromBytes('file', bytes, filename: 'feeds.opml'));
+    var response = await http.Response.fromStream(await request.send());
+
+    processResponse(response);
+    Iterable i = jsonDecode(response.body);
+
+    return i.map((e) => Feed.fromJson(e as Map<String, dynamic>)).toList();
   }
 }

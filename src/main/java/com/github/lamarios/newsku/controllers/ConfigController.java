@@ -16,12 +16,14 @@ public class ConfigController {
     private final OidcService oidcService;
     private final boolean allowSignUp;
     private final String announcement;
+    private final boolean demoMode;
 
     @Autowired
-    public ConfigController(OidcService oidcService, @Value("${ALLOW_SIGNUP:0}") boolean allowSignUp, @Value("${ANNOUNCEMENT:}") String announcement) {
+    public ConfigController(OidcService oidcService, @Value("${ALLOW_SIGNUP:0}") boolean allowSignUp, @Value("${ANNOUNCEMENT:}") String announcement, @Value("${DEMO_MODE:0}") boolean demoMode) {
         this.oidcService = oidcService;
         this.allowSignUp = allowSignUp;
         this.announcement = announcement;
+        this.demoMode = demoMode;
     }
 
     @GetMapping
@@ -29,6 +31,7 @@ public class ConfigController {
         AppConfig config = new AppConfig();
         config.setAnnouncement(announcement);
         config.setAllowSignup(allowSignUp);
+        config.setDemoMode(demoMode);
 
         if (oidcService.getOidcDiscoveryUrl() != null) {
             config.setOidcConfig(oidcService.getOidcConfig());

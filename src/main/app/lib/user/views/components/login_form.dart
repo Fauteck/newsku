@@ -41,7 +41,7 @@ class LoginFormScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: .spaceBetween,
                     children: [
-                      if (config?.allowSignup ?? false) TextButton(onPressed: () => AutoRouter.of(context).replace(SignupFormRoute()), child: Text('Sign up')),
+                      if ((config?.allowSignup ?? false) && !(config?.demoMode ?? false)) TextButton(onPressed: () => AutoRouter.of(context).replace(SignupFormRoute()), child: Text('Sign up')),
                       Spacer(),
                       FilledButton.tonalIcon(
                         onPressed: state.loading
