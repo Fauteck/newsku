@@ -37,3 +37,5 @@ services:
     volumes:
       - ./newsku/db:/var/lib/postgresql
 ```
+
+Open a browser to http://localhost:8080 and the login page should appear. You can also download the android application from the release page on [github](https://github.com/lamarios/newsku/releases) to access your server.
