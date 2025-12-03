@@ -6,6 +6,7 @@ preferences.
 ## Features
 
 - Sort your RSS feeds articles by importance based on your own preference.
+- Use natural language to describe the kind of article you prefer or the ones you do not
 - Format the front page as a news website
 - Can be fully self-hosted and private as it is compatible with OpenAI api.
 
