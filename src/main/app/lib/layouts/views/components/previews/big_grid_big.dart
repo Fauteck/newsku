@@ -22,7 +22,7 @@ class BigGridBig extends StatelessWidget {
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
           childAspectRatio: 16 / 13,
-          children: List.generate(last ? 4 : (block.settings ?? block.type.defaultSettings).items ?? 0, (index) => _GridItem()),
+          children: List.generate(last ? 4 : (block.settings ?? block.type.defaultSettings).items ?? 6, (index) => _GridItem()),
         ),
         if (!last)
           Row(
@@ -31,15 +31,15 @@ class BigGridBig extends StatelessWidget {
               IconButton(
                 onPressed: () {
                   var settings = block.settings ?? block.type.defaultSettings;
-                  onUpdated(block.copyWith(settings: settings.copyWith(items: max(2, (settings.items ?? 0) - 1))));
+                  onUpdated(block.copyWith(settings: settings.copyWith(items: max(2, (settings.items ?? 6) - 1))));
                 },
                 icon: Icon(Icons.remove),
               ),
-              Text('${(block.settings ?? block.type.defaultSettings).items ?? 0} items'),
+              Text('${(block.settings ?? block.type.defaultSettings).items ?? 6} items'),
               IconButton(
                 onPressed: () {
                   var settings = block.settings ?? block.type.defaultSettings;
-                  onUpdated(block.copyWith(settings: settings.copyWith(items: (settings.items ?? 0) + 1)));
+                  onUpdated(block.copyWith(settings: settings.copyWith(items: (settings.items ?? 6) + 1)));
                 },
                 icon: Icon(Icons.remove),
               ),

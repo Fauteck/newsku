@@ -4,14 +4,11 @@ import com.github.lamarios.newsku.models.LayoutBlockSettings;
 import com.github.lamarios.newsku.models.LayoutBlockType;
 import com.github.lamarios.newsku.persistence.entities.LayoutBlock;
 import com.github.lamarios.newsku.persistence.repositories.LayoutRepository;
-import com.openai.errors.BadRequestException;
 import org.apache.tomcat.util.http.InvalidParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -85,7 +82,7 @@ public class LayoutService {
         // small grid
         LayoutBlock smallGrid = new LayoutBlock();
         LayoutBlockSettings smallGridSettings = new LayoutBlockSettings();
-        gridSettings.setItems(2);
+        smallGridSettings.setItems(2);
         smallGrid.setSettings(smallGridSettings);
         smallGrid.setType(LayoutBlockType.smallGrid);
         smallGrid.setOrder(2);
