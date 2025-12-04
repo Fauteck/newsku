@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [BlocProvider(create: (context) => getIt.get<IdentityCubit>())],
       child: MaterialApp.router(
-        title: 'NewsKu',
+        title: 'Newsku',
         routerConfig: _appRouter.config(),
         darkTheme: ThemeData(
           colorScheme: .fromSeed(

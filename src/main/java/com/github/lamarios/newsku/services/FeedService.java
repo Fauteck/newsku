@@ -170,7 +170,7 @@ public class FeedService {
     public String exportFeed() throws OpmlWriteException {
         List<Feed> feeds = feedRepository.getFeedsByUser(userService.getCurrentUser());
 
-        Head head = new Head("NewsKu", LocalDateTime.now()
+        Head head = new Head("Newsku", LocalDateTime.now()
                 .toString(), null, null, null, null, null, null, null, null, null, null, null);
 
         List<Outline> outlines = feeds.stream()
