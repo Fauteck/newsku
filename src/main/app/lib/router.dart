@@ -3,6 +3,7 @@ import 'package:app/home/views/screens/home.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
 import 'package:app/settings/views/components/feeds.dart';
+import 'package:app/settings/views/components/layout.dart';
 import 'package:app/settings/views/screens/settings.dart';
 import 'package:app/user/views/components/login.dart';
 import 'package:app/user/views/components/login_form.dart';
@@ -12,7 +13,6 @@ import 'package:app/utils/utils.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 
-import 'config/models/config.dart';
 import 'settings/views/components/general.dart';
 import 'user/views/components/signup_form.dart';
 
@@ -55,6 +55,7 @@ class AppRouter extends RootStackRouter {
       onNavigation: loginRequired,
       children: [
         AutoRoute(page: FeedsSettingsRoute.page, initial: true),
+        AutoRoute(page: LayoutSettingsRoute.page),
         AutoRoute(page: GeneralSettingsRoute.page),
       ],
     ),

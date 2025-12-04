@@ -2,7 +2,6 @@ import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
 import 'package:app/router.dart';
 import 'package:app/utils/models/breakpoints.dart';
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
@@ -12,8 +11,9 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final BreakPoint breakPoint = BreakPoint.get(context);
     return AutoTabsRouter.tabBar(
-      routes: [FeedsSettingsRoute(), GeneralSettingsRoute()],
+      routes: [FeedsSettingsRoute(), if (breakPoint != .mobile) LayoutSettingsRoute(), GeneralSettingsRoute()],
       builder: (context, child, tabController) {
         return Scaffold(
           appBar: AppBar(
@@ -21,8 +21,9 @@ class SettingsScreen extends StatelessWidget {
             actions: [TextButton.icon(onPressed: () => getIt.get<IdentityCubit>().logout(), label: Text('Logout'), icon: Icon(Icons.logout))],
             bottom: TabBar(
               controller: tabController,
-              tabs: const [
+              tabs: [
                 Tab(text: 'Feeds', icon: Icon(Icons.rss_feed)),
+                if (breakPoint != .mobile) Tab(text: 'Layout', icon: Icon(Icons.grid_view_sharp)),
                 Tab(text: 'General', icon: Icon(Icons.settings)),
               ],
             ),

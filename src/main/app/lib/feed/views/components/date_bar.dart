@@ -19,14 +19,14 @@ class DateBar extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     if (!isFirst && !isPinned) {
-      return SizedBox.shrink();
+      return SizedBox(height: 64,);
     }
     return SingleMotionBuilder(
       motion: MaterialSpringMotion.expressiveSpatialDefault(),
       from: 0,
       value: isPinned ? 0 : 1,
       builder: (context, value, child) => Container(
-        decoration: BoxDecoration(color: colors.surface),
+        decoration: BoxDecoration(color: Color.lerp(colors.surface, colors.surface.withValues(alpha: 0), value)),
         padding: .symmetric(vertical: lerpDouble(8, 40, value.clamp(0, 1))!),
         child: Row(
           mainAxisSize: .max,

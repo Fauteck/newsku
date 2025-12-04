@@ -1,14 +1,11 @@
 import 'dart:ui';
 
 import 'package:app/feed/models/feed_item.dart';
-import 'package:app/feed/models/time_block_feed.dart';
 import 'package:app/feed/states/main_feed.dart';
 import 'package:app/feed/views/components/date_bar.dart';
-import 'package:app/feed/views/components/main_headline.dart';
-import 'package:app/feed/views/components/notable_news.dart';
 import 'package:app/feed/views/components/search_result.dart';
-import 'package:app/feed/views/components/simple_news.dart';
 import 'package:app/identity/states/identity.dart';
+import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/main.dart';
 import 'package:app/router.dart';
 import 'package:app/user/views/components/fancy_side.dart';
@@ -21,27 +18,63 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 import 'package:material_loading_indicator/loading_indicator.dart';
 import 'package:motor/motor.dart';
 
 final articleDateFormat = DateFormat.Hm();
 final double feedItemBorderRadius = 8;
 
+final _log = Logger('FeedScreen');
+
 @RoutePage()
 class FeedScreen extends StatelessWidget {
   const FeedScreen({super.key});
 
-  SliverList? getHeadlines(TimeBlockFeed timeBlockFeed) {
-    if (timeBlockFeed.headLineListCount > 0) {
-      return SliverList.builder(
-        itemCount: 1,
-        itemBuilder: (context, index) {
-          return MainHeadline(feed: timeBlockFeed);
-        },
-      );
-    } else {
-      return null;
+  List<Widget> buildSlivers({required BuildContext context, required DateTimeRange<DateTime> timeRange, required List<FeedItem> immutableItems, required List<LayoutBlock> blocks}) {
+    List<Widget> slivers = [];
+    _log.fine('Building Slivers, TimeRange: $timeRange, Layout blocks: ${blocks.length}, Items: ${immutableItems.length}');
+
+    List<FeedItem> items = List.from(immutableItems);
+
+    // for each block, we try to fit items
+    for (final (index, block) in blocks.indexed) {
+      if (items.isEmpty) {
+        break;
+      }
+
+      List<FeedItem> blockItems = [];
+      if (index == blocks.length - 1) {
+        // if we're in the last block, we take all items
+        blockItems = List.from(items);
+      } else {
+        int blockSize = block.type.fixedItemSize ?? block.settings?.items ?? 0;
+        _log.fine('${block.type}: Block Size: $blockSize');
+        // we take the items the block is expecting
+        blockItems.addAll(items.take(blockSize).toList());
+      }
+      _log.fine('Block item: ${blockItems.length}');
+
+      slivers.add(block.type.getSliver(context: context, items: blockItems, block: block));
+
+      // we remove them from the main list
+      for (var element in blockItems) {
+        items.remove(element);
+      }
     }
+
+    for (int i = 0; i < slivers.length; i++) {
+      slivers[i] = SliverPadding(
+        padding: .symmetric(horizontal: 16),
+        sliver: SliverStickyHeader.builder(
+          builder: (context, state) => DateBar(date: timeRange.end, isPinned: state.isPinned, isFirst: i == 0),
+
+          sliver: slivers[i],
+        ),
+      );
+    }
+
+    return slivers;
   }
 
   @override
@@ -49,16 +82,14 @@ class FeedScreen extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
 
-    final breakPoint = BreakPoint.get(context);
-
-    return Center(
-      child: BlocProvider(
-        create: (context) => MainFeedCubit(MainFeedState(currentTime: DateTime.now().copyWith(hour: 23, minute: 59, second: 59, millisecond: 999))),
-        child: ErrorHandler<MainFeedCubit, MainFeedState>(
-          child: BlocBuilder<MainFeedCubit, MainFeedState>(
-            builder: (context, state) {
-              var cubit = context.read<MainFeedCubit>();
-              return Stack(
+    return BlocProvider(
+      create: (context) => MainFeedCubit(MainFeedState(currentTime: DateTime.now().copyWith(hour: 23, minute: 59, second: 59, millisecond: 999))),
+      child: ErrorHandler<MainFeedCubit, MainFeedState>(
+        child: BlocBuilder<MainFeedCubit, MainFeedState>(
+          builder: (context, state) {
+            var cubit = context.read<MainFeedCubit>();
+            return Center(
+              child: Stack(
                 children: [
                   ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: BreakPoint.desktop.maxWidth),
@@ -126,74 +157,8 @@ class FeedScreen extends StatelessWidget {
                                     else
                                       ...state.items.keys.expand((value) {
                                         var feed = state.items[value];
-                                        if (feed != null && feed.itemCount > 0) {
-                                          var headlines = breakPoint != .mobile ? getHeadlines(feed) : null;
-
-                                          var notableNews = List<FeedItem>.from(feed.notableNews);
-
-                                          // on mobile, there's no real estate to build nice headlines so we put all as notable news
-                                          if (breakPoint == .mobile) {
-                                            notableNews.insertAll(0, feed.headlines.reversed.toList());
-
-                                            if (feed.mainHeadline != null) {
-                                              notableNews.insert(0, feed.mainHeadline!);
-                                            }
-                                          }
-
-                                          return [
-                                            // getDateHeader(value, state.timeBlock),
-                                            if (headlines != null)
-                                              SliverPadding(
-                                                padding: .symmetric(horizontal: 16),
-                                                sliver: SliverStickyHeader.builder(
-                                                  builder: (context, state) => DateBar(date: value.end, isPinned: state.isPinned, isFirst: true),
-
-                                                  sliver: headlines,
-                                                ),
-                                              ),
-                                            if (notableNews.isNotEmpty)
-                                              SliverPadding(
-                                                padding: .only(left: 16, right: 16, top: headlines != null ? 64 : 0),
-                                                sliver: SliverStickyHeader.builder(
-                                                  builder: (context, state) => DateBar(date: value.end, isPinned: state.isPinned, isFirst: headlines == null),
-                                                  sliver: SliverGrid.builder(
-                                                    itemCount: notableNews.length,
-                                                    itemBuilder: (context, index) => NotableNews(key: ValueKey(notableNews[index]), item: notableNews[index]),
-                                                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                                      crossAxisCount: switch (breakPoint) {
-                                                        .mobile => 1,
-                                                        .tablet => 2,
-                                                        _ => 3,
-                                                      },
-                                                      crossAxisSpacing: 16,
-                                                      mainAxisSpacing: 16,
-                                                      mainAxisExtent: 450,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            if (feed.others.isNotEmpty) ...[
-                                              SliverPadding(
-                                                padding: .only(left: 16, right: 16, top: 64),
-                                                sliver: SliverStickyHeader.builder(
-                                                  builder: (context, state) => DateBar(date: value.end, isPinned: state.isPinned, isFirst: headlines == null && notableNews.isEmpty),
-                                                  sliver: SliverGrid.builder(
-                                                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                                      crossAxisCount: switch (breakPoint) {
-                                                        .mobile => 1,
-                                                        _ => 2,
-                                                      },
-                                                      mainAxisExtent: 120,
-                                                      mainAxisSpacing: 16,
-                                                      crossAxisSpacing: 16,
-                                                    ),
-                                                    itemCount: feed.others.length,
-                                                    itemBuilder: (context, index) => SimpleNews(key: ValueKey(feed.others[index]), item: feed.others[index]),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ];
+                                        if (feed != null && feed.isNotEmpty) {
+                                          return buildSlivers(context: context, timeRange: value, immutableItems: feed, blocks: state.layout);
                                         } else {
                                           return [
                                             SliverStickyHeader.builder(
@@ -253,9 +218,9 @@ class FeedScreen extends StatelessWidget {
                     ),
                   ),
                 ],
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );

@@ -1,7 +1,6 @@
 import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
 import 'package:http/http.dart';
-import 'package:http/http.dart' as Preferences;
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -50,7 +49,9 @@ abstract class BaseService {
     List<String> formattedQuery = [];
     query.forEach((key, value) {
       if (value is List) {
-        value.forEach((element) => formattedQuery.add('$key=${element.toString()}'));
+        for (var element in value) {
+          formattedQuery.add('$key=${element.toString()}');
+        }
       } else {
         formattedQuery.add('$key=${value.toString()}');
       }
@@ -78,7 +79,7 @@ abstract class BaseService {
         }
         throw Exception("Couldn't execute request, unauthorized}");
       default:
-        throw Exception("Couldn't execute request ${statusCode} -> ${body}");
+        throw Exception("Couldn't execute request $statusCode -> $body");
     }
   }
 }

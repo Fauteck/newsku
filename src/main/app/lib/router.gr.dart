@@ -99,6 +99,26 @@ class LandingRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [LayoutSettingsTab]
+class LayoutSettingsRoute extends PageRouteInfo<void> {
+  const LayoutSettingsRoute({List<PageRouteInfo>? children})
+    : super(
+        LayoutSettingsRoute.name,
+        initialChildren: children,
+        argsEquality: false,
+      );
+
+  static const String name = 'LayoutSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const LayoutSettingsTab();
+    },
+  );
+}
+
+/// generated route for
 /// [LoginFormScreen]
 class LoginFormRoute extends PageRouteInfo<void> {
   const LoginFormRoute({List<PageRouteInfo>? children})

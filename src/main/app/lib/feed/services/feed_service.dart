@@ -8,6 +8,7 @@ import 'package:app/utils/models/pagination.dart';
 import 'package:http/http.dart' as http;
 
 class FeedService extends BaseService {
+  @override
   final String url;
 
   const FeedService(this.url);

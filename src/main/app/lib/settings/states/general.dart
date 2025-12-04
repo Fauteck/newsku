@@ -32,7 +32,7 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
     try {
       emit(state.copyWith(loading: true));
       final user = await UserService(serverUrl!).getUser();
-      print('user: ${user}');
+      print('user: $user');
       emit(state.copyWith(user: user, minimumImportance: user.minimumImportance));
       preferenceController.text = user.feedItemPreference ?? '';
     } catch (e, s) {

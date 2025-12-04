@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;
 
-public interface FeedRepository extends JpaRepository<Feed, UUID> {
+public interface FeedRepository extends JpaRepository<Feed, String> {
     List<Feed> getFeedsByUser(User user);
 
     User user(User user);

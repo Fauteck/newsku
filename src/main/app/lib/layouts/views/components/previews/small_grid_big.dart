@@ -1,0 +1,78 @@
+import 'dart:math';
+
+import 'package:app/layouts/models/layout_block.dart';
+import 'package:app/layouts/views/components/previews/preview_container.dart';
+import 'package:flutter/material.dart';
+
+class SmallGridBig extends StatelessWidget {
+  final LayoutBlock block;
+  final Function(LayoutBlock block) onUpdated;
+  final bool last;
+
+  const SmallGridBig({super.key, required this.block, required this.onUpdated, required this.last});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        GridView.count(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 0,
+          childAspectRatio: 16 / 4,
+          children: List.generate(last ? 4: (block.settings ?? block.type.defaultSettings).items ?? 0, (index) => _GridItem(),),
+        ),
+        if (!last)
+          Row(
+            mainAxisAlignment: .center,
+            children: [
+              IconButton(
+                onPressed: () {
+                  var settings = block.settings ?? block.type.defaultSettings;
+                  onUpdated(block.copyWith(settings: settings.copyWith(items: max(2, (settings.items ?? 0) - 1))));
+                },
+                icon: Icon(Icons.remove),
+              ),
+              Text('${(block.settings ?? block.type.defaultSettings).items ?? 0} items'),
+              IconButton(
+                onPressed: () {
+                  var settings = block.settings ?? block.type.defaultSettings;
+                  onUpdated(block.copyWith(settings: settings.copyWith(items: (settings.items ?? 0) + 1)));
+                },
+                icon: Icon(Icons.remove),
+              ),
+            ],
+          ),
+      ],
+    );
+  }
+}
+
+class _GridItem extends StatelessWidget {
+  const _GridItem();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: .center,
+      spacing: 8,
+      children: [
+        Expanded(
+          child: Column(
+            spacing: 8,
+            mainAxisAlignment: .center,
+            children: [
+              PreviewContainer(height: 12, borderRadius: .circular(5)),
+              PreviewContainer(height: 12, borderRadius: .circular(5)),
+              PreviewContainer(height: 6, borderRadius: .circular(5)),
+              PreviewContainer(height: 6, borderRadius: .circular(5)),
+            ],
+          ),
+        ),
+        PreviewContainer(height: 60, width: 24, borderRadius: .circular(2)),
+      ],
+    );
+  }
+}

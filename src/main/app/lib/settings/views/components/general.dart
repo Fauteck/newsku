@@ -1,5 +1,4 @@
 import 'package:app/settings/states/general.dart';
-import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +11,6 @@ class GeneralSettingsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     return Padding(

@@ -2,17 +2,16 @@ import 'package:app/feed/models/feed_item.dart';
 import 'package:app/feed/views/components/clickable_feed_item.dart';
 import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
 import '../screens/feed_screen.dart';
 import 'feed_item_image.dart';
 
-class NotableNews extends StatelessWidget {
+class BigGridItem extends StatelessWidget {
   final FeedItem item;
 
-  const NotableNews({super.key, required this.item});
+  const BigGridItem({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {

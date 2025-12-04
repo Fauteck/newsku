@@ -1,8 +1,9 @@
 import 'package:app/feed/models/feed_item.dart';
 import 'package:app/feed/models/time_block.dart';
-import 'package:app/feed/models/time_block_feed.dart';
 import 'package:app/feed/services/feed_service.dart';
 import 'package:app/identity/states/identity.dart';
+import 'package:app/layouts/models/layout_block.dart';
+import 'package:app/layouts/services/layout.dart';
 import 'package:app/main.dart';
 import 'package:app/utils/models/with_error.dart';
 import 'package:app/utils/utils.dart';
@@ -39,7 +40,7 @@ class MainFeedCubit extends Cubit<MainFeedState> {
         });
       }
     });
-    getFeed();
+    refresh();
   }
 
   @override
@@ -62,31 +63,8 @@ class MainFeedCubit extends Cubit<MainFeedState> {
       var data = List<FeedItem>.from(await service.getFeedItems(page: 0, pageSize: 50, from: from.millisecondsSinceEpoch, to: now.millisecondsSinceEpoch).then((value) => value.content));
 
       // we need to sort the data into the headlines and stuff
-      var feed = TimeBlockFeed();
-
-      if (data.isNotEmpty) {
-        // the data comes sorted by rank, date desc
-        feed.mainHeadline = data.removeAt(0);
-      }
-
-      // 3 headlines
-      for (var i = 0; i < 3; i++) {
-        if (data.isNotEmpty) {
-          feed.headlines.add(data.removeAt(0));
-        }
-      }
-
-      // 6 notable news
-      for (var i = 0; i < 6; i++) {
-        if (data.isNotEmpty) {
-          feed.notableNews.add(data.removeAt(0));
-        }
-      }
-
-      feed.others = data;
-
-      var map = Map<DateTimeRange, TimeBlockFeed>.from(state.items);
-      map[key] = feed;
+      var map = Map<DateTimeRange, List<FeedItem>>.from(state.items);
+      map[key] = data;
 
       emit(state.copyWith(loading: false, items: map, currentTime: from));
     } catch (e, s) {
@@ -102,7 +80,14 @@ class MainFeedCubit extends Cubit<MainFeedState> {
   }
 
   Future<void> refresh() async {
-    emit(state.copyWith(currentTime: DateTime.now().copyWith(hour: 23, minute: 59, second: 59, millisecond: 999), items: {}));
+    try {
+      emit(state.copyWith(loading: true));
+      final layout = await LayoutService(serverUrl!).getLayout();
+      emit(state.copyWith(currentTime: DateTime.now().copyWith(hour: 23, minute: 59, second: 59, millisecond: 999), items: {}, layout: layout));
+    } catch (e, s) {
+      emit(state.copyWith(error: e, stackTrace: s, loading: false));
+      rethrow;
+    }
     // loading 3 to have a minimum of things to see
     await getFeed();
     await getFeed();
@@ -143,11 +128,12 @@ sealed class MainFeedState with _$MainFeedState implements WithError {
     required DateTime currentTime,
     @Default(TimeBlock.one_day) TimeBlock timeBlock,
     @Default(true) bool loading,
-    @Default({}) Map<DateTimeRange, TimeBlockFeed> items,
+    @Default({}) Map<DateTimeRange, List<FeedItem>> items,
     @Default(false) bool searchMode,
     @Default('') String searchTerms,
     @Default([]) List<FeedItem> searchResults,
     @Default(0) int searchPage,
+    @Default([]) List<LayoutBlock> layout,
     dynamic error,
     StackTrace? stackTrace,
   }) = _MainFeedState;

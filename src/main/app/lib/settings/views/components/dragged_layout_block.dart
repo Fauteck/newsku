@@ -1,0 +1,21 @@
+import 'package:app/layouts/models/layout_block_types.dart';
+import 'package:flutter/material.dart';
+
+class DraggedLayoutBlock extends StatelessWidget {
+  final LayoutBlockTypes type;
+
+  const DraggedLayoutBlock({super.key, required this.type});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Opacity(
+      opacity: 0.75,
+      child: Container(
+        decoration: BoxDecoration(color: colors.surfaceContainerHigh, borderRadius: .circular(20)),
+        padding: .all(20),
+        child: type.smallPreview,
+      ),
+    );
+  }
+}

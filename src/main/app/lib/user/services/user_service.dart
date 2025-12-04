@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import '../models/user.dart';
 
 class UserService extends BaseService {
+  @override
   final String url;
 
   UserService(this.url);

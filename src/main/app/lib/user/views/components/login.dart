@@ -1,15 +1,12 @@
 import 'dart:ui';
 
-import 'package:app/config/models/config.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
 import 'package:app/user/views/components/fancy_side.dart';
 import 'package:app/utils/views/components/app_logo.dart';
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gap/gap.dart';
 import 'package:motor/motor.dart';
 
 @RoutePage()
@@ -19,7 +16,6 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     var announcement = context.read<IdentityCubit>().state.config?.announcement ?? '';
     return Column(

@@ -7,14 +7,14 @@ class ErrorDialog extends StatelessWidget {
 
   const ErrorDialog({super.key, required this.error, this.trace});
 
-  static show(BuildContext context, {required dynamic error, StackTrace? trace}) {
+  static void show(BuildContext context, {required dynamic error, StackTrace? trace}) {
     showDialog(
       context: context,
       builder: (context) => ErrorDialog(error: error, trace: trace),
     );
   }
 
-  static showSnack(BuildContext context, {required dynamic error, StackTrace? trace}) {
+  static void showSnack(BuildContext context, {required dynamic error, StackTrace? trace}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Column(

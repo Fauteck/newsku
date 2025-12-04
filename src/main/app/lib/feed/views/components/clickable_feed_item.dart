@@ -1,4 +1,3 @@
-import 'package:app/feed/models/feed.dart';
 import 'package:app/feed/models/feed_item.dart';
 import 'package:app/utils/states/simple_cubit.dart';
 import 'package:app/utils/views/components/simple_cubit_view.dart';

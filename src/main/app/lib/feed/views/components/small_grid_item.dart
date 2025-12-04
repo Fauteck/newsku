@@ -5,13 +5,12 @@ import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
 import 'package:app/feed/views/screens/feed_screen.dart';
 import 'package:app/utils/models/breakpoints.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-class SimpleNews extends StatelessWidget {
+class SmallGridItem extends StatelessWidget {
   final FeedItem item;
 
-  const SimpleNews({super.key, required this.item});
+  const SmallGridItem({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {

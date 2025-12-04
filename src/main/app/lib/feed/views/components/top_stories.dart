@@ -1,11 +1,9 @@
 import 'package:app/feed/models/feed_item.dart';
-import 'package:app/feed/models/time_block_feed.dart';
 import 'package:app/feed/views/components/clickable_feed_item.dart';
-import 'package:app/feed/views/components/feed_image.dart';
 import 'package:app/feed/views/components/feed_item_image.dart';
 import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
-import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/layouts/models/layout_block.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
@@ -13,10 +11,11 @@ import '../screens/feed_screen.dart';
 
 const double _roundImageSize = 100;
 
-class MainHeadline extends StatelessWidget {
-  final TimeBlockFeed feed;
+class TopStories extends StatelessWidget {
+  final List<FeedItem> items;
+  final LayoutBlock block;
 
-  const MainHeadline({super.key, required this.feed});
+  const TopStories({super.key, required this.items, required this.block});
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +25,7 @@ class MainHeadline extends StatelessWidget {
     return Container(
       clipBehavior: .none,
       constraints: BoxConstraints(maxHeight: 500),
-      decoration: BoxDecoration(color: colors.surfaceContainerHigh,
-      borderRadius: .circular(feedItemBorderRadius)
-      ),
+      decoration: BoxDecoration(color: colors.surfaceContainerHigh, borderRadius: .circular(feedItemBorderRadius)),
       padding: .all(16),
       child: Row(
         spacing: 24,
@@ -36,31 +33,21 @@ class MainHeadline extends StatelessWidget {
         children: [
           Align(
             alignment: .topCenter,
-            child: SizedBox(
-              height: 200,
-              child: RotatedBox(
-                quarterTurns: 1,
-                child: Container(
-                    decoration: BoxDecoration(
-                        color: colors.tertiary,
-                        borderRadius: .circular(50)
-                    ),
-                    padding: .symmetric(horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: .center,
-                      spacing: 8,
-                      children: [
-                        Icon(Icons.star, color: colors.onTertiary,),
-                        Text('Top Stories', style: textTheme.bodyLarge?.copyWith(fontSize: 25, color: colors.onTertiary),),
-                      ],
-                    )),
+            child: RotatedBox(
+              quarterTurns: 1,
+              child: Container(
+                decoration: BoxDecoration(color: colors.tertiary, borderRadius: .circular(50)),
+                padding: .symmetric(horizontal: 16),
+                child: Text((block.settings ?? block.type.defaultSettings).title ?? '★ Top Stories',maxLines: 1, overflow: .ellipsis, style: textTheme.bodyLarge?.copyWith(fontSize: 25, color: colors.onTertiary)),
               ),
             ),
           ),
           Expanded(
             child: Column(
               spacing: 24,
-              children: feed.headlines.indexed
+              children: items
+                  .skip(1)
+                  .indexed
                   .map(
                     (e) => ClickableFeedItem(
                       item: e.$2,
@@ -87,7 +74,7 @@ class MainHeadline extends StatelessWidget {
                               ),
                             ],
                           ),
-                          if (e.$1 < feed.headlines.length - 1) ...[
+                          if (e.$1 < items.skip(1).length - 1) ...[
                             Gap(24),
                             Align(
                               alignment: .center,
@@ -101,10 +88,10 @@ class MainHeadline extends StatelessWidget {
                   .toList(),
             ),
           ),
-          if (feed.mainHeadline != null)
+          if (items.isNotEmpty)
             Expanded(
               child: ClickableFeedItem(
-                item: feed.mainHeadline!,
+                item: items.first,
                 child: SizedBox(
                   height: 300,
                   child: Column(
@@ -112,10 +99,12 @@ class MainHeadline extends StatelessWidget {
                     mainAxisAlignment: .start,
                     spacing: 24,
                     children: [
-                      FeedItemImage(item: feed.mainHeadline!, height: 200, borderRadius: .circular(feedItemBorderRadius),),
-                      Text(feed.mainHeadline?.title ?? '', style: textTheme.headlineLarge?.copyWith(height: 1.4), maxLines: 3, overflow: .ellipsis,),
-                      Expanded(child: ItemContent(item: feed.mainHeadline!, maxLines: 2, overflow: .ellipsis)),
-                      InfoBar(item: feed.mainHeadline!),
+                      FeedItemImage(item: items.first, height: 200, borderRadius: .circular(feedItemBorderRadius)),
+                      Text(items.first.title ?? '', style: textTheme.headlineLarge?.copyWith(height: 1.4), maxLines: 3, overflow: .ellipsis),
+                      Expanded(
+                        child: ItemContent(item: items.first, maxLines: 2, overflow: .ellipsis),
+                      ),
+                      InfoBar(item: items.first),
                     ],
                   ),
                 ),

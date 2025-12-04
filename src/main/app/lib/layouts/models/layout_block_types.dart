@@ -1,0 +1,92 @@
+import 'package:app/feed/models/feed_item.dart';
+import 'package:app/feed/views/components/big_grid_item.dart';
+import 'package:app/feed/views/components/headline.dart';
+import 'package:app/feed/views/components/small_grid_item.dart';
+import 'package:app/feed/views/components/top_stories.dart';
+import 'package:app/layouts/models/layout_block.dart';
+import 'package:app/layouts/models/layout_block_settings.dart';
+import 'package:app/layouts/views/components/previews/big_grid_big.dart';
+import 'package:app/layouts/views/components/previews/big_grid_small.dart';
+import 'package:app/layouts/views/components/previews/headline_big.dart';
+import 'package:app/layouts/views/components/previews/headline_small.dart';
+import 'package:app/layouts/views/components/previews/small_grid_big.dart';
+import 'package:app/layouts/views/components/previews/small_grid_small.dart';
+import 'package:app/layouts/views/components/previews/top_stories_big.dart';
+import 'package:app/layouts/views/components/previews/top_stories_small.dart';
+import 'package:app/utils/models/breakpoints.dart';
+import 'package:flutter/material.dart';
+
+const double smallPreviewSize = 150;
+
+enum LayoutBlockTypes {
+  bigHeadline(1, HeadlineSmall(), LayoutBlockSettings(), 'Headline'),
+  topStories(4, TopStoriesSmall(), LayoutBlockSettings(title: 'Top stories'), 'Top stories'),
+  bigGrid(null, BigGridSmall(), LayoutBlockSettings(items: 6), 'Big grid'),
+  smallGrid(null, SmallGridSmall(), LayoutBlockSettings(items: 10), 'Small grid');
+
+  final int? fixedItemSize;
+  final Widget smallPreview;
+  final LayoutBlockSettings defaultSettings;
+  final String name;
+
+  const LayoutBlockTypes(this.fixedItemSize, this.smallPreview, this.defaultSettings, this.name);
+
+  bool get fixedSize => fixedItemSize != null;
+
+  Widget getBigPreview(BuildContext context, {required LayoutBlock block, required Function(LayoutBlock block) onUpdated, required bool last}) {
+    return switch (this) {
+      .bigGrid => BigGridBig(block: block, onUpdated: onUpdated, last: last),
+      .topStories => TopStoriesBig(block: block, onUpdated: onUpdated),
+      .smallGrid => SmallGridBig(block: block, onUpdated: onUpdated, last: last),
+      .bigHeadline => HeadlineBig(block: block, onUpdated: onUpdated),
+    };
+  }
+
+  Widget getSliver({required BuildContext context, required List<FeedItem> items, required LayoutBlock block}) {
+    final breakPoint = BreakPoint.get(context);
+    return switch (this) {
+      .bigHeadline => breakPoint == .mobile ? _bigGridSliver(breakPoint: breakPoint, items: items, block: block): SliverToBoxAdapter(child: Headline(item: items.first),),
+      .topStories =>
+        breakPoint == .mobile
+            ? _bigGridSliver(items: items, block: block, breakPoint: breakPoint)
+            : SliverToBoxAdapter(
+                child: TopStories(items: items, block: block),
+              ),
+      .bigGrid => _bigGridSliver(breakPoint: breakPoint, items: items, block: block),
+      .smallGrid => SliverGrid.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: switch (breakPoint) {
+            .mobile => 1,
+            _ => 2,
+          },
+          mainAxisExtent: 120,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+        ),
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+
+          return SmallGridItem(key: ValueKey(items[index]), item: items[index]);
+        },
+      )
+      
+    };
+  }
+
+  Widget _bigGridSliver({required BreakPoint breakPoint, required List<FeedItem> items, required LayoutBlock block}) {
+    return SliverGrid.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) => BigGridItem(key: ValueKey(items[index]), item: items[index]),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: switch (breakPoint) {
+          .mobile => 1,
+          .tablet => 2,
+          _ => 3,
+        },
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        mainAxisExtent: 450,
+      ),
+    );
+  }
+}

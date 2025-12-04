@@ -1,9 +1,7 @@
-import 'dart:math';
 
 import 'package:app/feed/models/feed_item.dart';
 import 'package:app/feed/views/components/feed_image.dart';
 import 'package:app/feed/views/screens/feed_screen.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class InfoBar extends StatelessWidget {
