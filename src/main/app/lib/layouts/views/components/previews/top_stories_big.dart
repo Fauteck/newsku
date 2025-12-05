@@ -59,6 +59,7 @@ class _TopStoriesBigState extends State<TopStoriesBig> {
         ),
         Gap(16),
         TextFormField(
+          key: ValueKey(widget.block.id),
           controller: controller,
           decoration: InputDecoration(label: Text('Title')),
         ),

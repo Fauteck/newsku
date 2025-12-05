@@ -22,7 +22,7 @@ class SmallGridBig extends StatelessWidget {
           crossAxisSpacing: 16,
           mainAxisSpacing: 0,
           childAspectRatio: 16 / 4,
-          children: List.generate(last ? 4: (block.settings ?? block.type.defaultSettings).items ?? 0, (index) => _GridItem(),),
+          children: List.generate(last ? 6: (block.settings ?? block.type.defaultSettings).items ?? 0, (index) => _GridItem(),),
         ),
         if (!last)
           Row(
@@ -61,17 +61,17 @@ class _GridItem extends StatelessWidget {
       children: [
         Expanded(
           child: Column(
-            spacing: 8,
+            spacing: 4,
             mainAxisAlignment: .center,
             children: [
-              PreviewContainer(height: 12, borderRadius: .circular(5)),
-              PreviewContainer(height: 12, borderRadius: .circular(5)),
-              PreviewContainer(height: 6, borderRadius: .circular(5)),
-              PreviewContainer(height: 6, borderRadius: .circular(5)),
+              PreviewContainer(height: 8, borderRadius: .circular(5)),
+              PreviewContainer(height: 8, borderRadius: .circular(5)),
+              PreviewContainer(height: 4, borderRadius: .circular(5)),
+              PreviewContainer(height: 4, borderRadius: .circular(5)),
             ],
           ),
         ),
-        PreviewContainer(height: 60, width: 24, borderRadius: .circular(2)),
+        PreviewContainer(height: 40, width: 24, borderRadius: .circular(2)),
       ],
     );
   }

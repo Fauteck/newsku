@@ -22,6 +22,7 @@ class LoginCubit extends Cubit<LoginState> {
     try {
       return await LoginService(serverUrl).login(username: state.username, password: state.password);
     } catch (e) {
+      print('hello');
       emit(state.copyWith(failedLogin: true));
       rethrow;
     }
@@ -109,7 +110,7 @@ class LoginCubit extends Cubit<LoginState> {
   }
 
   void setLoading(bool bool) {
-    emit(state.copyWith(loading: true));
+    emit(state.copyWith(loading: bool));
   }
 }
 

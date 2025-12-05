@@ -22,7 +22,7 @@ class BigGridBig extends StatelessWidget {
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
           childAspectRatio: 16 / 13,
-          children: List.generate(last ? 4 : (block.settings ?? block.type.defaultSettings).items ?? 6, (index) => _GridItem()),
+          children: List.generate(last ? 6 : (block.settings ?? block.type.defaultSettings).items ?? 6, (index) => _GridItem()),
         ),
         if (!last)
           Row(
@@ -56,12 +56,12 @@ class _GridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      spacing: 12,
+      spacing: 4,
       children: [
-        PreviewContainer(height: 100, borderRadius: .circular(5)),
-        PreviewContainer(height: 20, borderRadius: .circular(5)),
-        PreviewContainer(height: 10, borderRadius: .circular(5)),
-        PreviewContainer(height: 10, borderRadius: .circular(5)),
+        PreviewContainer(height: 50, borderRadius: .circular(5)),
+        PreviewContainer(height: 12, borderRadius: .circular(5)),
+        PreviewContainer(height: 7, borderRadius: .circular(5)),
+        PreviewContainer(height: 7, borderRadius: .circular(5)),
       ],
     );
   }
