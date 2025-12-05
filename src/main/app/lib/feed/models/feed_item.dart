@@ -16,6 +16,7 @@ sealed class FeedItem with _$FeedItem {
     String? content,
     String? reasoning,
     String? imageUrl,
+    @Default(false) bool read,
     @Default(0) int importance,
     @Default(0) int timeCreated,
     Feed? feed,

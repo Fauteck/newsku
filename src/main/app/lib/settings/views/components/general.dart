@@ -56,7 +56,7 @@ class GeneralSettingsTab extends StatelessWidget {
                     Divider(),
                     Gap(32),
                     Text('Minimum news score'),
-                    Text('This will filter out from your feed any news that has been scored lower than the selected value', style: textTheme.labelMedium,),
+                    Text('This will filter out from your feed any news that has been scored lower than the selected value', style: textTheme.labelMedium),
                     Slider(
                       min: 0,
                       max: 100,
@@ -80,6 +80,14 @@ class GeneralSettingsTab extends StatelessWidget {
                         label: Text('Update'),
                         icon: Icon(Icons.save),
                       ),
+                    ),
+                    Gap(8),
+                    SwitchListTile(
+                      contentPadding: .zero,
+                      title: Text('Dim read item in the feed'),
+                      subtitle: Text('While you scroll through the feed, items will be set as read. You can make the feed item dim for the next time you visit your feed'),
+                      value: state.user?.dimReadItems ?? false,
+                      onChanged: state.loading ? null : (value) => cubit.dimReadItems(value),
                     ),
                     Gap(32),
                     Divider(),

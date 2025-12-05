@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.domain.Page;
@@ -47,6 +46,12 @@ public class FeedItemController {
             throw new InvalidParameterException("from and to query parameters are required");
         }
         return feedItemService.getItems(from, to, page, pageSize);
+    }
+
+    @PostMapping("/read")
+    public boolean readArticles(@RequestBody List<String> ids){
+        log.info("Changing read status of {} items", ids.size());
+        return feedItemService.readItems(ids);
     }
 
     @GetMapping("/{id}/image")

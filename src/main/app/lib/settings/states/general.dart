@@ -1,3 +1,5 @@
+import 'package:app/identity/states/identity.dart';
+import 'package:app/main.dart';
 import 'package:app/user/models/user.dart';
 import 'package:app/user/services/user_service.dart';
 import 'package:app/utils/models/with_error.dart';
@@ -46,10 +48,18 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
     try {
       emit(state.copyWith(loading: true));
       await UserService(serverUrl!).updateUser(state.user!);
+      await getIt.get<IdentityCubit>().getUser();
     } catch (e, s) {
       emit(state.copyWith(error: e, stackTrace: s));
     } finally {
       emit(state.copyWith(loading: false));
+    }
+  }
+
+  Future<void> dimReadItems(bool dim) async {
+    if (state.user != null) {
+      emit(state.copyWith.user!(dimReadItems: dim));
+      await updateUser();
     }
   }
 

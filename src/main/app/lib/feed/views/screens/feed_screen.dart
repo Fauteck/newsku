@@ -23,6 +23,7 @@ import 'package:material_loading_indicator/loading_indicator.dart';
 import 'package:motor/motor.dart';
 
 final articleDateFormat = DateFormat.Hm();
+final fullArticleDateFormat = DateFormat.yMMMd().add_Hm();
 final double feedItemBorderRadius = 8;
 
 final _log = Logger('FeedScreen');
@@ -151,7 +152,7 @@ class FeedScreen extends StatelessWidget {
                                       SliverList.builder(
                                         itemCount: state.searchResults.length,
                                         itemBuilder: (context, index) {
-                                          return SearchResult(key: ValueKey(state.searchResults[index]), item: state.searchResults[index]);
+                                          return SearchResult(key: ValueKey(state.searchResults[index]), item: state.searchResults[index], fullDate: true);
                                         },
                                       )
                                     else

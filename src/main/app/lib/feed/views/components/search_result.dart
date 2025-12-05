@@ -9,8 +9,9 @@ import 'package:gap/gap.dart';
 
 class SearchResult extends StatelessWidget {
   final FeedItem item;
+  final bool fullDate;
 
-  const SearchResult({super.key, required this.item});
+  const SearchResult({super.key, required this.item,  this.fullDate = false});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class SearchResult extends StatelessWidget {
                 children: [
                   Text(item.title ?? '', style: breakPoint == .mobile ? textTheme.titleMedium : textTheme.headlineSmall, maxLines: 2, overflow: .ellipsis),
                   ItemContent(item: item, maxLines: breakPoint == .mobile ? 1 : 3 , overflow: .ellipsis),
-                  InfoBar(item: item),
+                  InfoBar(item: item, fullDate: fullDate,),
                 ],
               ),
             ),

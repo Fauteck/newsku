@@ -18,6 +18,7 @@ public class FeedItem {
     private String url;
     @Column(name = "timecreated")
     private long timeCreated;
+    private boolean read;
 
     @ManyToOne
     @JoinColumn(name = "feed_id")
@@ -109,5 +110,13 @@ public class FeedItem {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
     }
 }

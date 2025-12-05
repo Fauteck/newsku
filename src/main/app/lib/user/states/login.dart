@@ -52,10 +52,6 @@ class LoginCubit extends Cubit<LoginState> {
         if (accessToken != null) {
           final token = await LoginService(serverUrl).loginWithOidcToken(accessToken);
 
-          // emit(state.copyWith(loginError: ''));
-
-          // usernamePasswordCubit.setToken(url, token);
-
           return token;
         }
       }
@@ -110,6 +106,10 @@ class LoginCubit extends Cubit<LoginState> {
 
   void setPassword(String value) {
     emit(state.copyWith(password: value));
+  }
+
+  void setLoading(bool bool) {
+    emit(state.copyWith(loading: true));
   }
 }
 

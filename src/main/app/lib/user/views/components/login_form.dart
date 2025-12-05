@@ -46,10 +46,19 @@ class LoginFormScreen extends StatelessWidget {
                         onPressed: state.loading
                             ? null
                             : () async {
-                                var token = await cubit.login();
-                                if (context.mounted) {
-                                  context.read<IdentityCubit>().setToken(token);
-                                  AutoRouter.of(context).replaceAll([HomeRoute()]);
+                                try {
+                                  cubit.setLoading(true);
+                                  var token = await cubit.login();
+                                  if (context.mounted) {
+                                    await context.read<IdentityCubit>().setToken(token);
+                                    if (context.mounted) {
+                                      AutoRouter.of(context).replaceAll([HomeRoute()]);
+                                    }
+                                  }
+                                } finally {
+                                  if (context.mounted) {
+                                    cubit.setLoading(false);
+                                  }
                                 }
                               },
                         label: Text('Login'),
@@ -59,13 +68,16 @@ class LoginFormScreen extends StatelessWidget {
                   ),
                   if (config?.oidcConfig != null) ...[
                     Text('or'),
+                    Gap(8),
                     FilledButton.tonal(
                       onPressed: () async {
                         final token = await cubit.logInWithOidc();
 
                         if (context.mounted) {
-                          context.read<IdentityCubit>().setToken(token);
-                          AutoRouter.of(context).replaceAll([HomeRoute()]);
+                          await context.read<IdentityCubit>().setToken(token);
+                          if (context.mounted) {
+                            AutoRouter.of(context).replaceAll([HomeRoute()]);
+                          }
                         }
                       },
                       child: Text('Log in with ${config?.oidcConfig?.name}'),

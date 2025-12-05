@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FeedItem {
 
- String? get id; String? get guid; String? get title; String? get url; String? get description; String? get content; String? get reasoning; String? get imageUrl; int get importance; int get timeCreated; Feed? get feed;
+ String? get id; String? get guid; String? get title; String? get url; String? get description; String? get content; String? get reasoning; String? get imageUrl; bool get read; int get importance; int get timeCreated; Feed? get feed;
 /// Create a copy of FeedItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $FeedItemCopyWith<FeedItem> get copyWith => _$FeedItemCopyWithImpl<FeedItem>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeedItem&&(identical(other.id, id) || other.id == id)&&(identical(other.guid, guid) || other.guid == guid)&&(identical(other.title, title) || other.title == title)&&(identical(other.url, url) || other.url == url)&&(identical(other.description, description) || other.description == description)&&(identical(other.content, content) || other.content == content)&&(identical(other.reasoning, reasoning) || other.reasoning == reasoning)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.importance, importance) || other.importance == importance)&&(identical(other.timeCreated, timeCreated) || other.timeCreated == timeCreated)&&(identical(other.feed, feed) || other.feed == feed));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeedItem&&(identical(other.id, id) || other.id == id)&&(identical(other.guid, guid) || other.guid == guid)&&(identical(other.title, title) || other.title == title)&&(identical(other.url, url) || other.url == url)&&(identical(other.description, description) || other.description == description)&&(identical(other.content, content) || other.content == content)&&(identical(other.reasoning, reasoning) || other.reasoning == reasoning)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.read, read) || other.read == read)&&(identical(other.importance, importance) || other.importance == importance)&&(identical(other.timeCreated, timeCreated) || other.timeCreated == timeCreated)&&(identical(other.feed, feed) || other.feed == feed));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,guid,title,url,description,content,reasoning,imageUrl,importance,timeCreated,feed);
+int get hashCode => Object.hash(runtimeType,id,guid,title,url,description,content,reasoning,imageUrl,read,importance,timeCreated,feed);
 
 @override
 String toString() {
-  return 'FeedItem(id: $id, guid: $guid, title: $title, url: $url, description: $description, content: $content, reasoning: $reasoning, imageUrl: $imageUrl, importance: $importance, timeCreated: $timeCreated, feed: $feed)';
+  return 'FeedItem(id: $id, guid: $guid, title: $title, url: $url, description: $description, content: $content, reasoning: $reasoning, imageUrl: $imageUrl, read: $read, importance: $importance, timeCreated: $timeCreated, feed: $feed)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $FeedItemCopyWith<$Res>  {
   factory $FeedItemCopyWith(FeedItem value, $Res Function(FeedItem) _then) = _$FeedItemCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? guid, String? title, String? url, String? description, String? content, String? reasoning, String? imageUrl, int importance, int timeCreated, Feed? feed
+ String? id, String? guid, String? title, String? url, String? description, String? content, String? reasoning, String? imageUrl, bool read, int importance, int timeCreated, Feed? feed
 });
 
 
@@ -65,7 +65,7 @@ class _$FeedItemCopyWithImpl<$Res>
 
 /// Create a copy of FeedItem
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? guid = freezed,Object? title = freezed,Object? url = freezed,Object? description = freezed,Object? content = freezed,Object? reasoning = freezed,Object? imageUrl = freezed,Object? importance = null,Object? timeCreated = null,Object? feed = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? guid = freezed,Object? title = freezed,Object? url = freezed,Object? description = freezed,Object? content = freezed,Object? reasoning = freezed,Object? imageUrl = freezed,Object? read = null,Object? importance = null,Object? timeCreated = null,Object? feed = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,guid: freezed == guid ? _self.guid : guid // ignore: cast_nullable_to_non_nullable
@@ -75,7 +75,8 @@ as String?,description: freezed == description ? _self.description : description
 as String?,content: freezed == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
 as String?,reasoning: freezed == reasoning ? _self.reasoning : reasoning // ignore: cast_nullable_to_non_nullable
 as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
-as String?,importance: null == importance ? _self.importance : importance // ignore: cast_nullable_to_non_nullable
+as String?,read: null == read ? _self.read : read // ignore: cast_nullable_to_non_nullable
+as bool,importance: null == importance ? _self.importance : importance // ignore: cast_nullable_to_non_nullable
 as int,timeCreated: null == timeCreated ? _self.timeCreated : timeCreated // ignore: cast_nullable_to_non_nullable
 as int,feed: freezed == feed ? _self.feed : feed // ignore: cast_nullable_to_non_nullable
 as Feed?,
@@ -172,10 +173,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? guid,  String? title,  String? url,  String? description,  String? content,  String? reasoning,  String? imageUrl,  int importance,  int timeCreated,  Feed? feed)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? guid,  String? title,  String? url,  String? description,  String? content,  String? reasoning,  String? imageUrl,  bool read,  int importance,  int timeCreated,  Feed? feed)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FeedItem() when $default != null:
-return $default(_that.id,_that.guid,_that.title,_that.url,_that.description,_that.content,_that.reasoning,_that.imageUrl,_that.importance,_that.timeCreated,_that.feed);case _:
+return $default(_that.id,_that.guid,_that.title,_that.url,_that.description,_that.content,_that.reasoning,_that.imageUrl,_that.read,_that.importance,_that.timeCreated,_that.feed);case _:
   return orElse();
 
 }
@@ -193,10 +194,10 @@ return $default(_that.id,_that.guid,_that.title,_that.url,_that.description,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? guid,  String? title,  String? url,  String? description,  String? content,  String? reasoning,  String? imageUrl,  int importance,  int timeCreated,  Feed? feed)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? guid,  String? title,  String? url,  String? description,  String? content,  String? reasoning,  String? imageUrl,  bool read,  int importance,  int timeCreated,  Feed? feed)  $default,) {final _that = this;
 switch (_that) {
 case _FeedItem():
-return $default(_that.id,_that.guid,_that.title,_that.url,_that.description,_that.content,_that.reasoning,_that.imageUrl,_that.importance,_that.timeCreated,_that.feed);}
+return $default(_that.id,_that.guid,_that.title,_that.url,_that.description,_that.content,_that.reasoning,_that.imageUrl,_that.read,_that.importance,_that.timeCreated,_that.feed);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -210,10 +211,10 @@ return $default(_that.id,_that.guid,_that.title,_that.url,_that.description,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? guid,  String? title,  String? url,  String? description,  String? content,  String? reasoning,  String? imageUrl,  int importance,  int timeCreated,  Feed? feed)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? guid,  String? title,  String? url,  String? description,  String? content,  String? reasoning,  String? imageUrl,  bool read,  int importance,  int timeCreated,  Feed? feed)?  $default,) {final _that = this;
 switch (_that) {
 case _FeedItem() when $default != null:
-return $default(_that.id,_that.guid,_that.title,_that.url,_that.description,_that.content,_that.reasoning,_that.imageUrl,_that.importance,_that.timeCreated,_that.feed);case _:
+return $default(_that.id,_that.guid,_that.title,_that.url,_that.description,_that.content,_that.reasoning,_that.imageUrl,_that.read,_that.importance,_that.timeCreated,_that.feed);case _:
   return null;
 
 }
@@ -225,7 +226,7 @@ return $default(_that.id,_that.guid,_that.title,_that.url,_that.description,_tha
 @JsonSerializable()
 
 class _FeedItem implements FeedItem {
-  const _FeedItem({this.id, this.guid, this.title, this.url, this.description, this.content, this.reasoning, this.imageUrl, this.importance = 0, this.timeCreated = 0, this.feed});
+  const _FeedItem({this.id, this.guid, this.title, this.url, this.description, this.content, this.reasoning, this.imageUrl, this.read = false, this.importance = 0, this.timeCreated = 0, this.feed});
   factory _FeedItem.fromJson(Map<String, dynamic> json) => _$FeedItemFromJson(json);
 
 @override final  String? id;
@@ -236,6 +237,7 @@ class _FeedItem implements FeedItem {
 @override final  String? content;
 @override final  String? reasoning;
 @override final  String? imageUrl;
+@override@JsonKey() final  bool read;
 @override@JsonKey() final  int importance;
 @override@JsonKey() final  int timeCreated;
 @override final  Feed? feed;
@@ -253,16 +255,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeedItem&&(identical(other.id, id) || other.id == id)&&(identical(other.guid, guid) || other.guid == guid)&&(identical(other.title, title) || other.title == title)&&(identical(other.url, url) || other.url == url)&&(identical(other.description, description) || other.description == description)&&(identical(other.content, content) || other.content == content)&&(identical(other.reasoning, reasoning) || other.reasoning == reasoning)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.importance, importance) || other.importance == importance)&&(identical(other.timeCreated, timeCreated) || other.timeCreated == timeCreated)&&(identical(other.feed, feed) || other.feed == feed));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeedItem&&(identical(other.id, id) || other.id == id)&&(identical(other.guid, guid) || other.guid == guid)&&(identical(other.title, title) || other.title == title)&&(identical(other.url, url) || other.url == url)&&(identical(other.description, description) || other.description == description)&&(identical(other.content, content) || other.content == content)&&(identical(other.reasoning, reasoning) || other.reasoning == reasoning)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.read, read) || other.read == read)&&(identical(other.importance, importance) || other.importance == importance)&&(identical(other.timeCreated, timeCreated) || other.timeCreated == timeCreated)&&(identical(other.feed, feed) || other.feed == feed));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,guid,title,url,description,content,reasoning,imageUrl,importance,timeCreated,feed);
+int get hashCode => Object.hash(runtimeType,id,guid,title,url,description,content,reasoning,imageUrl,read,importance,timeCreated,feed);
 
 @override
 String toString() {
-  return 'FeedItem(id: $id, guid: $guid, title: $title, url: $url, description: $description, content: $content, reasoning: $reasoning, imageUrl: $imageUrl, importance: $importance, timeCreated: $timeCreated, feed: $feed)';
+  return 'FeedItem(id: $id, guid: $guid, title: $title, url: $url, description: $description, content: $content, reasoning: $reasoning, imageUrl: $imageUrl, read: $read, importance: $importance, timeCreated: $timeCreated, feed: $feed)';
 }
 
 
@@ -273,7 +275,7 @@ abstract mixin class _$FeedItemCopyWith<$Res> implements $FeedItemCopyWith<$Res>
   factory _$FeedItemCopyWith(_FeedItem value, $Res Function(_FeedItem) _then) = __$FeedItemCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? guid, String? title, String? url, String? description, String? content, String? reasoning, String? imageUrl, int importance, int timeCreated, Feed? feed
+ String? id, String? guid, String? title, String? url, String? description, String? content, String? reasoning, String? imageUrl, bool read, int importance, int timeCreated, Feed? feed
 });
 
 
@@ -290,7 +292,7 @@ class __$FeedItemCopyWithImpl<$Res>
 
 /// Create a copy of FeedItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? guid = freezed,Object? title = freezed,Object? url = freezed,Object? description = freezed,Object? content = freezed,Object? reasoning = freezed,Object? imageUrl = freezed,Object? importance = null,Object? timeCreated = null,Object? feed = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? guid = freezed,Object? title = freezed,Object? url = freezed,Object? description = freezed,Object? content = freezed,Object? reasoning = freezed,Object? imageUrl = freezed,Object? read = null,Object? importance = null,Object? timeCreated = null,Object? feed = freezed,}) {
   return _then(_FeedItem(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,guid: freezed == guid ? _self.guid : guid // ignore: cast_nullable_to_non_nullable
@@ -300,7 +302,8 @@ as String?,description: freezed == description ? _self.description : description
 as String?,content: freezed == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
 as String?,reasoning: freezed == reasoning ? _self.reasoning : reasoning // ignore: cast_nullable_to_non_nullable
 as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
-as String?,importance: null == importance ? _self.importance : importance // ignore: cast_nullable_to_non_nullable
+as String?,read: null == read ? _self.read : read // ignore: cast_nullable_to_non_nullable
+as bool,importance: null == importance ? _self.importance : importance // ignore: cast_nullable_to_non_nullable
 as int,timeCreated: null == timeCreated ? _self.timeCreated : timeCreated // ignore: cast_nullable_to_non_nullable
 as int,feed: freezed == feed ? _self.feed : feed // ignore: cast_nullable_to_non_nullable
 as Feed?,

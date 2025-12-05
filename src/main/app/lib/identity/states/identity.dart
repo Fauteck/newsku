@@ -1,5 +1,7 @@
 import 'package:app/config/models/config.dart';
+import 'package:app/user/models/user.dart';
 import 'package:app/user/services/server_url_service.dart';
+import 'package:app/user/services/user_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -32,7 +34,6 @@ class IdentityCubit extends Cubit<IdentityState> {
       }
     }
 
-
     Config? serverConfig;
     if (server != null) {
       try {
@@ -44,7 +45,12 @@ class IdentityCubit extends Cubit<IdentityState> {
       }
     }
 
-    emit(state.copyWith(serverUrl: server, token: token, config: serverConfig));
+    User? user;
+    if (token != null && server != null) {
+      user = await UserService(server).getUser();
+    }
+
+    emit(state.copyWith(serverUrl: server, token: token, config: serverConfig, currentUser: user));
   }
 
   void setUrl(String? serverUrl, {Config? config}) {
@@ -62,16 +68,31 @@ class IdentityCubit extends Cubit<IdentityState> {
   }
 
   Future<void> setToken(String token) async {
-    emit(state.copyWith(token: token));
     var prefs = await SharedPreferences.getInstance();
-    prefs.setString('token', token);
-    prefs.setString('server', state.serverUrl!);
+    await prefs.setString('token', token);
+    await prefs.setString('server', state.serverUrl!);
+
+    User? user;
+    if (state.serverUrl != null) {
+      user = await UserService(state.serverUrl!).getUser();
+    }
+
+    emit(state.copyWith(token: token, currentUser: user));
   }
+
+  Future<void> getUser() async {
+    if (isLoggedIn) {
+      final user = await UserService(state.serverUrl!).getUser();
+      emit(state.copyWith(currentUser: user));
+    }
+  }
+
+  User? get currentUser => state.currentUser;
 }
 
 @freezed
 sealed class IdentityState with _$IdentityState {
-  const factory IdentityState({String? token, String? serverUrl, Config? config}) = _IdentityState;
+  const factory IdentityState({String? token, String? serverUrl, Config? config, User? currentUser}) = _IdentityState;
 
   const IdentityState._();
 

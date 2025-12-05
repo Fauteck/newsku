@@ -1,13 +1,10 @@
 package com.github.lamarios.newsku.persistence.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
-import javax.swing.*;
 
 @Entity
 @Table(name = "users")
@@ -25,6 +22,10 @@ public class User {
     private String oidcSub;
     @Column(name = "minimum_importance")
     private int minimumImportance;
+
+    @Column(name = "dim_read_items")
+    private boolean dimReadItems;
+
 
     public String getId() {
         return id;
@@ -80,5 +81,13 @@ public class User {
 
     public void setMinimumImportance(int minimumImportance) {
         this.minimumImportance = minimumImportance;
+    }
+
+    public boolean isDimReadItems() {
+        return dimReadItems;
+    }
+
+    public void setDimReadItems(boolean dimReadItems) {
+        this.dimReadItems = dimReadItems;
     }
 }

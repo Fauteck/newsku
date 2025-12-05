@@ -168,7 +168,7 @@ public class FeedItemService {
                 .setParameter("textQuery", query)
                 .setParameter("feeds", feeds.stream().map(Feed::getId).toList())
                 .setParameter("pageSize", pageSize)
-                .setParameter("page", page*pageSize)
+                .setParameter("page", page * pageSize)
                 .getResultList();
     }
 
@@ -178,5 +178,17 @@ public class FeedItemService {
         List<Feed> feeds = feedService.getFeeds();
 
         return feedItemRepository.findFirstByIdAndFeedIn(id, feeds).stream().findFirst().orElse(null);
+    }
+
+    @Transactional
+    public boolean readItems(List<String> ids) {
+        var feeds = feedRepository.getFeedsByUser(userService.getCurrentUser());
+        var items = feedItemRepository.findByIdInAndFeedIn(ids, feeds);
+
+        items.forEach(feedItem -> feedItem.setRead(true));
+
+        feedItemRepository.saveAll(items);
+
+        return true;
     }
 }

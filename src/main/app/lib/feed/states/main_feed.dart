@@ -12,14 +12,19 @@ import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:logging/logging.dart';
 
 part 'main_feed.freezed.dart';
 
 final searchPageSize = 100;
 
+final _log = Logger('MainFeedCubit');
+
 class MainFeedCubit extends Cubit<MainFeedState> {
   final ScrollController scrollController = ScrollController();
   final TextEditingController searchController = TextEditingController();
+
+  final List<String> readItems = [];
 
   MainFeedCubit(super.initialState) {
     init();
@@ -48,6 +53,19 @@ class MainFeedCubit extends Cubit<MainFeedState> {
     scrollController.dispose();
     searchController.dispose();
     super.close();
+  }
+
+  void readItem(String? id) {
+    if (id == null) {
+      return;
+    }
+    readItems.add(id);
+
+    EasyDebounce.debounce('read-items-update', Duration(seconds: 1), () {
+      _log.info('set read status of ${readItems.length} items');
+      FeedService(serverUrl!).readItems(List.from(readItems));
+      readItems.clear();
+    });
   }
 
   Future<void> getFeed() async {

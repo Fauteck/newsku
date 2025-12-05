@@ -19,4 +19,6 @@ public interface FeedItemRepository extends JpaRepository<FeedItem, String> {
     Page<FeedItem> findallByTimeAndFeeds(@Param("minImportance") int minImportance, @Param("from") long from, @Param("to") long to, @Param("feeds") List<Feed> feeds, Pageable pageable);
 
     List<FeedItem> findFirstByIdAndFeedIn(String id, Collection<Feed> feeds);
+
+    List<FeedItem> findByIdInAndFeedIn(Collection<String> ids, Collection<Feed> feeds);
 }

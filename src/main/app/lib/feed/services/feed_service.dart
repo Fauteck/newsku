@@ -91,4 +91,12 @@ class FeedService extends BaseService {
 
     return i.map((e) => Feed.fromJson(e as Map<String, dynamic>)).toList();
   }
+
+  Future<void> readItems(List<String> itemIds) async {
+    var uri = await formatUrl('/api/feeds/items/read');
+
+    var response = await http.post(uri, headers: await headers, body: jsonEncode(itemIds));
+
+    processResponse(response);
+  }
 }

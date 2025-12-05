@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$IdentityState implements DiagnosticableTreeMixin {
 
- String? get token; String? get serverUrl; Config? get config;
+ String? get token; String? get serverUrl; Config? get config; User? get currentUser;
 /// Create a copy of IdentityState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,21 +26,21 @@ $IdentityStateCopyWith<IdentityState> get copyWith => _$IdentityStateCopyWithImp
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   properties
     ..add(DiagnosticsProperty('type', 'IdentityState'))
-    ..add(DiagnosticsProperty('token', token))..add(DiagnosticsProperty('serverUrl', serverUrl))..add(DiagnosticsProperty('config', config));
+    ..add(DiagnosticsProperty('token', token))..add(DiagnosticsProperty('serverUrl', serverUrl))..add(DiagnosticsProperty('config', config))..add(DiagnosticsProperty('currentUser', currentUser));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is IdentityState&&(identical(other.token, token) || other.token == token)&&(identical(other.serverUrl, serverUrl) || other.serverUrl == serverUrl)&&(identical(other.config, config) || other.config == config));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is IdentityState&&(identical(other.token, token) || other.token == token)&&(identical(other.serverUrl, serverUrl) || other.serverUrl == serverUrl)&&(identical(other.config, config) || other.config == config)&&(identical(other.currentUser, currentUser) || other.currentUser == currentUser));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,token,serverUrl,config);
+int get hashCode => Object.hash(runtimeType,token,serverUrl,config,currentUser);
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'IdentityState(token: $token, serverUrl: $serverUrl, config: $config)';
+  return 'IdentityState(token: $token, serverUrl: $serverUrl, config: $config, currentUser: $currentUser)';
 }
 
 
@@ -51,11 +51,11 @@ abstract mixin class $IdentityStateCopyWith<$Res>  {
   factory $IdentityStateCopyWith(IdentityState value, $Res Function(IdentityState) _then) = _$IdentityStateCopyWithImpl;
 @useResult
 $Res call({
- String? token, String? serverUrl, Config? config
+ String? token, String? serverUrl, Config? config, User? currentUser
 });
 
 
-$ConfigCopyWith<$Res>? get config;
+$ConfigCopyWith<$Res>? get config;$UserCopyWith<$Res>? get currentUser;
 
 }
 /// @nodoc
@@ -68,12 +68,13 @@ class _$IdentityStateCopyWithImpl<$Res>
 
 /// Create a copy of IdentityState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? token = freezed,Object? serverUrl = freezed,Object? config = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? token = freezed,Object? serverUrl = freezed,Object? config = freezed,Object? currentUser = freezed,}) {
   return _then(_self.copyWith(
 token: freezed == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
 as String?,serverUrl: freezed == serverUrl ? _self.serverUrl : serverUrl // ignore: cast_nullable_to_non_nullable
 as String?,config: freezed == config ? _self.config : config // ignore: cast_nullable_to_non_nullable
-as Config?,
+as Config?,currentUser: freezed == currentUser ? _self.currentUser : currentUser // ignore: cast_nullable_to_non_nullable
+as User?,
   ));
 }
 /// Create a copy of IdentityState
@@ -87,6 +88,18 @@ $ConfigCopyWith<$Res>? get config {
 
   return $ConfigCopyWith<$Res>(_self.config!, (value) {
     return _then(_self.copyWith(config: value));
+  });
+}/// Create a copy of IdentityState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserCopyWith<$Res>? get currentUser {
+    if (_self.currentUser == null) {
+    return null;
+  }
+
+  return $UserCopyWith<$Res>(_self.currentUser!, (value) {
+    return _then(_self.copyWith(currentUser: value));
   });
 }
 }
@@ -167,10 +180,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? token,  String? serverUrl,  Config? config)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? token,  String? serverUrl,  Config? config,  User? currentUser)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _IdentityState() when $default != null:
-return $default(_that.token,_that.serverUrl,_that.config);case _:
+return $default(_that.token,_that.serverUrl,_that.config,_that.currentUser);case _:
   return orElse();
 
 }
@@ -188,10 +201,10 @@ return $default(_that.token,_that.serverUrl,_that.config);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? token,  String? serverUrl,  Config? config)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? token,  String? serverUrl,  Config? config,  User? currentUser)  $default,) {final _that = this;
 switch (_that) {
 case _IdentityState():
-return $default(_that.token,_that.serverUrl,_that.config);}
+return $default(_that.token,_that.serverUrl,_that.config,_that.currentUser);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -205,10 +218,10 @@ return $default(_that.token,_that.serverUrl,_that.config);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? token,  String? serverUrl,  Config? config)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? token,  String? serverUrl,  Config? config,  User? currentUser)?  $default,) {final _that = this;
 switch (_that) {
 case _IdentityState() when $default != null:
-return $default(_that.token,_that.serverUrl,_that.config);case _:
+return $default(_that.token,_that.serverUrl,_that.config,_that.currentUser);case _:
   return null;
 
 }
@@ -220,12 +233,13 @@ return $default(_that.token,_that.serverUrl,_that.config);case _:
 
 
 class _IdentityState extends IdentityState with DiagnosticableTreeMixin {
-  const _IdentityState({this.token, this.serverUrl, this.config}): super._();
+  const _IdentityState({this.token, this.serverUrl, this.config, this.currentUser}): super._();
   
 
 @override final  String? token;
 @override final  String? serverUrl;
 @override final  Config? config;
+@override final  User? currentUser;
 
 /// Create a copy of IdentityState
 /// with the given fields replaced by the non-null parameter values.
@@ -238,21 +252,21 @@ _$IdentityStateCopyWith<_IdentityState> get copyWith => __$IdentityStateCopyWith
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   properties
     ..add(DiagnosticsProperty('type', 'IdentityState'))
-    ..add(DiagnosticsProperty('token', token))..add(DiagnosticsProperty('serverUrl', serverUrl))..add(DiagnosticsProperty('config', config));
+    ..add(DiagnosticsProperty('token', token))..add(DiagnosticsProperty('serverUrl', serverUrl))..add(DiagnosticsProperty('config', config))..add(DiagnosticsProperty('currentUser', currentUser));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _IdentityState&&(identical(other.token, token) || other.token == token)&&(identical(other.serverUrl, serverUrl) || other.serverUrl == serverUrl)&&(identical(other.config, config) || other.config == config));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _IdentityState&&(identical(other.token, token) || other.token == token)&&(identical(other.serverUrl, serverUrl) || other.serverUrl == serverUrl)&&(identical(other.config, config) || other.config == config)&&(identical(other.currentUser, currentUser) || other.currentUser == currentUser));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,token,serverUrl,config);
+int get hashCode => Object.hash(runtimeType,token,serverUrl,config,currentUser);
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'IdentityState(token: $token, serverUrl: $serverUrl, config: $config)';
+  return 'IdentityState(token: $token, serverUrl: $serverUrl, config: $config, currentUser: $currentUser)';
 }
 
 
@@ -263,11 +277,11 @@ abstract mixin class _$IdentityStateCopyWith<$Res> implements $IdentityStateCopy
   factory _$IdentityStateCopyWith(_IdentityState value, $Res Function(_IdentityState) _then) = __$IdentityStateCopyWithImpl;
 @override @useResult
 $Res call({
- String? token, String? serverUrl, Config? config
+ String? token, String? serverUrl, Config? config, User? currentUser
 });
 
 
-@override $ConfigCopyWith<$Res>? get config;
+@override $ConfigCopyWith<$Res>? get config;@override $UserCopyWith<$Res>? get currentUser;
 
 }
 /// @nodoc
@@ -280,12 +294,13 @@ class __$IdentityStateCopyWithImpl<$Res>
 
 /// Create a copy of IdentityState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? token = freezed,Object? serverUrl = freezed,Object? config = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? token = freezed,Object? serverUrl = freezed,Object? config = freezed,Object? currentUser = freezed,}) {
   return _then(_IdentityState(
 token: freezed == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
 as String?,serverUrl: freezed == serverUrl ? _self.serverUrl : serverUrl // ignore: cast_nullable_to_non_nullable
 as String?,config: freezed == config ? _self.config : config // ignore: cast_nullable_to_non_nullable
-as Config?,
+as Config?,currentUser: freezed == currentUser ? _self.currentUser : currentUser // ignore: cast_nullable_to_non_nullable
+as User?,
   ));
 }
 
@@ -300,6 +315,18 @@ $ConfigCopyWith<$Res>? get config {
 
   return $ConfigCopyWith<$Res>(_self.config!, (value) {
     return _then(_self.copyWith(config: value));
+  });
+}/// Create a copy of IdentityState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserCopyWith<$Res>? get currentUser {
+    if (_self.currentUser == null) {
+    return null;
+  }
+
+  return $UserCopyWith<$Res>(_self.currentUser!, (value) {
+    return _then(_self.copyWith(currentUser: value));
   });
 }
 }
