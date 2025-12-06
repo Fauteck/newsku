@@ -1,2 +1,4 @@
 site_name: Newsku
-theme: readthedocs
+theme: material
+plugins:
+  - mkdocs-video

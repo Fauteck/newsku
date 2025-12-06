@@ -15,6 +15,7 @@ class DraggableLayoutBlock extends StatelessWidget {
     return Draggable<LayoutBlockTypes>(
       onDragStarted: () => setDragging(true),
       onDragEnd: (details) => setDragging(false),
+      hitTestBehavior: HitTestBehavior.translucent,
       feedback: DraggedLayoutBlock(type: type),
       data: type,
       child: Column(

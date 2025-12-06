@@ -47,22 +47,23 @@ class LayoutSettingsTab extends StatelessWidget {
                               Text('Available blocks', style: textTheme.titleLarge),
                               Text('Drag and drop the blocks onto your layout to personalize your home page'),
                               Gap(32),
-                              Text('Fixed article count blocks'),
-                              Center(
-                                child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigHeadline),
-                              ),
-                              Center(
-                                child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.topStories),
-                              ),
-                              Gap(32),
-                              Text('Dynamic article count blocks'),
-                              Center(
-                                child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigGrid),
-                              ),
-                              Center(
-                                child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.smallGrid),
-                              ),
-                              Divider(),
+                              Expanded(child: ListView(children: [
+                                Text('Fixed article count blocks'),
+                                Center(
+                                  child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigHeadline),
+                                ),
+                                Center(
+                                  child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.topStories),
+                                ),
+                                Gap(32),
+                                Text('Dynamic article count blocks'),
+                                Center(
+                                  child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigGrid),
+                                ),
+                                Center(
+                                  child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.smallGrid),
+                                ),
+                              ],))
                             ],
                           ),
                         ),

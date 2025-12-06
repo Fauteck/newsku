@@ -14,11 +14,18 @@ let
 in
 pkgs.mkShell {
   buildInputs = with pkgs; builtins.concatLists [
-    [ corretto21 maven gnumake mkdocs ]
+    [ corretto21 maven gnumake python313Packages.pip ]
   ];
 
   # to run CI or DB migrations
   shellHook =  ''
+  # Setting up mkdocs
+  python -m venv mkdocs/venv
+  source mkdocs/venv/bin/activate
+  pip install -r mkdocs/requirements.txt
+
+  # to install new plugin dependencies, pip install <package> then pip freeze > mkdocs/requirements.txt to add it to the requirement file
+
   echo -e "\nAll done 🎉 \nAvailable aliases:"
   ''+
           pkgs.lib.concatStrings (map (x: ''echo "${x.name}: ${x.description}";'') aliases);

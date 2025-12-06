@@ -16,3 +16,10 @@ By default, the AI model will decide what is important news on its own. You can 
 Note that the change will only apply to future articles.
 
 ![image](general.png)
+
+## Customizing layout
+
+With Newsku you can design your home page with building block. Go to Settings > Layout then you can just drag and drop the blocks as you wish.
+The only limit here is that you need to end your layout with a "Dynamic article count" block.
+
+![type:video](./layout.webm)
