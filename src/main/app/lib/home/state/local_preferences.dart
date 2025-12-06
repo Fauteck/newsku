@@ -10,6 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 part 'local_preferences.freezed.dart';
 
+
+const _defaultColor = Colors.deepOrange;
+
 class LocalPreferencesCubit extends Cubit<LocalPreferencesState> {
   LocalPreferencesCubit(super.initialState) {
     init();
@@ -18,7 +21,7 @@ class LocalPreferencesCubit extends Cubit<LocalPreferencesState> {
   Future<void> init() async {
     var prefs = await SharedPreferences.getInstance();
     var colorValue = prefs.getInt('theme-color');
-    Color color = colorValue != null ? Color(colorValue) : Colors.deepOrange;
+    Color color = colorValue != null ? Color(colorValue) : _defaultColor;
 
     var dynamic = prefs.getBool('dynamic-color');
     var blackbackground = prefs.getBool('black-background');
@@ -47,7 +50,7 @@ class LocalPreferencesCubit extends Cubit<LocalPreferencesState> {
 
 @freezed
 sealed class LocalPreferencesState with _$LocalPreferencesState {
-  const factory LocalPreferencesState({@Default(Colors.deepOrange) Color themeColor, @Default(false) bool dynamicColor, @Default(false) bool blackBackground}) = _LocalPreferencesState;
+  const factory LocalPreferencesState({@Default(_defaultColor) Color themeColor, @Default(false) bool dynamicColor, @Default(false) bool blackBackground}) = _LocalPreferencesState;
 
   const LocalPreferencesState._();
 
