@@ -18,7 +18,7 @@ class LocalPreferencesCubit extends Cubit<LocalPreferencesState> {
   Future<void> init() async {
     var prefs = await SharedPreferences.getInstance();
     var colorValue = prefs.getInt('theme-color');
-    Color color = colorValue != null ? Color(colorValue) : Colors.deepPurple;
+    Color color = colorValue != null ? Color(colorValue) : Colors.deepOrange;
 
     var dynamic = prefs.getBool('dynamic-color');
     var blackbackground = prefs.getBool('black-background');
