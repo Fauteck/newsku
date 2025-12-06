@@ -1,9 +1,9 @@
 import 'dart:ui';
 
 import 'package:app/identity/states/identity.dart';
-import 'package:app/main.dart';
 import 'package:app/user/views/components/fancy_side.dart';
 import 'package:app/utils/views/components/app_logo.dart';
+import 'package:app/utils/views/components/main_color_provider.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,61 +18,65 @@ class LoginScreen extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     var announcement = context.read<IdentityCubit>().state.config?.announcement ?? '';
-    return Column(
-      children: [
-        if (announcement.isNotEmpty) ...[
-          SingleMotionBuilder(
-            motion: MaterialSpringMotion.expressiveSpatialDefault(),
-            value: 1,
-            from: 0,
-            builder: (context, value, child) => Opacity(
-              opacity: value.clamp(0, 1),
-              child: Transform.translate(offset: Offset(0, lerpDouble(0, 50, 1 - value)!), child: child),
-            ),
-            child: Container(
-              margin: .symmetric(horizontal: 64),
-              decoration: BoxDecoration(
-                color: colors.tertiaryContainer,
-                borderRadius: .only(topLeft: .circular(32), topRight: .circular(32)),
+    return MainColorProvider(
+      builder: (context, appColor) {
+        return Column(
+          children: [
+            if (announcement.isNotEmpty) ...[
+              SingleMotionBuilder(
+                motion: MaterialSpringMotion.expressiveSpatialDefault(),
+                value: 1,
+                from: 0,
+                builder: (context, value, child) => Opacity(
+                  opacity: value.clamp(0, 1),
+                  child: Transform.translate(offset: Offset(0, lerpDouble(0, 50, 1 - value)!), child: child),
+                ),
+                child: Container(
+                  margin: .symmetric(horizontal: 64),
+                  decoration: BoxDecoration(
+                    color: colors.tertiaryContainer,
+                    borderRadius: .only(topLeft: .circular(32), topRight: .circular(32)),
+                  ),
+                  padding: .symmetric(horizontal: 36, vertical: 16),
+                  child: Row(
+                    crossAxisAlignment: .center,
+                    spacing: 24,
+                    children: [
+                      Icon(Icons.info_outline),
+                      Expanded(child: Text(announcement)),
+                    ],
+                  ),
+                ),
               ),
-              padding: .symmetric(horizontal: 36, vertical: 16),
-              child: Row(
+            ],
+            Container(
+              decoration: BoxDecoration(color: colors.surfaceContainerHigh, borderRadius: .circular(30)),
+              child: Column(
                 crossAxisAlignment: .center,
-                spacing: 24,
                 children: [
-                  Icon(Icons.info_outline),
-                  Expanded(child: Text(announcement)),
+                  ClipPath(
+                    clipper: FancyHorizontalSide(),
+                    child: Container(
+                      height: 175,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        color: appColor,
+                        borderRadius: .only(topLeft: .circular(30), topRight: .circular(30)),
+                      ),
+                      child: Align(alignment: .center, child: AppLogo(size: 70, color: colors.onSurface)),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Center(child: AutoRouter()),
+                  ),
                 ],
               ),
             ),
-          ),
-        ],
-        Container(
-          decoration: BoxDecoration(color: colors.surfaceContainerHigh, borderRadius: .circular(30)),
-          child: Column(
-            crossAxisAlignment: .center,
-            children: [
-              ClipPath(
-                clipper: FancyHorizontalSide(),
-                child: Container(
-                  height: 175,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    color: seedColor,
-                    borderRadius: .only(topLeft: .circular(30), topRight: .circular(30)),
-                  ),
-                  child: Align(alignment: .center, child: AppLogo(size: 70, color: colors.onSurface)),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Center(child: AutoRouter()),
-              ),
-            ],
-          ),
-        ),
-      ],
+          ],
+        );
+      }
     );
   }
 }

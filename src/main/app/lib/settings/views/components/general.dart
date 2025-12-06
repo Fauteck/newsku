@@ -1,9 +1,16 @@
+import 'dart:io';
+import 'dart:ui';
+
+import 'package:app/home/state/local_preferences.dart';
+import 'package:app/main.dart';
 import 'package:app/settings/states/general.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:auto_route/annotations.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:motor/motor.dart';
 
 @RoutePage()
 class GeneralSettingsTab extends StatelessWidget {
@@ -12,6 +19,7 @@ class GeneralSettingsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
 
     return Padding(
       padding: .symmetric(horizontal: 8),
@@ -89,6 +97,56 @@ class GeneralSettingsTab extends StatelessWidget {
                       value: state.user?.dimReadItems ?? false,
                       onChanged: state.loading ? null : (value) => cubit.dimReadItems(value),
                     ),
+                    Gap(32),
+                    Divider(),
+                    Gap(32),
+                    Text('App Color'),
+                    Gap(8),
+                    SwitchListTile(
+                      contentPadding: .zero,
+                      title: Text('Black background'),
+                      subtitle: Text('Use black background for the darktheme'),
+                      value: context.select((LocalPreferencesCubit p) => p.state.blackBackground),
+                      onChanged: (value) => getIt.get<LocalPreferencesCubit>().setBlackBackground(value),
+                    ),
+                    Gap(8),
+                    if (!kIsWeb && Platform.isAndroid) ...[
+                      SwitchListTile(
+                        contentPadding: .zero,
+                        title: Text('Dynamic color'),
+                        subtitle: Text('Use device accent color'),
+                        value: context.select((LocalPreferencesCubit p) => p.state.dynamicColor),
+                        onChanged: (value) => getIt.get<LocalPreferencesCubit>().setDynamicColor(value),
+                      ),
+                      Gap(8),
+                    ],
+                    if (!context.select((LocalPreferencesCubit p) => p.state.dynamicColor))
+                      Wrap(
+                        spacing: 16,
+                        runSpacing: 16,
+                        children: [Colors.deepOrange, Colors.deepPurple, Colors.amber, Colors.green, Colors.pink, Colors.blue, Colors.grey, Colors.red, Colors.teal].map((c) {
+                          return InkWell(
+                            onTap: () => getIt.get<LocalPreferencesCubit>().setColor(c),
+                            child: SingleMotionBuilder(
+                              from: 0,
+                              value: context.select((LocalPreferencesCubit p) => p.state.themeColor).toARGB32() == c.toARGB32() ? 1 : 0,
+                              motion: MaterialSpringMotion.expressiveSpatialSlow(),
+                              builder: (context, value, child) => Transform.scale(
+                                scale: lerpDouble(1, 1.3, value),
+                                child: Container(
+                                  width: 30,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                    color: c,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(width: 2, color: Color.lerp(colors.surface, colors.tertiary, value)!),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     Gap(32),
                     Divider(),
                     Gap(32),

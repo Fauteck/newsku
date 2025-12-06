@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  dynamic_color
   file_saver
   oidc_windows
   simple_secure_storage_windows
