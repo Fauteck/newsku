@@ -78,7 +78,7 @@ class MainFeedCubit extends Cubit<MainFeedState> {
 
       var key = DateTimeRange(start: from, end: now);
 
-      var data = List<FeedItem>.from(await service.getFeedItems(page: 0, pageSize: 50, from: from.millisecondsSinceEpoch, to: now.millisecondsSinceEpoch).then((value) => value.content));
+      var data = List<FeedItem>.from(await service.getFeedItems(page: 0, pageSize: 999999, from: from.millisecondsSinceEpoch, to: now.millisecondsSinceEpoch).then((value) => value.content));
 
       // we need to sort the data into the headlines and stuff
       var map = Map<DateTimeRange, List<FeedItem>>.from(state.items);
