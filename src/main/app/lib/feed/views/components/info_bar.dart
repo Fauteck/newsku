@@ -1,6 +1,7 @@
 import 'package:app/feed/models/feed_item.dart';
 import 'package:app/feed/views/components/feed_image.dart';
 import 'package:app/feed/views/screens/feed_screen.dart';
+import 'package:app/l10n/app_localizations.dart';
 import 'package:app/utils/dialog.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +15,7 @@ class InfoBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
+    final locals = AppLocalizations.of(context)!;
     return Row(
       spacing: 8,
       children: [
@@ -34,7 +36,13 @@ class InfoBar extends StatelessWidget {
           style: textTheme.labelMedium?.copyWith(color: colors.onSecondaryContainer),
         ),
         InkWell(
-          onTap: () => okCancelDialog(context, title: 'Reasoning', content: Text(item.reasoning ?? ''), onOk: () {}, showCancel: false),
+          onTap: () => okCancelDialog(
+            context,
+            title: locals.reasoning,
+            content: ConstrainedBox(constraints: BoxConstraints(maxWidth: 400), child: Text(item.reasoning ?? '')),
+            onOk: () {},
+            showCancel: false,
+          ),
           child: Container(
             decoration: BoxDecoration(color: colors.secondaryContainer, borderRadius: .circular(20)),
             padding: .symmetric(vertical: 2, horizontal: 8),
