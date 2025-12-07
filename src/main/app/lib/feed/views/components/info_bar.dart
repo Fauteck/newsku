@@ -23,9 +23,15 @@ class InfoBar extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            '${item.feed?.name ?? ''} - ${(fullDate ? fullArticleDateFormat : articleDateFormat).format(DateTime.fromMillisecondsSinceEpoch(item.timeCreated))}',
+            item.feed?.name ?? '',
             style: textTheme.labelMedium?.copyWith(color: colors.onSecondaryContainer),
+            maxLines: 1,
+            overflow: .ellipsis,
           ),
+        ),
+        Text(
+          (fullDate ? fullArticleDateFormat : articleDateFormat).format(DateTime.fromMillisecondsSinceEpoch(item.timeCreated)),
+          style: textTheme.labelMedium?.copyWith(color: colors.onSecondaryContainer),
         ),
         InkWell(
           onTap: () => okCancelDialog(context, title: 'Reasoning', content: Text(item.reasoning ?? ''), onOk: () {}, showCancel: false),
