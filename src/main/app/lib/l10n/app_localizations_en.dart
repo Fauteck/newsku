@@ -233,4 +233,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dropBlockHere => 'Drop block here';
+
+  @override
+  String itemHandlingLabel(String handling) {
+    String _temp0 = intl.Intl.selectLogic(handling, {
+      'none': 'None',
+      'dim': 'Dim',
+      'hide': 'Hide',
+      'other': 'No handling selected',
+    });
+    return '$_temp0';
+  }
 }

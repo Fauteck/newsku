@@ -471,6 +471,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Drop block here'**
   String get dropBlockHere;
+
+  /// No description provided for @itemHandlingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{handling, select, none{None} dim{Dim} hide{Hide} other{No handling selected}}'**
+  String itemHandlingLabel(String handling);
 }
 
 class _AppLocalizationsDelegate

@@ -61,6 +61,7 @@
     "newPassword": "New password",
     "confirmPassword": "Confirm password",
     "passwordUpdated": "Password updated",
-    "dropBlockHere": "Drop block here"
+    "dropBlockHere": "Drop block here",
+    "itemHandlingLabel": "{handling, select, none{None} dim{Dim} hide{Hide} other{No handling selected}}"
 
 }

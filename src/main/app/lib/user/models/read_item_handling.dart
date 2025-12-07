@@ -1,3 +1,4 @@
+import 'package:app/l10n/app_localizations.dart';
 import 'package:flutter/cupertino.dart';
 
 enum ReadItemHandling {
@@ -6,10 +7,7 @@ enum ReadItemHandling {
   hide;
 
   String getLabel(BuildContext context) {
-    return switch (this) {
-      none => 'None',
-      dim => 'Dim',
-      hide => 'Hide',
-    };
+    final locals = AppLocalizations.of(context)!;
+    return locals.itemHandlingLabel(name);
   }
 }
