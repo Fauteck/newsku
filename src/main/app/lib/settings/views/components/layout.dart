@@ -1,3 +1,4 @@
+import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block_types.dart';
 import 'package:app/settings/states/layout.dart';
 import 'package:app/settings/views/components/draggable_layout_block.dart';
@@ -19,6 +20,7 @@ class LayoutSettingsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final locals = AppLocalizations.of(context)!;
 
     return Padding(
       padding: .only(bottom: 32),
@@ -41,14 +43,14 @@ class LayoutSettingsTab extends StatelessWidget {
                             children: [
                               Gap(8),
                               Text(
-                                'In this screen you can adjust how your RSS feed articles are being displayed by arranging the different types of blocks the way you want it. Your feed items will be inserted from most important to least important following the blocks top to bottom.\n\nNote that the Fixed article blocks on mobile will be displayed in a similar way as the big grid items.',
+                                locals.layoutExplanation,
                               ),
                               Divider(),
-                              Text('Available blocks', style: textTheme.titleLarge),
-                              Text('Drag and drop the blocks onto your layout to personalize your home page'),
+                              Text(locals.availableBlocks, style: textTheme.titleLarge),
+                              Text(locals.dragAndDropInstructions),
                               Gap(32),
                               Expanded(child: ListView(children: [
-                                Text('Fixed article count blocks'),
+                                Text(locals.fixedArticleCountBlocks),
                                 Center(
                                   child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigHeadline),
                                 ),
@@ -56,7 +58,7 @@ class LayoutSettingsTab extends StatelessWidget {
                                   child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.topStories),
                                 ),
                                 Gap(32),
-                                Text('Dynamic article count blocks'),
+                                Text(locals.dynamicArticleCountBlocks),
                                 Center(
                                   child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigGrid),
                                 ),
@@ -74,7 +76,7 @@ class LayoutSettingsTab extends StatelessWidget {
                             crossAxisAlignment: .stretch,
                             children: [
                               Gap(8),
-                              Text('Current Layout', style: textTheme.titleLarge),
+                              Text(locals.currentLayout, style: textTheme.titleLarge),
                               Expanded(
                                 child: ReorderableListView.builder(
                                   proxyDecorator: (child, index, animation) => Center(child: DraggedLayoutBlock(type: state.blocks[index].type)),
@@ -154,18 +156,18 @@ class LayoutSettingsTab extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      if (!state.valid) Text('Your layout must finish with a dynamic block', style: TextStyle(color: colors.error)),
+                      if (!state.valid) Text(locals.layoutMustFinishWithDynamicBlock, style: TextStyle(color: colors.error)),
                       Spacer(),
                       FilledButton.tonalIcon(
                         onPressed: state.valid
                             ? () async {
                                 await cubit.save();
                                 if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Layout saved')));
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(locals.layoutSaved)));
                                 }
                               }
                             : null,
-                        label: Text('Update'),
+                        label: Text(locals.update),
                         icon: Icon(Icons.save),
                       ),
                     ],

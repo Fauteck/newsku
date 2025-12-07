@@ -3,6 +3,7 @@ import 'package:app/feed/views/components/big_grid_item.dart';
 import 'package:app/feed/views/components/headline.dart';
 import 'package:app/feed/views/components/small_grid_item.dart';
 import 'package:app/feed/views/components/top_stories.dart';
+import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/layouts/models/layout_block_settings.dart';
 import 'package:app/layouts/views/components/previews/big_grid_big.dart';
@@ -19,19 +20,27 @@ import 'package:flutter/material.dart';
 const double smallPreviewSize = 150;
 
 enum LayoutBlockTypes {
-  bigHeadline(1, HeadlineSmall(), LayoutBlockSettings(), 'Headline'),
-  topStories(4, TopStoriesSmall(), LayoutBlockSettings(title: 'Top stories'), 'Top stories'),
-  bigGrid(null, BigGridSmall(), LayoutBlockSettings(items: 6), 'Big grid'),
-  smallGrid(null, SmallGridSmall(), LayoutBlockSettings(items: 10), 'Small grid');
+  bigHeadline(1, HeadlineSmall(), LayoutBlockSettings()),
+  topStories(4, TopStoriesSmall(), LayoutBlockSettings(title: 'Top stories')),
+  bigGrid(null, BigGridSmall(), LayoutBlockSettings(items: 6)),
+  smallGrid(null, SmallGridSmall(), LayoutBlockSettings(items: 10));
 
   final int? fixedItemSize;
   final Widget smallPreview;
   final LayoutBlockSettings defaultSettings;
-  final String name;
 
-  const LayoutBlockTypes(this.fixedItemSize, this.smallPreview, this.defaultSettings, this.name);
+  const LayoutBlockTypes(this.fixedItemSize, this.smallPreview, this.defaultSettings);
 
   bool get fixedSize => fixedItemSize != null;
+
+  String getLabel(AppLocalizations locals) {
+    return switch (this) {
+      bigHeadline => locals.headline,
+      topStories => locals.topStories,
+      bigGrid => locals.bigGrid,
+      smallGrid => locals.smallGrid,
+    };
+  }
 
   Widget getBigPreview(BuildContext context, {required LayoutBlock block, required Function(LayoutBlock block) onUpdated, required bool last}) {
     return switch (this) {
@@ -45,7 +54,7 @@ enum LayoutBlockTypes {
   Widget getSliver({required BuildContext context, required List<FeedItem> items, required LayoutBlock block}) {
     final breakPoint = BreakPoint.get(context);
     return switch (this) {
-      .bigHeadline => breakPoint == .mobile ? _bigGridSliver(breakPoint: breakPoint, items: items, block: block): SliverToBoxAdapter(child: Headline(item: items.first),),
+      .bigHeadline => breakPoint == .mobile ? _bigGridSliver(breakPoint: breakPoint, items: items, block: block) : SliverToBoxAdapter(child: Headline(item: items.first)),
       .topStories =>
         breakPoint == .mobile
             ? _bigGridSliver(items: items, block: block, breakPoint: breakPoint)
@@ -65,11 +74,9 @@ enum LayoutBlockTypes {
         ),
         itemCount: items.length,
         itemBuilder: (context, index) {
-
           return SmallGridItem(key: ValueKey(items[index]), item: items[index]);
         },
-      )
-      
+      ),
     };
   }
 

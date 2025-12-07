@@ -1,0 +1,506 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart' as intl;
+
+import 'app_localizations_en.dart';
+
+// ignore_for_file: type=lint
+
+/// Callers can lookup localized strings with an instance of AppLocalizations
+/// returned by `AppLocalizations.of(context)`.
+///
+/// Applications need to include `AppLocalizations.delegate()` in their app's
+/// `localizationDelegates` list, and the locales they support in the app's
+/// `supportedLocales` list. For example:
+///
+/// ```dart
+/// import 'l10n/app_localizations.dart';
+///
+/// return MaterialApp(
+///   localizationsDelegates: AppLocalizations.localizationsDelegates,
+///   supportedLocales: AppLocalizations.supportedLocales,
+///   home: MyApplicationHome(),
+/// );
+/// ```
+///
+/// ## Update pubspec.yaml
+///
+/// Please make sure to update your pubspec.yaml to include the following
+/// packages:
+///
+/// ```yaml
+/// dependencies:
+///   # Internationalization support.
+///   flutter_localizations:
+///     sdk: flutter
+///   intl: any # Use the pinned version from flutter_localizations
+///
+///   # Rest of dependencies
+/// ```
+///
+/// ## iOS Applications
+///
+/// iOS applications define key application metadata, including supported
+/// locales, in an Info.plist file that is built into the application bundle.
+/// To configure the locales supported by your app, you’ll need to edit this
+/// file.
+///
+/// First, open your project’s ios/Runner.xcworkspace Xcode workspace file.
+/// Then, in the Project Navigator, open the Info.plist file under the Runner
+/// project’s Runner folder.
+///
+/// Next, select the Information Property List item, select Add Item from the
+/// Editor menu, then select Localizations from the pop-up menu.
+///
+/// Select and expand the newly-created Localizations item then, for each
+/// locale your application supports, add a new item and select the locale
+/// you wish to add from the pop-up menu in the Value field. This list should
+/// be consistent with the languages listed in the AppLocalizations.supportedLocales
+/// property.
+abstract class AppLocalizations {
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+
+  final String localeName;
+
+  static AppLocalizations? of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  }
+
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
+
+  /// A list of this localizations delegate along with the default localizations
+  /// delegates.
+  ///
+  /// Returns a list of localizations delegates containing this delegate along with
+  /// GlobalMaterialLocalizations.delegate, GlobalCupertinoLocalizations.delegate,
+  /// and GlobalWidgetsLocalizations.delegate.
+  ///
+  /// Additional delegates can be added by appending to this list in
+  /// MaterialApp. This list does not have to be used at all if a custom list
+  /// of delegates is preferred or required.
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
+
+  /// A list of this localizations delegate's supported locales.
+  static const List<Locale> supportedLocales = <Locale>[Locale('en')];
+
+  /// No description provided for @articlePreference.
+  ///
+  /// In en, this message translates to:
+  /// **'Article preferences'**
+  String get articlePreference;
+
+  /// No description provided for @server.
+  ///
+  /// In en, this message translates to:
+  /// **'Server'**
+  String get server;
+
+  /// No description provided for @continueToLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueToLogin;
+
+  /// No description provided for @serverUrlUnreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t ead server or get its config'**
+  String get serverUrlUnreachable;
+
+  /// No description provided for @username.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get username;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @signUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up'**
+  String get signUp;
+
+  /// No description provided for @login.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in'**
+  String get login;
+
+  /// No description provided for @or.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get or;
+
+  /// No description provided for @loginWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in with {provider}'**
+  String loginWith(Object provider);
+
+  /// No description provided for @invalidCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid username or password'**
+  String get invalidCredentials;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @repeatPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'RepeatPassword'**
+  String get repeatPassword;
+
+  /// No description provided for @passwordsNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordsNotMatch;
+
+  /// No description provided for @noNews.
+  ///
+  /// In en, this message translates to:
+  /// **'No news'**
+  String get noNews;
+
+  /// No description provided for @readItems.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No read items} =1{1 read item} other{{count} read items}}'**
+  String readItems(num count);
+
+  /// No description provided for @loadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get loadMore;
+
+  /// No description provided for @reasoning.
+  ///
+  /// In en, this message translates to:
+  /// **'Reasoning'**
+  String get reasoning;
+
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search;
+
+  /// No description provided for @feeds.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeds'**
+  String get feeds;
+
+  /// No description provided for @layout.
+  ///
+  /// In en, this message translates to:
+  /// **'Layout'**
+  String get layout;
+
+  /// No description provided for @general.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get general;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out'**
+  String get logout;
+
+  /// No description provided for @addFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Add feed'**
+  String get addFeed;
+
+  /// No description provided for @newFeedUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'New feed URL'**
+  String get newFeedUrl;
+
+  /// No description provided for @import.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get import;
+
+  /// No description provided for @export.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get export;
+
+  /// No description provided for @deleteFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete feed?'**
+  String get deleteFeed;
+
+  /// No description provided for @deleteFeedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This will delete the feed and all its articles'**
+  String get deleteFeedMessage;
+
+  /// No description provided for @importedNFeeds.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No feed imported} =1{Imported 1 feed} other{Importer {count} feeds}}'**
+  String importedNFeeds(num count);
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'Ok'**
+  String get ok;
+
+  /// No description provided for @layoutExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'In this screen you can adjust how your RSS feed articles are being displayed by arranging the different types of blocks the way you want it. Your feed items will be inserted from most important to least important following the blocks top to bottom.\\n\\nNote that the Fixed article blocks on mobile will be displayed in a similar way as the big grid items.'**
+  String get layoutExplanation;
+
+  /// No description provided for @availableBlocks.
+  ///
+  /// In en, this message translates to:
+  /// **'Available blocks'**
+  String get availableBlocks;
+
+  /// No description provided for @dragAndDropInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag and drop the blocks onto your layout to personalize your home page'**
+  String get dragAndDropInstructions;
+
+  /// No description provided for @fixedArticleCountBlocks.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed article count blocks'**
+  String get fixedArticleCountBlocks;
+
+  /// No description provided for @dynamicArticleCountBlocks.
+  ///
+  /// In en, this message translates to:
+  /// **'Dynamic article count blocks'**
+  String get dynamicArticleCountBlocks;
+
+  /// No description provided for @headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Headline'**
+  String get headline;
+
+  /// No description provided for @topStories.
+  ///
+  /// In en, this message translates to:
+  /// **'Top stories'**
+  String get topStories;
+
+  /// No description provided for @bigGrid.
+  ///
+  /// In en, this message translates to:
+  /// **'Big grid'**
+  String get bigGrid;
+
+  /// No description provided for @smallGrid.
+  ///
+  /// In en, this message translates to:
+  /// **'Small grid'**
+  String get smallGrid;
+
+  /// No description provided for @title.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get title;
+
+  /// No description provided for @nItems.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No items} =1{1 item} other{{count} items}}'**
+  String nItems(num count);
+
+  /// No description provided for @currentLayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Current layout'**
+  String get currentLayout;
+
+  /// No description provided for @layoutMustFinishWithDynamicBlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Your layout must finish with a dynamic block'**
+  String get layoutMustFinishWithDynamicBlock;
+
+  /// No description provided for @update.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get update;
+
+  /// No description provided for @layoutSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Layout saved'**
+  String get layoutSaved;
+
+  /// No description provided for @articlePreferencesExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'This is guidance for the AI model. Telling it what kind of article you prefer to prioritize for the scoring  of each article. The change only applies to future articles.'**
+  String get articlePreferencesExplanation;
+
+  /// No description provided for @minimumNewsScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum news score'**
+  String get minimumNewsScore;
+
+  /// No description provided for @minimumNewsScoreExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'This will filter out from your feed any news that has been scored lower than the selected value'**
+  String get minimumNewsScoreExplanation;
+
+  /// No description provided for @preferenceUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences updated'**
+  String get preferenceUpdated;
+
+  /// No description provided for @readItemHandling.
+  ///
+  /// In en, this message translates to:
+  /// **'Read item handling'**
+  String get readItemHandling;
+
+  /// No description provided for @readItemHandlingExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'While you scroll through the feed, items will be set as read. You can make the feed item dim for the next time you visit your feed'**
+  String get readItemHandlingExplanation;
+
+  /// No description provided for @appColor.
+  ///
+  /// In en, this message translates to:
+  /// **'App color'**
+  String get appColor;
+
+  /// No description provided for @blackBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Black background'**
+  String get blackBackground;
+
+  /// No description provided for @blackBackgroundExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'User black background for the dark theme'**
+  String get blackBackgroundExplanation;
+
+  /// No description provided for @dynamicColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Dynamic color'**
+  String get dynamicColor;
+
+  /// No description provided for @dynamicColorExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'User device accent color'**
+  String get dynamicColorExplanation;
+
+  /// No description provided for @newPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get newPassword;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get confirmPassword;
+
+  /// No description provided for @passwordUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Password updated'**
+  String get passwordUpdated;
+
+  /// No description provided for @dropBlockHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop block here'**
+  String get dropBlockHere;
+}
+
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
+  const _AppLocalizationsDelegate();
+
+  @override
+  Future<AppLocalizations> load(Locale locale) {
+    return SynchronousFuture<AppLocalizations>(lookupAppLocalizations(locale));
+  }
+
+  @override
+  bool isSupported(Locale locale) =>
+      <String>['en'].contains(locale.languageCode);
+
+  @override
+  bool shouldReload(_AppLocalizationsDelegate old) => false;
+}
+
+AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when only language code is specified.
+  switch (locale.languageCode) {
+    case 'en':
+      return AppLocalizationsEn();
+  }
+
+  throw FlutterError(
+    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.',
+  );
+}

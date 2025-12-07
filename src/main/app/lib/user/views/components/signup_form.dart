@@ -1,3 +1,4 @@
+import 'package:app/l10n/app_localizations.dart';
 import 'package:app/router.dart';
 import 'package:app/user/states/signup.dart';
 import 'package:auto_route/auto_route.dart';
@@ -13,6 +14,7 @@ class SignupFormScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
+    final locals = AppLocalizations.of(context)!;
     return BlocProvider(
       create: (context) => SignupCubit(SignupState()),
       child: BlocBuilder<SignupCubit, SignupState>(
@@ -23,22 +25,22 @@ class SignupFormScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: .center,
               children: [
-                Align(alignment: .centerLeft, child: Text('Username')),
+                Align(alignment: .centerLeft, child: Text(locals.username)),
                 TextField(onChanged: (value) => cubit.setUsername(value), autofillHints: [AutofillHints.newUsername], autocorrect: false),
                 Gap(16),
-                Align(alignment: .centerLeft, child: Text('email')),
+                Align(alignment: .centerLeft, child: Text(locals.email)),
                 TextField(onChanged: (value) => cubit.setEmail(value), autofillHints: [AutofillHints.email], autocorrect: false),
                 Gap(16),
-                Align(alignment: .centerLeft, child: Text('Password')),
+                Align(alignment: .centerLeft, child: Text(locals.password)),
                 TextField(obscureText: true, onChanged: (value) => cubit.setPassword(value), autofillHints: [AutofillHints.newPassword], autocorrect: false),
                 Gap(16),
-                Align(alignment: .centerLeft, child: Text('Repeat password')),
+                Align(alignment: .centerLeft, child: Text(locals.repeatPassword)),
                 TextField(obscureText: true, onChanged: (value) => cubit.setRepeatPassword(value), autocorrect: false),
                 Gap(16),
-                if (state.password != state.repeatPassword) ...[Gap(16), Text('Passwords do not match', style: textTheme.bodyMedium?.copyWith(color: colors.error)), Gap(16)],
+                if (state.password != state.repeatPassword) ...[Gap(16), Text(locals.passwordsNotMatch, style: textTheme.bodyMedium?.copyWith(color: colors.error)), Gap(16)],
                 Row(
                   children: [
-                    TextButton(onPressed: () => AutoRouter.of(context).replace(LoginFormRoute()), child: Text('Log in')),
+                    TextButton(onPressed: () => AutoRouter.of(context).replace(LoginFormRoute()), child: Text(locals.login)),
                     Spacer(),
                     FilledButton.tonalIcon(
                       onPressed: state.loading || state.invalidForm
@@ -49,7 +51,7 @@ class SignupFormScreen extends StatelessWidget {
                                 AutoRouter.of(context).replace(LoginFormRoute());
                               }
                             },
-                      label: Text('Sign up'),
+                      label: Text(locals.signUp),
                       icon: Icon(Icons.login),
                     ),
                   ],

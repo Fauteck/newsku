@@ -1,4 +1,5 @@
 import 'package:app/feed/views/components/feed_image.dart';
+import 'package:app/l10n/app_localizations.dart';
 import 'package:app/settings/states/feeds.dart';
 import 'package:app/utils/dialog.dart';
 import 'package:app/utils/views/components/error_listener.dart';
@@ -14,6 +15,7 @@ class FeedsSettingsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final locals = AppLocalizations.of(context)!;
     return BlocProvider(
       create: (context) => FeedsSettingsCubit(FeedsSettingsState()),
       child: ErrorHandler<FeedsSettingsCubit, FeedsSettingsState>(
@@ -33,10 +35,10 @@ class FeedsSettingsTab extends StatelessWidget {
                               child: TextField(
                                 controller: cubit.newFeedController,
                                 autofillHints: [AutofillHints.url],
-                                decoration: InputDecoration(label: Text('New feed Url')),
+                                decoration: InputDecoration(label: Text(locals.newFeedUrl)),
                               ),
                             ),
-                            FilledButton.tonalIcon(onPressed: () => cubit.addFeed(), label: Text('Add Feed'), icon: Icon(Icons.add)),
+                            FilledButton.tonalIcon(onPressed: () => cubit.addFeed(), label: Text(locals.addFeed), icon: Icon(Icons.add)),
                           ],
                         ),
                       ),
@@ -44,7 +46,7 @@ class FeedsSettingsTab extends StatelessWidget {
                         mainAxisAlignment: .start,
                         spacing: 8,
                         children: [
-                          TextButton.icon(onPressed: () => cubit.exportFeed(), label: Text('Export'), icon: Icon(Icons.download)),
+                          TextButton.icon(onPressed: () => cubit.exportFeed(), label: Text(locals.export), icon: Icon(Icons.download)),
                           TextButton.icon(
                             onPressed: () async {
                               FilePickerResult? result = await FilePicker.platform.pickFiles(allowedExtensions: ['opml'], allowMultiple: false, type: FileType.custom);
@@ -52,11 +54,11 @@ class FeedsSettingsTab extends StatelessWidget {
                               if (result != null && result.files.isNotEmpty) {
                                 final feeds = await cubit.importFeeds(result.files.first.bytes);
                                 if (context.mounted && feeds.isNotEmpty) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Imported ${feeds.length} feeds')));
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(locals.importedNFeeds(feeds.length))));
                                 }
                               }
                             },
-                            label: Text('Import'),
+                            label: Text(locals.import),
                             icon: Icon(Icons.upload),
                           ),
                         ],
@@ -76,7 +78,7 @@ class FeedsSettingsTab extends StatelessWidget {
                               subtitle: Text(f.url ?? ''),
                               trailing: IconButton(
                                 onPressed: () {
-                                  okCancelDialog(context, title: 'Delete feed ?', content: Text('This will delete the feed and all its articles.'), onOk: () => cubit.deleteFeed(f));
+                                  okCancelDialog(context, title: locals.deleteFeed, content: Text(locals.deleteFeedMessage), onOk: () => cubit.deleteFeed(f));
                                 },
                                 icon: Icon(Icons.delete),
                               ),

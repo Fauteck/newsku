@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:app/home/state/local_preferences.dart';
+import 'package:app/l10n/app_localizations.dart';
 import 'package:app/main.dart';
 import 'package:app/settings/states/general.dart';
 import 'package:app/user/models/read_item_handling.dart';
@@ -21,6 +22,7 @@ class GeneralSettingsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
+    final locals = AppLocalizations.of(context)!;
 
     final subTextTheme = textTheme.labelMedium?.copyWith(color: colors.secondary);
 
@@ -37,15 +39,11 @@ class GeneralSettingsTab extends StatelessWidget {
                   crossAxisAlignment: .start,
                   children: [
                     Gap(16),
-                    Text('Article preferences'),
+                    Text(locals.articlePreference),
                     TextField(
                       controller: cubit.preferenceController,
                       maxLines: 5,
-                      decoration: InputDecoration(
-                        helper: Text(
-                          'This is guidance for the AI model. Telling it what kind of article you prefer to prioritize for the scoring  of each article. The change only applies to future articles.',
-                        style: subTextTheme,),
-                      ),
+                      decoration: InputDecoration(helper: Text(locals.articlePreferencesExplanation, style: subTextTheme)),
                     ),
                     Gap(8),
                     Align(
@@ -56,18 +54,18 @@ class GeneralSettingsTab extends StatelessWidget {
                             : () async {
                                 await cubit.setAiPreferences();
                                 if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Preference updated')));
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(locals.preferenceUpdated)));
                                 }
                               },
-                        label: Text('Update'),
+                        label: Text(locals.update),
                         icon: Icon(Icons.save),
                       ),
                     ),
                     Gap(32),
                     Divider(),
                     Gap(32),
-                    Text('Minimum news score'),
-                    Text('This will filter out from your feed any news that has been scored lower than the selected value', style: subTextTheme),
+                    Text(locals.minimumNewsScore),
+                    Text(locals.minimumNewsScoreExplanation, style: subTextTheme),
                     Slider(
                       min: 0,
                       max: 100,
@@ -84,8 +82,8 @@ class GeneralSettingsTab extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: .stretch,
                             children: [
-                              Text('Read item handling'),
-                              Text('While you scroll through the feed, items will be set as read. You can make the feed item dim for the next time you visit your feed', style: subTextTheme),
+                              Text(locals.readItemHandling),
+                              Text(locals.readItemHandlingExplanation, style: subTextTheme),
                             ],
                           ),
                         ),
@@ -99,12 +97,12 @@ class GeneralSettingsTab extends StatelessWidget {
                     Gap(32),
                     Divider(),
                     Gap(32),
-                    Text('App Color'),
+                    Text(locals.appColor),
                     Gap(8),
                     SwitchListTile(
                       contentPadding: .zero,
-                      title: Text('Black background'),
-                      subtitle: Text('Use black background for the dark theme', style: subTextTheme,),
+                      title: Text(locals.blackBackground),
+                      subtitle: Text(locals.blackBackgroundExplanation, style: subTextTheme),
                       value: context.select((LocalPreferencesCubit p) => p.state.blackBackground),
                       onChanged: (value) => getIt.get<LocalPreferencesCubit>().setBlackBackground(value),
                     ),
@@ -112,8 +110,8 @@ class GeneralSettingsTab extends StatelessWidget {
                     if (!kIsWeb && Platform.isAndroid) ...[
                       SwitchListTile(
                         contentPadding: .zero,
-                        title: Text('Dynamic color'),
-                        subtitle: Text('Use device accent color', style: subTextTheme,),
+                        title: Text(locals.dynamicColor),
+                        subtitle: Text(locals.blackBackgroundExplanation, style: subTextTheme),
                         value: context.select((LocalPreferencesCubit p) => p.state.dynamicColor),
                         onChanged: (value) => getIt.get<LocalPreferencesCubit>().setDynamicColor(value),
                       ),
@@ -149,14 +147,14 @@ class GeneralSettingsTab extends StatelessWidget {
                     Gap(32),
                     Divider(),
                     Gap(32),
-                    Text('Change password'),
+                    Text(locals.newPassword),
                     TextField(controller: cubit.password, obscureText: true),
                     Gap(8),
-                    Text('Confirm password'),
+                    Text(locals.confirmPassword),
                     TextField(
                       controller: cubit.repeatPassword,
                       obscureText: true,
-                      decoration: InputDecoration(error: (state.password != state.repeatPassword) ? Text('Password do not match') : null),
+                      decoration: InputDecoration(error: (state.password != state.repeatPassword) ? Text(locals.passwordsNotMatch) : null),
                     ),
                     Gap(8),
                     Align(
@@ -167,10 +165,10 @@ class GeneralSettingsTab extends StatelessWidget {
                             : () async {
                                 await cubit.resetPassword();
                                 if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Password updated')));
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(locals.passwordUpdated)));
                                 }
                               },
-                        label: Text('Update'),
+                        label: Text(locals.update),
                         icon: Icon(Icons.save),
                       ),
                     ),

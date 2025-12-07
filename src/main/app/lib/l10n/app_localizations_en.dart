@@ -1,0 +1,236 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for English (`en`).
+class AppLocalizationsEn extends AppLocalizations {
+  AppLocalizationsEn([String locale = 'en']) : super(locale);
+
+  @override
+  String get articlePreference => 'Article preferences';
+
+  @override
+  String get server => 'Server';
+
+  @override
+  String get continueToLogin => 'Continue';
+
+  @override
+  String get serverUrlUnreachable => 'Couldn\'t ead server or get its config';
+
+  @override
+  String get username => 'Username';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get signUp => 'Sign up';
+
+  @override
+  String get login => 'Log in';
+
+  @override
+  String get or => 'or';
+
+  @override
+  String loginWith(Object provider) {
+    return 'Log in with $provider';
+  }
+
+  @override
+  String get invalidCredentials => 'Invalid username or password';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get repeatPassword => 'RepeatPassword';
+
+  @override
+  String get passwordsNotMatch => 'Passwords do not match';
+
+  @override
+  String get noNews => 'No news';
+
+  @override
+  String readItems(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count read items',
+      one: '1 read item',
+      zero: 'No read items',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get loadMore => 'Load more';
+
+  @override
+  String get reasoning => 'Reasoning';
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String get feeds => 'Feeds';
+
+  @override
+  String get layout => 'Layout';
+
+  @override
+  String get general => 'General';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get logout => 'Log out';
+
+  @override
+  String get addFeed => 'Add feed';
+
+  @override
+  String get newFeedUrl => 'New feed URL';
+
+  @override
+  String get import => 'Import';
+
+  @override
+  String get export => 'Export';
+
+  @override
+  String get deleteFeed => 'Delete feed?';
+
+  @override
+  String get deleteFeedMessage =>
+      'This will delete the feed and all its articles';
+
+  @override
+  String importedNFeeds(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Importer $count feeds',
+      one: 'Imported 1 feed',
+      zero: 'No feed imported',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get ok => 'Ok';
+
+  @override
+  String get layoutExplanation =>
+      'In this screen you can adjust how your RSS feed articles are being displayed by arranging the different types of blocks the way you want it. Your feed items will be inserted from most important to least important following the blocks top to bottom.\\n\\nNote that the Fixed article blocks on mobile will be displayed in a similar way as the big grid items.';
+
+  @override
+  String get availableBlocks => 'Available blocks';
+
+  @override
+  String get dragAndDropInstructions =>
+      'Drag and drop the blocks onto your layout to personalize your home page';
+
+  @override
+  String get fixedArticleCountBlocks => 'Fixed article count blocks';
+
+  @override
+  String get dynamicArticleCountBlocks => 'Dynamic article count blocks';
+
+  @override
+  String get headline => 'Headline';
+
+  @override
+  String get topStories => 'Top stories';
+
+  @override
+  String get bigGrid => 'Big grid';
+
+  @override
+  String get smallGrid => 'Small grid';
+
+  @override
+  String get title => 'Title';
+
+  @override
+  String nItems(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+      zero: 'No items',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get currentLayout => 'Current layout';
+
+  @override
+  String get layoutMustFinishWithDynamicBlock =>
+      'Your layout must finish with a dynamic block';
+
+  @override
+  String get update => 'Update';
+
+  @override
+  String get layoutSaved => 'Layout saved';
+
+  @override
+  String get articlePreferencesExplanation =>
+      'This is guidance for the AI model. Telling it what kind of article you prefer to prioritize for the scoring  of each article. The change only applies to future articles.';
+
+  @override
+  String get minimumNewsScore => 'Minimum news score';
+
+  @override
+  String get minimumNewsScoreExplanation =>
+      'This will filter out from your feed any news that has been scored lower than the selected value';
+
+  @override
+  String get preferenceUpdated => 'Preferences updated';
+
+  @override
+  String get readItemHandling => 'Read item handling';
+
+  @override
+  String get readItemHandlingExplanation =>
+      'While you scroll through the feed, items will be set as read. You can make the feed item dim for the next time you visit your feed';
+
+  @override
+  String get appColor => 'App color';
+
+  @override
+  String get blackBackground => 'Black background';
+
+  @override
+  String get blackBackgroundExplanation =>
+      'User black background for the dark theme';
+
+  @override
+  String get dynamicColor => 'Dynamic color';
+
+  @override
+  String get dynamicColorExplanation => 'User device accent color';
+
+  @override
+  String get newPassword => 'New password';
+
+  @override
+  String get confirmPassword => 'Confirm password';
+
+  @override
+  String get passwordUpdated => 'Password updated';
+
+  @override
+  String get dropBlockHere => 'Drop block here';
+}

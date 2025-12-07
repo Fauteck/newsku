@@ -1,4 +1,5 @@
 import 'package:app/identity/states/identity.dart';
+import 'package:app/l10n/app_localizations.dart';
 import 'package:app/router.dart';
 import 'package:app/user/states/login.dart';
 import 'package:app/utils/utils.dart';
@@ -16,6 +17,7 @@ class LoginFormScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
+    final locals = AppLocalizations.of(context)!;
 
     return BlocProvider(
       create: (context) => LoginCubit(LoginState(), serverUrl: serverUrl!),
@@ -30,17 +32,17 @@ class LoginFormScreen extends StatelessWidget {
                 crossAxisAlignment: .center,
                 mainAxisAlignment: .center,
                 children: [
-                  Align(alignment: .centerLeft, child: Text('Username')),
+                  Align(alignment: .centerLeft, child: Text(locals.username)),
                   TextField(onChanged: (value) => cubit.setUser(value), autofillHints: [AutofillHints.username], autocorrect: false),
                   Gap(16),
-                  Align(alignment: .centerLeft, child: Text('Password')),
+                  Align(alignment: .centerLeft, child: Text(locals.password)),
                   TextField(obscureText: true, onChanged: (value) => cubit.setPassword(value), autofillHints: [AutofillHints.password], autocorrect: false),
-                  if (state.failedLogin) ...[Gap(16), Text('Invalid username or password', style: textTheme.bodyMedium?.copyWith(color: colors.error)), Gap(16)],
+                  if (state.failedLogin) ...[Gap(16), Text(locals.invalidCredentials, style: textTheme.bodyMedium?.copyWith(color: colors.error)), Gap(16)],
                   Gap(16),
                   Row(
                     mainAxisAlignment: .spaceBetween,
                     children: [
-                      if ((config?.allowSignup ?? false) && !(config?.demoMode ?? false)) TextButton(onPressed: () => AutoRouter.of(context).replace(SignupFormRoute()), child: Text('Sign up')),
+                      if ((config?.allowSignup ?? false) && !(config?.demoMode ?? false)) TextButton(onPressed: () => AutoRouter.of(context).replace(SignupFormRoute()), child: Text(locals.signUp)),
                       Spacer(),
                       FilledButton.tonalIcon(
                         onPressed: state.loading
@@ -61,13 +63,13 @@ class LoginFormScreen extends StatelessWidget {
                                   }
                                 }
                               },
-                        label: Text('Login'),
+                        label: Text(locals.login),
                         icon: Icon(Icons.login),
                       ),
                     ],
                   ),
                   if (config?.oidcConfig != null) ...[
-                    Text('or'),
+                    Text(locals.or),
                     Gap(8),
                     FilledButton.tonal(
                       onPressed: () async {
@@ -80,7 +82,7 @@ class LoginFormScreen extends StatelessWidget {
                           }
                         }
                       },
-                      child: Text('Log in with ${config?.oidcConfig?.name}'),
+                      child: Text(locals.loginWith(config?.oidcConfig?.name ?? '')),
                     ),
                   ],
                 ],

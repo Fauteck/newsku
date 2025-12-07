@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:app/identity/states/identity.dart';
+import 'package:app/l10n/app_localizations.dart';
 import 'package:app/router.dart';
 import 'package:app/user/states/server_url.dart';
 import 'package:app/utils/views/components/app_logo.dart';
@@ -18,6 +19,7 @@ class ServerUrlScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final locals = AppLocalizations.of(context)!;
 
     return BlocProvider(
       create: (context) => ServerUrlCubit(ServerUrlState()),
@@ -45,10 +47,10 @@ class ServerUrlScreen extends StatelessWidget {
                     ],
                   )),
               Gap(32),
-              Align(alignment: .centerLeft, child: Text('Server')),
+              Align(alignment: .centerLeft, child: Text(locals.server)),
               TextField(
                 onChanged: (value) => cubit.setUrl(value),
-                decoration: InputDecoration(error: state.error ? Text('Couldn\'t reach server or get its config') : null),
+                decoration: InputDecoration(error: state.error ? Text(locals.serverUrlUnreachable) : null),
               ),
               Gap(8),
               Align(
@@ -60,7 +62,7 @@ class ServerUrlScreen extends StatelessWidget {
                           context.read<IdentityCubit>().setUrl(state.serverUrl, config: state.config);
                           AutoRouter.of(context).push(LoginRoute());
                         },
-                  label: Text('Continue'),
+                  label: Text(locals.continueToLogin),
                   icon: Icon(Icons.navigate_next),
                   iconAlignment: .end,
                 ),

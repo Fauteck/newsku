@@ -5,6 +5,7 @@ import 'package:app/feed/states/main_feed.dart';
 import 'package:app/feed/views/components/date_bar.dart';
 import 'package:app/feed/views/components/search_result.dart';
 import 'package:app/identity/states/identity.dart';
+import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/router.dart';
 import 'package:app/user/views/components/fancy_side.dart';
@@ -39,6 +40,8 @@ class FeedScreen extends StatelessWidget {
     required List<LayoutBlock> blocks,
     required int readItems,
   }) {
+    final locals = AppLocalizations.of(context)!;
+
     List<Widget> slivers = [];
     _log.fine('Building Slivers, TimeRange: $timeRange, Layout blocks: ${blocks.length}, Items: ${immutableItems.length}');
 
@@ -94,7 +97,7 @@ class FeedScreen extends StatelessWidget {
               spacing: 8,
               children: [
                 Icon(Icons.task_alt, color: colors.secondary, size: 15),
-                Text('$readItems read items', style: textTheme.bodySmall?.copyWith(color: colors.secondary)),
+                Text(locals.readItems(readItems), style: textTheme.bodySmall?.copyWith(color: colors.secondary)),
               ],
             ),
           ),
@@ -109,6 +112,7 @@ class FeedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
+    final locals = AppLocalizations.of(context)!;
 
     return MainColorProvider(
       builder: (context, appColor) {
@@ -150,7 +154,7 @@ class FeedScreen extends StatelessWidget {
                                                           controller: cubit.searchController,
                                                           autofocus: true,
                                                           onChanged: (value) => cubit.search(value),
-                                                          decoration: InputDecoration(border: UnderlineInputBorder(), label: Text('Search')),
+                                                          decoration: InputDecoration(border: UnderlineInputBorder(), label: Text(locals.search)),
                                                         ),
                                                       ),
                                                     ],
@@ -212,9 +216,9 @@ class FeedScreen extends StatelessWidget {
                                                         spacing: 24,
                                                         children: [
                                                           Icon(unreadCount == 0 && totalItemCount > 0 ? Icons.task_alt_outlined : Icons.newspaper, size: 50, color: colors.onSurface),
-                                                          if (totalItemCount == 0) Text('No news', style: textTheme.titleLarge),
+                                                          if (totalItemCount == 0) Text(locals.noNews, style: textTheme.titleLarge),
                                                           // this is our read item count
-                                                          if (unreadCount == 0 && totalItemCount > 0) Text('${totalItemCount - unreadCount} read items', style: textTheme.titleLarge),
+                                                          if (unreadCount == 0 && totalItemCount > 0) Text(locals.readItems(totalItemCount - unreadCount), style: textTheme.titleLarge),
                                                         ],
                                                       ),
                                                     ),
@@ -232,7 +236,7 @@ class FeedScreen extends StatelessWidget {
                                             child: Center(
                                               child: FilledButton.tonalIcon(
                                                 onPressed: () => state.searchMode ? cubit.loadMoreSearchResults() : cubit.getFeed(),
-                                                label: Text('Load more'),
+                                                label: Text(locals.loadMore),
                                                 icon: Icon(Icons.expand_more),
                                               ),
                                             ),

@@ -8,6 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
 
+import 'l10n/app_localizations.dart';
+
 late final _appRouter;
 
 final getIt = GetIt.instance;
@@ -48,6 +50,8 @@ class MyApp extends StatelessWidget {
             builder: (context, appColor) {
               return MaterialApp.router(
                 title: 'Newsku',
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
                 routerConfig: _appRouter.config(),
                 darkTheme: ThemeData(
                   colorScheme: .fromSeed(

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/layouts/views/components/previews/preview_container.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ class SmallGridBig extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final locals = AppLocalizations.of(context)!;
     return Column(
       children: [
         GridView.count(
@@ -35,7 +37,7 @@ class SmallGridBig extends StatelessWidget {
                 },
                 icon: Icon(Icons.remove),
               ),
-              Text('${(block.settings ?? block.type.defaultSettings).items ?? 0} items'),
+              Text(locals.nItems((block.settings ?? block.type.defaultSettings).items ?? 0)),
               IconButton(
                 onPressed: () {
                   var settings = block.settings ?? block.type.defaultSettings;

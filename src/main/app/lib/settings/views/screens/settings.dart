@@ -1,4 +1,5 @@
 import 'package:app/identity/states/identity.dart';
+import 'package:app/l10n/app_localizations.dart';
 import 'package:app/main.dart';
 import 'package:app/router.dart';
 import 'package:app/utils/models/breakpoints.dart';
@@ -11,20 +12,21 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final locals = AppLocalizations.of(context)!;
     final BreakPoint breakPoint = BreakPoint.get(context);
     return AutoTabsRouter.tabBar(
       routes: [FeedsSettingsRoute(), if (breakPoint != .mobile) LayoutSettingsRoute(), GeneralSettingsRoute()],
       builder: (context, child, tabController) {
         return Scaffold(
           appBar: AppBar(
-            title: Text('Settings'),
-            actions: [TextButton.icon(onPressed: () => getIt.get<IdentityCubit>().logout(), label: Text('Logout'), icon: Icon(Icons.logout))],
+            title: Text(locals.settings),
+            actions: [TextButton.icon(onPressed: () => getIt.get<IdentityCubit>().logout(), label: Text(locals.logout), icon: Icon(Icons.logout))],
             bottom: TabBar(
               controller: tabController,
               tabs: [
-                Tab(text: 'Feeds', icon: Icon(Icons.rss_feed)),
-                if (breakPoint != .mobile) Tab(text: 'Layout', icon: Icon(Icons.grid_view_sharp)),
-                Tab(text: 'General', icon: Icon(Icons.settings)),
+                Tab(text: locals.feeds, icon: Icon(Icons.rss_feed)),
+                if (breakPoint != .mobile) Tab(text: locals.layout, icon: Icon(Icons.grid_view_sharp)),
+                Tab(text: locals.general, icon: Icon(Icons.settings)),
               ],
             ),
           ),

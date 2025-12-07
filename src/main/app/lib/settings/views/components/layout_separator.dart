@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block_types.dart';
 import 'package:app/settings/states/layout.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class LayoutSeparator extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final cubit = context.read<LayoutCubit>();
+    final locals = AppLocalizations.of(context)!;
     return DragTarget<LayoutBlockTypes>(
       onAcceptWithDetails: (details) => cubit.acceptDrag(index, details),
       builder: (BuildContext context, List<LayoutBlockTypes?> candidateData, List<dynamic> rejectedData) {
@@ -37,7 +39,7 @@ class LayoutSeparator extends StatelessWidget {
           ),
           child: AnimatedSwitcher(
             duration: Duration(milliseconds: 250),
-            child: dragging ? Text('Drop block here', style: TextStyle(color: colors.primary)) : SizedBox.shrink(),
+            child: dragging ? Text(locals.dropBlockHere, style: TextStyle(color: colors.primary)) : SizedBox.shrink(),
           ),
         );
       },
