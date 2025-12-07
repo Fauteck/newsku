@@ -14,7 +14,12 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
   feedItemPreference: json['feedItemPreference'] as String?,
   oidcSub: json['oidcSub'] as String?,
   minimumImportance: (json['minimumImportance'] as num?)?.toInt() ?? 0,
-  dimReadItems: json['dimReadItems'] as bool? ?? false,
+  readItemHandling:
+      $enumDecodeNullable(
+        _$ReadItemHandlingEnumMap,
+        json['readItemHandling'],
+      ) ??
+      ReadItemHandling.none,
 );
 
 Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
@@ -25,5 +30,11 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'feedItemPreference': instance.feedItemPreference,
   'oidcSub': instance.oidcSub,
   'minimumImportance': instance.minimumImportance,
-  'dimReadItems': instance.dimReadItems,
+  'readItemHandling': _$ReadItemHandlingEnumMap[instance.readItemHandling]!,
+};
+
+const _$ReadItemHandlingEnumMap = {
+  ReadItemHandling.none: 'none',
+  ReadItemHandling.dim: 'dim',
+  ReadItemHandling.hide: 'hide',
 };

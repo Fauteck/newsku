@@ -12,7 +12,7 @@ part of 'local_preferences.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$LocalPreferencesState {
+mixin _$LocalPreferencesState implements DiagnosticableTreeMixin {
 
  Color get themeColor; bool get dynamicColor; bool get blackBackground;
 /// Create a copy of LocalPreferencesState
@@ -22,6 +22,12 @@ mixin _$LocalPreferencesState {
 $LocalPreferencesStateCopyWith<LocalPreferencesState> get copyWith => _$LocalPreferencesStateCopyWithImpl<LocalPreferencesState>(this as LocalPreferencesState, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LocalPreferencesState'))
+    ..add(DiagnosticsProperty('themeColor', themeColor))..add(DiagnosticsProperty('dynamicColor', dynamicColor))..add(DiagnosticsProperty('blackBackground', blackBackground));
+}
 
 @override
 bool operator ==(Object other) {
@@ -33,7 +39,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,themeColor,dynamicColor,blackBackground);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LocalPreferencesState(themeColor: $themeColor, dynamicColor: $dynamicColor, blackBackground: $blackBackground)';
 }
 
@@ -201,8 +207,8 @@ return $default(_that.themeColor,_that.dynamicColor,_that.blackBackground);case 
 /// @nodoc
 
 
-class _LocalPreferencesState extends LocalPreferencesState {
-  const _LocalPreferencesState({this.themeColor = Colors.deepOrange, this.dynamicColor = false, this.blackBackground = false}): super._();
+class _LocalPreferencesState extends LocalPreferencesState with DiagnosticableTreeMixin {
+  const _LocalPreferencesState({this.themeColor = _defaultColor, this.dynamicColor = false, this.blackBackground = false}): super._();
   
 
 @override@JsonKey() final  Color themeColor;
@@ -216,6 +222,12 @@ class _LocalPreferencesState extends LocalPreferencesState {
 _$LocalPreferencesStateCopyWith<_LocalPreferencesState> get copyWith => __$LocalPreferencesStateCopyWithImpl<_LocalPreferencesState>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  properties
+    ..add(DiagnosticsProperty('type', 'LocalPreferencesState'))
+    ..add(DiagnosticsProperty('themeColor', themeColor))..add(DiagnosticsProperty('dynamicColor', dynamicColor))..add(DiagnosticsProperty('blackBackground', blackBackground));
+}
 
 @override
 bool operator ==(Object other) {
@@ -227,7 +239,7 @@ bool operator ==(Object other) {
 int get hashCode => Object.hash(runtimeType,themeColor,dynamicColor,blackBackground);
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   return 'LocalPreferencesState(themeColor: $themeColor, dynamicColor: $dynamicColor, blackBackground: $blackBackground)';
 }
 

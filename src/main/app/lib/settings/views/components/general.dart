@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:app/home/state/local_preferences.dart';
 import 'package:app/main.dart';
 import 'package:app/settings/states/general.dart';
+import 'package:app/user/models/read_item_handling.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/foundation.dart';
@@ -20,6 +21,8 @@ class GeneralSettingsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
+
+    final subTextTheme = textTheme.labelMedium?.copyWith(color: colors.secondary);
 
     return Padding(
       padding: .symmetric(horizontal: 8),
@@ -41,7 +44,7 @@ class GeneralSettingsTab extends StatelessWidget {
                       decoration: InputDecoration(
                         helper: Text(
                           'This is guidance for the AI model. Telling it what kind of article you prefer to prioritize for the scoring  of each article. The change only applies to future articles.',
-                        ),
+                        style: subTextTheme,),
                       ),
                     ),
                     Gap(8),
@@ -64,38 +67,34 @@ class GeneralSettingsTab extends StatelessWidget {
                     Divider(),
                     Gap(32),
                     Text('Minimum news score'),
-                    Text('This will filter out from your feed any news that has been scored lower than the selected value', style: textTheme.labelMedium),
+                    Text('This will filter out from your feed any news that has been scored lower than the selected value', style: subTextTheme),
                     Slider(
                       min: 0,
                       max: 100,
                       divisions: 20,
-                      label: state.minimumImportance.toString(),
-                      value: state.minimumImportance.toDouble(),
-                      onChanged: (double value) => cubit.setImportance(value),
+                      label: state.user?.minimumImportance.toString(),
+                      value: (state.user?.minimumImportance ?? 0).toDouble(),
+                      onChanged: (double value) => cubit.setAndSaveImportance(value),
                     ),
-                    Gap(8),
-                    Align(
-                      alignment: .centerRight,
-                      child: FilledButton.tonalIcon(
-                        onPressed: state.loading
-                            ? null
-                            : () async {
-                                await cubit.saveImportance();
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Preference updated')));
-                                }
-                              },
-                        label: Text('Update'),
-                        icon: Icon(Icons.save),
-                      ),
-                    ),
-                    Gap(8),
-                    SwitchListTile(
-                      contentPadding: .zero,
-                      title: Text('Dim read item in the feed'),
-                      subtitle: Text('While you scroll through the feed, items will be set as read. You can make the feed item dim for the next time you visit your feed'),
-                      value: state.user?.dimReadItems ?? false,
-                      onChanged: state.loading ? null : (value) => cubit.dimReadItems(value),
+                    Gap(16),
+                    Row(
+                      spacing: 8,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: .stretch,
+                            children: [
+                              Text('Read item handling'),
+                              Text('While you scroll through the feed, items will be set as read. You can make the feed item dim for the next time you visit your feed', style: subTextTheme),
+                            ],
+                          ),
+                        ),
+                        DropdownMenu<ReadItemHandling>(
+                          initialSelection: state.user?.readItemHandling ?? ReadItemHandling.none,
+                          onSelected: cubit.setReadItemPreference,
+                          dropdownMenuEntries: ReadItemHandling.values.map((h) => DropdownMenuEntry(value: h, label: h.getLabel(context))).toList(),
+                        ),
+                      ],
                     ),
                     Gap(32),
                     Divider(),
@@ -105,7 +104,7 @@ class GeneralSettingsTab extends StatelessWidget {
                     SwitchListTile(
                       contentPadding: .zero,
                       title: Text('Black background'),
-                      subtitle: Text('Use black background for the darktheme'),
+                      subtitle: Text('Use black background for the dark theme', style: subTextTheme,),
                       value: context.select((LocalPreferencesCubit p) => p.state.blackBackground),
                       onChanged: (value) => getIt.get<LocalPreferencesCubit>().setBlackBackground(value),
                     ),
@@ -114,7 +113,7 @@ class GeneralSettingsTab extends StatelessWidget {
                       SwitchListTile(
                         contentPadding: .zero,
                         title: Text('Dynamic color'),
-                        subtitle: Text('Use device accent color'),
+                        subtitle: Text('Use device accent color', style: subTextTheme,),
                         value: context.select((LocalPreferencesCubit p) => p.state.dynamicColor),
                         onChanged: (value) => getIt.get<LocalPreferencesCubit>().setDynamicColor(value),
                       ),

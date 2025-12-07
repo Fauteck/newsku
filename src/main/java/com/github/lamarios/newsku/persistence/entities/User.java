@@ -1,10 +1,8 @@
 package com.github.lamarios.newsku.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.github.lamarios.newsku.models.ReadItemHandling;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
@@ -23,8 +21,10 @@ public class User {
     @Column(name = "minimum_importance")
     private int minimumImportance;
 
-    @Column(name = "dim_read_items")
-    private boolean dimReadItems;
+    @Column(name = "read_item_handling")
+    @Enumerated(EnumType.STRING)
+    private ReadItemHandling readItemHandling;
+
 
 
     public String getId() {
@@ -83,11 +83,12 @@ public class User {
         this.minimumImportance = minimumImportance;
     }
 
-    public boolean isDimReadItems() {
-        return dimReadItems;
+
+    public ReadItemHandling getReadItemHandling() {
+        return readItemHandling;
     }
 
-    public void setDimReadItems(boolean dimReadItems) {
-        this.dimReadItems = dimReadItems;
+    public void setReadItemHandling(ReadItemHandling readItemHandling) {
+        this.readItemHandling = readItemHandling;
     }
 }

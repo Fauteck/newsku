@@ -13,8 +13,9 @@ import 'package:visibility_detector/visibility_detector.dart';
 class ClickableFeedItem extends StatelessWidget {
   final FeedItem item;
   final Widget child;
+  final bool noDimming;
 
-  const ClickableFeedItem({super.key, required this.item, required this.child});
+  const ClickableFeedItem({super.key, required this.item, required this.child, this.noDimming = false});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +28,7 @@ class ClickableFeedItem extends StatelessWidget {
 
           child: ConditionalWrap(
             wrapIf: item.read,
-            wrapper: (child) => context.read<IdentityCubit>().currentUser?.dimReadItems ?? false ? Opacity(opacity: 0.5, child: child) : child,
+            wrapper: (child) => !noDimming && context.read<IdentityCubit>().currentUser?.readItemHandling == .dim ? Opacity(opacity: 0.5, child: child) : child,
             wrapElse: (child) => VisibilityDetector(
               key: ValueKey(item.id),
               onVisibilityChanged: (VisibilityInfo info) {

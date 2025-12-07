@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$GeneralSettingsState {
 
- User? get user; bool get loading; dynamic get error; StackTrace? get stackTrace; String get password; String get repeatPassword; int get minimumImportance;
+ User? get user; bool get loading; dynamic get error; StackTrace? get stackTrace; String get password; String get repeatPassword;
 /// Create a copy of GeneralSettingsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $GeneralSettingsStateCopyWith<GeneralSettingsState> get copyWith => _$GeneralSet
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GeneralSettingsState&&(identical(other.user, user) || other.user == user)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace)&&(identical(other.password, password) || other.password == password)&&(identical(other.repeatPassword, repeatPassword) || other.repeatPassword == repeatPassword)&&(identical(other.minimumImportance, minimumImportance) || other.minimumImportance == minimumImportance));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GeneralSettingsState&&(identical(other.user, user) || other.user == user)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace)&&(identical(other.password, password) || other.password == password)&&(identical(other.repeatPassword, repeatPassword) || other.repeatPassword == repeatPassword));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,user,loading,const DeepCollectionEquality().hash(error),stackTrace,password,repeatPassword,minimumImportance);
+int get hashCode => Object.hash(runtimeType,user,loading,const DeepCollectionEquality().hash(error),stackTrace,password,repeatPassword);
 
 @override
 String toString() {
-  return 'GeneralSettingsState(user: $user, loading: $loading, error: $error, stackTrace: $stackTrace, password: $password, repeatPassword: $repeatPassword, minimumImportance: $minimumImportance)';
+  return 'GeneralSettingsState(user: $user, loading: $loading, error: $error, stackTrace: $stackTrace, password: $password, repeatPassword: $repeatPassword)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $GeneralSettingsStateCopyWith<$Res>  {
   factory $GeneralSettingsStateCopyWith(GeneralSettingsState value, $Res Function(GeneralSettingsState) _then) = _$GeneralSettingsStateCopyWithImpl;
 @useResult
 $Res call({
- User? user, bool loading, dynamic error, StackTrace? stackTrace, String password, String repeatPassword, int minimumImportance
+ User? user, bool loading, dynamic error, StackTrace? stackTrace, String password, String repeatPassword
 });
 
 
@@ -62,7 +62,7 @@ class _$GeneralSettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of GeneralSettingsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? user = freezed,Object? loading = null,Object? error = freezed,Object? stackTrace = freezed,Object? password = null,Object? repeatPassword = null,Object? minimumImportance = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? user = freezed,Object? loading = null,Object? error = freezed,Object? stackTrace = freezed,Object? password = null,Object? repeatPassword = null,}) {
   return _then(_self.copyWith(
 user: freezed == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
 as User?,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
@@ -70,8 +70,7 @@ as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_t
 as dynamic,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
 as StackTrace?,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,repeatPassword: null == repeatPassword ? _self.repeatPassword : repeatPassword // ignore: cast_nullable_to_non_nullable
-as String,minimumImportance: null == minimumImportance ? _self.minimumImportance : minimumImportance // ignore: cast_nullable_to_non_nullable
-as int,
+as String,
   ));
 }
 /// Create a copy of GeneralSettingsState
@@ -165,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( User? user,  bool loading,  dynamic error,  StackTrace? stackTrace,  String password,  String repeatPassword,  int minimumImportance)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( User? user,  bool loading,  dynamic error,  StackTrace? stackTrace,  String password,  String repeatPassword)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GeneralSettingsState() when $default != null:
-return $default(_that.user,_that.loading,_that.error,_that.stackTrace,_that.password,_that.repeatPassword,_that.minimumImportance);case _:
+return $default(_that.user,_that.loading,_that.error,_that.stackTrace,_that.password,_that.repeatPassword);case _:
   return orElse();
 
 }
@@ -186,10 +185,10 @@ return $default(_that.user,_that.loading,_that.error,_that.stackTrace,_that.pass
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( User? user,  bool loading,  dynamic error,  StackTrace? stackTrace,  String password,  String repeatPassword,  int minimumImportance)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( User? user,  bool loading,  dynamic error,  StackTrace? stackTrace,  String password,  String repeatPassword)  $default,) {final _that = this;
 switch (_that) {
 case _GeneralSettingsState():
-return $default(_that.user,_that.loading,_that.error,_that.stackTrace,_that.password,_that.repeatPassword,_that.minimumImportance);}
+return $default(_that.user,_that.loading,_that.error,_that.stackTrace,_that.password,_that.repeatPassword);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -203,10 +202,10 @@ return $default(_that.user,_that.loading,_that.error,_that.stackTrace,_that.pass
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( User? user,  bool loading,  dynamic error,  StackTrace? stackTrace,  String password,  String repeatPassword,  int minimumImportance)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( User? user,  bool loading,  dynamic error,  StackTrace? stackTrace,  String password,  String repeatPassword)?  $default,) {final _that = this;
 switch (_that) {
 case _GeneralSettingsState() when $default != null:
-return $default(_that.user,_that.loading,_that.error,_that.stackTrace,_that.password,_that.repeatPassword,_that.minimumImportance);case _:
+return $default(_that.user,_that.loading,_that.error,_that.stackTrace,_that.password,_that.repeatPassword);case _:
   return null;
 
 }
@@ -218,7 +217,7 @@ return $default(_that.user,_that.loading,_that.error,_that.stackTrace,_that.pass
 
 
 class _GeneralSettingsState implements GeneralSettingsState, WithError {
-  const _GeneralSettingsState({this.user, this.loading = true, this.error, this.stackTrace, this.password = '', this.repeatPassword = '', this.minimumImportance = 0});
+  const _GeneralSettingsState({this.user, this.loading = true, this.error, this.stackTrace, this.password = '', this.repeatPassword = ''});
   
 
 @override final  User? user;
@@ -227,7 +226,6 @@ class _GeneralSettingsState implements GeneralSettingsState, WithError {
 @override final  StackTrace? stackTrace;
 @override@JsonKey() final  String password;
 @override@JsonKey() final  String repeatPassword;
-@override@JsonKey() final  int minimumImportance;
 
 /// Create a copy of GeneralSettingsState
 /// with the given fields replaced by the non-null parameter values.
@@ -239,16 +237,16 @@ _$GeneralSettingsStateCopyWith<_GeneralSettingsState> get copyWith => __$General
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GeneralSettingsState&&(identical(other.user, user) || other.user == user)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace)&&(identical(other.password, password) || other.password == password)&&(identical(other.repeatPassword, repeatPassword) || other.repeatPassword == repeatPassword)&&(identical(other.minimumImportance, minimumImportance) || other.minimumImportance == minimumImportance));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GeneralSettingsState&&(identical(other.user, user) || other.user == user)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace)&&(identical(other.password, password) || other.password == password)&&(identical(other.repeatPassword, repeatPassword) || other.repeatPassword == repeatPassword));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,user,loading,const DeepCollectionEquality().hash(error),stackTrace,password,repeatPassword,minimumImportance);
+int get hashCode => Object.hash(runtimeType,user,loading,const DeepCollectionEquality().hash(error),stackTrace,password,repeatPassword);
 
 @override
 String toString() {
-  return 'GeneralSettingsState(user: $user, loading: $loading, error: $error, stackTrace: $stackTrace, password: $password, repeatPassword: $repeatPassword, minimumImportance: $minimumImportance)';
+  return 'GeneralSettingsState(user: $user, loading: $loading, error: $error, stackTrace: $stackTrace, password: $password, repeatPassword: $repeatPassword)';
 }
 
 
@@ -259,7 +257,7 @@ abstract mixin class _$GeneralSettingsStateCopyWith<$Res> implements $GeneralSet
   factory _$GeneralSettingsStateCopyWith(_GeneralSettingsState value, $Res Function(_GeneralSettingsState) _then) = __$GeneralSettingsStateCopyWithImpl;
 @override @useResult
 $Res call({
- User? user, bool loading, dynamic error, StackTrace? stackTrace, String password, String repeatPassword, int minimumImportance
+ User? user, bool loading, dynamic error, StackTrace? stackTrace, String password, String repeatPassword
 });
 
 
@@ -276,7 +274,7 @@ class __$GeneralSettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of GeneralSettingsState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? user = freezed,Object? loading = null,Object? error = freezed,Object? stackTrace = freezed,Object? password = null,Object? repeatPassword = null,Object? minimumImportance = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? user = freezed,Object? loading = null,Object? error = freezed,Object? stackTrace = freezed,Object? password = null,Object? repeatPassword = null,}) {
   return _then(_GeneralSettingsState(
 user: freezed == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
 as User?,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
@@ -284,8 +282,7 @@ as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_t
 as dynamic,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
 as StackTrace?,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,repeatPassword: null == repeatPassword ? _self.repeatPassword : repeatPassword // ignore: cast_nullable_to_non_nullable
-as String,minimumImportance: null == minimumImportance ? _self.minimumImportance : minimumImportance // ignore: cast_nullable_to_non_nullable
-as int,
+as String,
   ));
 }
 

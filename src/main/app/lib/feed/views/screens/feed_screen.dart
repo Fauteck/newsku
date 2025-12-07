@@ -32,7 +32,13 @@ final _log = Logger('FeedScreen');
 class FeedScreen extends StatelessWidget {
   const FeedScreen({super.key});
 
-  List<Widget> buildSlivers({required BuildContext context, required DateTimeRange<DateTime> timeRange, required List<FeedItem> immutableItems, required List<LayoutBlock> blocks}) {
+  List<Widget> buildSlivers({
+    required BuildContext context,
+    required DateTimeRange<DateTime> timeRange,
+    required List<FeedItem> immutableItems,
+    required List<LayoutBlock> blocks,
+    required int readItems,
+  }) {
     List<Widget> slivers = [];
     _log.fine('Building Slivers, TimeRange: $timeRange, Layout blocks: ${blocks.length}, Items: ${immutableItems.length}');
 
@@ -75,6 +81,27 @@ class FeedScreen extends StatelessWidget {
       );
     }
 
+    if (readItems > 0) {
+      final colors = Theme.of(context).colorScheme;
+      final textTheme = Theme.of(context).textTheme;
+
+      slivers.add(
+        SliverPadding(
+          padding: .only(top: 16),
+          sliver: SliverToBoxAdapter(
+            child: Row(
+              mainAxisAlignment: .center,
+              spacing: 8,
+              children: [
+                Icon(Icons.task_alt, color: colors.secondary, size: 15),
+                Text('$readItems read items', style: textTheme.bodySmall?.copyWith(color: colors.secondary)),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return slivers;
   }
 
@@ -113,36 +140,38 @@ class FeedScreen extends StatelessWidget {
                                           elevation: 0,
                                           scrolledUnderElevation: 0,
                                           leadingWidth: 150,
-                                          title: AnimatedCrossFade(
-                                            firstChild: AppName(style: textTheme.titleLarge),
-                                            secondChild: Row(
-                                              children: [
-                                                Expanded(
-                                                  child: TextField(
-                                                    controller: cubit.searchController,
-                                                    autofocus: true,
-                                                    onChanged: (value) => cubit.search(value),
-                                                    decoration: InputDecoration(border: UnderlineInputBorder(), label: Text('Search')),
+                                          title: AnimatedSwitcher(
+                                            duration: Duration(milliseconds: 250),
+                                            child: state.searchMode
+                                                ? Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: TextField(
+                                                          controller: cubit.searchController,
+                                                          autofocus: true,
+                                                          onChanged: (value) => cubit.search(value),
+                                                          decoration: InputDecoration(border: UnderlineInputBorder(), label: Text('Search')),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                : AppName(style: textTheme.titleLarge),
+                                          ),
+                                          leading: state.searchMode
+                                              ? null
+                                              : ClipPath(
+                                                  clipper: FancySide(),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(color: appColor),
+                                                    child: Padding(
+                                                      padding: .only(left: 24),
+                                                      child: Align(
+                                                        alignment: .centerLeft,
+                                                        child: AppLogo(color: colors.onSurface, size: 20),
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
-                                              ],
-                                            ),
-                                            crossFadeState: state.searchMode ? .showSecond : .showFirst,
-                                            duration: Duration(milliseconds: 250),
-                                          ),
-                                          leading: ClipPath(
-                                            clipper: FancySide(),
-                                            child: Container(
-                                              decoration: BoxDecoration(color: appColor),
-                                              child: Padding(
-                                                padding: .only(left: 24),
-                                                child: Align(
-                                                  alignment: .centerLeft,
-                                                  child: AppLogo(color: colors.onSurface, size: 20),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
                                           actions: [
                                             IconButton(onPressed: () => cubit.setSearch(!state.searchMode), icon: Icon(state.searchMode ? Icons.close : Icons.search)),
                                             if (!state.searchMode) IconButton(onPressed: () => cubit.refresh(), icon: Icon(Icons.refresh)),
@@ -159,9 +188,18 @@ class FeedScreen extends StatelessWidget {
                                           )
                                         else
                                           ...state.items.keys.expand((value) {
-                                            var feed = state.items[value];
-                                            if (feed != null && feed.isNotEmpty) {
-                                              return buildSlivers(context: context, timeRange: value, immutableItems: feed, blocks: state.layout);
+                                            var feed = state.items[value] ?? [];
+                                            final totalItemCount = feed.length;
+                                            // if the user wants ti hide read item, we do so
+
+                                            var unreadCount = totalItemCount;
+                                            if (context.read<IdentityCubit>().currentUser?.readItemHandling == .hide) {
+                                              feed = feed.where((element) => !element.read).toList();
+                                              unreadCount = feed.length;
+                                            }
+
+                                            if (feed.isNotEmpty) {
+                                              return buildSlivers(context: context, timeRange: value, immutableItems: feed, blocks: state.layout, readItems: totalItemCount - unreadCount);
                                             } else {
                                               return [
                                                 SliverStickyHeader.builder(
@@ -173,8 +211,10 @@ class FeedScreen extends StatelessWidget {
                                                         mainAxisAlignment: .center,
                                                         spacing: 24,
                                                         children: [
-                                                          Icon(Icons.newspaper, size: 50, color: colors.onSurface),
-                                                          Text('No news', style: textTheme.titleLarge),
+                                                          Icon(unreadCount == 0 && totalItemCount > 0 ? Icons.task_alt_outlined : Icons.newspaper, size: 50, color: colors.onSurface),
+                                                          if (totalItemCount == 0) Text('No news', style: textTheme.titleLarge),
+                                                          // this is our read item count
+                                                          if (unreadCount == 0 && totalItemCount > 0) Text('${totalItemCount - unreadCount} read items', style: textTheme.titleLarge),
                                                         ],
                                                       ),
                                                     ),
@@ -227,7 +267,7 @@ class FeedScreen extends StatelessWidget {
             ),
           ),
         );
-      }
+      },
     );
   }
 }

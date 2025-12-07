@@ -1,9 +1,11 @@
 import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
+import 'package:app/user/models/read_item_handling.dart';
 import 'package:app/user/models/user.dart';
 import 'package:app/user/services/user_service.dart';
 import 'package:app/utils/models/with_error.dart';
 import 'package:app/utils/utils.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -34,8 +36,6 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
     try {
       emit(state.copyWith(loading: true));
       final user = await UserService(serverUrl!).getUser();
-      print('user: $user');
-      emit(state.copyWith(user: user, minimumImportance: user.minimumImportance));
       preferenceController.text = user.feedItemPreference ?? '';
     } catch (e, s) {
       emit(state.copyWith(error: e, stackTrace: s));
@@ -56,9 +56,9 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
     }
   }
 
-  Future<void> dimReadItems(bool dim) async {
-    if (state.user != null) {
-      emit(state.copyWith.user!(dimReadItems: dim));
+  Future<void> setReadItemPreference(ReadItemHandling? pref) async {
+    if (state.user != null && pref != null) {
+      emit(state.copyWith.user!(readItemHandling: pref));
       await updateUser();
     }
   }
@@ -80,14 +80,10 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
     }
   }
 
-  void setImportance(double value) {
-    emit(state.copyWith(minimumImportance: value.toInt()));
-  }
-
-  Future<void> saveImportance() async {
+  Future<void> setAndSaveImportance(double importance) async {
     if (state.user != null) {
-      emit(state.copyWith.user!(minimumImportance: state.minimumImportance));
-      await updateUser();
+      emit(state.copyWith.user!(minimumImportance: importance.toInt()));
+      EasyDebounce.debounce('importance update', Duration(milliseconds: 250), updateUser);
     }
   }
 }
@@ -95,6 +91,12 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
 @freezed
 sealed class GeneralSettingsState with _$GeneralSettingsState implements WithError {
   @Implements<WithError>()
-  const factory GeneralSettingsState({User? user, @Default(true) bool loading, dynamic error, StackTrace? stackTrace, @Default('') String password, @Default('') String repeatPassword, @Default(0) int minimumImportance}) =
-      _GeneralSettingsState;
+  const factory GeneralSettingsState({
+    User? user,
+    @Default(true) bool loading,
+    dynamic error,
+    StackTrace? stackTrace,
+    @Default('') String password,
+    @Default('') String repeatPassword,
+  }) = _GeneralSettingsState;
 }

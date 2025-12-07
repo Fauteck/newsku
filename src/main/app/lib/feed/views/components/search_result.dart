@@ -21,6 +21,7 @@ class SearchResult extends StatelessWidget {
     return Padding(
       padding: .symmetric(horizontal: 32, vertical: 16),
       child: ClickableFeedItem(
+        noDimming: true,
         item: item,
         child: Row(
           crossAxisAlignment: .center,
