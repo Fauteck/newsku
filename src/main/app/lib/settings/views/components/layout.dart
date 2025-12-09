@@ -3,8 +3,12 @@ import 'package:app/layouts/models/layout_block_types.dart';
 import 'package:app/settings/states/layout.dart';
 import 'package:app/settings/views/components/draggable_layout_block.dart';
 import 'package:app/settings/views/components/dragged_layout_block.dart';
+import 'package:app/settings/views/components/new_block_dialog.dart';
+import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/utils/states/simple_cubit.dart';
 import 'package:app/utils/views/components/conditional_wrap.dart';
 import 'package:app/utils/views/components/error_listener.dart';
+import 'package:app/utils/views/components/simple_cubit_view.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,55 +28,78 @@ class LayoutSettingsTab extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final locals = AppLocalizations.of(context)!;
 
+    final device = BreakPoint.get(context);
+
     return Padding(
       padding: .only(bottom: 32),
       child: BlocProvider(
         create: (context) => LayoutCubit(LayoutState()),
-        child: BlocBuilder<LayoutCubit, LayoutState>(
+        child: BlocConsumer<LayoutCubit, LayoutState>(
+          listener: (context, state) => context.read<LayoutCubit>().save(),
+          listenWhen: (previous, current) => current.blocks.isNotEmpty && previous.blocks != current.blocks,
           builder: (context, state) {
             final cubit = context.read<LayoutCubit>();
             return ErrorHandler<LayoutCubit, LayoutState>(
               child: Column(
                 children: [
                   Expanded(
-                    child: Row(
+                    child: Flex(
+                      direction: device == .mobile ? .vertical : .horizontal,
                       spacing: 8,
                       children: [
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            crossAxisAlignment: .start,
-                            children: [
-                              Gap(8),
-                              Text(locals.layoutExplanation),
-                              Divider(),
-                              Text(locals.availableBlocks, style: textTheme.titleLarge),
-                              Text(locals.dragAndDropInstructions),
-                              Gap(32),
-                              Expanded(
-                                child: ListView(
-                                  children: [
-                                    Text(locals.fixedArticleCountBlocks),
-                                    Center(
-                                      child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigHeadline),
-                                    ),
-                                    Center(
-                                      child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.topStories),
-                                    ),
-                                    Gap(32),
-                                    Text(locals.dynamicArticleCountBlocks),
-                                    Center(
-                                      child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigGrid),
-                                    ),
-                                    Center(
-                                      child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.smallGrid),
-                                    ),
-                                  ],
+                        if (device == .mobile)
+                          SimpleCubitView<bool>(
+                            initialValue: false,
+                            builder: (context, expanded) => Row(
+                              crossAxisAlignment: .start,
+                              children: [
+                                Expanded(
+                                  child: Text(locals.layoutExplanation, overflow: .ellipsis, maxLines: expanded ? 10 : 2),
                                 ),
-                              ),
-                            ],
+                                IconButton(
+                                  visualDensity: .compact,
+                                  onPressed: () => context.read<SimpleCubit<bool>>().setValue(!expanded),
+                                  icon: Icon(expanded ? Icons.expand_less : Icons.expand_more),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                        if (device != .mobile)
+                          Expanded(
+                            flex: 1,
+                            child: Column(
+                              crossAxisAlignment: .start,
+                              children: [
+                                Gap(8),
+                                Text(locals.layoutExplanation),
+                                Divider(),
+                                Text(locals.availableBlocks, style: textTheme.titleLarge),
+                                Text(locals.dragAndDropInstructions),
+                                Gap(32),
+                                Expanded(
+                                  child: ListView(
+                                    children: [
+                                      Text(locals.fixedArticleCountBlocks),
+                                      Center(
+                                        child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigHeadline),
+                                      ),
+                                      Center(
+                                        child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.topStories),
+                                      ),
+                                      Gap(32),
+                                      Text(locals.dynamicArticleCountBlocks),
+                                      Center(
+                                        child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigGrid),
+                                      ),
+                                      Center(
+                                        child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.smallGrid),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         VerticalDivider(),
                         Expanded(
                           flex: 2,
@@ -80,9 +107,28 @@ class LayoutSettingsTab extends StatelessWidget {
                             crossAxisAlignment: .stretch,
                             children: [
                               Gap(8),
-                              Text(locals.currentLayout, style: textTheme.titleLarge),
+                              Row(
+                                children: [
+                                  Expanded(child: Text(locals.currentLayout, style: textTheme.titleLarge)),
+                                  TextButton(
+                                    onPressed: () async {
+                                      final newBlock = await NewBlockDialog.show(context);
+                                      if (newBlock != null) {
+                                        cubit.acceptDrag(state.blocks.length - 1, DragTargetDetails(data: newBlock, offset: .zero));
+                                        cubit.scrollController.animateTo(
+                                          cubit.scrollController.position.maxScrollExtent + cubit.scrollController.position.viewportDimension,
+                                          duration: Duration(seconds: 1),
+                                          curve: Curves.easeInOutQuart,
+                                        );
+                                      }
+                                    },
+                                    child: Text(locals.addBlock),
+                                  ),
+                                ],
+                              ),
                               Expanded(
                                 child: ReorderableListView.builder(
+                                  scrollController: cubit.scrollController,
                                   proxyDecorator: (child, index, animation) => Center(child: DraggedLayoutBlock(type: state.blocks[index].type)),
                                   itemCount: state.blocks.length,
                                   onReorder: (int oldIndex, int newIndex) => cubit.onReorder(oldIndex, newIndex),
@@ -158,24 +204,7 @@ class LayoutSettingsTab extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Row(
-                    children: [
-                      if (!state.valid) Text(locals.layoutMustFinishWithDynamicBlock, style: TextStyle(color: colors.error)),
-                      Spacer(),
-                      FilledButton.tonalIcon(
-                        onPressed: state.valid
-                            ? () async {
-                                await cubit.save();
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(locals.layoutSaved)));
-                                }
-                              }
-                            : null,
-                        label: Text(locals.update),
-                        icon: Icon(Icons.save),
-                      ),
-                    ],
-                  ),
+                  if (!state.valid) Text(locals.layoutMustFinishWithDynamicBlock, style: TextStyle(color: colors.error)),
                 ],
               ),
             );

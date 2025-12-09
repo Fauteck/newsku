@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/layouts/views/components/previews/preview_container.dart';
+import 'package:app/utils/models/breakpoints.dart';
 import 'package:flutter/material.dart';
 
 class SmallGridBig extends StatelessWidget {
@@ -14,6 +15,8 @@ class SmallGridBig extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final device = BreakPoint.get(context);
+
     final locals = AppLocalizations.of(context)!;
     return Column(
       children: [
@@ -23,8 +26,8 @@ class SmallGridBig extends StatelessWidget {
           crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 0,
-          childAspectRatio: 16 / 4,
-          children: List.generate(last ? 6: (block.settings ?? block.type.defaultSettings).items ?? 0, (index) => _GridItem(),),
+          childAspectRatio: 16 / (device == .mobile ? 8 : 5),
+          children: List.generate(last ? 6 : (block.settings ?? block.type.defaultSettings).items ?? 0, (index) => _GridItem()),
         ),
         if (!last)
           Row(

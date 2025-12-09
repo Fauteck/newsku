@@ -130,7 +130,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get layoutExplanation =>
-      'In this screen you can adjust how your RSS feed articles are being displayed by arranging the different types of blocks the way you want it. Your feed items will be inserted from most important to least important following the blocks top to bottom.\\n\\nNote that the Fixed article blocks on mobile will be displayed in a similar way as the big grid items.';
+      'In this screen you can adjust how your RSS feed articles are being displayed by arranging the different types of blocks the way you want it. Your feed items will be inserted from most important to least important following the blocks top to bottom.\n\nNote that the Fixed article blocks on mobile will be displayed in a similar way as the big grid items.';
 
   @override
   String get availableBlocks => 'Available blocks';
@@ -267,4 +267,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get noFeeds =>
       'No feeds added, either add a feed via its url or import an OPML file';
+
+  @override
+  String get addBlock => 'Add block';
+
+  @override
+  String get selectBlock => 'Select block type to add to your layout';
 }

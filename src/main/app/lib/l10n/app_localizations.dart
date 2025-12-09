@@ -295,7 +295,7 @@ abstract class AppLocalizations {
   /// No description provided for @layoutExplanation.
   ///
   /// In en, this message translates to:
-  /// **'In this screen you can adjust how your RSS feed articles are being displayed by arranging the different types of blocks the way you want it. Your feed items will be inserted from most important to least important following the blocks top to bottom.\\n\\nNote that the Fixed article blocks on mobile will be displayed in a similar way as the big grid items.'**
+  /// **'In this screen you can adjust how your RSS feed articles are being displayed by arranging the different types of blocks the way you want it. Your feed items will be inserted from most important to least important following the blocks top to bottom.\n\nNote that the Fixed article blocks on mobile will be displayed in a similar way as the big grid items.'**
   String get layoutExplanation;
 
   /// No description provided for @availableBlocks.
@@ -519,6 +519,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No feeds added, either add a feed via its url or import an OPML file'**
   String get noFeeds;
+
+  /// No description provided for @addBlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Add block'**
+  String get addBlock;
+
+  /// No description provided for @selectBlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Select block type to add to your layout'**
+  String get selectBlock;
 }
 
 class _AppLocalizationsDelegate

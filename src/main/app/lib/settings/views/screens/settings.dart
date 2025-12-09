@@ -13,9 +13,8 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final locals = AppLocalizations.of(context)!;
-    final BreakPoint breakPoint = BreakPoint.get(context);
     return AutoTabsRouter.tabBar(
-      routes: [FeedsSettingsRoute(), if (breakPoint != .mobile) LayoutSettingsRoute(), GeneralSettingsRoute()],
+      routes: [FeedsSettingsRoute(), LayoutSettingsRoute(), GeneralSettingsRoute()],
       builder: (context, child, tabController) {
         return Scaffold(
           appBar: AppBar(
@@ -25,7 +24,7 @@ class SettingsScreen extends StatelessWidget {
               controller: tabController,
               tabs: [
                 Tab(text: locals.feeds, icon: Icon(Icons.rss_feed)),
-                if (breakPoint != .mobile) Tab(text: locals.layout, icon: Icon(Icons.grid_view_sharp)),
+                Tab(text: locals.layout, icon: Icon(Icons.grid_view_sharp)),
                 Tab(text: locals.general, icon: Icon(Icons.settings)),
               ],
             ),

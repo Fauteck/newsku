@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:app/identity/states/identity.dart';
 import 'package:app/identity/views/components/first_time_setup/done.dart';
+import 'package:app/identity/views/components/first_time_setup/llm_preference.dart';
 import 'package:app/identity/views/components/first_time_setup/welcome.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/settings/views/components/feeds.dart';
@@ -29,62 +30,71 @@ class _FirstTimeSetupDialogState extends State<FirstTimeSetupDialog> {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
 
-
-    final maxPages = BreakPoint.get(context) == .mobile ? 3 : 4;
+    final maxPages = 5;
 
     return SimpleCubitView<int>(
       initialValue: 0,
       builder: (context, page) => Center(
-        child: Dialog(
-          child: Column(
-            mainAxisSize: .min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24),
-                child: Align(
-                  alignment: .centerLeft,
-                  child: Text(switch (page) {
-                    1 => locals.feeds,
-                    2 => locals.layout,
-                    _ => '',
-                  }, style: textTheme.titleLarge),
-                ),
-              ),
-              Expanded(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: BreakPoint.tablet.maxWidth),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: AnimatedSwitcher(duration: Duration(milliseconds: 250), child: [Welcome(), FeedsSettingsTab(), LayoutSettingsTab(fadeColor: colors.surfaceContainerHigh,), Done()][page]),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: BreakPoint.tablet.maxWidth),
+          child: Dialog(
+            child: Column(
+              mainAxisSize: .min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 12.0, right: 24, left: 24, bottom: 4),
+                  child: Align(
+                    alignment: .centerLeft,
+                    child: switch (page) {
+                      1 => Text(locals.feeds, style: textTheme.titleLarge),
+                      2 => Text(locals.articlePreference, style: textTheme.titleLarge),
+                      3 => Text(locals.layout, style: textTheme.titleLarge),
+                      _ => SizedBox.shrink(),
+                    },
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8),
-                child: Row(
-                  children: [
-                    TextButton(onPressed: page == 0 ? null : () => context.read<SimpleCubit<int>>().setValue(page - 1), child: Text(locals.back)),
-                    Expanded(
-                      child: _Pager(page: page, maxPages: maxPages),
+                [
+                  Welcome(),
+                  Expanded(
+                    child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: FeedsSettingsTab()),
+                  ),
+                  LlmPreference(),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: LayoutSettingsTab(fadeColor: colors.surfaceContainerHigh),
                     ),
-                    if (page < maxPages - 1)
-                      TextButton(onPressed: () => context.read<SimpleCubit<int>>().setValue(page + 1), child: Text(locals.next))
-                    else
-                      TextButton(
-                        onPressed: () {
-                          final user = context.read<IdentityCubit>().state.currentUser;
-                          if(user != null) {
-                            UserService(serverUrl!).updateUser(user.copyWith(firstTimeSetupDone: true));
-                          }
-                          Navigator.of(context).pop();
-                          // save the user
-                        },
-                        child: Text(locals.done),
+                  ),
+                  Done(),
+                ][page],
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8),
+                  child: Row(
+                    children: [
+                      TextButton(onPressed: page == 0 ? null : () => context.read<SimpleCubit<int>>().setValue(page - 1), child: Text(locals.back)),
+                      Expanded(
+                        child: _Pager(page: page, maxPages: maxPages),
                       ),
-                  ],
+                      if (page < maxPages - 1)
+                        TextButton(onPressed: () => context.read<SimpleCubit<int>>().setValue(page + 1), child: Text(locals.next))
+                      else
+                        TextButton(
+                          onPressed: () {
+                            final user = context.read<IdentityCubit>().state.currentUser;
+                            if (user != null) {
+                              UserService(serverUrl!).updateUser(user.copyWith(firstTimeSetupDone: true));
+                            }
+                            Navigator.of(context).pop();
+                            // save the user
+                          },
+                          child: Text(locals.done),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -96,7 +106,7 @@ class _Pager extends StatelessWidget {
   final int page;
   final int maxPages;
 
-  const _Pager({super.key, required this.page, required this.maxPages});
+  const _Pager({required this.page, required this.maxPages});
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +122,7 @@ class _Pager extends StatelessWidget {
           motion: MaterialSpringMotion.expressiveSpatialDefault(),
           builder: (context, value, child) {
             return Transform.scale(
-              scale: lerpDouble(1, 2, value),
+              scale: lerpDouble(1, 1.5, value),
               child: Container(
                 key: ValueKey(i),
                 width: 15,
@@ -131,7 +141,7 @@ class _Pager extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Row(mainAxisAlignment: .center, spacing: 24, children: widgets),
+      child: Row(mainAxisAlignment: .center, spacing: 16, children: widgets),
     );
   }
 }

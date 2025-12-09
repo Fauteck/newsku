@@ -3,15 +3,27 @@ import 'package:app/layouts/models/layout_block_types.dart';
 import 'package:app/layouts/services/layout.dart';
 import 'package:app/utils/models/with_error.dart';
 import 'package:app/utils/utils.dart';
-import 'package:flutter/src/widgets/drag_target.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'layout.freezed.dart';
 
 class LayoutCubit extends Cubit<LayoutState> {
+  final scrollController = ScrollController();
+
   LayoutCubit(super.initialState) {
-    getLayout();
+    init();
+  }
+
+  Future<void> init() async {
+    await getLayout();
+  }
+
+  @override
+  Future<void> close() {
+    scrollController.dispose();
+    return super.close();
   }
 
   void setDragging(bool dragging) {
@@ -51,7 +63,9 @@ class LayoutCubit extends Cubit<LayoutState> {
 
   Future<void> save() async {
     try {
-      await LayoutService(serverUrl!).setLayout(state.blocks);
+      if (state.valid) {
+        await LayoutService(serverUrl!).setLayout(state.blocks);
+      }
     } catch (e, s) {
       emit(state.copyWith(error: e, stackTrace: s));
       rethrow;

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/layouts/views/components/previews/preview_container.dart';
+import 'package:app/utils/models/breakpoints.dart';
 import 'package:flutter/material.dart';
 
 class BigGridBig extends StatelessWidget {
@@ -10,11 +11,12 @@ class BigGridBig extends StatelessWidget {
   final LayoutBlock block;
   final Function(LayoutBlock block) onUpdated;
 
-
   const BigGridBig({super.key, required this.block, required this.onUpdated, required this.last});
 
   @override
   Widget build(BuildContext context) {
+    final device = BreakPoint.get(context);
+
     final locals = AppLocalizations.of(context)!;
     return Column(
       children: [
@@ -24,7 +26,7 @@ class BigGridBig extends StatelessWidget {
           crossAxisCount: 3,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          childAspectRatio: 16 / 13,
+          childAspectRatio: 16 / (device == .mobile ? 17 : 15),
           children: List.generate(last ? 6 : (block.settings ?? block.type.defaultSettings).items ?? 6, (index) => _GridItem()),
         ),
         if (!last)
@@ -58,13 +60,15 @@ class _GridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final device = BreakPoint.get(context);
+
     return Column(
       spacing: 4,
       children: [
-        PreviewContainer(height: 50, borderRadius: .circular(5)),
-        PreviewContainer(height: 12, borderRadius: .circular(5)),
-        PreviewContainer(height: 7, borderRadius: .circular(5)),
-        PreviewContainer(height: 7, borderRadius: .circular(5)),
+        PreviewContainer(height: device == .mobile ? 30 : 50, borderRadius: .circular(5)),
+        PreviewContainer(height: device == .mobile ? 8 : 12, borderRadius: .circular(5)),
+        PreviewContainer(height: device == .mobile ? 5 : 7, borderRadius: .circular(5)),
+        PreviewContainer(height: device == .mobile ? 5 : 7, borderRadius: .circular(5)),
       ],
     );
   }
