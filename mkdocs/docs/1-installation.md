@@ -28,8 +28,6 @@ services:
     container_name: postgres-newsku
     restart: always
     image: postgres:18
-    ports:
-      - "35433:5432"
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres

@@ -2,18 +2,18 @@
 
 ## Environment variables
 
-| Name         | Default | Required | Comments                                                                              |
-|--------------|---------|----------|---------------------------------------------------------------------------------------|
-| SALT         | (none)  | **Yes**  | **Once this is set, do not ever change it.**                                          | 
-| DB_HOST      | (none)  | **Yes**  | Database host                                                                         |
-| DB_USER      | (none)  | **Yes**  |                                                                                       | 
-| DB_PASSWORD  | (none)  | **Yes**  |                                                                                       | 
-| ALLOW_SIGNUP | 0       | No       | 1 = allow signups, 0 = Do not allow signups                                           |
-| ANNOUNCEMENT | (none)  | No       | Show a message on the login screen, ex: ANNOUNCEMENT="Welcome to my Newsku instance". |
+| Name         | Default | Required | Comments                                     |
+|--------------|---------|----------|----------------------------------------------|
+| SALT         | (none)  | **Yes**  | **Once this is set, do not ever change it.** | 
+| DB_HOST      | (none)  | **Yes**  | Database host                                |
+| DB_USER      | (none)  | **Yes**  |                                              | 
+| DB_PASSWORD  | (none)  | **Yes**  |                                              | 
+| ALLOW_SIGNUP | 0       | No       | 1 = allow signups, 0 = Do not allow signups  |
+| ANNOUNCEMENT | (none)  | No       | Show a message on the login screen           |
 
-### AI (openai)
+### AI
 
-Newsku requires a connection to an openai api compatible server
+Newsku requires a connection to an Openai API compatible server
 
 | Name           | Default | Required | Comments                                         | 
 |----------------|---------|----------|--------------------------------------------------|
@@ -27,7 +27,7 @@ Newsku Supports SSO by implementing OIDC. You will need to set up your OIDC clie
 Here are the used callback urls:
 
 ```
-com.github.lamarios.newku:/oidcRedirect 
+com.github.lamarios.newku:/oidcRedirect  # for the android application
 https://your.newsku-domain.com/redirect.html
 ```
 
