@@ -1,0 +1,1 @@
+alter table users add column first_time_setup_done boolean default False;

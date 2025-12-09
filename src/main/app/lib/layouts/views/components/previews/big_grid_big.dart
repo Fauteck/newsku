@@ -10,6 +10,7 @@ class BigGridBig extends StatelessWidget {
   final LayoutBlock block;
   final Function(LayoutBlock block) onUpdated;
 
+
   const BigGridBig({super.key, required this.block, required this.onUpdated, required this.last});
 
   @override

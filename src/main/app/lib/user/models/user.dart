@@ -15,6 +15,7 @@ sealed class User with _$User {
     String? feedItemPreference,
     String? oidcSub,
     @Default(0) int minimumImportance,
+    @Default(false) bool firstTimeSetupDone,
     @Default(ReadItemHandling.none) ReadItemHandling readItemHandling,
   }) = _User;
 

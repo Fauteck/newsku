@@ -85,7 +85,7 @@ public class FeedItemService {
                         }
 
                         try {
-                            var existingFeed = feedItemRepository.getFirstByGuid(item.getGuid().get());
+                            var existingFeed = feedItemRepository.getFirstByGuidAndFeed(item.getGuid().get(), feed);
 
                             Optional<String> image = item.getEnclosure()
                                     .filter(e -> e.getType().contains("image"))

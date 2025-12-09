@@ -25,6 +25,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private ReadItemHandling readItemHandling;
 
+    @Column(name = "first_time_setup_done")
+    private boolean firstTimeSetupDone;
 
 
     public String getId() {
@@ -90,5 +92,13 @@ public class User {
 
     public void setReadItemHandling(ReadItemHandling readItemHandling) {
         this.readItemHandling = readItemHandling;
+    }
+
+    public boolean isFirstTimeSetupDone() {
+        return firstTimeSetupDone;
+    }
+
+    public void setFirstTimeSetupDone(boolean firstTimeSetupDone) {
+        this.firstTimeSetupDone = firstTimeSetupDone;
     }
 }

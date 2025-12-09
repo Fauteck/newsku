@@ -14,7 +14,9 @@ import 'layout_separator.dart';
 
 @RoutePage()
 class LayoutSettingsTab extends StatelessWidget {
-  const LayoutSettingsTab({super.key});
+  final Color? fadeColor;
+
+  const LayoutSettingsTab({super.key, this.fadeColor});
 
   @override
   Widget build(BuildContext context) {
@@ -42,30 +44,32 @@ class LayoutSettingsTab extends StatelessWidget {
                             crossAxisAlignment: .start,
                             children: [
                               Gap(8),
-                              Text(
-                                locals.layoutExplanation,
-                              ),
+                              Text(locals.layoutExplanation),
                               Divider(),
                               Text(locals.availableBlocks, style: textTheme.titleLarge),
                               Text(locals.dragAndDropInstructions),
                               Gap(32),
-                              Expanded(child: ListView(children: [
-                                Text(locals.fixedArticleCountBlocks),
-                                Center(
-                                  child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigHeadline),
+                              Expanded(
+                                child: ListView(
+                                  children: [
+                                    Text(locals.fixedArticleCountBlocks),
+                                    Center(
+                                      child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigHeadline),
+                                    ),
+                                    Center(
+                                      child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.topStories),
+                                    ),
+                                    Gap(32),
+                                    Text(locals.dynamicArticleCountBlocks),
+                                    Center(
+                                      child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigGrid),
+                                    ),
+                                    Center(
+                                      child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.smallGrid),
+                                    ),
+                                  ],
                                 ),
-                                Center(
-                                  child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.topStories),
-                                ),
-                                Gap(32),
-                                Text(locals.dynamicArticleCountBlocks),
-                                Center(
-                                  child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigGrid),
-                                ),
-                                Center(
-                                  child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.smallGrid),
-                                ),
-                              ],))
+                              ),
                             ],
                           ),
                         ),
@@ -124,7 +128,7 @@ class LayoutSettingsTab extends StatelessWidget {
                                                             height: 150,
                                                             decoration: BoxDecoration(
                                                               gradient: LinearGradient(
-                                                                colors: [colors.surface.withValues(alpha: 0), colors.surface],
+                                                                colors: [(fadeColor ?? colors.surface).withValues(alpha: 0), (fadeColor ?? colors.surface)],
                                                                 stops: [0, 0.90],
                                                                 begin: .topCenter,
                                                                 end: .bottomCenter,

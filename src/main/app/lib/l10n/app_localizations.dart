@@ -477,6 +477,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{handling, select, none{None} dim{Dim} hide{Hide} other{No handling selected}}'**
   String itemHandlingLabel(String handling);
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @firstTimeSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'First time setup'**
+  String get firstTimeSetup;
+
+  /// No description provided for @done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
+
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// No description provided for @setupComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Setup complete !'**
+  String get setupComplete;
+
+  /// No description provided for @welcomeText.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Newsku!\n\nThis walkthrough will help you complete the initial configuration of the application.You can adjust any of these settings later in the Application Settings menu.'**
+  String get welcomeText;
+
+  /// No description provided for @noFeeds.
+  ///
+  /// In en, this message translates to:
+  /// **'No feeds added, either add a feed via its url or import an OPML file'**
+  String get noFeeds;
 }
 
 class _AppLocalizationsDelegate

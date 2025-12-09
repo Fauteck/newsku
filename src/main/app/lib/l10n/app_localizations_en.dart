@@ -244,4 +244,27 @@ class AppLocalizationsEn extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get firstTimeSetup => 'First time setup';
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get setupComplete => 'Setup complete !';
+
+  @override
+  String get welcomeText =>
+      'Welcome to Newsku!\n\nThis walkthrough will help you complete the initial configuration of the application.You can adjust any of these settings later in the Application Settings menu.';
+
+  @override
+  String get noFeeds =>
+      'No feeds added, either add a feed via its url or import an OPML file';
 }

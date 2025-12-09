@@ -14,6 +14,7 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
   feedItemPreference: json['feedItemPreference'] as String?,
   oidcSub: json['oidcSub'] as String?,
   minimumImportance: (json['minimumImportance'] as num?)?.toInt() ?? 0,
+  firstTimeSetupDone: json['firstTimeSetupDone'] as bool? ?? false,
   readItemHandling:
       $enumDecodeNullable(
         _$ReadItemHandlingEnumMap,
@@ -30,6 +31,7 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'feedItemPreference': instance.feedItemPreference,
   'oidcSub': instance.oidcSub,
   'minimumImportance': instance.minimumImportance,
+  'firstTimeSetupDone': instance.firstTimeSetupDone,
   'readItemHandling': _$ReadItemHandlingEnumMap[instance.readItemHandling]!,
 };
 

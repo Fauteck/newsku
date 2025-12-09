@@ -15,6 +15,8 @@ class FeedsSettingsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     final locals = AppLocalizations.of(context)!;
     return BlocProvider(
       create: (context) => FeedsSettingsCubit(FeedsSettingsState()),
@@ -63,29 +65,41 @@ class FeedsSettingsTab extends StatelessWidget {
                           ),
                         ],
                       ),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: state.feeds.length,
-                          itemBuilder: (context, index) {
-                            final f = state.feeds[index];
+                      state.feeds.isEmpty
+                          ? Expanded(
+                              child: Column(
+                                crossAxisAlignment: .center,
+                                mainAxisAlignment: .center,
+                                spacing: 24,
+                                children: [
+                                  Icon(Icons.sentiment_neutral_outlined, size: 50),
+                                  Text(locals.noFeeds, style: textTheme.bodyLarge),
+                                ],
+                              ),
+                            )
+                          : Expanded(
+                              child: ListView.builder(
+                                itemCount: state.feeds.length,
+                                itemBuilder: (context, index) {
+                                  final f = state.feeds[index];
 
-                            return ListTile(
-                              leading: ClipRRect(
-                                borderRadius: .circular(50),
-                                child: FeedImage(item: f, width: 50, height: 50),
-                              ),
-                              title: Text(f.name ?? ''),
-                              subtitle: Text(f.url ?? ''),
-                              trailing: IconButton(
-                                onPressed: () {
-                                  okCancelDialog(context, title: locals.deleteFeed, content: Text(locals.deleteFeedMessage), onOk: () => cubit.deleteFeed(f));
+                                  return ListTile(
+                                    leading: ClipRRect(
+                                      borderRadius: .circular(50),
+                                      child: FeedImage(item: f, width: 50, height: 50),
+                                    ),
+                                    title: Text(f.name ?? ''),
+                                    subtitle: Text(f.url ?? ''),
+                                    trailing: IconButton(
+                                      onPressed: () {
+                                        okCancelDialog(context, title: locals.deleteFeed, content: Text(locals.deleteFeedMessage), onOk: () => cubit.deleteFeed(f));
+                                      },
+                                      icon: Icon(Icons.delete),
+                                    ),
+                                  );
                                 },
-                                icon: Icon(Icons.delete),
                               ),
-                            );
-                          },
-                        ),
-                      ),
+                            ),
                     ],
                   );
           },

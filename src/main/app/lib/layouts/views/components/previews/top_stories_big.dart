@@ -39,6 +39,12 @@ class _TopStoriesBigState extends State<TopStoriesBig> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        TextFormField(
+          key: ValueKey(widget.block.id),
+          controller: controller,
+          decoration: InputDecoration(label: Text('Title')),
+        ),
+        Gap(16),
         Row(
           crossAxisAlignment: .start,
           spacing: 12,
@@ -56,12 +62,6 @@ class _TopStoriesBigState extends State<TopStoriesBig> {
               ),
             ),
           ],
-        ),
-        Gap(16),
-        TextFormField(
-          key: ValueKey(widget.block.id),
-          controller: controller,
-          decoration: InputDecoration(label: Text('Title')),
         ),
       ],
     );
