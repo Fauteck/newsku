@@ -129,7 +129,7 @@ class _Pager extends StatelessWidget {
                 height: 15,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Color.lerp(colors.primary.withValues(alpha: 0), colors.secondary, value.clamp(0, 1)),
+                  color: Color.lerp(colors.primary.withValues(alpha: 0), colors.primary, value.clamp(0, 1)),
                   border: Border.all(color: colors.primary, width: 2),
                 ),
               ),

@@ -30,7 +30,7 @@ class Welcome extends StatelessWidget {
           mainAxisAlignment: .center,
           spacing: 32,
           children: [
-            AppLogo(color: localPreferences.themeColor, size: 100),
+            AppLogo(size: 100),
             ConstrainedBox(
               constraints: BoxConstraints(maxWidth: 350),
               child: Text(locals.welcomeText, style: textTheme.bodyLarge, textAlign: .center),
