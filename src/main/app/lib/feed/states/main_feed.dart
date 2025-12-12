@@ -37,7 +37,9 @@ class MainFeedCubit extends Cubit<MainFeedState> {
       } else if (state.hasScrolled && scrollController.position.pixels == 0) {
         emit(state.copyWith(hasScrolled: false));
       }
-      if (!state.searchMode && scrollController.position.pixels > scrollController.position.maxScrollExtent * 0.95 && !state.loading) {
+      if (!state.searchMode &&
+          scrollController.position.pixels > scrollController.position.maxScrollExtent * 0.95 &&
+          !state.loading) {
         EasyThrottle.throttle('load-feed', Duration(seconds: 1), () {
           if (!state.loading) {
             getFeed();
@@ -78,7 +80,11 @@ class MainFeedCubit extends Cubit<MainFeedState> {
 
       var key = DateTimeRange(start: from, end: now);
 
-      var data = List<FeedItem>.from(await service.getFeedItems(page: 0, pageSize: 999999, from: from.millisecondsSinceEpoch, to: now.millisecondsSinceEpoch).then((value) => value.content));
+      var data = List<FeedItem>.from(
+        await service
+            .getFeedItems(page: 0, pageSize: 999999, from: from.millisecondsSinceEpoch, to: now.millisecondsSinceEpoch)
+            .then((value) => value.content),
+      );
 
       // we need to sort the data into the headlines and stuff
       var map = Map<DateTimeRange, List<FeedItem>>.from(state.items);
@@ -101,7 +107,13 @@ class MainFeedCubit extends Cubit<MainFeedState> {
     try {
       emit(state.copyWith(loading: true));
       final layout = await LayoutService(serverUrl!).getLayout();
-      emit(state.copyWith(currentTime: DateTime.now().copyWith(hour: 23, minute: 59, second: 59, millisecond: 999), items: {}, layout: layout));
+      emit(
+        state.copyWith(
+          currentTime: DateTime.now().copyWith(hour: 23, minute: 59, second: 59, millisecond: 999),
+          items: {},
+          layout: layout,
+        ),
+      );
     } catch (e, s) {
       emit(state.copyWith(error: e, stackTrace: s, loading: false));
       rethrow;
@@ -116,7 +128,9 @@ class MainFeedCubit extends Cubit<MainFeedState> {
     emit(state.copyWith(searchPage: 0, searchResults: []));
     EasyDebounce.debounce('search', Duration(milliseconds: 500), () async {
       try {
-        final results = await FeedService(serverUrl!).search(query: value, page: state.searchPage, pageSize: searchPageSize);
+        final results = await FeedService(
+          serverUrl!,
+        ).search(query: value, page: state.searchPage, pageSize: searchPageSize);
         emit(state.copyWith(searchPage: 0, searchResults: results, searchTerms: value));
       } catch (e, s) {
         emit(state.copyWith(error: e, stackTrace: s));
@@ -128,7 +142,9 @@ class MainFeedCubit extends Cubit<MainFeedState> {
     try {
       emit(state.copyWith(loading: true));
       final page = state.searchPage + 1;
-      final results = await FeedService(serverUrl!).search(query: state.searchTerms, page: page, pageSize: searchPageSize);
+      final results = await FeedService(
+        serverUrl!,
+      ).search(query: state.searchTerms, page: page, pageSize: searchPageSize);
       final feeds = List<FeedItem>.from(state.searchResults);
       feeds.addAll(results);
       emit(state.copyWith(searchResults: feeds, searchPage: page, loading: false));

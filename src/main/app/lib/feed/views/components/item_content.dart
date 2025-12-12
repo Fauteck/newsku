@@ -24,7 +24,10 @@ class ItemContent extends StatelessWidget {
     html = html.replaceAllMapped(RegExp(r'&#(\d+);'), (m) => String.fromCharCode(int.parse(m.group(1)!)));
 
     // Numeric hex entities &#x1F600;
-    html = html.replaceAllMapped(RegExp(r'&#x([A-Fa-f0-9]+);'), (m) => String.fromCharCode(int.parse(m.group(1)!, radix: 16)));
+    html = html.replaceAllMapped(
+      RegExp(r'&#x([A-Fa-f0-9]+);'),
+      (m) => String.fromCharCode(int.parse(m.group(1)!, radix: 16)),
+    );
 
     // Common named entities
     const entityMap = {

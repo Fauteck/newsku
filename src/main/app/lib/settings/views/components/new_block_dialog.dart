@@ -26,18 +26,21 @@ class NewBlockDialog extends StatelessWidget {
               child: Text(locals.selectBlock, style: textTheme.titleLarge, textAlign: .center),
             ),
             Gap(12),
-            ListView(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              children: [
-                Center(child: Text(locals.fixedArticleCountBlocks)),
-                _BlockPreview(type: LayoutBlockTypes.bigHeadline),
-                _BlockPreview(type: LayoutBlockTypes.topStories),
-                Gap(32),
-                Center(child: Text(locals.dynamicArticleCountBlocks)),
-                _BlockPreview(type: LayoutBlockTypes.bigGrid),
-                _BlockPreview(type: LayoutBlockTypes.smallGrid),
-              ],
+            Expanded(
+              child: ListView(
+                children: [
+                  Center(child: Text(locals.fixedArticleCountBlocks)),
+                  _BlockPreview(type: LayoutBlockTypes.bigHeadline),
+                  _BlockPreview(type: LayoutBlockTypes.bigHeadlinePicture),
+                  _BlockPreview(type: LayoutBlockTypes.topStories),
+                  Gap(32),
+                  Center(child: Text(locals.dynamicArticleCountBlocks)),
+                  _BlockPreview(type: LayoutBlockTypes.bigGrid),
+                  _BlockPreview(type: LayoutBlockTypes.bigGridPicture),
+                  _BlockPreview(type: LayoutBlockTypes.smallGrid),
+                  _BlockPreview(type: LayoutBlockTypes.searchResult),
+                ],
+              ),
             ),
             Align(
               alignment: .centerRight,

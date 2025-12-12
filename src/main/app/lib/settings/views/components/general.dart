@@ -43,7 +43,9 @@ class GeneralSettingsTab extends StatelessWidget {
                     TextField(
                       controller: cubit.preferenceController,
                       maxLines: 5,
-                      decoration: InputDecoration(helper: Text(locals.articlePreferencesExplanation, style: subTextTheme)),
+                      decoration: InputDecoration(
+                        helper: Text(locals.articlePreferencesExplanation, style: subTextTheme),
+                      ),
                     ),
                     Gap(8),
                     Align(
@@ -54,7 +56,9 @@ class GeneralSettingsTab extends StatelessWidget {
                             : () async {
                                 await cubit.setAiPreferences();
                                 if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(locals.preferenceUpdated)));
+                                  ScaffoldMessenger.of(
+                                    context,
+                                  ).showSnackBar(SnackBar(content: Text(locals.preferenceUpdated)));
                                 }
                               },
                         label: Text(locals.update),
@@ -90,7 +94,9 @@ class GeneralSettingsTab extends StatelessWidget {
                         DropdownMenu<ReadItemHandling>(
                           initialSelection: state.user?.readItemHandling ?? ReadItemHandling.none,
                           onSelected: cubit.setReadItemPreference,
-                          dropdownMenuEntries: ReadItemHandling.values.map((h) => DropdownMenuEntry(value: h, label: h.getLabel(context))).toList(),
+                          dropdownMenuEntries: ReadItemHandling.values
+                              .map((h) => DropdownMenuEntry(value: h, label: h.getLabel(context)))
+                              .toList(),
                         ),
                       ],
                     ),
@@ -121,28 +127,46 @@ class GeneralSettingsTab extends StatelessWidget {
                       Wrap(
                         spacing: 16,
                         runSpacing: 16,
-                        children: [Colors.deepOrange, Colors.deepPurple, Colors.amber, Colors.green, Colors.pink, Colors.blue, Colors.grey, Colors.red, Colors.teal].map((c) {
-                          return InkWell(
-                            onTap: () => getIt.get<LocalPreferencesCubit>().setColor(c),
-                            child: SingleMotionBuilder(
-                              from: 0,
-                              value: context.select((LocalPreferencesCubit p) => p.state.themeColor).toARGB32() == c.toARGB32() ? 1 : 0,
-                              motion: MaterialSpringMotion.expressiveSpatialSlow(),
-                              builder: (context, value, child) => Transform.scale(
-                                scale: lerpDouble(1, 1.3, value),
-                                child: Container(
-                                  width: 30,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    color: c,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(width: 2, color: Color.lerp(colors.surface, colors.tertiary, value)!),
+                        children:
+                            [
+                              Colors.deepOrange,
+                              Colors.deepPurple,
+                              Colors.amber,
+                              Colors.green,
+                              Colors.pink,
+                              Colors.blue,
+                              Colors.grey,
+                              Colors.red,
+                              Colors.teal,
+                            ].map((c) {
+                              return InkWell(
+                                onTap: () => getIt.get<LocalPreferencesCubit>().setColor(c),
+                                child: SingleMotionBuilder(
+                                  from: 0,
+                                  value:
+                                      context.select((LocalPreferencesCubit p) => p.state.themeColor).toARGB32() ==
+                                          c.toARGB32()
+                                      ? 1
+                                      : 0,
+                                  motion: MaterialSpringMotion.expressiveSpatialSlow(),
+                                  builder: (context, value, child) => Transform.scale(
+                                    scale: lerpDouble(1, 1.3, value),
+                                    child: Container(
+                                      width: 30,
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                        color: c,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          width: 2,
+                                          color: Color.lerp(colors.surface, colors.tertiary, value)!,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                              );
+                            }).toList(),
                       ),
                     Gap(32),
                     Divider(),
@@ -154,7 +178,9 @@ class GeneralSettingsTab extends StatelessWidget {
                     TextField(
                       controller: cubit.repeatPassword,
                       obscureText: true,
-                      decoration: InputDecoration(error: (state.password != state.repeatPassword) ? Text(locals.passwordsNotMatch) : null),
+                      decoration: InputDecoration(
+                        error: (state.password != state.repeatPassword) ? Text(locals.passwordsNotMatch) : null,
+                      ),
                     ),
                     Gap(8),
                     Align(
@@ -165,7 +191,9 @@ class GeneralSettingsTab extends StatelessWidget {
                             : () async {
                                 await cubit.resetPassword();
                                 if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(locals.passwordUpdated)));
+                                  ScaffoldMessenger.of(
+                                    context,
+                                  ).showSnackBar(SnackBar(content: Text(locals.passwordUpdated)));
                                 }
                               },
                         label: Text(locals.update),

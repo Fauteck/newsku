@@ -18,7 +18,6 @@ class FeedItemImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     var cubit = context.read<IdentityCubit>();
     return ConditionalWrap(
       wrapIf: border != null,

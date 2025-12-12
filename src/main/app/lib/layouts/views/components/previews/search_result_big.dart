@@ -2,16 +2,17 @@ import 'dart:math';
 
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
-import 'package:app/layouts/views/components/previews/preview_container.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:flutter/material.dart';
 
-class SmallGridBig extends StatelessWidget {
+import 'preview_container.dart';
+
+class SearchResultBig extends StatelessWidget {
   final LayoutBlock block;
   final Function(LayoutBlock block) onUpdated;
   final bool last;
 
-  const SmallGridBig({super.key, required this.block, required this.onUpdated, required this.last});
+  const SearchResultBig({super.key, required this.block, required this.onUpdated, required this.last});
 
   @override
   Widget build(BuildContext context) {
@@ -20,15 +21,11 @@ class SmallGridBig extends StatelessWidget {
     final locals = AppLocalizations.of(context)!;
     return Column(
       children: [
-        GridView.count(
+        ListView(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 0,
-          childAspectRatio: 16 / (device == .mobile ? 8 : 5),
           children: List.generate(
-            last ? 6 : (block.settings ?? block.type.defaultSettings).items ?? 0,
+            last ? 3 : (block.settings ?? block.type.defaultSettings).items ?? 0,
             (index) => _GridItem(),
           ),
         ),
@@ -39,7 +36,7 @@ class SmallGridBig extends StatelessWidget {
               IconButton(
                 onPressed: () {
                   var settings = block.settings ?? block.type.defaultSettings;
-                  onUpdated(block.copyWith(settings: settings.copyWith(items: max(2, (settings.items ?? 0) - 1))));
+                  onUpdated(block.copyWith(settings: settings.copyWith(items: max(1, (settings.items ?? 0) - 1))));
                 },
                 icon: Icon(Icons.remove),
               ),
@@ -63,24 +60,25 @@ class _GridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: .center,
-      spacing: 8,
-      children: [
-        Expanded(
-          child: Column(
-            spacing: 4,
-            mainAxisAlignment: .center,
-            children: [
-              PreviewContainer(height: 8, borderRadius: .circular(5)),
-              PreviewContainer(height: 8, borderRadius: .circular(5)),
-              PreviewContainer(height: 4, borderRadius: .circular(5)),
-              PreviewContainer(height: 4, borderRadius: .circular(5)),
-            ],
+    return Padding(
+      padding: .only(bottom: 8),
+      child: Row(
+        spacing: 8,
+        children: [
+          PreviewContainer(width: 50, height: 50, borderRadius: .circular(10)),
+          Expanded(
+            child: Column(
+              spacing: 4,
+              children: [
+                PreviewContainer(height: 10, borderRadius: .circular(10)),
+                PreviewContainer(height: 5, borderRadius: .circular(5)),
+                PreviewContainer(height: 5, borderRadius: .circular(5)),
+                PreviewContainer(height: 5, borderRadius: .circular(5)),
+              ],
+            ),
           ),
-        ),
-        PreviewContainer(height: 40, width: 24, borderRadius: .circular(2)),
-      ],
+        ],
+      ),
     );
   }
 }

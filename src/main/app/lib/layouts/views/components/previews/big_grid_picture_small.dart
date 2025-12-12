@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'preview_container.dart';
 
-class BigGridSmall extends StatelessWidget {
-  const BigGridSmall({super.key});
+class BigGridPictureSmall extends StatelessWidget {
+  const BigGridPictureSmall({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,14 +28,22 @@ class _GridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      spacing: 4,
-      children: [
-        PreviewContainer(height: 20, borderRadius: .circular(5)),
-        PreviewContainer(height: 5, borderRadius: .circular(5)),
-        PreviewContainer(height: 2, borderRadius: .circular(5)),
-        PreviewContainer(height: 2, borderRadius: .circular(5)),
-      ],
+    final colors = Theme.of(context).colorScheme;
+
+    return PreviewContainer(
+      borderRadius: .circular(5),
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Column(
+          mainAxisAlignment: .end,
+          spacing: 2,
+          children: [
+            PreviewContainer(color: colors.surface, height: 5, borderRadius: .circular(5)),
+            PreviewContainer(color: colors.surface, height: 2, borderRadius: .circular(5)),
+            PreviewContainer(color: colors.surface, height: 2, borderRadius: .circular(5)),
+          ],
+        ),
+      ),
     );
   }
 }

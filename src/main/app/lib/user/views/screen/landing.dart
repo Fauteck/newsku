@@ -18,10 +18,7 @@ class LandingScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: .center,
                   mainAxisAlignment: .center,
-                  children: [Center(child: AutoRouter(
-                    clipBehavior: .none,
-
-                  ))],
+                  children: [Center(child: AutoRouter(clipBehavior: .none))],
                 ),
               ),
             ),

@@ -2,16 +2,17 @@ import 'dart:math';
 
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
-import 'package:app/layouts/views/components/previews/preview_container.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:flutter/material.dart';
 
-class BigGridBig extends StatelessWidget {
+import 'preview_container.dart';
+
+class BigGridPictureBig extends StatelessWidget {
   final bool last;
   final LayoutBlock block;
   final Function(LayoutBlock block) onUpdated;
 
-  const BigGridBig({super.key, required this.block, required this.onUpdated, required this.last});
+  const BigGridPictureBig({super.key, required this.last, required this.block, required this.onUpdated});
 
   @override
   Widget build(BuildContext context) {
@@ -64,15 +65,22 @@ class _GridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final device = BreakPoint.get(context);
+    final colors = Theme.of(context).colorScheme;
 
-    return Column(
-      spacing: 4,
-      children: [
-        PreviewContainer(height: device == .mobile ? 30 : 50, borderRadius: .circular(5)),
-        PreviewContainer(height: device == .mobile ? 8 : 12, borderRadius: .circular(5)),
-        PreviewContainer(height: device == .mobile ? 5 : 7, borderRadius: .circular(5)),
-        PreviewContainer(height: device == .mobile ? 5 : 7, borderRadius: .circular(5)),
-      ],
+    return PreviewContainer(
+      borderRadius: .circular(10),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: .end,
+          spacing: 4,
+          children: [
+            PreviewContainer(color: colors.surface, height: device == .mobile ? 8 : 12, borderRadius: .circular(5)),
+            PreviewContainer(color: colors.surface, height: device == .mobile ? 5 : 7, borderRadius: .circular(5)),
+            PreviewContainer(color: colors.surface, height: device == .mobile ? 5 : 7, borderRadius: .circular(5)),
+          ],
+        ),
+      ),
     );
   }
 }

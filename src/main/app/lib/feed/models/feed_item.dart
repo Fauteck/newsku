@@ -22,6 +22,5 @@ sealed class FeedItem with _$FeedItem {
     Feed? feed,
   }) = _FeedItem;
 
-  factory FeedItem.fromJson(Map<String, Object?> json)
-      => _$FeedItemFromJson(json);
+  factory FeedItem.fromJson(Map<String, Object?> json) => _$FeedItemFromJson(json);
 }

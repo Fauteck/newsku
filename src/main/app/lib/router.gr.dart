@@ -100,22 +100,42 @@ class LandingRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [LayoutSettingsTab]
-class LayoutSettingsRoute extends PageRouteInfo<void> {
-  const LayoutSettingsRoute({List<PageRouteInfo>? children})
-    : super(
-        LayoutSettingsRoute.name,
-        initialChildren: children,
-        argsEquality: false,
-      );
+class LayoutSettingsRoute extends PageRouteInfo<LayoutSettingsRouteArgs> {
+  LayoutSettingsRoute({
+    Key? key,
+    Color? fadeColor,
+    List<PageRouteInfo>? children,
+  }) : super(
+         LayoutSettingsRoute.name,
+         args: LayoutSettingsRouteArgs(key: key, fadeColor: fadeColor),
+         initialChildren: children,
+         argsEquality: false,
+       );
 
   static const String name = 'LayoutSettingsRoute';
 
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const LayoutSettingsTab();
+      final args = data.argsAs<LayoutSettingsRouteArgs>(
+        orElse: () => const LayoutSettingsRouteArgs(),
+      );
+      return LayoutSettingsTab(key: args.key, fadeColor: args.fadeColor);
     },
   );
+}
+
+class LayoutSettingsRouteArgs {
+  const LayoutSettingsRouteArgs({this.key, this.fadeColor});
+
+  final Key? key;
+
+  final Color? fadeColor;
+
+  @override
+  String toString() {
+    return 'LayoutSettingsRouteArgs{key: $key, fadeColor: $fadeColor}';
+  }
 }
 
 /// generated route for

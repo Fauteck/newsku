@@ -107,8 +107,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteFeed => 'Delete feed?';
 
   @override
-  String get deleteFeedMessage =>
-      'This will delete the feed and all its articles';
+  String get deleteFeedMessage => 'This will delete the feed and all its articles';
 
   @override
   String importedNFeeds(num count) {
@@ -136,8 +135,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get availableBlocks => 'Available blocks';
 
   @override
-  String get dragAndDropInstructions =>
-      'Drag and drop the blocks onto your layout to personalize your home page';
+  String get dragAndDropInstructions => 'Drag and drop the blocks onto your layout to personalize your home page';
 
   @override
   String get fixedArticleCountBlocks => 'Fixed article count blocks';
@@ -147,6 +145,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get headline => 'Headline';
+
+  @override
+  String get headlinePicture => 'Picture headline';
+
+  @override
+  String get bigGridPicture => 'Big picture grid';
+
+  @override
+  String get singleItemRow => 'Single item row';
 
   @override
   String get topStories => 'Top stories';
@@ -176,8 +183,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currentLayout => 'Current layout';
 
   @override
-  String get layoutMustFinishWithDynamicBlock =>
-      'Your layout must finish with a dynamic block';
+  String get layoutMustFinishWithDynamicBlock => 'Your layout must finish with a dynamic block';
 
   @override
   String get update => 'Update';
@@ -213,8 +219,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get blackBackground => 'Black background';
 
   @override
-  String get blackBackgroundExplanation =>
-      'User black background for the dark theme';
+  String get blackBackgroundExplanation => 'User black background for the dark theme';
 
   @override
   String get dynamicColor => 'Dynamic color';
@@ -265,8 +270,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Welcome to Newsku!\n\nThis walkthrough will help you complete the initial configuration of the application.You can adjust any of these settings later in the Application Settings menu.';
 
   @override
-  String get noFeeds =>
-      'No feeds added, either add a feed via its url or import an OPML file';
+  String get noFeeds => 'No feeds added, either add a feed via its url or import an OPML file';
 
   @override
   String get addBlock => 'Add block';

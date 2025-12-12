@@ -27,7 +27,7 @@ class Headline extends StatelessWidget {
             Gap(8),
             ItemContent(item: item, maxLines: 5, style: textTheme.bodyLarge),
             Gap(16),
-            InfoBar(item: item)
+            InfoBar(item: item),
           ],
         ),
       ),

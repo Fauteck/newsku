@@ -31,21 +31,23 @@ class ServerUrlScreen extends StatelessWidget {
             crossAxisAlignment: .center,
             children: [
               SingleMotionBuilder(
-                  motion: Motion.smoothSpring(duration: Duration(seconds: 1)),
-                  from: 0,
-                  value: 1,
-                  builder: (context, value, child) => Opacity(opacity: value.clamp(0, 1), child: Transform.translate(
-                      offset: Offset(0, lerpDouble(25, 0, value)!),
-                      child: child),),
-                  child: Row(
-                    crossAxisAlignment: .center,
-                    mainAxisAlignment: .center,
-                    spacing: 16,
-                    children: [
-                      AppLogo(size: 40,),
-                      AppName(style: textTheme.displayMedium, alignment: .center),
-                    ],
-                  )),
+                motion: Motion.smoothSpring(duration: Duration(seconds: 1)),
+                from: 0,
+                value: 1,
+                builder: (context, value, child) => Opacity(
+                  opacity: value.clamp(0, 1),
+                  child: Transform.translate(offset: Offset(0, lerpDouble(25, 0, value)!), child: child),
+                ),
+                child: Row(
+                  crossAxisAlignment: .center,
+                  mainAxisAlignment: .center,
+                  spacing: 16,
+                  children: [
+                    AppLogo(size: 40),
+                    AppName(style: textTheme.displayMedium, alignment: .center),
+                  ],
+                ),
+              ),
               Gap(32),
               Align(alignment: .centerLeft, child: Text(locals.server)),
               TextField(

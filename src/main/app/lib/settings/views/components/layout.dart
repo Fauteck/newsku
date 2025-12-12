@@ -54,7 +54,11 @@ class LayoutSettingsTab extends StatelessWidget {
                               crossAxisAlignment: .start,
                               children: [
                                 Expanded(
-                                  child: Text(locals.layoutExplanation, overflow: .ellipsis, maxLines: expanded ? 10 : 2),
+                                  child: Text(
+                                    locals.layoutExplanation,
+                                    overflow: .ellipsis,
+                                    maxLines: expanded ? 10 : 2,
+                                  ),
                                 ),
                                 IconButton(
                                   visualDensity: .compact,
@@ -81,18 +85,49 @@ class LayoutSettingsTab extends StatelessWidget {
                                     children: [
                                       Text(locals.fixedArticleCountBlocks),
                                       Center(
-                                        child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigHeadline),
+                                        child: DraggableLayoutBlock(
+                                          setDragging: cubit.setDragging,
+                                          type: LayoutBlockTypes.bigHeadline,
+                                        ),
                                       ),
                                       Center(
-                                        child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.topStories),
+                                        child: DraggableLayoutBlock(
+                                          setDragging: cubit.setDragging,
+                                          type: LayoutBlockTypes.topStories,
+                                        ),
+                                      ),
+                                      Center(
+                                        child: DraggableLayoutBlock(
+                                          setDragging: cubit.setDragging,
+                                          type: LayoutBlockTypes.bigHeadlinePicture,
+                                        ),
                                       ),
                                       Gap(32),
                                       Text(locals.dynamicArticleCountBlocks),
                                       Center(
-                                        child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigGrid),
+                                        child: DraggableLayoutBlock(
+                                          setDragging: cubit.setDragging,
+                                          type: LayoutBlockTypes.bigGrid,
+                                        ),
                                       ),
                                       Center(
-                                        child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.smallGrid),
+                                        child: DraggableLayoutBlock(
+                                          setDragging: cubit.setDragging,
+                                          type: LayoutBlockTypes.smallGrid,
+                                        ),
+                                      ),
+
+                                      Center(
+                                        child: DraggableLayoutBlock(
+                                          setDragging: cubit.setDragging,
+                                          type: LayoutBlockTypes.bigGridPicture,
+                                        ),
+                                      ),
+                                      Center(
+                                        child: DraggableLayoutBlock(
+                                          setDragging: cubit.setDragging,
+                                          type: LayoutBlockTypes.searchResult,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -110,26 +145,32 @@ class LayoutSettingsTab extends StatelessWidget {
                               Row(
                                 children: [
                                   Expanded(child: Text(locals.currentLayout, style: textTheme.titleLarge)),
-                                  TextButton(
-                                    onPressed: () async {
-                                      final newBlock = await NewBlockDialog.show(context);
-                                      if (newBlock != null) {
-                                        cubit.acceptDrag(state.blocks.length - 1, DragTargetDetails(data: newBlock, offset: .zero));
-                                        cubit.scrollController.animateTo(
-                                          cubit.scrollController.position.maxScrollExtent + cubit.scrollController.position.viewportDimension,
-                                          duration: Duration(seconds: 1),
-                                          curve: Curves.easeInOutQuart,
-                                        );
-                                      }
-                                    },
-                                    child: Text(locals.addBlock),
-                                  ),
+                                  if (device == .mobile)
+                                    TextButton(
+                                      onPressed: () async {
+                                        final newBlock = await NewBlockDialog.show(context);
+                                        if (newBlock != null) {
+                                          cubit.acceptDrag(
+                                            state.blocks.length - 1,
+                                            DragTargetDetails(data: newBlock, offset: .zero),
+                                          );
+                                          cubit.scrollController.animateTo(
+                                            cubit.scrollController.position.maxScrollExtent +
+                                                cubit.scrollController.position.viewportDimension,
+                                            duration: Duration(seconds: 1),
+                                            curve: Curves.easeInOutQuart,
+                                          );
+                                        }
+                                      },
+                                      child: Text(locals.addBlock),
+                                    ),
                                 ],
                               ),
                               Expanded(
                                 child: ReorderableListView.builder(
                                   scrollController: cubit.scrollController,
-                                  proxyDecorator: (child, index, animation) => Center(child: DraggedLayoutBlock(type: state.blocks[index].type)),
+                                  proxyDecorator: (child, index, animation) =>
+                                      Center(child: DraggedLayoutBlock(type: state.blocks[index].type)),
                                   itemCount: state.blocks.length,
                                   onReorder: (int oldIndex, int newIndex) => cubit.onReorder(oldIndex, newIndex),
 
@@ -158,7 +199,10 @@ class LayoutSettingsTab extends StatelessWidget {
                                               children: [
                                                 ReorderableDragStartListener(
                                                   index: index,
-                                                  child: MouseRegion(cursor: SystemMouseCursors.move, child: Icon(Icons.drag_handle, size: 40)),
+                                                  child: MouseRegion(
+                                                    cursor: SystemMouseCursors.move,
+                                                    child: Icon(Icons.drag_handle, size: 40),
+                                                  ),
                                                 ),
                                                 Expanded(
                                                   child: ConditionalWrap(
@@ -174,7 +218,10 @@ class LayoutSettingsTab extends StatelessWidget {
                                                             height: 150,
                                                             decoration: BoxDecoration(
                                                               gradient: LinearGradient(
-                                                                colors: [(fadeColor ?? colors.surface).withValues(alpha: 0), (fadeColor ?? colors.surface)],
+                                                                colors: [
+                                                                  (fadeColor ?? colors.surface).withValues(alpha: 0),
+                                                                  (fadeColor ?? colors.surface),
+                                                                ],
                                                                 stops: [0, 0.90],
                                                                 begin: .topCenter,
                                                                 end: .bottomCenter,
@@ -184,10 +231,20 @@ class LayoutSettingsTab extends StatelessWidget {
                                                         ),
                                                       ],
                                                     ),
-                                                    child: block.type.getBigPreview(context, block: block, onUpdated: (newBlock) => cubit.updateBlock(block, newBlock), last: isLast),
+                                                    child: block.type.getBigPreview(
+                                                      context,
+                                                      block: block,
+                                                      onUpdated: (newBlock) => cubit.updateBlock(block, newBlock),
+                                                      last: isLast,
+                                                    ),
                                                   ),
                                                 ),
-                                                if (state.blocks.length > 1) IconButton(onPressed: () => cubit.removeBlock(block), icon: Icon(Icons.delete), color: colors.error),
+                                                if (state.blocks.length > 1)
+                                                  IconButton(
+                                                    onPressed: () => cubit.removeBlock(block),
+                                                    icon: Icon(Icons.delete),
+                                                    color: colors.error,
+                                                  ),
                                               ],
                                             ),
                                             LayoutSeparator(index: index, dragging: state.dragging),
@@ -204,7 +261,8 @@ class LayoutSettingsTab extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (!state.valid) Text(locals.layoutMustFinishWithDynamicBlock, style: TextStyle(color: colors.error)),
+                  if (!state.valid)
+                    Text(locals.layoutMustFinishWithDynamicBlock, style: TextStyle(color: colors.error)),
                 ],
               ),
             );

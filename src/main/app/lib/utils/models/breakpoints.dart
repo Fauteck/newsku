@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 
 enum BreakPoint {
@@ -6,7 +5,6 @@ enum BreakPoint {
   tablet(maxWidth: 800),
   desktop(maxWidth: 1280),
   bigDesktop(maxWidth: 999999);
-
 
   final double maxWidth;
 
@@ -17,6 +15,6 @@ enum BreakPoint {
     var bps = List<BreakPoint>.from(BreakPoint.values);
     bps.sort((a, b) => a.maxWidth.compareTo(b.maxWidth));
 
-    return bps.where((element) => width <= element.maxWidth,).first;
+    return bps.where((element) => width <= element.maxWidth).first;
   }
 }

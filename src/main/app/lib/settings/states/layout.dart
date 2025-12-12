@@ -101,7 +101,13 @@ class LayoutCubit extends Cubit<LayoutState> {
 @freezed
 sealed class LayoutState with _$LayoutState implements WithError {
   @Implements<WithError>()
-  const factory LayoutState({@Default(false) bool dragging, @Default([]) List<LayoutBlock> blocks, @Default(true) bool loading, dynamic error, StackTrace? stackTrace}) = _LayoutState;
+  const factory LayoutState({
+    @Default(false) bool dragging,
+    @Default([]) List<LayoutBlock> blocks,
+    @Default(true) bool loading,
+    dynamic error,
+    StackTrace? stackTrace,
+  }) = _LayoutState;
 
   const LayoutState._();
 

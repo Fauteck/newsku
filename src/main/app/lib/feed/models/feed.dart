@@ -11,9 +11,8 @@ sealed class Feed with _$Feed {
     String? description,
     String? url,
     String? itemPreference,
-    String? image
+    String? image,
   }) = _Feed;
 
-  factory Feed.fromJson(Map<String, Object?> json)
-      => _$FeedFromJson(json);
+  factory Feed.fromJson(Map<String, Object?> json) => _$FeedFromJson(json);
 }

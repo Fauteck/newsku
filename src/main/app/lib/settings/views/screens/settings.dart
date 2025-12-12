@@ -19,7 +19,13 @@ class SettingsScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text(locals.settings),
-            actions: [TextButton.icon(onPressed: () => getIt.get<IdentityCubit>().logout(), label: Text(locals.logout), icon: Icon(Icons.logout))],
+            actions: [
+              TextButton.icon(
+                onPressed: () => getIt.get<IdentityCubit>().logout(),
+                label: Text(locals.logout),
+                icon: Icon(Icons.logout),
+              ),
+            ],
             bottom: TabBar(
               controller: tabController,
               tabs: [

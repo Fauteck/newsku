@@ -15,7 +15,13 @@ class ImagePlaceholder extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(color: colors.secondaryContainer),
-      child: Center(child: Icon(icon ?? Icons.image_outlined, size: iconSize, color: colors.onSecondaryContainer.withValues(alpha: 0.5),),),
+      child: Center(
+        child: Icon(
+          icon ?? Icons.image_outlined,
+          size: iconSize,
+          color: colors.onSecondaryContainer.withValues(alpha: 0.5),
+        ),
+      ),
     );
   }
 }

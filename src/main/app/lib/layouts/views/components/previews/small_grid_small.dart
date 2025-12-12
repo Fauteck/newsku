@@ -15,13 +15,8 @@ class SmallGridSmall extends StatelessWidget {
         crossAxisCount: 2,
         crossAxisSpacing: 16,
         mainAxisSpacing: 0,
-        childAspectRatio: 16/9,
-        children: [
-          _GridItem(),
-          _GridItem(),
-          _GridItem(),
-          _GridItem()
-        ],
+        childAspectRatio: 16 / 9,
+        children: [_GridItem(), _GridItem(), _GridItem(), _GridItem()],
       ),
     );
   }
@@ -48,11 +43,8 @@ class _GridItem extends StatelessWidget {
             ],
           ),
         ),
-        PreviewContainer(
-          height: 30,
-          width: 12, borderRadius: .circular(2),)
+        PreviewContainer(height: 30, width: 12, borderRadius: .circular(2)),
       ],
     );
   }
 }
-

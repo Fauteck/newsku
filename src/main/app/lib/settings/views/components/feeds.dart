@@ -40,7 +40,11 @@ class FeedsSettingsTab extends StatelessWidget {
                                 decoration: InputDecoration(label: Text(locals.newFeedUrl)),
                               ),
                             ),
-                            FilledButton.tonalIcon(onPressed: () => cubit.addFeed(), label: Text(locals.addFeed), icon: Icon(Icons.add)),
+                            FilledButton.tonalIcon(
+                              onPressed: () => cubit.addFeed(),
+                              label: Text(locals.addFeed),
+                              icon: Icon(Icons.add),
+                            ),
                           ],
                         ),
                       ),
@@ -48,15 +52,25 @@ class FeedsSettingsTab extends StatelessWidget {
                         mainAxisAlignment: .start,
                         spacing: 8,
                         children: [
-                          TextButton.icon(onPressed: () => cubit.exportFeed(), label: Text(locals.export), icon: Icon(Icons.download)),
+                          TextButton.icon(
+                            onPressed: () => cubit.exportFeed(),
+                            label: Text(locals.export),
+                            icon: Icon(Icons.download),
+                          ),
                           TextButton.icon(
                             onPressed: () async {
-                              FilePickerResult? result = await FilePicker.platform.pickFiles(allowedExtensions: ['opml'], allowMultiple: false, type: FileType.custom);
+                              FilePickerResult? result = await FilePicker.platform.pickFiles(
+                                allowedExtensions: ['opml'],
+                                allowMultiple: false,
+                                type: FileType.custom,
+                              );
 
                               if (result != null && result.files.isNotEmpty) {
                                 final feeds = await cubit.importFeeds(result.files.first.bytes);
                                 if (context.mounted && feeds.isNotEmpty) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(locals.importedNFeeds(feeds.length))));
+                                  ScaffoldMessenger.of(
+                                    context,
+                                  ).showSnackBar(SnackBar(content: Text(locals.importedNFeeds(feeds.length))));
                                 }
                               }
                             },
@@ -92,7 +106,12 @@ class FeedsSettingsTab extends StatelessWidget {
                                     subtitle: Text(f.url ?? ''),
                                     trailing: IconButton(
                                       onPressed: () {
-                                        okCancelDialog(context, title: locals.deleteFeed, content: Text(locals.deleteFeedMessage), onOk: () => cubit.deleteFeed(f));
+                                        okCancelDialog(
+                                          context,
+                                          title: locals.deleteFeed,
+                                          content: Text(locals.deleteFeedMessage),
+                                          onOk: () => cubit.deleteFeed(f),
+                                        );
                                       },
                                       icon: Icon(Icons.delete),
                                     ),

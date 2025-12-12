@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:app/feed/views/screens/feed_screen.dart';
 import 'package:app/home/views/screens/home.dart';
 import 'package:app/identity/states/identity.dart';
@@ -44,38 +46,38 @@ class AppRouter extends RootStackRouter {
   List<AutoRoute> get routes {
     var hasServerUrlSetup = !kIsWeb || kDebugMode;
     return [
-    AutoRoute.guarded(
-      page: HomeRoute.page,
-      initial: loggedInOnStart,
-      children: [AutoRoute(page: FeedRoute.page, initial: true)],
-      onNavigation: loginRequired,
-    ),
-    AutoRoute.guarded(
-      page: SettingsRoute.page,
-      onNavigation: loginRequired,
-      children: [
-        AutoRoute(page: FeedsSettingsRoute.page, initial: true),
-        AutoRoute(page: LayoutSettingsRoute.page),
-        AutoRoute(page: GeneralSettingsRoute.page),
-      ],
-    ),
-    AutoRoute(
-      page: LandingRoute.page,
-      initial: !loggedInOnStart,
-      children: [
-        if(hasServerUrlSetup)AutoRoute(page: ServerUrlRoute.page, initial: hasServerUrlSetup),
-        AutoRoute.guarded(
-          onNavigation: serverUrlRequired,
-          page: LoginRoute.page,
-          initial: !hasServerUrlSetup,
-          children: [
-            AutoRoute(page: LoginFormRoute.page, initial: true),
-            AutoRoute(page: SignupFormRoute.page),
-          ],
-        ),
-      ],
-    ),
-  ];
+      AutoRoute.guarded(
+        page: HomeRoute.page,
+        initial: loggedInOnStart,
+        children: [AutoRoute(page: FeedRoute.page, initial: true)],
+        onNavigation: loginRequired,
+      ),
+      AutoRoute.guarded(
+        page: SettingsRoute.page,
+        onNavigation: loginRequired,
+        children: [
+          AutoRoute(page: FeedsSettingsRoute.page, initial: true),
+          AutoRoute(page: LayoutSettingsRoute.page),
+          AutoRoute(page: GeneralSettingsRoute.page),
+        ],
+      ),
+      AutoRoute(
+        page: LandingRoute.page,
+        initial: !loggedInOnStart,
+        children: [
+          if (hasServerUrlSetup) AutoRoute(page: ServerUrlRoute.page, initial: hasServerUrlSetup),
+          AutoRoute.guarded(
+            onNavigation: serverUrlRequired,
+            page: LoginRoute.page,
+            initial: !hasServerUrlSetup,
+            children: [
+              AutoRoute(page: LoginFormRoute.page, initial: true),
+              AutoRoute(page: SignupFormRoute.page),
+            ],
+          ),
+        ],
+      ),
+    ];
   }
 
   /*

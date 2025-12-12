@@ -24,7 +24,9 @@ class FirstTimeSetupTrigger extends StatelessWidget {
   Widget build(BuildContext context) {
     return SimpleCubitView<bool>(
       builder: (context, dialogShown) {
-        final firstTimeSetupDone = context.select((IdentityCubit c) => c.state.currentUser?.firstTimeSetupDone ?? false);
+        final firstTimeSetupDone = context.select(
+          (IdentityCubit c) => c.state.currentUser?.firstTimeSetupDone ?? false,
+        );
 
         if (!dialogShown && !firstTimeSetupDone) {
           WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -39,4 +41,3 @@ class FirstTimeSetupTrigger extends StatelessWidget {
     );
   }
 }
-

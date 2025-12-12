@@ -15,7 +15,7 @@ class FeedImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if ((item.image ?? '').isEmpty) {
-      return ImagePlaceholder(width: width, height: height, icon: Icons.rss_feed, iconSize: 10,);
+      return ImagePlaceholder(width: width, height: height, icon: Icons.rss_feed, iconSize: 10);
     }
 
     var cubit = context.read<IdentityCubit>();
@@ -25,8 +25,9 @@ class FeedImage extends StatelessWidget {
       height: height,
       fit: BoxFit.cover,
       imageRenderMethodForWeb: .HttpGet,
-      placeholder: (context, url) => ImagePlaceholder(width: width, height: height, icon: Icons.rss_feed, iconSize: 10,),
-      errorWidget: (context, url, error) =>  ImagePlaceholder(width: width, height: height, icon: Icons.rss_feed, iconSize: 10,),
+      placeholder: (context, url) => ImagePlaceholder(width: width, height: height, icon: Icons.rss_feed, iconSize: 10),
+      errorWidget: (context, url, error) =>
+          ImagePlaceholder(width: width, height: height, icon: Icons.rss_feed, iconSize: 10),
       httpHeaders: {'Authorization': 'Bearer ${cubit.state.token}'},
     );
   }

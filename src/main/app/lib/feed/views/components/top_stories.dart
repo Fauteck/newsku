@@ -38,7 +38,12 @@ class TopStories extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(color: colors.tertiary, borderRadius: .circular(50)),
                 padding: .symmetric(horizontal: 16),
-                child: Text((block.settings ?? block.type.defaultSettings).title ?? '★ Top Stories',maxLines: 1, overflow: .ellipsis, style: textTheme.bodyLarge?.copyWith(fontSize: 25, color: colors.onTertiary)),
+                child: Text(
+                  (block.settings ?? block.type.defaultSettings).title ?? '★ Top Stories',
+                  maxLines: 1,
+                  overflow: .ellipsis,
+                  style: textTheme.bodyLarge?.copyWith(fontSize: 25, color: colors.onTertiary),
+                ),
               ),
             ),
           ),
@@ -67,7 +72,12 @@ class TopStories extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: .stretch,
                                   children: [
-                                    Text(e.$2.title ?? '', style: textTheme.headlineMedium?.copyWith(height: 1.4), maxLines: 2, overflow: .ellipsis),
+                                    Text(
+                                      e.$2.title ?? '',
+                                      style: textTheme.headlineMedium?.copyWith(height: 1.4),
+                                      maxLines: 2,
+                                      overflow: .ellipsis,
+                                    ),
                                     InfoBar(item: e.$2),
                                   ],
                                 ),
@@ -78,7 +88,10 @@ class TopStories extends StatelessWidget {
                             Gap(24),
                             Align(
                               alignment: .center,
-                              child: SizedBox(width: 200, child: Divider(indent: 16, thickness: 3, radius: .circular(20))),
+                              child: SizedBox(
+                                width: 200,
+                                child: Divider(indent: 16, thickness: 3, radius: .circular(20)),
+                              ),
                             ),
                           ],
                         ],
@@ -100,7 +113,12 @@ class TopStories extends StatelessWidget {
                     spacing: 24,
                     children: [
                       FeedItemImage(item: items.first, height: 200, borderRadius: .circular(feedItemBorderRadius)),
-                      Text(items.first.title ?? '', style: textTheme.headlineLarge?.copyWith(height: 1.4), maxLines: 3, overflow: .ellipsis),
+                      Text(
+                        items.first.title ?? '',
+                        style: textTheme.headlineLarge?.copyWith(height: 1.4),
+                        maxLines: 3,
+                        overflow: .ellipsis,
+                      ),
                       Expanded(
                         child: ItemContent(item: items.first, maxLines: 2, overflow: .ellipsis),
                       ),

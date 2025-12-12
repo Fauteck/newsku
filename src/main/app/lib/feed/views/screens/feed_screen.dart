@@ -43,7 +43,9 @@ class FeedScreen extends StatelessWidget {
     final locals = AppLocalizations.of(context)!;
 
     List<Widget> slivers = [];
-    _log.fine('Building Slivers, TimeRange: $timeRange, Layout blocks: ${blocks.length}, Items: ${immutableItems.length}');
+    _log.fine(
+      'Building Slivers, TimeRange: $timeRange, Layout blocks: ${blocks.length}, Items: ${immutableItems.length}',
+    );
 
     List<FeedItem> items = List.from(immutableItems);
 
@@ -117,7 +119,9 @@ class FeedScreen extends StatelessWidget {
     return MainColorProvider(
       builder: (context, appColor) {
         return BlocProvider(
-          create: (context) => MainFeedCubit(MainFeedState(currentTime: DateTime.now().copyWith(hour: 23, minute: 59, second: 59, millisecond: 999))),
+          create: (context) => MainFeedCubit(
+            MainFeedState(currentTime: DateTime.now().copyWith(hour: 23, minute: 59, second: 59, millisecond: 999)),
+          ),
           child: ErrorHandler<MainFeedCubit, MainFeedState>(
             child: BlocBuilder<MainFeedCubit, MainFeedState>(
               builder: (context, state) {
@@ -154,7 +158,10 @@ class FeedScreen extends StatelessWidget {
                                                           controller: cubit.searchController,
                                                           autofocus: true,
                                                           onChanged: (value) => cubit.search(value),
-                                                          decoration: InputDecoration(border: UnderlineInputBorder(), label: Text(locals.search)),
+                                                          decoration: InputDecoration(
+                                                            border: UnderlineInputBorder(),
+                                                            label: Text(locals.search),
+                                                          ),
                                                         ),
                                                       ),
                                                     ],
@@ -177,17 +184,31 @@ class FeedScreen extends StatelessWidget {
                                                   ),
                                                 ),
                                           actions: [
-                                            IconButton(onPressed: () => cubit.setSearch(!state.searchMode), icon: Icon(state.searchMode ? Icons.close : Icons.search)),
-                                            if (!state.searchMode) IconButton(onPressed: () => cubit.refresh(), icon: Icon(Icons.refresh)),
+                                            IconButton(
+                                              onPressed: () => cubit.setSearch(!state.searchMode),
+                                              icon: Icon(state.searchMode ? Icons.close : Icons.search),
+                                            ),
+                                            if (!state.searchMode)
+                                              IconButton(onPressed: () => cubit.refresh(), icon: Icon(Icons.refresh)),
                                             if (!(context.read<IdentityCubit>().state.config?.demoMode ?? false))
-                                              IconButton(onPressed: () => AutoRouter.of(context).push(SettingsRoute()).then((value) => cubit.refresh()), icon: Icon(Icons.settings)),
+                                              IconButton(
+                                                onPressed: () => AutoRouter.of(
+                                                  context,
+                                                ).push(SettingsRoute()).then((value) => cubit.refresh()),
+                                                icon: Icon(Icons.settings),
+                                              ),
                                           ],
                                         ),
                                         if (state.searchMode)
                                           SliverList.builder(
                                             itemCount: state.searchResults.length,
                                             itemBuilder: (context, index) {
-                                              return SearchResult(key: ValueKey(state.searchResults[index]), item: state.searchResults[index], fullDate: true);
+                                              return SearchResult(
+                                                key: ValueKey(state.searchResults[index]),
+                                                item: state.searchResults[index],
+                                                fullDate: true,
+                                                noDimming: true,
+                                              );
                                             },
                                           )
                                         else
@@ -203,11 +224,18 @@ class FeedScreen extends StatelessWidget {
                                             }
 
                                             if (feed.isNotEmpty) {
-                                              return buildSlivers(context: context, timeRange: value, immutableItems: feed, blocks: state.layout, readItems: totalItemCount - unreadCount);
+                                              return buildSlivers(
+                                                context: context,
+                                                timeRange: value,
+                                                immutableItems: feed,
+                                                blocks: state.layout,
+                                                readItems: totalItemCount - unreadCount,
+                                              );
                                             } else {
                                               return [
                                                 SliverStickyHeader.builder(
-                                                  builder: (context, state) => DateBar(date: value.end, isPinned: state.isPinned, isFirst: true),
+                                                  builder: (context, state) =>
+                                                      DateBar(date: value.end, isPinned: state.isPinned, isFirst: true),
                                                   sliver: SliverToBoxAdapter(
                                                     child: SizedBox(
                                                       height: 500,
@@ -215,10 +243,21 @@ class FeedScreen extends StatelessWidget {
                                                         mainAxisAlignment: .center,
                                                         spacing: 24,
                                                         children: [
-                                                          Icon(unreadCount == 0 && totalItemCount > 0 ? Icons.task_alt_outlined : Icons.newspaper, size: 50, color: colors.onSurface),
-                                                          if (totalItemCount == 0) Text(locals.noNews, style: textTheme.titleLarge),
+                                                          Icon(
+                                                            unreadCount == 0 && totalItemCount > 0
+                                                                ? Icons.task_alt_outlined
+                                                                : Icons.newspaper,
+                                                            size: 50,
+                                                            color: colors.onSurface,
+                                                          ),
+                                                          if (totalItemCount == 0)
+                                                            Text(locals.noNews, style: textTheme.titleLarge),
                                                           // this is our read item count
-                                                          if (unreadCount == 0 && totalItemCount > 0) Text(locals.readItems(totalItemCount - unreadCount), style: textTheme.titleLarge),
+                                                          if (unreadCount == 0 && totalItemCount > 0)
+                                                            Text(
+                                                              locals.readItems(totalItemCount - unreadCount),
+                                                              style: textTheme.titleLarge,
+                                                            ),
                                                         ],
                                                       ),
                                                     ),
@@ -229,13 +268,18 @@ class FeedScreen extends StatelessWidget {
                                           }),
                                         if (state.loading)
                                           SliverToBoxAdapter(
-                                            child: Center(child: SizedBox(width: 50, height: 50, child: LoadingIndicator())),
+                                            child: Center(
+                                              child: SizedBox(width: 50, height: 50, child: LoadingIndicator()),
+                                            ),
                                           )
-                                        else if (!state.searchMode || (state.searchMode && state.searchResults.length == searchPageSize * (state.searchPage + 1)))
+                                        else if (!state.searchMode ||
+                                            (state.searchMode &&
+                                                state.searchResults.length == searchPageSize * (state.searchPage + 1)))
                                           SliverToBoxAdapter(
                                             child: Center(
                                               child: FilledButton.tonalIcon(
-                                                onPressed: () => state.searchMode ? cubit.loadMoreSearchResults() : cubit.getFeed(),
+                                                onPressed: () =>
+                                                    state.searchMode ? cubit.loadMoreSearchResults() : cubit.getFeed(),
                                                 label: Text(locals.loadMore),
                                                 icon: Icon(Icons.expand_more),
                                               ),
@@ -260,7 +304,11 @@ class FeedScreen extends StatelessWidget {
                           child: Opacity(opacity: value.clamp(0, 1), child: child!),
                         ),
                         child: FloatingActionButton(
-                          onPressed: () => cubit.scrollController.animateTo(0, duration: Duration(milliseconds: 500), curve: Curves.easeInOutQuart),
+                          onPressed: () => cubit.scrollController.animateTo(
+                            0,
+                            duration: Duration(milliseconds: 500),
+                            curve: Curves.easeInOutQuart,
+                          ),
                           child: Icon(Icons.arrow_upward),
                         ),
                       ),

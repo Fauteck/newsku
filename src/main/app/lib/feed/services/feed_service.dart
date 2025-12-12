@@ -44,7 +44,12 @@ class FeedService extends BaseService {
     return Feed.fromJson(feed);
   }
 
-  Future<Paginated<FeedItem>> getFeedItems({required int page, required int pageSize, required int from, required int to}) async {
+  Future<Paginated<FeedItem>> getFeedItems({
+    required int page,
+    required int pageSize,
+    required int from,
+    required int to,
+  }) async {
     var uri = await formatUrl('/api/feeds/items', query: {'page': page, 'pageSize': pageSize, 'from': from, 'to': to});
 
     var response = await http.get(uri, headers: await headers);

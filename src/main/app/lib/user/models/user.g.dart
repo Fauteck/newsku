@@ -15,12 +15,7 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
   oidcSub: json['oidcSub'] as String?,
   minimumImportance: (json['minimumImportance'] as num?)?.toInt() ?? 0,
   firstTimeSetupDone: json['firstTimeSetupDone'] as bool? ?? false,
-  readItemHandling:
-      $enumDecodeNullable(
-        _$ReadItemHandlingEnumMap,
-        json['readItemHandling'],
-      ) ??
-      ReadItemHandling.none,
+  readItemHandling: $enumDecodeNullable(_$ReadItemHandlingEnumMap, json['readItemHandling']) ?? ReadItemHandling.none,
 );
 
 Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{

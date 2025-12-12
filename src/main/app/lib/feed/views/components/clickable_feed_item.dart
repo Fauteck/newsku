@@ -28,7 +28,9 @@ class ClickableFeedItem extends StatelessWidget {
 
           child: ConditionalWrap(
             wrapIf: item.read,
-            wrapper: (child) => !noDimming && context.read<IdentityCubit>().currentUser?.readItemHandling == .dim ? Opacity(opacity: 0.5, child: child) : child,
+            wrapper: (child) => !noDimming && context.read<IdentityCubit>().currentUser?.readItemHandling == .dim
+                ? Opacity(opacity: 0.5, child: child)
+                : child,
             wrapElse: (child) => VisibilityDetector(
               key: ValueKey(item.id),
               onVisibilityChanged: (VisibilityInfo info) {

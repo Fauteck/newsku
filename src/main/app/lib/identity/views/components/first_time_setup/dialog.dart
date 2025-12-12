@@ -72,12 +72,18 @@ class _FirstTimeSetupDialogState extends State<FirstTimeSetupDialog> {
                   padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8),
                   child: Row(
                     children: [
-                      TextButton(onPressed: page == 0 ? null : () => context.read<SimpleCubit<int>>().setValue(page - 1), child: Text(locals.back)),
+                      TextButton(
+                        onPressed: page == 0 ? null : () => context.read<SimpleCubit<int>>().setValue(page - 1),
+                        child: Text(locals.back),
+                      ),
                       Expanded(
                         child: _Pager(page: page, maxPages: maxPages),
                       ),
                       if (page < maxPages - 1)
-                        TextButton(onPressed: () => context.read<SimpleCubit<int>>().setValue(page + 1), child: Text(locals.next))
+                        TextButton(
+                          onPressed: () => context.read<SimpleCubit<int>>().setValue(page + 1),
+                          child: Text(locals.next),
+                        )
                       else
                         TextButton(
                           onPressed: () {

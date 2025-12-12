@@ -12,8 +12,13 @@ class AppLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     return MainColorProvider(
       builder: (context, mainColor) {
-        return SvgPicture.asset('assets/newsku.svg', width: size, height: size, colorFilter: ColorFilter.mode(color ?? mainColor, BlendMode.srcIn));
-      }
+        return SvgPicture.asset(
+          'assets/newsku.svg',
+          width: size,
+          height: size,
+          colorFilter: ColorFilter.mode(color ?? mainColor, BlendMode.srcIn),
+        );
+      },
     );
   }
 }

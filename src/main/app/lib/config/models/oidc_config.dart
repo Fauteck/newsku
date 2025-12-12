@@ -15,6 +15,5 @@ sealed class OidcConfig with _$OidcConfig {
     required String name,
   }) = _OidcConfig;
 
-  factory OidcConfig.fromJson(Map<String, Object?> json)
-      => _$OidcConfigFromJson(json);
+  factory OidcConfig.fromJson(Map<String, Object?> json) => _$OidcConfigFromJson(json);
 }

@@ -10,7 +10,9 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LogoutListener(
-      child: Scaffold(body: SafeArea(bottom: false, child: FirstTimeSetupTrigger(child: AutoRouter()))),
+      child: Scaffold(
+        body: SafeArea(bottom: false, child: FirstTimeSetupTrigger(child: AutoRouter())),
+      ),
     );
   }
 }

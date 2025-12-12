@@ -64,7 +64,10 @@ class LoginScreen extends StatelessWidget {
                         color: appColor,
                         borderRadius: .only(topLeft: .circular(30), topRight: .circular(30)),
                       ),
-                      child: Align(alignment: .center, child: AppLogo(size: 70, color: colors.onSurface)),
+                      child: Align(
+                        alignment: .center,
+                        child: AppLogo(size: 70, color: colors.onSurface),
+                      ),
                     ),
                   ),
                   Padding(
@@ -76,7 +79,7 @@ class LoginScreen extends StatelessWidget {
             ),
           ],
         );
-      }
+      },
     );
   }
 }

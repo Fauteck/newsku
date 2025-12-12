@@ -27,5 +27,10 @@ class ServerUrlCubit extends Cubit<ServerUrlState> {
 
 @freezed
 sealed class ServerUrlState with _$ServerUrlState {
-  const factory ServerUrlState({String? serverUrl, @Default(false) bool loading, Config? config, @Default(false) bool error}) = _ServerUrlState;
+  const factory ServerUrlState({
+    String? serverUrl,
+    @Default(false) bool loading,
+    Config? config,
+    @Default(false) bool error,
+  }) = _ServerUrlState;
 }

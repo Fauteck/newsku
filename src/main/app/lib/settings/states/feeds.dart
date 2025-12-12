@@ -80,5 +80,10 @@ class FeedsSettingsCubit extends Cubit<FeedsSettingsState> {
 @freezed
 sealed class FeedsSettingsState with _$FeedsSettingsState implements WithError {
   @Implements<WithError>()
-  const factory FeedsSettingsState({@Default([]) List<Feed> feeds, @Default(true) bool loading, dynamic error, StackTrace? stackTrace}) = _FeedsSettingsState;
+  const factory FeedsSettingsState({
+    @Default([]) List<Feed> feeds,
+    @Default(true) bool loading,
+    dynamic error,
+    StackTrace? stackTrace,
+  }) = _FeedsSettingsState;
 }

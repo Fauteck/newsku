@@ -10,8 +10,9 @@ import 'package:gap/gap.dart';
 class SearchResult extends StatelessWidget {
   final FeedItem item;
   final bool fullDate;
+  final bool noDimming;
 
-  const SearchResult({super.key, required this.item,  this.fullDate = false});
+  const SearchResult({super.key, required this.item, this.fullDate = false, this.noDimming = false});
 
   @override
   Widget build(BuildContext context) {
@@ -19,23 +20,33 @@ class SearchResult extends StatelessWidget {
     final breakPoint = BreakPoint.get(context);
 
     return Padding(
-      padding: .symmetric(horizontal: 32, vertical: 16),
+      padding: .symmetric(horizontal: breakPoint == .mobile ? 8 : 32, vertical: 16),
       child: ClickableFeedItem(
-        noDimming: true,
+        noDimming: noDimming,
         item: item,
         child: Row(
           crossAxisAlignment: .center,
           children: [
-            FeedItemImage(item: item, width: breakPoint == .mobile? 50 : 100, height: breakPoint == .mobile ? 50: 100, borderRadius: .circular(10)),
-            Gap(32),
+            FeedItemImage(
+              item: item,
+              width: breakPoint == .mobile ? 75 : 100,
+              height: breakPoint == .mobile ? 75 : 100,
+              borderRadius: .circular(10),
+            ),
+            Gap(breakPoint == .mobile ? 16 : 32),
             Expanded(
               child: Column(
                 crossAxisAlignment: .stretch,
                 spacing: 8,
                 children: [
-                  Text(item.title ?? '', style: breakPoint == .mobile ? textTheme.titleMedium : textTheme.headlineSmall, maxLines: 2, overflow: .ellipsis),
-                  ItemContent(item: item, maxLines: breakPoint == .mobile ? 1 : 3 , overflow: .ellipsis),
-                  InfoBar(item: item, fullDate: fullDate,),
+                  Text(
+                    item.title ?? '',
+                    style: breakPoint == .mobile ? textTheme.titleMedium : textTheme.headlineSmall,
+                    maxLines: 2,
+                    overflow: .ellipsis,
+                  ),
+                  ItemContent(item: item, maxLines: breakPoint == .mobile ? 1 : 3, overflow: .ellipsis),
+                  InfoBar(item: item, fullDate: fullDate),
                 ],
               ),
             ),

@@ -32,7 +32,9 @@ class InfoBar extends StatelessWidget {
           ),
         ),
         Text(
-          (fullDate ? fullArticleDateFormat : articleDateFormat).format(DateTime.fromMillisecondsSinceEpoch(item.timeCreated)),
+          (fullDate ? fullArticleDateFormat : articleDateFormat).format(
+            DateTime.fromMillisecondsSinceEpoch(item.timeCreated),
+          ),
           style: textTheme.labelMedium?.copyWith(color: colors.onSecondaryContainer),
         ),
         InkWell(

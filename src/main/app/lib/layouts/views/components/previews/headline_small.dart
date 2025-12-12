@@ -7,29 +7,17 @@ class HeadlineSmall extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return SizedBox(
       width: smallPreviewSize,
       child: Column(
         spacing: 4,
-        children: [PreviewContainer(width: smallPreviewSize, height: smallPreviewSize / 3, borderRadius: .circular(5)),
+        children: [
+          PreviewContainer(width: smallPreviewSize, height: smallPreviewSize / 3, borderRadius: .circular(5)),
 
-        PreviewContainer(
-            width: smallPreviewSize,
-            height: 10,
-            borderRadius: .circular(20)),
-          PreviewContainer(
-              width: smallPreviewSize,
-              height: 2,
-              borderRadius: .circular(20)),
-          PreviewContainer(
-              width: smallPreviewSize,
-              height: 2,
-              borderRadius: .circular(20)),
-          PreviewContainer(
-              width: smallPreviewSize,
-              height: 2,
-              borderRadius: .circular(20)),
+          PreviewContainer(width: smallPreviewSize, height: 10, borderRadius: .circular(20)),
+          PreviewContainer(width: smallPreviewSize, height: 2, borderRadius: .circular(20)),
+          PreviewContainer(width: smallPreviewSize, height: 2, borderRadius: .circular(20)),
+          PreviewContainer(width: smallPreviewSize, height: 2, borderRadius: .circular(20)),
         ],
       ),
     );

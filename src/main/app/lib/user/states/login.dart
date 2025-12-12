@@ -70,7 +70,9 @@ class LoginCubit extends Cubit<LoginState> {
 
       var basePort = Uri.base.port;
 
-      String webUrl = kIsWeb ? '${Uri.base.scheme}://${Uri.base.host}${basePort != 80 && basePort != 443 ? ':$basePort' : ''}/redirect.html' : '';
+      String webUrl = kIsWeb
+          ? '${Uri.base.scheme}://${Uri.base.host}${basePort != 80 && basePort != 443 ? ':$basePort' : ''}/redirect.html'
+          : '';
 
       _log.fine(config);
       var redirectUri = kIsWeb
@@ -86,10 +88,14 @@ class LoginCubit extends Cubit<LoginState> {
         store: OidcMemoryStore(),
         settings: OidcUserManagerSettings(
           postLogoutRedirectUri: redirectUri,
-          frontChannelLogoutUri: Uri(path: webUrl).replace(queryParameters: {...redirectUri.queryParameters, 'requestType': 'front-channel-logout'}),
+          frontChannelLogoutUri: Uri(
+            path: webUrl,
+          ).replace(queryParameters: {...redirectUri.queryParameters, 'requestType': 'front-channel-logout'}),
           scope: ["openid", 'profile', 'email'],
           redirectUri: redirectUri,
-          options: OidcPlatformSpecificOptions(web: OidcPlatformSpecificOptions_Web(broadcastChannel: 'oidc_flutter_web/redirect')),
+          options: OidcPlatformSpecificOptions(
+            web: OidcPlatformSpecificOptions_Web(broadcastChannel: 'oidc_flutter_web/redirect'),
+          ),
         ),
       );
 
@@ -117,6 +123,12 @@ class LoginCubit extends Cubit<LoginState> {
 @freezed
 sealed class LoginState with _$LoginState implements WithError {
   @Implements<WithError>()
-  const factory LoginState({@Default(false) bool loading, @Default(false) bool failedLogin, @Default("") String username, @Default("") String password, dynamic error, StackTrace? stackTrace}) =
-      _LoginState;
+  const factory LoginState({
+    @Default(false) bool loading,
+    @Default(false) bool failedLogin,
+    @Default("") String username,
+    @Default("") String password,
+    dynamic error,
+    StackTrace? stackTrace,
+  }) = _LoginState;
 }

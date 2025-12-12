@@ -20,7 +20,7 @@ class AppName extends StatelessWidget {
             Text('ku', style: (style ?? textTheme.bodyMedium)?.copyWith(color: mainColor)),
           ],
         );
-      }
+      },
     );
   }
 }

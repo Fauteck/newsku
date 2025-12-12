@@ -81,7 +81,12 @@ class MyApp extends StatelessWidget {
                   // This works for code too, not just values: Most code changes can be
                   // tested with just a hot reload.
                   inputDecorationTheme: inputTheme,
-                  colorScheme: .fromSeed(seedColor: appColor, surface: Colors.white, surfaceContainerHigh: Color.fromARGB(255, 233, 234, 237), onSurface: Colors.black),
+                  colorScheme: .fromSeed(
+                    seedColor: appColor,
+                    surface: Colors.white,
+                    surfaceContainerHigh: Color.fromARGB(255, 233, 234, 237),
+                    onSurface: Colors.black,
+                  ),
                 ),
               );
             },

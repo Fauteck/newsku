@@ -33,16 +33,33 @@ class LoginFormScreen extends StatelessWidget {
                 mainAxisAlignment: .center,
                 children: [
                   Align(alignment: .centerLeft, child: Text(locals.username)),
-                  TextField(onChanged: (value) => cubit.setUser(value), autofillHints: [AutofillHints.username], autocorrect: false),
+                  TextField(
+                    onChanged: (value) => cubit.setUser(value),
+                    autofillHints: [AutofillHints.username],
+                    autocorrect: false,
+                  ),
                   Gap(16),
                   Align(alignment: .centerLeft, child: Text(locals.password)),
-                  TextField(obscureText: true, onChanged: (value) => cubit.setPassword(value), autofillHints: [AutofillHints.password], autocorrect: false),
-                  if (state.failedLogin) ...[Gap(16), Text(locals.invalidCredentials, style: textTheme.bodyMedium?.copyWith(color: colors.error)), Gap(16)],
+                  TextField(
+                    obscureText: true,
+                    onChanged: (value) => cubit.setPassword(value),
+                    autofillHints: [AutofillHints.password],
+                    autocorrect: false,
+                  ),
+                  if (state.failedLogin) ...[
+                    Gap(16),
+                    Text(locals.invalidCredentials, style: textTheme.bodyMedium?.copyWith(color: colors.error)),
+                    Gap(16),
+                  ],
                   Gap(16),
                   Row(
                     mainAxisAlignment: .spaceBetween,
                     children: [
-                      if ((config?.allowSignup ?? false) && !(config?.demoMode ?? false)) TextButton(onPressed: () => AutoRouter.of(context).replace(SignupFormRoute()), child: Text(locals.signUp)),
+                      if ((config?.allowSignup ?? false) && !(config?.demoMode ?? false))
+                        TextButton(
+                          onPressed: () => AutoRouter.of(context).replace(SignupFormRoute()),
+                          child: Text(locals.signUp),
+                        ),
                       Spacer(),
                       FilledButton.tonalIcon(
                         onPressed: state.loading

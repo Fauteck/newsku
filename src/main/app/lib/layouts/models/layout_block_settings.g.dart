@@ -7,11 +7,9 @@ part of 'layout_block_settings.dart';
 // **************************************************************************
 
 _LayoutBlockSettings _$LayoutBlockSettingsFromJson(Map<String, dynamic> json) =>
-    _LayoutBlockSettings(
-      title: json['title'] as String?,
-      items: (json['items'] as num?)?.toInt(),
-    );
+    _LayoutBlockSettings(title: json['title'] as String?, items: (json['items'] as num?)?.toInt());
 
-Map<String, dynamic> _$LayoutBlockSettingsToJson(
-  _LayoutBlockSettings instance,
-) => <String, dynamic>{'title': instance.title, 'items': instance.items};
+Map<String, dynamic> _$LayoutBlockSettingsToJson(_LayoutBlockSettings instance) => <String, dynamic>{
+  'title': instance.title,
+  'items': instance.items,
+};

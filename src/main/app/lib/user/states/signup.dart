@@ -32,9 +32,16 @@ class SignupCubit extends Cubit<SignupState> {
 
 @freezed
 sealed class SignupState with _$SignupState {
-  const factory SignupState({@Default(false) bool loading, String? username, String? email, String? password, String? repeatPassword}) = _SignupState;
+  const factory SignupState({
+    @Default(false) bool loading,
+    String? username,
+    String? email,
+    String? password,
+    String? repeatPassword,
+  }) = _SignupState;
 
   const SignupState._();
 
-  bool get invalidForm => (password ?? '').isEmpty || password != repeatPassword || (username ?? '').isEmpty || (email ?? '').isEmpty;
+  bool get invalidForm =>
+      (password ?? '').isEmpty || password != repeatPassword || (username ?? '').isEmpty || (email ?? '').isEmpty;
 }

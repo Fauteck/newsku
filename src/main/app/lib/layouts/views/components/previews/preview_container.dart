@@ -5,8 +5,9 @@ class PreviewContainer extends StatelessWidget {
   final double? height;
   final BorderRadius? borderRadius;
   final Widget? child;
+  final Color? color;
 
-  const PreviewContainer({super.key, this.width, this.height, this.borderRadius, this.child});
+  const PreviewContainer({super.key, this.width, this.height, this.borderRadius, this.child, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +16,7 @@ class PreviewContainer extends StatelessWidget {
     return Container(
       width: width,
       height: height,
-      decoration: BoxDecoration(color: colors.primaryContainer, borderRadius: borderRadius),
+      decoration: BoxDecoration(color: color ?? colors.primaryContainer, borderRadius: borderRadius),
       child: child,
     );
   }

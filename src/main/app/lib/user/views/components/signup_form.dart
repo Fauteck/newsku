@@ -26,21 +26,41 @@ class SignupFormScreen extends StatelessWidget {
               mainAxisAlignment: .center,
               children: [
                 Align(alignment: .centerLeft, child: Text(locals.username)),
-                TextField(onChanged: (value) => cubit.setUsername(value), autofillHints: [AutofillHints.newUsername], autocorrect: false),
+                TextField(
+                  onChanged: (value) => cubit.setUsername(value),
+                  autofillHints: [AutofillHints.newUsername],
+                  autocorrect: false,
+                ),
                 Gap(16),
                 Align(alignment: .centerLeft, child: Text(locals.email)),
-                TextField(onChanged: (value) => cubit.setEmail(value), autofillHints: [AutofillHints.email], autocorrect: false),
+                TextField(
+                  onChanged: (value) => cubit.setEmail(value),
+                  autofillHints: [AutofillHints.email],
+                  autocorrect: false,
+                ),
                 Gap(16),
                 Align(alignment: .centerLeft, child: Text(locals.password)),
-                TextField(obscureText: true, onChanged: (value) => cubit.setPassword(value), autofillHints: [AutofillHints.newPassword], autocorrect: false),
+                TextField(
+                  obscureText: true,
+                  onChanged: (value) => cubit.setPassword(value),
+                  autofillHints: [AutofillHints.newPassword],
+                  autocorrect: false,
+                ),
                 Gap(16),
                 Align(alignment: .centerLeft, child: Text(locals.repeatPassword)),
                 TextField(obscureText: true, onChanged: (value) => cubit.setRepeatPassword(value), autocorrect: false),
                 Gap(16),
-                if (state.password != state.repeatPassword) ...[Gap(16), Text(locals.passwordsNotMatch, style: textTheme.bodyMedium?.copyWith(color: colors.error)), Gap(16)],
+                if (state.password != state.repeatPassword) ...[
+                  Gap(16),
+                  Text(locals.passwordsNotMatch, style: textTheme.bodyMedium?.copyWith(color: colors.error)),
+                  Gap(16),
+                ],
                 Row(
                   children: [
-                    TextButton(onPressed: () => AutoRouter.of(context).replace(LoginFormRoute()), child: Text(locals.login)),
+                    TextButton(
+                      onPressed: () => AutoRouter.of(context).replace(LoginFormRoute()),
+                      child: Text(locals.login),
+                    ),
                     Spacer(),
                     FilledButton.tonalIcon(
                       onPressed: state.loading || state.invalidForm

@@ -9,9 +9,7 @@ part of 'config.dart';
 _Config _$ConfigFromJson(Map<String, dynamic> json) => _Config(
   demoMode: json['demoMode'] as bool? ?? false,
   allowSignup: json['allowSignup'] as bool,
-  oidcConfig: json['oidcConfig'] == null
-      ? null
-      : OidcConfig.fromJson(json['oidcConfig'] as Map<String, dynamic>),
+  oidcConfig: json['oidcConfig'] == null ? null : OidcConfig.fromJson(json['oidcConfig'] as Map<String, dynamic>),
   announcement: json['announcement'] as String? ?? "",
 );
 

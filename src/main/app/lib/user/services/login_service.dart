@@ -12,7 +12,11 @@ class LoginService extends BaseService {
 
   Future<String> login({required String username, required String password}) async {
     var uri = await formatUrl('/login');
-    var response = await http.post(uri, body: jsonEncode({'username': username, 'password': password}), headers: await headers);
+    var response = await http.post(
+      uri,
+      body: jsonEncode({'username': username, 'password': password}),
+      headers: await headers,
+    );
     processResponse(response, logoutOn401: false);
     return response.body;
   }

@@ -9,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 part 'local_preferences.freezed.dart';
 
-
 const _defaultColor = Colors.deepOrange;
 
 class LocalPreferencesCubit extends Cubit<LocalPreferencesState> {
@@ -49,7 +48,11 @@ class LocalPreferencesCubit extends Cubit<LocalPreferencesState> {
 
 @freezed
 sealed class LocalPreferencesState with _$LocalPreferencesState {
-  const factory LocalPreferencesState({@Default(_defaultColor) Color themeColor, @Default(false) bool dynamicColor, @Default(false) bool blackBackground}) = _LocalPreferencesState;
+  const factory LocalPreferencesState({
+    @Default(_defaultColor) Color themeColor,
+    @Default(false) bool dynamicColor,
+    @Default(false) bool blackBackground,
+  }) = _LocalPreferencesState;
 
   const LocalPreferencesState._();
 

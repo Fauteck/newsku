@@ -32,11 +32,12 @@ class SmallGridItem extends StatelessWidget {
                   crossAxisAlignment: .stretch,
                   spacing: 4,
                   children: [
-                    Text(item.title ?? '', style: textTheme.bodyLarge, overflow: .ellipsis, maxLines: 2,),
+                    Text(item.title ?? '', style: textTheme.bodyLarge, overflow: .ellipsis, maxLines: 2),
                     Expanded(
                       child: Align(
-                          alignment: .centerLeft,
-                          child: ItemContent(item: item, maxLines: 1, overflow: .ellipsis,)),
+                        alignment: .centerLeft,
+                        child: ItemContent(item: item, maxLines: 1, overflow: .ellipsis),
+                      ),
                     ),
                     InfoBar(item: item),
                   ],
