@@ -11,7 +11,7 @@ preferences.
 - Can be fully self-hosted and private as it is compatible with OpenAI API for self-hosted server like Llama.cpp.
 - Customizable layout
 
-## Screenshot
+## Screenshots
 
 ### Main page
 
