@@ -328,7 +328,7 @@ abstract class AppLocalizations {
   /// No description provided for @headlinePicture.
   ///
   /// In en, this message translates to:
-  /// **'Picture headline'**
+  /// **'Headline on picture'**
   String get headlinePicture;
 
   /// No description provided for @bigGridPicture.
@@ -340,7 +340,7 @@ abstract class AppLocalizations {
   /// No description provided for @singleItemRow.
   ///
   /// In en, this message translates to:
-  /// **'Single item row'**
+  /// **'List'**
   String get singleItemRow;
 
   /// No description provided for @topStories.

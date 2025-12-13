@@ -93,13 +93,13 @@ class LayoutSettingsTab extends StatelessWidget {
                                       Center(
                                         child: DraggableLayoutBlock(
                                           setDragging: cubit.setDragging,
-                                          type: LayoutBlockTypes.topStories,
+                                          type: LayoutBlockTypes.bigHeadlinePicture,
                                         ),
                                       ),
                                       Center(
                                         child: DraggableLayoutBlock(
                                           setDragging: cubit.setDragging,
-                                          type: LayoutBlockTypes.bigHeadlinePicture,
+                                          type: LayoutBlockTypes.topStories,
                                         ),
                                       ),
                                       Gap(32),
@@ -113,16 +113,16 @@ class LayoutSettingsTab extends StatelessWidget {
                                       Center(
                                         child: DraggableLayoutBlock(
                                           setDragging: cubit.setDragging,
+                                          type: LayoutBlockTypes.bigGridPicture,
+                                        ),
+                                      ),
+                                      Center(
+                                        child: DraggableLayoutBlock(
+                                          setDragging: cubit.setDragging,
                                           type: LayoutBlockTypes.smallGrid,
                                         ),
                                       ),
 
-                                      Center(
-                                        child: DraggableLayoutBlock(
-                                          setDragging: cubit.setDragging,
-                                          type: LayoutBlockTypes.bigGridPicture,
-                                        ),
-                                      ),
                                       Center(
                                         child: DraggableLayoutBlock(
                                           setDragging: cubit.setDragging,

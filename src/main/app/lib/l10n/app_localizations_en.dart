@@ -147,13 +147,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get headline => 'Headline';
 
   @override
-  String get headlinePicture => 'Picture headline';
+  String get headlinePicture => 'Headline on picture';
 
   @override
   String get bigGridPicture => 'Big picture grid';
 
   @override
-  String get singleItemRow => 'Single item row';
+  String get singleItemRow => 'List';
 
   @override
   String get topStories => 'Top stories';
