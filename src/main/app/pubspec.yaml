@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  auto_route: 10.2.3
+  auto_route: 11.0.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cached_network_image: 3.4.1
@@ -52,13 +52,13 @@ dependencies:
   flutter_sticky_header: 0.8.0
   flutter_svg: 2.2.3
   freezed_annotation: 3.1.0
-  get_it: 9.1.0
+  get_it: 9.2.0
   logging: 1.3.0
   material_loading_indicator: 1.0.0
-  motor: 1.0.1
+  motor: 1.1.0
   oidc: 0.13.0
   oidc_default_store: 0.5.0
-  shared_preferences: 2.5.3
+  shared_preferences: 2.5.4
   url_launcher: 6.3.2
   visibility_detector: 0.4.0+2
 
@@ -76,7 +76,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
-  json_serializable: ^6.11.2
+  json_serializable: 6.11.2
   freezed: 3.2.3
 
 # For information on the generic Dart part of this file, see the
