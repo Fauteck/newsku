@@ -277,4 +277,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectBlock => 'Select block type to add to your layout';
+
+  @override
+  String nErrors(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count errors',
+      one: '1 error',
+      zero: 'No errors',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get inTheLast24Hours => 'In the last 24 hours';
+
+  @override
+  String feedErrorTitle(Object feedName) {
+    return '$feedName errors';
+  }
+
+  @override
+  String get error => 'Error';
+
+  @override
+  String get stackTrace => 'Stack trace';
+
+  @override
+  String get articleUrl => 'Article URL';
+
+  @override
+  String get feedRetrievalError => 'Error while querying the RSS feed URL';
 }

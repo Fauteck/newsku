@@ -1,11 +1,13 @@
 import 'dart:ui';
 
+import 'package:app/feed/models/feed.dart';
 import 'package:app/feed/views/screens/feed_screen.dart';
 import 'package:app/home/views/screens/home.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
 import 'package:app/settings/views/components/feeds.dart';
 import 'package:app/settings/views/components/layout.dart';
+import 'package:app/settings/views/screens/feed_errors.dart';
 import 'package:app/settings/views/screens/settings.dart';
 import 'package:app/user/views/components/login.dart';
 import 'package:app/user/views/components/login_form.dart';
@@ -52,6 +54,7 @@ class AppRouter extends RootStackRouter {
         children: [AutoRoute(page: FeedRoute.page, initial: true)],
         onNavigation: loginRequired,
       ),
+      AutoRoute.guarded(page: FeedErrorsRoute.page, onNavigation: loginRequired),
       AutoRoute.guarded(
         page: SettingsRoute.page,
         onNavigation: loginRequired,

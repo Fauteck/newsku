@@ -106,12 +106,16 @@ class MainFeedCubit extends Cubit<MainFeedState> {
   Future<void> refresh() async {
     try {
       emit(state.copyWith(loading: true));
-      final layout = await LayoutService(serverUrl!).getLayout();
+      final layout = LayoutService(serverUrl!).getLayout();
+
+      final errorCount = FeedService(serverUrl!).countLast24Hours();
+
       emit(
         state.copyWith(
           currentTime: DateTime.now().copyWith(hour: 23, minute: 59, second: 59, millisecond: 999),
           items: {},
-          layout: layout,
+          layout: await layout,
+          errorCount: await errorCount,
         ),
       );
     } catch (e, s) {
@@ -168,6 +172,7 @@ sealed class MainFeedState with _$MainFeedState implements WithError {
     @Default([]) List<FeedItem> searchResults,
     @Default(0) int searchPage,
     @Default([]) List<LayoutBlock> layout,
+    @Default(0) int errorCount,
     dynamic error,
     StackTrace? stackTrace,
   }) = _MainFeedState;

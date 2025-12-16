@@ -12,6 +12,7 @@ import 'package:app/user/views/components/fancy_side.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/views/components/app_logo.dart';
 import 'package:app/utils/views/components/app_name.dart';
+import 'package:app/utils/views/components/conditional_wrap.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:app/utils/views/components/main_color_provider.dart';
 import 'package:auto_route/auto_route.dart';
@@ -191,11 +192,21 @@ class FeedScreen extends StatelessWidget {
                                             if (!state.searchMode)
                                               IconButton(onPressed: () => cubit.refresh(), icon: Icon(Icons.refresh)),
                                             if (!(context.read<IdentityCubit>().state.config?.demoMode ?? false))
-                                              IconButton(
-                                                onPressed: () => AutoRouter.of(
-                                                  context,
-                                                ).push(SettingsRoute()).then((value) => cubit.refresh()),
-                                                icon: Icon(Icons.settings),
+                                              ConditionalWrap(
+                                                wrapIf: state.errorCount > 0,
+                                                wrapper: (child) => Badge(
+                                                  offset: Offset(-3, 3),
+                                                  backgroundColor: colors.errorContainer,
+                                                  textColor: colors.error,
+                                                  label: Text('${state.errorCount}'),
+                                                  child: child,
+                                                ),
+                                                child: IconButton(
+                                                  onPressed: () => AutoRouter.of(
+                                                    context,
+                                                  ).push(SettingsRoute()).then((value) => cubit.refresh()),
+                                                  icon: Icon(Icons.settings),
+                                                ),
                                               ),
                                           ],
                                         ),

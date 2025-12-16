@@ -11,6 +11,7 @@ sealed class Paginated<T> with _$Paginated<T> {
     @Default(0) int totalElements,
     @Default(0) int totalPages,
     @Default(0) int numberOfElements,
+    @Default(0) int number,
   }) = _Paginated;
 
   factory Paginated.fromJson(Map<String, Object?> json, T Function(Object?) fromJsonT) =>

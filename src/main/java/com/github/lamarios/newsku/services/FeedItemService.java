@@ -5,11 +5,14 @@ import com.apptasticsoftware.rssreader.Item;
 import com.apptasticsoftware.rssreader.RssReader;
 import com.apptasticsoftware.rssreader.filter.InvalidXmlCharacterFilter;
 import com.github.lamarios.newsku.persistence.entities.Feed;
+import com.github.lamarios.newsku.persistence.entities.FeedError;
 import com.github.lamarios.newsku.persistence.entities.FeedItem;
+import com.github.lamarios.newsku.persistence.repositories.FeedErrorRepository;
 import com.github.lamarios.newsku.persistence.repositories.FeedItemRepository;
 import com.github.lamarios.newsku.persistence.repositories.FeedRepository;
 import com.github.lamarios.newsku.utils.TransactionHelper;
 import jakarta.persistence.EntityManager;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -42,9 +45,10 @@ public class FeedItemService {
     private final UserService userService;
     private final EntityManager entityManager;
     private final FeedRepository feedRepository;
+    private final FeedErrorRepository feedErrorRepository;
 
     @Autowired
-    public FeedItemService(FeedItemRepository feedItemRepository, PlatformTransactionManager transactionManager, OpenaiService openaiService, FeedService feedService, UserService userService, EntityManager entityManager, FeedRepository feedRepository) {
+    public FeedItemService(FeedItemRepository feedItemRepository, PlatformTransactionManager transactionManager, OpenaiService openaiService, FeedService feedService, UserService userService, EntityManager entityManager, FeedRepository feedRepository, FeedErrorRepository feedErrorRepository) {
         this.feedItemRepository = feedItemRepository;
         this.transactionManager = transactionManager;
         this.openaiService = openaiService;
@@ -52,6 +56,7 @@ public class FeedItemService {
         this.userService = userService;
         this.entityManager = entityManager;
         this.feedRepository = feedRepository;
+        this.feedErrorRepository = feedErrorRepository;
     }
 
     public void refreshFeed(Feed feed) {
@@ -80,6 +85,8 @@ public class FeedItemService {
             for (Item item : items) {
                 try {
                     TransactionHelper.doInNewTransaction(transactionManager, false, () -> {
+
+
                         if (item.getGuid().isEmpty()) {
                             return;
                         }
@@ -130,10 +137,31 @@ public class FeedItemService {
                     });
                 } catch (Exception e) {
                     logger.error("Couldn't parse feed item: {}, top level catch", item.getGuid(), e);
+                    FeedError error = new FeedError();
+                    error.setId(UUID.randomUUID().toString());
+                    error.setTimeCreated(System.currentTimeMillis());
+                    error.setFeed(feed);
+                    error.setMessage(ExceptionUtils.getMessage(e));
+                    error.setError(ExceptionUtils.getStackTrace(e));
+                    if (item.getLink().isPresent()) {
+                        error.setUrl(item.getLink().get());
+                    }
+
+                    feedErrorRepository.save(error);
+
                 }
             }
+
         } catch (Exception e) {
             logger.error("Couldn't parse feed: {}", feed.getUrl(), e);
+
+            FeedError error = new FeedError();
+            error.setId(UUID.randomUUID().toString());
+            error.setTimeCreated(System.currentTimeMillis());
+            error.setFeed(feed);
+            error.setMessage(ExceptionUtils.getMessage(e));
+            error.setError(ExceptionUtils.getStackTrace(e));
+            feedErrorRepository.save(error);
         }
     }
 

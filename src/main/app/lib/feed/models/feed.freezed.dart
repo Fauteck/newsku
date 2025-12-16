@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Feed {
 
- String? get id; String? get name; String? get description; String? get url; String? get itemPreference; String? get image;
+ String? get id; String? get name; String? get description; String? get url; String? get itemPreference; String? get image; int get errorsInLast24Hours;
 /// Create a copy of Feed
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $FeedCopyWith<Feed> get copyWith => _$FeedCopyWithImpl<Feed>(this as Feed, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Feed&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.url, url) || other.url == url)&&(identical(other.itemPreference, itemPreference) || other.itemPreference == itemPreference)&&(identical(other.image, image) || other.image == image));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Feed&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.url, url) || other.url == url)&&(identical(other.itemPreference, itemPreference) || other.itemPreference == itemPreference)&&(identical(other.image, image) || other.image == image)&&(identical(other.errorsInLast24Hours, errorsInLast24Hours) || other.errorsInLast24Hours == errorsInLast24Hours));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,url,itemPreference,image);
+int get hashCode => Object.hash(runtimeType,id,name,description,url,itemPreference,image,errorsInLast24Hours);
 
 @override
 String toString() {
-  return 'Feed(id: $id, name: $name, description: $description, url: $url, itemPreference: $itemPreference, image: $image)';
+  return 'Feed(id: $id, name: $name, description: $description, url: $url, itemPreference: $itemPreference, image: $image, errorsInLast24Hours: $errorsInLast24Hours)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $FeedCopyWith<$Res>  {
   factory $FeedCopyWith(Feed value, $Res Function(Feed) _then) = _$FeedCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? name, String? description, String? url, String? itemPreference, String? image
+ String? id, String? name, String? description, String? url, String? itemPreference, String? image, int errorsInLast24Hours
 });
 
 
@@ -65,7 +65,7 @@ class _$FeedCopyWithImpl<$Res>
 
 /// Create a copy of Feed
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = freezed,Object? description = freezed,Object? url = freezed,Object? itemPreference = freezed,Object? image = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = freezed,Object? description = freezed,Object? url = freezed,Object? itemPreference = freezed,Object? image = freezed,Object? errorsInLast24Hours = null,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -73,7 +73,8 @@ as String?,description: freezed == description ? _self.description : description
 as String?,url: freezed == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
 as String?,itemPreference: freezed == itemPreference ? _self.itemPreference : itemPreference // ignore: cast_nullable_to_non_nullable
 as String?,image: freezed == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,errorsInLast24Hours: null == errorsInLast24Hours ? _self.errorsInLast24Hours : errorsInLast24Hours // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? name,  String? description,  String? url,  String? itemPreference,  String? image)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? name,  String? description,  String? url,  String? itemPreference,  String? image,  int errorsInLast24Hours)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Feed() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.url,_that.itemPreference,_that.image);case _:
+return $default(_that.id,_that.name,_that.description,_that.url,_that.itemPreference,_that.image,_that.errorsInLast24Hours);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.id,_that.name,_that.description,_that.url,_that.itemPrefer
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? name,  String? description,  String? url,  String? itemPreference,  String? image)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? name,  String? description,  String? url,  String? itemPreference,  String? image,  int errorsInLast24Hours)  $default,) {final _that = this;
 switch (_that) {
 case _Feed():
-return $default(_that.id,_that.name,_that.description,_that.url,_that.itemPreference,_that.image);}
+return $default(_that.id,_that.name,_that.description,_that.url,_that.itemPreference,_that.image,_that.errorsInLast24Hours);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -193,10 +194,10 @@ return $default(_that.id,_that.name,_that.description,_that.url,_that.itemPrefer
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? name,  String? description,  String? url,  String? itemPreference,  String? image)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? name,  String? description,  String? url,  String? itemPreference,  String? image,  int errorsInLast24Hours)?  $default,) {final _that = this;
 switch (_that) {
 case _Feed() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.url,_that.itemPreference,_that.image);case _:
+return $default(_that.id,_that.name,_that.description,_that.url,_that.itemPreference,_that.image,_that.errorsInLast24Hours);case _:
   return null;
 
 }
@@ -208,7 +209,7 @@ return $default(_that.id,_that.name,_that.description,_that.url,_that.itemPrefer
 @JsonSerializable()
 
 class _Feed implements Feed {
-  const _Feed({this.id, this.name, this.description, this.url, this.itemPreference, this.image});
+  const _Feed({this.id, this.name, this.description, this.url, this.itemPreference, this.image, this.errorsInLast24Hours = 0});
   factory _Feed.fromJson(Map<String, dynamic> json) => _$FeedFromJson(json);
 
 @override final  String? id;
@@ -217,6 +218,7 @@ class _Feed implements Feed {
 @override final  String? url;
 @override final  String? itemPreference;
 @override final  String? image;
+@override@JsonKey() final  int errorsInLast24Hours;
 
 /// Create a copy of Feed
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +233,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Feed&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.url, url) || other.url == url)&&(identical(other.itemPreference, itemPreference) || other.itemPreference == itemPreference)&&(identical(other.image, image) || other.image == image));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Feed&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.url, url) || other.url == url)&&(identical(other.itemPreference, itemPreference) || other.itemPreference == itemPreference)&&(identical(other.image, image) || other.image == image)&&(identical(other.errorsInLast24Hours, errorsInLast24Hours) || other.errorsInLast24Hours == errorsInLast24Hours));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,url,itemPreference,image);
+int get hashCode => Object.hash(runtimeType,id,name,description,url,itemPreference,image,errorsInLast24Hours);
 
 @override
 String toString() {
-  return 'Feed(id: $id, name: $name, description: $description, url: $url, itemPreference: $itemPreference, image: $image)';
+  return 'Feed(id: $id, name: $name, description: $description, url: $url, itemPreference: $itemPreference, image: $image, errorsInLast24Hours: $errorsInLast24Hours)';
 }
 
 
@@ -251,7 +253,7 @@ abstract mixin class _$FeedCopyWith<$Res> implements $FeedCopyWith<$Res> {
   factory _$FeedCopyWith(_Feed value, $Res Function(_Feed) _then) = __$FeedCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? name, String? description, String? url, String? itemPreference, String? image
+ String? id, String? name, String? description, String? url, String? itemPreference, String? image, int errorsInLast24Hours
 });
 
 
@@ -268,7 +270,7 @@ class __$FeedCopyWithImpl<$Res>
 
 /// Create a copy of Feed
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = freezed,Object? description = freezed,Object? url = freezed,Object? itemPreference = freezed,Object? image = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = freezed,Object? description = freezed,Object? url = freezed,Object? itemPreference = freezed,Object? image = freezed,Object? errorsInLast24Hours = null,}) {
   return _then(_Feed(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -276,7 +278,8 @@ as String?,description: freezed == description ? _self.description : description
 as String?,url: freezed == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
 as String?,itemPreference: freezed == itemPreference ? _self.itemPreference : itemPreference // ignore: cast_nullable_to_non_nullable
 as String?,image: freezed == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,errorsInLast24Hours: null == errorsInLast24Hours ? _self.errorsInLast24Hours : errorsInLast24Hours // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

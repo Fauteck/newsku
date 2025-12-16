@@ -35,13 +35,15 @@ import java.util.*;
 public class FeedService {
     private final UserService userService;
     private final FeedRepository feedRepository;
+    private final FeedErrorService feedErrorService;
 
     private final Logger log = LogManager.getLogger();
 
     @Autowired
-    public FeedService(UserService userService, FeedRepository feedRepository) {
+    public FeedService(UserService userService, FeedRepository feedRepository, FeedErrorService feedErrorService) {
         this.userService = userService;
         this.feedRepository = feedRepository;
+        this.feedErrorService = feedErrorService;
     }
 
 
@@ -74,7 +76,14 @@ public class FeedService {
 
     @Transactional(readOnly = true)
     public List<Feed> getFeeds() throws SQLException {
-        return feedRepository.getFeedsByUser(userService.getCurrentUser());
+        List<Feed> feeds = feedRepository.getFeedsByUser(userService.getCurrentUser());
+
+        long to = System.currentTimeMillis();
+        long from = to - 24 * 60 * 60 * 1000;
+
+        feeds.forEach(f -> f.setErrorsInLast24Hours(feedErrorService.countErrors(f, from, to)));
+
+        return feeds;
     }
 
     @Transactional

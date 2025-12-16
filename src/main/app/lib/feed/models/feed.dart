@@ -12,6 +12,7 @@ sealed class Feed with _$Feed {
     String? url,
     String? itemPreference,
     String? image,
+    @Default(0) int errorsInLast24Hours,
   }) = _Feed;
 
   factory Feed.fromJson(Map<String, Object?> json) => _$FeedFromJson(json);

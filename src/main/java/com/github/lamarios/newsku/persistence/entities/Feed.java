@@ -2,6 +2,7 @@ package com.github.lamarios.newsku.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -16,6 +17,8 @@ public class Feed {
     @Column(name = "feed_item_preference")
     private String itemPreference;
     private String image;
+    @Transient
+    private int errorsInLast24Hours;
 
     public String getImage() {
         return image;
@@ -76,5 +79,13 @@ public class Feed {
 
     public void setItemPreference(String itemPreference) {
         this.itemPreference = itemPreference;
+    }
+
+    public int getErrorsInLast24Hours() {
+        return errorsInLast24Hours;
+    }
+
+    public void setErrorsInLast24Hours(int errorsInLast24Hours) {
+        this.errorsInLast24Hours = errorsInLast24Hours;
     }
 }

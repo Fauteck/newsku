@@ -11,6 +11,41 @@
 part of 'router.dart';
 
 /// generated route for
+/// [FeedErrorsScreen]
+class FeedErrorsRoute extends PageRouteInfo<FeedErrorsRouteArgs> {
+  FeedErrorsRoute({Key? key, required Feed feed, List<PageRouteInfo>? children})
+    : super(
+        FeedErrorsRoute.name,
+        args: FeedErrorsRouteArgs(key: key, feed: feed),
+        initialChildren: children,
+        argsEquality: false,
+      );
+
+  static const String name = 'FeedErrorsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<FeedErrorsRouteArgs>();
+      return FeedErrorsScreen(key: args.key, feed: args.feed);
+    },
+  );
+}
+
+class FeedErrorsRouteArgs {
+  const FeedErrorsRouteArgs({this.key, required this.feed});
+
+  final Key? key;
+
+  final Feed feed;
+
+  @override
+  String toString() {
+    return 'FeedErrorsRouteArgs{key: $key, feed: $feed}';
+  }
+}
+
+/// generated route for
 /// [FeedScreen]
 class FeedRoute extends PageRouteInfo<void> {
   const FeedRoute({List<PageRouteInfo>? children})

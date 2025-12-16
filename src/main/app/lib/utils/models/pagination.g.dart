@@ -11,6 +11,7 @@ _Paginated<T> _$PaginatedFromJson<T>(Map<String, dynamic> json, T Function(Objec
   totalElements: (json['totalElements'] as num?)?.toInt() ?? 0,
   totalPages: (json['totalPages'] as num?)?.toInt() ?? 0,
   numberOfElements: (json['numberOfElements'] as num?)?.toInt() ?? 0,
+  number: (json['number'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$PaginatedToJson<T>(_Paginated<T> instance, Object? Function(T value) toJsonT) =>
@@ -19,4 +20,5 @@ Map<String, dynamic> _$PaginatedToJson<T>(_Paginated<T> instance, Object? Functi
       'totalElements': instance.totalElements,
       'totalPages': instance.totalPages,
       'numberOfElements': instance.numberOfElements,
+      'number': instance.number,
     };

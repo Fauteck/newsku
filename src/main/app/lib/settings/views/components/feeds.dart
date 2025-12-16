@@ -1,9 +1,11 @@
 import 'package:app/feed/views/components/feed_image.dart';
 import 'package:app/l10n/app_localizations.dart';
+import 'package:app/router.dart';
 import 'package:app/settings/states/feeds.dart';
 import 'package:app/utils/dialog.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,6 +17,8 @@ class FeedsSettingsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     final textTheme = Theme.of(context).textTheme;
 
     final locals = AppLocalizations.of(context)!;
@@ -96,6 +100,7 @@ class FeedsSettingsTab extends StatelessWidget {
                                 itemCount: state.feeds.length,
                                 itemBuilder: (context, index) {
                                   final f = state.feeds[index];
+                                  final hasErrors = f.errorsInLast24Hours > 0;
 
                                   return ListTile(
                                     leading: ClipRRect(
@@ -104,16 +109,43 @@ class FeedsSettingsTab extends StatelessWidget {
                                     ),
                                     title: Text(f.name ?? ''),
                                     subtitle: Text(f.url ?? ''),
-                                    trailing: IconButton(
-                                      onPressed: () {
-                                        okCancelDialog(
-                                          context,
-                                          title: locals.deleteFeed,
-                                          content: Text(locals.deleteFeedMessage),
-                                          onOk: () => cubit.deleteFeed(f),
-                                        );
-                                      },
-                                      icon: Icon(Icons.delete),
+                                    trailing: Row(
+                                      mainAxisAlignment: .end,
+                                      crossAxisAlignment: .center,
+                                      mainAxisSize: .min,
+                                      children: [
+                                        Tooltip(
+                                          message: locals.inTheLast24Hours,
+                                          child: TextButton.icon(
+                                            onPressed: () => AutoRouter.of(context).push(FeedErrorsRoute(feed: f)),
+                                            icon: Icon(
+                                              hasErrors ? Icons.error_outline : Icons.check,
+                                              color: hasErrors
+                                                  ? colors.error
+                                                  : Colors.lightGreen.withValues(alpha: 0.5),
+                                            ),
+                                            label: Text(
+                                              locals.nErrors(f.errorsInLast24Hours),
+                                              style: TextStyle(
+                                                color: hasErrors
+                                                    ? colors.error
+                                                    : colors.onSurface.withValues(alpha: 0.5),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        IconButton(
+                                          onPressed: () {
+                                            okCancelDialog(
+                                              context,
+                                              title: locals.deleteFeed,
+                                              content: Text(locals.deleteFeedMessage),
+                                              onOk: () => cubit.deleteFeed(f),
+                                            );
+                                          },
+                                          icon: Icon(Icons.delete),
+                                        ),
+                                      ],
                                     ),
                                   );
                                 },

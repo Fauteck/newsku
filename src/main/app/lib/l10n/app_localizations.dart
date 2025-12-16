@@ -546,6 +546,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select block type to add to your layout'**
   String get selectBlock;
+
+  /// No description provided for @nErrors.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No errors} =1{1 error} other{{count} errors}}'**
+  String nErrors(num count);
+
+  /// No description provided for @inTheLast24Hours.
+  ///
+  /// In en, this message translates to:
+  /// **'In the last 24 hours'**
+  String get inTheLast24Hours;
+
+  /// No description provided for @feedErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{feedName} errors'**
+  String feedErrorTitle(Object feedName);
+
+  /// No description provided for @error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
+
+  /// No description provided for @stackTrace.
+  ///
+  /// In en, this message translates to:
+  /// **'Stack trace'**
+  String get stackTrace;
+
+  /// No description provided for @articleUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Article URL'**
+  String get articleUrl;
+
+  /// No description provided for @feedRetrievalError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error while querying the RSS feed URL'**
+  String get feedRetrievalError;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

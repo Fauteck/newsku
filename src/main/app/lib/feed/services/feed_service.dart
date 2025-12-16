@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:app/base_service.dart';
 import 'package:app/feed/models/feed.dart';
+import 'package:app/feed/models/feed_error.dart';
 import 'package:app/feed/models/feed_item.dart';
 import 'package:app/utils/models/pagination.dart';
 import 'package:http/http.dart' as http;
@@ -18,6 +19,26 @@ class FeedService extends BaseService {
 
     var response = await http.delete(uri, headers: await headers);
     processResponse(response);
+  }
+
+  Future<Paginated<FeedError>> getErrors({required String feedId, required int page, required int pageSize}) async {
+    var uri = await formatUrl('/api/feed-errors/$feedId', query: {'page': page, 'pageSize': pageSize});
+
+    var response = await http.get(uri, headers: await headers);
+
+    processResponse(response);
+
+    Map<String, dynamic> json = jsonDecode(response.body);
+
+    return Paginated<FeedError>.fromJson(json, (feedItem) => FeedError.fromJson(feedItem as Map<String, dynamic>));
+  }
+
+  Future<int> countLast24Hours() async {
+    var uri = await formatUrl('/api/feed-errors/24h-count');
+    var response = await http.get(uri, headers: await headers);
+    processResponse(response);
+
+    return jsonDecode(response.body);
   }
 
   Future<List<Feed>> getFeeds() async {
