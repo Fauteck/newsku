@@ -25,7 +25,7 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
   }
 
   @override
-  close() async {
+  Future<void> close() async {
     preferenceController.dispose();
     password.dispose();
     repeatPassword.dispose();

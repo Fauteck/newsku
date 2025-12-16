@@ -5,7 +5,7 @@ import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:flutter/material.dart';
 
-import 'preview_container.dart';
+import 'package:app/layouts/views/components/previews/preview_container.dart';
 
 class BigGridPictureBig extends StatelessWidget {
   final bool last;

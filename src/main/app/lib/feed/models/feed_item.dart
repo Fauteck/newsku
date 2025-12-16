@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'feed.dart';
+import 'package:app/feed/models/feed.dart';
 
 part 'feed_item.freezed.dart';
 part 'feed_item.g.dart';

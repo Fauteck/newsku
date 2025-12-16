@@ -2,10 +2,8 @@ import 'dart:math';
 
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
-import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/layouts/views/components/previews/preview_container.dart';
 import 'package:flutter/material.dart';
-
-import 'preview_container.dart';
 
 class SearchResultBig extends StatelessWidget {
   final LayoutBlock block;
@@ -16,8 +14,6 @@ class SearchResultBig extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final device = BreakPoint.get(context);
-
     final locals = AppLocalizations.of(context)!;
     return Column(
       children: [

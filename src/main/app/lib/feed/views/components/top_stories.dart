@@ -7,7 +7,7 @@ import 'package:app/layouts/models/layout_block.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
-import '../screens/feed_screen.dart';
+import 'package:app/feed/views/screens/feed_screen.dart';
 
 const double _roundImageSize = 100;
 

@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
-import 'layout_separator.dart';
+import 'package:app/settings/views/components/layout_separator.dart';
 
 @RoutePage()
 class LayoutSettingsTab extends StatelessWidget {

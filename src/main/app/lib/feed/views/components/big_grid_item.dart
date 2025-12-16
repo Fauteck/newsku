@@ -5,8 +5,8 @@ import 'package:app/feed/views/components/item_content.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
-import '../screens/feed_screen.dart';
-import 'feed_item_image.dart';
+import 'package:app/feed/views/screens/feed_screen.dart';
+import 'package:app/feed/views/components/feed_item_image.dart';
 
 class BigGridItem extends StatelessWidget {
   final FeedItem item;

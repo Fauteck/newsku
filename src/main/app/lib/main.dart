@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
 
-import 'l10n/app_localizations.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 late final _appRouter;
 

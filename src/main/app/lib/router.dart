@@ -15,8 +15,8 @@ import 'package:app/utils/utils.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 
-import 'settings/views/components/general.dart';
-import 'user/views/components/signup_form.dart';
+import 'package:app/settings/views/components/general.dart';
+import 'package:app/user/views/components/signup_form.dart';
 
 part 'router.gr.dart';
 

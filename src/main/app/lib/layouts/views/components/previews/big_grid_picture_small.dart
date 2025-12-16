@@ -1,7 +1,7 @@
 import 'package:app/layouts/models/layout_block_types.dart';
 import 'package:flutter/material.dart';
 
-import 'preview_container.dart';
+import 'package:app/layouts/views/components/previews/preview_container.dart';
 
 class BigGridPictureSmall extends StatelessWidget {
   const BigGridPictureSmall({super.key});

@@ -2,7 +2,7 @@ import 'package:app/utils/views/components/error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../models/with_error.dart';
+import 'package:app/utils/models/with_error.dart';
 
 class ErrorHandler<C extends Cubit<S>, S extends WithError> extends StatelessWidget {
   final bool showAsSnack;

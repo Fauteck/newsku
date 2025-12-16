@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:app/l10n/app_localizations.dart';
-import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/main_color_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:motor/motor.dart';
