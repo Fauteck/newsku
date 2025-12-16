@@ -1,7 +1,9 @@
 import 'package:app/home/state/local_preferences.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/router.dart';
+import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/main_color_provider.dart';
+import 'package:feedback/feedback.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,6 +22,7 @@ Future<void> main() async {
     print('${record.level.name}: ${record.time}: ${record.message}');
   });
   WidgetsFlutterBinding.ensureInitialized();
+  addAppLicense();
   var identityCubit = IdentityCubit(IdentityState());
   await identityCubit.init();
   getIt.registerSingleton<IdentityCubit>(identityCubit);
@@ -28,7 +31,7 @@ Future<void> main() async {
 
   _appRouter = AppRouter(loggedInOnStart: identityCubit.isLoggedIn);
 
-  runApp(const MyApp());
+  runApp(BetterFeedback(child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {

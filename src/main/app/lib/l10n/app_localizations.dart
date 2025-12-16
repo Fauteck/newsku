@@ -588,6 +588,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error while querying the RSS feed URL'**
   String get feedRetrievalError;
+
+  /// No description provided for @about.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// No description provided for @version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get version;
+
+  /// No description provided for @buildNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Build number'**
+  String get buildNumber;
+
+  /// No description provided for @package.
+  ///
+  /// In en, this message translates to:
+  /// **'Package'**
+  String get package;
+
+  /// No description provided for @backendVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Backend version'**
+  String get backendVersion;
+
+  /// No description provided for @licenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Show License'**
+  String get licenses;
+
+  /// No description provided for @feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Send feedback'**
+  String get feedback;
+
+  /// No description provided for @backendUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Backend URL'**
+  String get backendUrl;
+
+  /// No description provided for @submitFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit feedback'**
+  String get submitFeedback;
+
+  /// No description provided for @submitFeedbackDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Found a bug or have a suggestion? Use this tool to take screenshot of the app, annotate and submit feedback'**
+  String get submitFeedbackDescription;
+
+  /// No description provided for @feedbackDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'To submit feedback you will need a GitHub account and your screenshot will be submitted to Imgur anonymously.'**
+  String get feedbackDisclaimer;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

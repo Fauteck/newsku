@@ -118,6 +118,22 @@ class HomeRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [InfoTab]
+class InfoRoute extends PageRouteInfo<void> {
+  const InfoRoute({List<PageRouteInfo>? children})
+    : super(InfoRoute.name, initialChildren: children, argsEquality: false);
+
+  static const String name = 'InfoRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const InfoTab();
+    },
+  );
+}
+
+/// generated route for
 /// [LandingScreen]
 class LandingRoute extends PageRouteInfo<void> {
   const LandingRoute({List<PageRouteInfo>? children})

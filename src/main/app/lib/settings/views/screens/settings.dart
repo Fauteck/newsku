@@ -14,7 +14,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final locals = AppLocalizations.of(context)!;
     return AutoTabsRouter.tabBar(
-      routes: [FeedsSettingsRoute(), LayoutSettingsRoute(), GeneralSettingsRoute()],
+      routes: [FeedsSettingsRoute(), LayoutSettingsRoute(), GeneralSettingsRoute(), InfoRoute()],
       builder: (context, child, tabController) {
         return Scaffold(
           appBar: AppBar(
@@ -32,6 +32,7 @@ class SettingsScreen extends StatelessWidget {
                 Tab(text: locals.feeds, icon: Icon(Icons.rss_feed)),
                 Tab(text: locals.layout, icon: Icon(Icons.grid_view_sharp)),
                 Tab(text: locals.general, icon: Icon(Icons.settings)),
+                Tab(text: locals.about, icon: Icon(Icons.info_outline)),
               ],
             ),
           ),

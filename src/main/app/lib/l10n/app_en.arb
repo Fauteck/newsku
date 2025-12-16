@@ -81,5 +81,16 @@
     "error": "Error",
     "stackTrace": "Stack trace",
     "articleUrl": "Article URL",
-    "feedRetrievalError": "Error while querying the RSS feed URL"
+    "feedRetrievalError": "Error while querying the RSS feed URL",
+    "about": "About",
+    "version": "Version",
+    "buildNumber": "Build number",
+    "package": "Package",
+    "backendVersion": "Backend version",
+    "licenses": "Show License",
+    "feedback": "Send feedback",
+    "backendUrl": "Backend URL",
+    "submitFeedback": "Submit feedback",
+    "submitFeedbackDescription": "Found a bug or have a suggestion? Use this tool to take screenshot of the app, annotate and submit feedback",
+    "feedbackDisclaimer": "To submit feedback you will need a GitHub account and your screenshot will be submitted to Imgur anonymously."
 }

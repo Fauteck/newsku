@@ -5,6 +5,7 @@ import com.github.lamarios.newsku.services.OidcService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,13 +18,15 @@ public class ConfigController {
     private final boolean allowSignUp;
     private final String announcement;
     private final boolean demoMode;
+    private final BuildProperties buildProperties;
 
     @Autowired
-    public ConfigController(OidcService oidcService, @Value("${ALLOW_SIGNUP:0}") boolean allowSignUp, @Value("${ANNOUNCEMENT:}") String announcement, @Value("${DEMO_MODE:0}") boolean demoMode) {
+    public ConfigController(OidcService oidcService, @Value("${ALLOW_SIGNUP:0}") boolean allowSignUp, @Value("${ANNOUNCEMENT:}") String announcement, @Value("${DEMO_MODE:0}") boolean demoMode, BuildProperties buildProperties) {
         this.oidcService = oidcService;
         this.allowSignUp = allowSignUp;
         this.announcement = announcement;
         this.demoMode = demoMode;
+        this.buildProperties = buildProperties;
     }
 
     @GetMapping
@@ -32,6 +35,8 @@ public class ConfigController {
         config.setAnnouncement(announcement);
         config.setAllowSignup(allowSignUp);
         config.setDemoMode(demoMode);
+
+        config.setBackendVersion(buildProperties.getVersion());
 
         if (oidcService.getOidcDiscoveryUrl() != null) {
             config.setOidcConfig(oidcService.getOidcConfig());

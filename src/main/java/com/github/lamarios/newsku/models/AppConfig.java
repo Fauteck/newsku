@@ -5,6 +5,7 @@ public class AppConfig {
     private OIDCConfig oidcConfig;
     private String announcement;
     private boolean demoMode;
+    private String backendVersion;
 
     public String getAnnouncement() {
         return announcement;
@@ -36,5 +37,13 @@ public class AppConfig {
 
     public void setDemoMode(boolean demoMode) {
         this.demoMode = demoMode;
+    }
+
+    public String getBackendVersion() {
+        return backendVersion;
+    }
+
+    public void setBackendVersion(String backendVersion) {
+        this.backendVersion = backendVersion;
     }
 }

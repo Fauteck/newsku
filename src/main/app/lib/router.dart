@@ -6,6 +6,7 @@ import 'package:app/home/views/screens/home.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
 import 'package:app/settings/views/components/feeds.dart';
+import 'package:app/settings/views/components/info.dart';
 import 'package:app/settings/views/components/layout.dart';
 import 'package:app/settings/views/screens/feed_errors.dart';
 import 'package:app/settings/views/screens/settings.dart';
@@ -62,6 +63,7 @@ class AppRouter extends RootStackRouter {
           AutoRoute(page: FeedsSettingsRoute.page, initial: true),
           AutoRoute(page: LayoutSettingsRoute.page),
           AutoRoute(page: GeneralSettingsRoute.page),
+          AutoRoute(page: InfoRoute.page),
         ],
       ),
       AutoRoute(

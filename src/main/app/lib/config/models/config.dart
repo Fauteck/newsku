@@ -8,6 +8,7 @@ part 'config.g.dart';
 sealed class Config with _$Config {
   const factory Config({
     @Default(false) bool demoMode,
+    required String backendVersion,
     required bool allowSignup,
     OidcConfig? oidcConfig,
     @Default("") String announcement,

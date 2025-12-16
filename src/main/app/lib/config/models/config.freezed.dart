@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Config {
 
- bool get demoMode; bool get allowSignup; OidcConfig? get oidcConfig; String get announcement;
+ bool get demoMode; String get backendVersion; bool get allowSignup; OidcConfig? get oidcConfig; String get announcement;
 /// Create a copy of Config
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $ConfigCopyWith<Config> get copyWith => _$ConfigCopyWithImpl<Config>(this as Con
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Config&&(identical(other.demoMode, demoMode) || other.demoMode == demoMode)&&(identical(other.allowSignup, allowSignup) || other.allowSignup == allowSignup)&&(identical(other.oidcConfig, oidcConfig) || other.oidcConfig == oidcConfig)&&(identical(other.announcement, announcement) || other.announcement == announcement));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Config&&(identical(other.demoMode, demoMode) || other.demoMode == demoMode)&&(identical(other.backendVersion, backendVersion) || other.backendVersion == backendVersion)&&(identical(other.allowSignup, allowSignup) || other.allowSignup == allowSignup)&&(identical(other.oidcConfig, oidcConfig) || other.oidcConfig == oidcConfig)&&(identical(other.announcement, announcement) || other.announcement == announcement));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,demoMode,allowSignup,oidcConfig,announcement);
+int get hashCode => Object.hash(runtimeType,demoMode,backendVersion,allowSignup,oidcConfig,announcement);
 
 @override
 String toString() {
-  return 'Config(demoMode: $demoMode, allowSignup: $allowSignup, oidcConfig: $oidcConfig, announcement: $announcement)';
+  return 'Config(demoMode: $demoMode, backendVersion: $backendVersion, allowSignup: $allowSignup, oidcConfig: $oidcConfig, announcement: $announcement)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $ConfigCopyWith<$Res>  {
   factory $ConfigCopyWith(Config value, $Res Function(Config) _then) = _$ConfigCopyWithImpl;
 @useResult
 $Res call({
- bool demoMode, bool allowSignup, OidcConfig? oidcConfig, String announcement
+ bool demoMode, String backendVersion, bool allowSignup, OidcConfig? oidcConfig, String announcement
 });
 
 
@@ -65,10 +65,11 @@ class _$ConfigCopyWithImpl<$Res>
 
 /// Create a copy of Config
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? demoMode = null,Object? allowSignup = null,Object? oidcConfig = freezed,Object? announcement = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? demoMode = null,Object? backendVersion = null,Object? allowSignup = null,Object? oidcConfig = freezed,Object? announcement = null,}) {
   return _then(_self.copyWith(
 demoMode: null == demoMode ? _self.demoMode : demoMode // ignore: cast_nullable_to_non_nullable
-as bool,allowSignup: null == allowSignup ? _self.allowSignup : allowSignup // ignore: cast_nullable_to_non_nullable
+as bool,backendVersion: null == backendVersion ? _self.backendVersion : backendVersion // ignore: cast_nullable_to_non_nullable
+as String,allowSignup: null == allowSignup ? _self.allowSignup : allowSignup // ignore: cast_nullable_to_non_nullable
 as bool,oidcConfig: freezed == oidcConfig ? _self.oidcConfig : oidcConfig // ignore: cast_nullable_to_non_nullable
 as OidcConfig?,announcement: null == announcement ? _self.announcement : announcement // ignore: cast_nullable_to_non_nullable
 as String,
@@ -165,10 +166,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool demoMode,  bool allowSignup,  OidcConfig? oidcConfig,  String announcement)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool demoMode,  String backendVersion,  bool allowSignup,  OidcConfig? oidcConfig,  String announcement)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Config() when $default != null:
-return $default(_that.demoMode,_that.allowSignup,_that.oidcConfig,_that.announcement);case _:
+return $default(_that.demoMode,_that.backendVersion,_that.allowSignup,_that.oidcConfig,_that.announcement);case _:
   return orElse();
 
 }
@@ -186,10 +187,10 @@ return $default(_that.demoMode,_that.allowSignup,_that.oidcConfig,_that.announce
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool demoMode,  bool allowSignup,  OidcConfig? oidcConfig,  String announcement)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool demoMode,  String backendVersion,  bool allowSignup,  OidcConfig? oidcConfig,  String announcement)  $default,) {final _that = this;
 switch (_that) {
 case _Config():
-return $default(_that.demoMode,_that.allowSignup,_that.oidcConfig,_that.announcement);}
+return $default(_that.demoMode,_that.backendVersion,_that.allowSignup,_that.oidcConfig,_that.announcement);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -203,10 +204,10 @@ return $default(_that.demoMode,_that.allowSignup,_that.oidcConfig,_that.announce
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool demoMode,  bool allowSignup,  OidcConfig? oidcConfig,  String announcement)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool demoMode,  String backendVersion,  bool allowSignup,  OidcConfig? oidcConfig,  String announcement)?  $default,) {final _that = this;
 switch (_that) {
 case _Config() when $default != null:
-return $default(_that.demoMode,_that.allowSignup,_that.oidcConfig,_that.announcement);case _:
+return $default(_that.demoMode,_that.backendVersion,_that.allowSignup,_that.oidcConfig,_that.announcement);case _:
   return null;
 
 }
@@ -218,10 +219,11 @@ return $default(_that.demoMode,_that.allowSignup,_that.oidcConfig,_that.announce
 @JsonSerializable()
 
 class _Config implements Config {
-  const _Config({this.demoMode = false, required this.allowSignup, this.oidcConfig, this.announcement = ""});
+  const _Config({this.demoMode = false, required this.backendVersion, required this.allowSignup, this.oidcConfig, this.announcement = ""});
   factory _Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
 
 @override@JsonKey() final  bool demoMode;
+@override final  String backendVersion;
 @override final  bool allowSignup;
 @override final  OidcConfig? oidcConfig;
 @override@JsonKey() final  String announcement;
@@ -239,16 +241,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Config&&(identical(other.demoMode, demoMode) || other.demoMode == demoMode)&&(identical(other.allowSignup, allowSignup) || other.allowSignup == allowSignup)&&(identical(other.oidcConfig, oidcConfig) || other.oidcConfig == oidcConfig)&&(identical(other.announcement, announcement) || other.announcement == announcement));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Config&&(identical(other.demoMode, demoMode) || other.demoMode == demoMode)&&(identical(other.backendVersion, backendVersion) || other.backendVersion == backendVersion)&&(identical(other.allowSignup, allowSignup) || other.allowSignup == allowSignup)&&(identical(other.oidcConfig, oidcConfig) || other.oidcConfig == oidcConfig)&&(identical(other.announcement, announcement) || other.announcement == announcement));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,demoMode,allowSignup,oidcConfig,announcement);
+int get hashCode => Object.hash(runtimeType,demoMode,backendVersion,allowSignup,oidcConfig,announcement);
 
 @override
 String toString() {
-  return 'Config(demoMode: $demoMode, allowSignup: $allowSignup, oidcConfig: $oidcConfig, announcement: $announcement)';
+  return 'Config(demoMode: $demoMode, backendVersion: $backendVersion, allowSignup: $allowSignup, oidcConfig: $oidcConfig, announcement: $announcement)';
 }
 
 
@@ -259,7 +261,7 @@ abstract mixin class _$ConfigCopyWith<$Res> implements $ConfigCopyWith<$Res> {
   factory _$ConfigCopyWith(_Config value, $Res Function(_Config) _then) = __$ConfigCopyWithImpl;
 @override @useResult
 $Res call({
- bool demoMode, bool allowSignup, OidcConfig? oidcConfig, String announcement
+ bool demoMode, String backendVersion, bool allowSignup, OidcConfig? oidcConfig, String announcement
 });
 
 
@@ -276,10 +278,11 @@ class __$ConfigCopyWithImpl<$Res>
 
 /// Create a copy of Config
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? demoMode = null,Object? allowSignup = null,Object? oidcConfig = freezed,Object? announcement = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? demoMode = null,Object? backendVersion = null,Object? allowSignup = null,Object? oidcConfig = freezed,Object? announcement = null,}) {
   return _then(_Config(
 demoMode: null == demoMode ? _self.demoMode : demoMode // ignore: cast_nullable_to_non_nullable
-as bool,allowSignup: null == allowSignup ? _self.allowSignup : allowSignup // ignore: cast_nullable_to_non_nullable
+as bool,backendVersion: null == backendVersion ? _self.backendVersion : backendVersion // ignore: cast_nullable_to_non_nullable
+as String,allowSignup: null == allowSignup ? _self.allowSignup : allowSignup // ignore: cast_nullable_to_non_nullable
 as bool,oidcConfig: freezed == oidcConfig ? _self.oidcConfig : oidcConfig // ignore: cast_nullable_to_non_nullable
 as OidcConfig?,announcement: null == announcement ? _self.announcement : announcement // ignore: cast_nullable_to_non_nullable
 as String,

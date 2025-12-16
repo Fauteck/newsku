@@ -309,4 +309,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get feedRetrievalError => 'Error while querying the RSS feed URL';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get version => 'Version';
+
+  @override
+  String get buildNumber => 'Build number';
+
+  @override
+  String get package => 'Package';
+
+  @override
+  String get backendVersion => 'Backend version';
+
+  @override
+  String get licenses => 'Show License';
+
+  @override
+  String get feedback => 'Send feedback';
+
+  @override
+  String get backendUrl => 'Backend URL';
+
+  @override
+  String get submitFeedback => 'Submit feedback';
+
+  @override
+  String get submitFeedbackDescription =>
+      'Found a bug or have a suggestion? Use this tool to take screenshot of the app, annotate and submit feedback';
+
+  @override
+  String get feedbackDisclaimer =>
+      'To submit feedback you will need a GitHub account and your screenshot will be submitted to Imgur anonymously.';
 }
