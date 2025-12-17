@@ -3,6 +3,7 @@ import 'package:app/feed/views/components/clickable_feed_item.dart';
 import 'package:app/feed/views/components/feed_item_image.dart';
 import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
+import 'package:app/feed/views/components/item_title.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ class SearchResult extends StatelessWidget {
       child: ClickableFeedItem(
         noDimming: noDimming,
         item: item,
-        child: Row(
+        builder: (hovered) => Row(
           crossAxisAlignment: .center,
           children: [
             FeedItemImage(
@@ -40,8 +41,9 @@ class SearchResult extends StatelessWidget {
                 crossAxisAlignment: .stretch,
                 spacing: pu2,
                 children: [
-                  Text(
-                    item.title ?? '',
+                  ItemTitle(
+                    item: item,
+                    hovered: hovered,
                     style: breakPoint == .mobile ? textTheme.titleMedium : textTheme.headlineSmall,
                     maxLines: 2,
                     overflow: .ellipsis,

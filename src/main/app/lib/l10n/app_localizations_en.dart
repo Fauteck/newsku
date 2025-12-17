@@ -210,7 +210,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get readItemHandlingExplanation =>
-      'While you scroll through the feed, items will be set as read. You can make the feed item dim for the next time you visit your feed';
+      'While you scroll through the feed, items will be set as read. Select how you want to handle the read items in your feed';
 
   @override
   String get appColor => 'App color';
@@ -242,9 +242,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String itemHandlingLabel(String handling) {
     String _temp0 = intl.Intl.selectLogic(handling, {
-      'none': 'None',
+      'none': 'Display normally',
       'dim': 'Dim',
       'hide': 'Hide',
+      'unreadFirstThenDim': 'Unread first then dim',
       'other': 'No handling selected',
     });
     return '$_temp0';

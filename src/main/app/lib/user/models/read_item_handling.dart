@@ -4,7 +4,8 @@ import 'package:flutter/cupertino.dart';
 enum ReadItemHandling {
   none,
   dim,
-  hide;
+  hide,
+  unreadFirstThenDim;
 
   String getLabel(BuildContext context) {
     final locals = AppLocalizations.of(context)!;

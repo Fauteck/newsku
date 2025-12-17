@@ -2,6 +2,7 @@ import 'package:app/feed/models/feed_item.dart';
 import 'package:app/feed/views/components/clickable_feed_item.dart';
 import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
+import 'package:app/feed/views/components/item_title.dart';
 import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +20,7 @@ class BigGridPictureItem extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return ClickableFeedItem(
       item: item,
-      child: ClipRRect(
+      builder: (hovered) => ClipRRect(
         borderRadius: .circular(10),
         child: Container(
           decoration: BoxDecoration(color: colors.surfaceContainerHigh, borderRadius: .circular(feedItemBorderRadius)),
@@ -48,9 +49,10 @@ class BigGridPictureItem extends StatelessWidget {
                     mainAxisAlignment: .end,
                     crossAxisAlignment: .stretch,
                     children: [
-                      Text(
-                        item.title ?? '',
-                        style: textTheme.headlineSmall?.copyWith(height: 1.4),
+                      ItemTitle(
+                        item: item,
+                        hovered: hovered,
+                        style: textTheme.headlineSmall,
                         maxLines: 3,
                         overflow: .ellipsis,
                       ),

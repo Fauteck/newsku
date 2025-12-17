@@ -12,15 +12,16 @@ import 'package:visibility_detector/visibility_detector.dart';
 
 class ClickableFeedItem extends StatelessWidget {
   final FeedItem item;
-  final Widget child;
+  final Widget Function(bool hovered) builder;
   final bool noDimming;
 
-  const ClickableFeedItem({super.key, required this.item, required this.child, this.noDimming = false});
+  const ClickableFeedItem({super.key, required this.item, required this.builder, this.noDimming = false});
 
   @override
   Widget build(BuildContext context) {
     return SimpleCubitView<bool>(
       builder: (context, hovered) {
+        var currentUser = context.read<IdentityCubit>().currentUser;
         return MouseRegion(
           cursor: SystemMouseCursors.click,
           onEnter: (event) => context.read<SimpleCubit<bool>>().setValue(true),
@@ -28,9 +29,12 @@ class ClickableFeedItem extends StatelessWidget {
 
           child: ConditionalWrap(
             wrapIf: item.read,
-            wrapper: (child) => !noDimming && context.read<IdentityCubit>().currentUser?.readItemHandling == .dim
-                ? Opacity(opacity: 0.5, child: child)
-                : child,
+            wrapper: (child) {
+              return !noDimming &&
+                      (currentUser?.readItemHandling == .dim || currentUser?.readItemHandling == .unreadFirstThenDim)
+                  ? Opacity(opacity: 0.5, child: child)
+                  : child;
+            },
             wrapElse: (child) => VisibilityDetector(
               key: ValueKey(item.id),
               onVisibilityChanged: (VisibilityInfo info) {
@@ -40,16 +44,7 @@ class ClickableFeedItem extends StatelessWidget {
               },
               child: child,
             ),
-            child: SingleMotionBuilder(
-              motion: MaterialSpringMotion.expressiveSpatialDefault(),
-              from: 1,
-              value: hovered ? 1.02 : 1,
-              builder: (context, value, child) => Opacity(
-                opacity: value.clamp(0, 1),
-                child: Transform.scale(scale: value, child: child),
-              ),
-              child: GestureDetector(onTap: () => launchUrl(Uri.parse(item.url!)), child: child),
-            ),
+            child: GestureDetector(onTap: () => launchUrl(Uri.parse(item.url!)), child: builder(hovered)),
           ),
         );
       },

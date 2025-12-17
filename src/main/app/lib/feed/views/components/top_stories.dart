@@ -3,6 +3,7 @@ import 'package:app/feed/views/components/clickable_feed_item.dart';
 import 'package:app/feed/views/components/feed_item_image.dart';
 import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
+import 'package:app/feed/views/components/item_title.dart';
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +59,7 @@ class TopStories extends StatelessWidget {
                   .map(
                     (e) => ClickableFeedItem(
                       item: e.$2,
-                      child: Column(
+                      builder: (hovered) => Column(
                         children: [
                           Row(
                             spacing: pu6,
@@ -74,8 +75,9 @@ class TopStories extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: .stretch,
                                   children: [
-                                    Text(
-                                      e.$2.title ?? '',
+                                    ItemTitle(
+                                      item: e.$2,
+                                      hovered: hovered,
                                       style: textTheme.headlineMedium?.copyWith(height: 1.4),
                                       maxLines: 2,
                                       overflow: .ellipsis,
@@ -107,15 +109,16 @@ class TopStories extends StatelessWidget {
             Expanded(
               child: ClickableFeedItem(
                 item: items.first,
-                child: Column(
+                builder: (hovered) => Column(
                   mainAxisSize: .min,
                   crossAxisAlignment: .stretch,
                   mainAxisAlignment: .start,
                   spacing: pu6,
                   children: [
                     FeedItemImage(item: items.first, height: 200, borderRadius: .circular(feedItemBorderRadius)),
-                    Text(
-                      items.first.title ?? '',
+                    ItemTitle(
+                      item: items.first,
+                      hovered: hovered,
                       style: textTheme.headlineLarge?.copyWith(height: 1.4),
                       maxLines: 3,
                       overflow: .ellipsis,

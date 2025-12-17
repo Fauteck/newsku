@@ -34,4 +34,5 @@ const _$ReadItemHandlingEnumMap = {
   ReadItemHandling.none: 'none',
   ReadItemHandling.dim: 'dim',
   ReadItemHandling.hide: 'hide',
+  ReadItemHandling.unreadFirstThenDim: 'unreadFirstThenDim',
 };

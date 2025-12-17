@@ -3,6 +3,7 @@ import 'package:app/feed/views/components/clickable_feed_item.dart';
 import 'package:app/feed/views/components/feed_item_image.dart';
 import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
+import 'package:app/feed/views/components/item_title.dart';
 import 'package:app/feed/views/screens/feed_screen.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
@@ -19,7 +20,7 @@ class SmallGridItem extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return ClickableFeedItem(
       item: item,
-      child: Container(
+      builder: (hovered) => Container(
         // constraints: BoxConstraints(maxHeight: 100),
         // margin: .only(top: 16),
         decoration: BoxDecoration(color: colors.surfaceContainerHigh, borderRadius: .circular(feedItemBorderRadius)),
@@ -33,7 +34,13 @@ class SmallGridItem extends StatelessWidget {
                   crossAxisAlignment: .stretch,
                   spacing: pu,
                   children: [
-                    Text(item.title ?? '', style: textTheme.bodyLarge, overflow: .ellipsis, maxLines: 2),
+                    ItemTitle(
+                      item: item,
+                      hovered: hovered,
+                      style: textTheme.bodyLarge,
+                      overflow: .ellipsis,
+                      maxLines: 2,
+                    ),
                     Expanded(
                       child: Align(
                         alignment: .centerLeft,

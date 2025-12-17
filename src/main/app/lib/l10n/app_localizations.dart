@@ -430,7 +430,7 @@ abstract class AppLocalizations {
   /// No description provided for @readItemHandlingExplanation.
   ///
   /// In en, this message translates to:
-  /// **'While you scroll through the feed, items will be set as read. You can make the feed item dim for the next time you visit your feed'**
+  /// **'While you scroll through the feed, items will be set as read. Select how you want to handle the read items in your feed'**
   String get readItemHandlingExplanation;
 
   /// No description provided for @appColor.
@@ -490,7 +490,7 @@ abstract class AppLocalizations {
   /// No description provided for @itemHandlingLabel.
   ///
   /// In en, this message translates to:
-  /// **'{handling, select, none{None} dim{Dim} hide{Hide} other{No handling selected}}'**
+  /// **'{handling, select, none{Display normally} dim{Dim} hide{Hide} unreadFirstThenDim{Unread first then dim} other{No handling selected}}'**
   String itemHandlingLabel(String handling);
 
   /// No description provided for @next.

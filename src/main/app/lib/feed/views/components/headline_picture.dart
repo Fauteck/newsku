@@ -3,6 +3,7 @@ import 'package:app/feed/views/components/clickable_feed_item.dart';
 import 'package:app/feed/views/components/feed_item_image.dart';
 import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
+import 'package:app/feed/views/components/item_title.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,7 @@ class HeadlinePicture extends StatelessWidget {
 
     return ClickableFeedItem(
       item: item,
-      child: ClipRRect(
+      builder: (hovered) => ClipRRect(
         borderRadius: .circular(10),
         child: Stack(
           children: [
@@ -53,7 +54,7 @@ class HeadlinePicture extends StatelessWidget {
                   mainAxisAlignment: .end,
                   crossAxisAlignment: .stretch,
                   children: [
-                    Text(item.title ?? ' ', style: textTheme.displaySmall),
+                    ItemTitle(item: item, hovered: hovered, style: textTheme.displaySmall),
                     Gap(pu2),
                     ItemContent(item: item, maxLines: 1, overflow: .ellipsis, style: textTheme.bodyLarge),
                     Gap(pu4),

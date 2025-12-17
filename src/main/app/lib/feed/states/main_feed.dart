@@ -73,7 +73,8 @@ class MainFeedCubit extends Cubit<MainFeedState> {
   Future<void> getFeed() async {
     try {
       emit(state.copyWith(loading: true));
-      var service = FeedService(getIt.get<IdentityCubit>().state.serverUrl ?? '');
+      var identityCubit = getIt.get<IdentityCubit>();
+      var service = FeedService(identityCubit.state.serverUrl ?? '');
 
       final now = state.currentTime;
       final from = now.add(-state.timeBlock.duration);
@@ -85,6 +86,19 @@ class MainFeedCubit extends Cubit<MainFeedState> {
             .getFeedItems(page: 0, pageSize: 999999, from: from.millisecondsSinceEpoch, to: now.millisecondsSinceEpoch)
             .then((value) => value.content),
       );
+
+      // if required, we sort by read status then by the importance
+      if (identityCubit.currentUser?.readItemHandling == .unreadFirstThenDim) {
+        data.sort((a, b) {
+          final readSort = (a.read == b.read ? 0 : (a.read ? 1 : -1));
+
+          if (readSort == 0) {
+            return b.importance.compareTo(a.importance);
+          } else {
+            return readSort;
+          }
+        });
+      }
 
       // we need to sort the data into the headlines and stuff
       var map = Map<DateTimeRange, List<FeedItem>>.from(state.items);
