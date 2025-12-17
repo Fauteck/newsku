@@ -4,6 +4,7 @@ import 'package:app/identity/states/identity.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/router.dart';
 import 'package:app/user/states/server_url.dart';
+import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/app_logo.dart';
 import 'package:app/utils/views/components/app_name.dart';
 import 'package:auto_route/auto_route.dart';
@@ -41,20 +42,20 @@ class ServerUrlScreen extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: .center,
                   mainAxisAlignment: .center,
-                  spacing: 16,
+                  spacing: pu4,
                   children: [
                     AppLogo(size: 40),
                     AppName(style: textTheme.displayMedium, alignment: .center),
                   ],
                 ),
               ),
-              Gap(32),
+              Gap(pu8),
               Align(alignment: .centerLeft, child: Text(locals.server)),
               TextField(
                 onChanged: (value) => cubit.setUrl(value),
                 decoration: InputDecoration(error: state.error ? Text(locals.serverUrlUnreachable) : null),
               ),
-              Gap(8),
+              Gap(pu2),
               Align(
                 alignment: .centerRight,
                 child: FilledButton.tonalIcon(

@@ -4,6 +4,7 @@ import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/layouts/views/components/previews/preview_container.dart';
 import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class BigGridBig extends StatelessWidget {
@@ -66,7 +67,7 @@ class _GridItem extends StatelessWidget {
     final device = BreakPoint.get(context);
 
     return Column(
-      spacing: 4,
+      spacing: pu,
       children: [
         PreviewContainer(height: device == .mobile ? 30 : 50, borderRadius: .circular(5)),
         PreviewContainer(height: device == .mobile ? 8 : 12, borderRadius: .circular(5)),

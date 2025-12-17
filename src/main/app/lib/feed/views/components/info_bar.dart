@@ -3,6 +3,7 @@ import 'package:app/feed/views/components/feed_image.dart';
 import 'package:app/feed/views/screens/feed_screen.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/utils/dialog.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class InfoBar extends StatelessWidget {
@@ -17,7 +18,7 @@ class InfoBar extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final locals = AppLocalizations.of(context)!;
     return Row(
-      spacing: 8,
+      spacing: pu2,
       children: [
         ClipRRect(
           borderRadius: .circular(20),
@@ -47,13 +48,13 @@ class InfoBar extends StatelessWidget {
           ),
           child: Container(
             decoration: BoxDecoration(color: colors.secondaryContainer, borderRadius: .circular(20)),
-            padding: .symmetric(vertical: 2, horizontal: 8),
+            padding: .symmetric(vertical: pu, horizontal: pu2),
             child: Row(
-              spacing: 4,
+              spacing: pu,
               crossAxisAlignment: .center,
               children: [
                 Row(
-                  spacing: 4,
+                  spacing: pu,
                   children: [
                     Icon(Icons.label_important_outline, size: 12),
                     Text(item.importance.toStringAsFixed(0), style: textTheme.labelSmall),

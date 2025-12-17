@@ -16,10 +16,10 @@ class LlmPreference extends StatelessWidget {
     var identityCubit = context.read<IdentityCubit>();
     var currentUser = identityCubit.currentUser;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      padding: const EdgeInsets.symmetric(horizontal: pu6),
       child: Column(
         mainAxisSize: .min,
-        spacing: 16,
+        spacing: pu4,
         children: [
           Text(locals.articlePreferencesExplanation),
           TextFormField(

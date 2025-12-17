@@ -34,7 +34,7 @@ class FeedService extends BaseService {
   }
 
   Future<int> countLast24Hours() async {
-    var uri = await formatUrl('/api/feed-errors/24h-count');
+    var uri = await formatUrl('/api/feed-errors/last-refresh-count');
     var response = await http.get(uri, headers: await headers);
     processResponse(response);
 

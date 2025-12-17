@@ -2,6 +2,7 @@ package com.github.lamarios.newsku.controllers;
 
 import com.github.lamarios.newsku.persistence.entities.FeedItem;
 import com.github.lamarios.newsku.services.FeedItemService;
+import com.github.lamarios.newsku.utils.ImageHelper;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.logging.log4j.LogManager;
@@ -49,7 +50,7 @@ public class FeedItemController {
     }
 
     @PostMapping("/read")
-    public boolean readArticles(@RequestBody List<String> ids){
+    public boolean readArticles(@RequestBody List<String> ids) {
         log.info("Changing read status of {} items", ids.size());
         return feedItemService.readItems(ids);
     }
@@ -67,12 +68,7 @@ public class FeedItemController {
 
         if (!filePath.toFile().exists()) {
             log.info("File doesn't exist in cache, caching it...");
-            try (InputStream in = new URL(item.getImageUrl()).openStream()) {
-                byte[] imageBytes = in.readAllBytes();
-
-                Files.write(filePath, imageBytes);
-                // Guess content type
-            }
+            ImageHelper.downloadImageToPath(item.getImageUrl(), filePath);
         } else {
             log.info("Serving from cache");
         }

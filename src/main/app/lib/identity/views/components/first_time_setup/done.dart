@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:app/l10n/app_localizations.dart';
+import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/main_color_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:motor/motor.dart';
@@ -24,11 +25,11 @@ class Done extends StatelessWidget {
             child: Transform.scale(scale: lerpDouble(0.9, 1, value), child: child),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(pu6),
             child: Column(
               crossAxisAlignment: .center,
               mainAxisAlignment: .center,
-              spacing: 32,
+              spacing: pu8,
               children: [
                 Text(locals.setupComplete, style: textTheme.displaySmall),
                 Icon(Icons.check, size: 100, color: color),

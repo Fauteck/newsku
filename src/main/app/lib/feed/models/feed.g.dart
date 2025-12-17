@@ -13,7 +13,7 @@ _Feed _$FeedFromJson(Map<String, dynamic> json) => _Feed(
   url: json['url'] as String?,
   itemPreference: json['itemPreference'] as String?,
   image: json['image'] as String?,
-  errorsInLast24Hours: (json['errorsInLast24Hours'] as num?)?.toInt() ?? 0,
+  lastRefreshErrors: (json['lastRefreshErrors'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$FeedToJson(_Feed instance) => <String, dynamic>{
@@ -23,5 +23,5 @@ Map<String, dynamic> _$FeedToJson(_Feed instance) => <String, dynamic>{
   'url': instance.url,
   'itemPreference': instance.itemPreference,
   'image': instance.image,
-  'errorsInLast24Hours': instance.errorsInLast24Hours,
+  'lastRefreshErrors': instance.lastRefreshErrors,
 };

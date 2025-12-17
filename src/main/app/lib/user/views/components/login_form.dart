@@ -27,7 +27,7 @@ class LoginFormScreen extends StatelessWidget {
           final config = context.read<IdentityCubit>().state.config;
           return ErrorHandler<LoginCubit, LoginState>(
             child: Padding(
-              padding: .only(right: 24),
+              padding: .only(right: pu6),
               child: Column(
                 crossAxisAlignment: .center,
                 mainAxisAlignment: .center,
@@ -38,7 +38,7 @@ class LoginFormScreen extends StatelessWidget {
                     autofillHints: [AutofillHints.username],
                     autocorrect: false,
                   ),
-                  Gap(16),
+                  Gap(pu4),
                   Align(alignment: .centerLeft, child: Text(locals.password)),
                   TextField(
                     obscureText: true,
@@ -47,11 +47,11 @@ class LoginFormScreen extends StatelessWidget {
                     autocorrect: false,
                   ),
                   if (state.failedLogin) ...[
-                    Gap(16),
+                    Gap(pu4),
                     Text(locals.invalidCredentials, style: textTheme.bodyMedium?.copyWith(color: colors.error)),
-                    Gap(16),
+                    Gap(pu4),
                   ],
-                  Gap(16),
+                  Gap(pu4),
                   Row(
                     mainAxisAlignment: .spaceBetween,
                     children: [
@@ -87,7 +87,7 @@ class LoginFormScreen extends StatelessWidget {
                   ),
                   if (config?.oidcConfig != null) ...[
                     Text(locals.or),
-                    Gap(8),
+                    Gap(pu2),
                     FilledButton.tonal(
                       onPressed: () async {
                         final token = await cubit.logInWithOidc();

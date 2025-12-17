@@ -1,5 +1,6 @@
 import 'package:app/layouts/models/layout_block_types.dart';
 import 'package:app/layouts/views/components/previews/preview_container.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class HeadlineSmall extends StatelessWidget {
@@ -10,7 +11,7 @@ class HeadlineSmall extends StatelessWidget {
     return SizedBox(
       width: smallPreviewSize,
       child: Column(
-        spacing: 4,
+        spacing: pu,
         children: [
           PreviewContainer(width: smallPreviewSize, height: smallPreviewSize / 3, borderRadius: .circular(5)),
 

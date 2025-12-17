@@ -5,6 +5,7 @@ import be.ceau.opml.OpmlWriteException;
 import com.github.lamarios.newsku.persistence.entities.Feed;
 import com.github.lamarios.newsku.services.FeedItemService;
 import com.github.lamarios.newsku.services.FeedService;
+import com.github.lamarios.newsku.utils.ImageHelper;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.io.IOUtils;
@@ -123,12 +124,7 @@ public class FeedController {
 
         if (!filePath.toFile().exists()) {
             log.info("File doesn't exist in cache, caching it...");
-            try (InputStream in = new URL(item.getImage()).openStream()) {
-                byte[] imageBytes = in.readAllBytes();
-
-                Files.write(filePath, imageBytes);
-                // Guess content type
-            }
+            ImageHelper.downloadImageToPath(item.getImage(), filePath);
         } else {
             log.info("Serving from cache");
         }

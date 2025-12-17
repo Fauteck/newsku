@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 import 'package:app/layouts/views/components/previews/preview_container.dart';
@@ -70,10 +71,10 @@ class _GridItem extends StatelessWidget {
     return PreviewContainer(
       borderRadius: .circular(10),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(pu2),
         child: Column(
           mainAxisAlignment: .end,
-          spacing: 4,
+          spacing: pu,
           children: [
             PreviewContainer(color: colors.surface, height: device == .mobile ? 8 : 12, borderRadius: .circular(5)),
             PreviewContainer(color: colors.surface, height: device == .mobile ? 5 : 7, borderRadius: .circular(5)),

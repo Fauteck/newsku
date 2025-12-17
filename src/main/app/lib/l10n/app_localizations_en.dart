@@ -291,7 +291,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get inTheLast24Hours => 'In the last 24 hours';
+  String get duringLastRefreshAttempt => 'During last refresh attempt';
 
   @override
   String feedErrorTitle(Object feedName) {

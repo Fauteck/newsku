@@ -1,4 +1,5 @@
 import 'package:app/layouts/models/layout_block_types.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 import 'package:app/layouts/views/components/previews/preview_container.dart';
@@ -33,10 +34,10 @@ class _GridItem extends StatelessWidget {
     return PreviewContainer(
       borderRadius: .circular(5),
       child: Padding(
-        padding: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.all(pu),
         child: Column(
           mainAxisAlignment: .end,
-          spacing: 2,
+          spacing: pu / 2,
           children: [
             PreviewContainer(color: colors.surface, height: 5, borderRadius: .circular(5)),
             PreviewContainer(color: colors.surface, height: 2, borderRadius: .circular(5)),

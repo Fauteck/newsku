@@ -4,6 +4,17 @@ import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
 import 'package:flutter/foundation.dart';
 
+const double pu = 4;
+const double pu1 = pu * 1;
+const double pu2 = pu * 2;
+const double pu3 = pu * 3;
+const double pu4 = pu * 4;
+const double pu5 = pu * 5;
+const double pu6 = pu * 6;
+const double pu7 = pu * 7;
+const double pu8 = pu * 8;
+const double pu9 = pu * 9;
+
 String? get serverUrl => getIt.get<IdentityCubit>().state.serverUrl;
 
 LocalPreferencesState get localPreferences => getIt.get<LocalPreferencesCubit>().state;

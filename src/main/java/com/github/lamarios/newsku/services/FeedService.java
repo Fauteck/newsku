@@ -8,10 +8,9 @@ import be.ceau.opml.entity.Body;
 import be.ceau.opml.entity.Head;
 import be.ceau.opml.entity.Opml;
 import be.ceau.opml.entity.Outline;
-import com.apptasticsoftware.rssreader.Image;
-import com.apptasticsoftware.rssreader.Item;
-import com.apptasticsoftware.rssreader.RssReader;
+import com.apptasticsoftware.rssreader.*;
 import com.apptasticsoftware.rssreader.filter.InvalidXmlCharacterFilter;
+import com.github.lamarios.newsku.Constants;
 import com.github.lamarios.newsku.persistence.entities.Feed;
 import com.github.lamarios.newsku.persistence.entities.User;
 import com.github.lamarios.newsku.persistence.repositories.FeedRepository;
@@ -35,15 +34,23 @@ import java.util.*;
 public class FeedService {
     private final UserService userService;
     private final FeedRepository feedRepository;
-    private final FeedErrorService feedErrorService;
 
     private final Logger log = LogManager.getLogger();
 
+    public final static AbstractRssReader<Channel, Item> DEFAULT_READER = new RssReader()
+            .setUserAgent(Constants.USER_AGENT)
+            .addFeedFilter(new InvalidXmlCharacterFilter())
+            .addItemExtension("media:thumbnail", "url", (item, s) -> {
+                Enclosure enclosure = new Enclosure();
+                enclosure.setType("image");
+                enclosure.setUrl(s);
+                item.addEnclosure(enclosure);
+            });
+
     @Autowired
-    public FeedService(UserService userService, FeedRepository feedRepository, FeedErrorService feedErrorService) {
+    public FeedService(UserService userService, FeedRepository feedRepository) {
         this.userService = userService;
         this.feedRepository = feedRepository;
-        this.feedErrorService = feedErrorService;
     }
 
 
@@ -51,8 +58,7 @@ public class FeedService {
     public Feed addFeed(String url) throws SQLException, IOException {
         User currentUser = userService.getCurrentUser();
 
-        var reader = new RssReader();
-        List<Item> list = reader.addFeedFilter(new InvalidXmlCharacterFilter())
+        List<Item> list = DEFAULT_READER
                 .read(url)
                 .sorted()
                 .toList();
@@ -75,15 +81,8 @@ public class FeedService {
     }
 
     @Transactional(readOnly = true)
-    public List<Feed> getFeeds() throws SQLException {
-        List<Feed> feeds = feedRepository.getFeedsByUser(userService.getCurrentUser());
-
-        long to = System.currentTimeMillis();
-        long from = to - 24 * 60 * 60 * 1000;
-
-        feeds.forEach(f -> f.setErrorsInLast24Hours(feedErrorService.countErrors(f, from, to)));
-
-        return feeds;
+    public List<Feed> getFeeds() {
+        return feedRepository.getFeedsByUser(userService.getCurrentUser());
     }
 
     @Transactional

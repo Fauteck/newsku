@@ -90,23 +90,23 @@ class InfoTab extends StatelessWidget {
                 crossAxisAlignment: .center,
 
                 children: [
-                  Gap(16),
+                  Gap(pu4),
                   AppLogo(size: 75),
-                  Gap(24),
+                  Gap(pu6),
                   AppName(style: textTheme.displaySmall, alignment: .center),
-                  Gap(24),
+                  Gap(pu6),
                   Text(locals.version, style: titlesTheme),
                   Text(snapshot.data?.version ?? '-'),
-                  Gap(8),
+                  Gap(pu2),
                   Text(locals.buildNumber, style: titlesTheme),
                   Text(snapshot.data?.buildNumber ?? '-'),
-                  Gap(8),
+                  Gap(pu2),
                   Text(locals.backendVersion, style: titlesTheme),
                   Text(serverUrl ?? '-'),
-                  Gap(8),
+                  Gap(pu2),
                   Text(locals.backendVersion, style: titlesTheme),
                   Text(config?.backendVersion ?? '-'),
-                  Gap(24),
+                  Gap(pu6),
                   FilledButton.tonalIcon(
                     icon: Icon(Icons.info_outline),
                     onPressed: () {
@@ -115,7 +115,7 @@ class InfoTab extends StatelessWidget {
                     label: Text(locals.licenses),
                   ),
                   /*
-                  Gap(24),
+                  Gap(pu6),
                   FilledButton.tonalIcon(
                     icon: Icon(Icons.feedback),
                     onPressed: () {

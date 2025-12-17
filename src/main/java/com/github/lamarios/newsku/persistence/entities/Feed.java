@@ -17,8 +17,8 @@ public class Feed {
     @Column(name = "feed_item_preference")
     private String itemPreference;
     private String image;
-    @Transient
-    private int errorsInLast24Hours;
+    @Column(name = "last_refresh_errors")
+    private int lastRefreshErrors;
 
     public String getImage() {
         return image;
@@ -81,11 +81,11 @@ public class Feed {
         this.itemPreference = itemPreference;
     }
 
-    public int getErrorsInLast24Hours() {
-        return errorsInLast24Hours;
+    public int getLastRefreshErrors() {
+        return lastRefreshErrors;
     }
 
-    public void setErrorsInLast24Hours(int errorsInLast24Hours) {
-        this.errorsInLast24Hours = errorsInLast24Hours;
+    public void setLastRefreshErrors(int lastRefreshErrors) {
+        this.lastRefreshErrors = lastRefreshErrors;
     }
 }

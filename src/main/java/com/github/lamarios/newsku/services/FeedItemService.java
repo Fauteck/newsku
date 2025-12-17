@@ -1,8 +1,6 @@
 package com.github.lamarios.newsku.services;
 
-import com.apptasticsoftware.rssreader.Enclosure;
-import com.apptasticsoftware.rssreader.Item;
-import com.apptasticsoftware.rssreader.RssReader;
+import com.apptasticsoftware.rssreader.*;
 import com.apptasticsoftware.rssreader.filter.InvalidXmlCharacterFilter;
 import com.github.lamarios.newsku.persistence.entities.Feed;
 import com.github.lamarios.newsku.persistence.entities.FeedError;
@@ -64,19 +62,12 @@ public class FeedItemService {
     }
 
     private void refreshFeedWorker(Feed feed) {
+        int errors = 0;
         try {
             logger.info("Refreshing feed {}", feed.getId());
             RssReader reader;
             reader = new RssReader();
-            List<Item> items = reader
-                    .addFeedFilter(new InvalidXmlCharacterFilter())
-                    .addItemExtension("media:thumbnail", "url", (item, s) -> {
-                        System.out.println(s);
-                        Enclosure enclosure = new Enclosure();
-                        enclosure.setType("image");
-                        enclosure.setUrl(s);
-                        item.addEnclosure(enclosure);
-                    })
+            List<Item> items = FeedService.DEFAULT_READER
                     .read(feed.getUrl())
                     .sorted()
                     .filter(item -> item.getGuid().isPresent())
@@ -149,9 +140,9 @@ public class FeedItemService {
 
                     feedErrorRepository.save(error);
 
+                    errors++;
                 }
             }
-
         } catch (Exception e) {
             logger.error("Couldn't parse feed: {}", feed.getUrl(), e);
 
@@ -162,7 +153,11 @@ public class FeedItemService {
             error.setMessage(ExceptionUtils.getMessage(e));
             error.setError(ExceptionUtils.getStackTrace(e));
             feedErrorRepository.save(error);
+            errors++;
         }
+
+        feed.setLastRefreshErrors(errors);
+        feedRepository.save(feed);
     }
 
     private String getImageUrl(Item item) {

@@ -1,5 +1,6 @@
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block_types.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
@@ -17,15 +18,15 @@ class NewBlockDialog extends StatelessWidget {
     final locals = AppLocalizations.of(context)!;
     return Dialog(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24),
+        padding: const EdgeInsets.symmetric(vertical: pu6),
         child: Column(
           mainAxisSize: .min,
-          spacing: 8,
+          spacing: pu2,
           children: [
             Center(
               child: Text(locals.selectBlock, style: textTheme.titleLarge, textAlign: .center),
             ),
-            Gap(12),
+            Gap(pu3),
             Expanded(
               child: ListView(
                 children: [
@@ -33,7 +34,7 @@ class NewBlockDialog extends StatelessWidget {
                   _BlockPreview(type: LayoutBlockTypes.bigHeadline),
                   _BlockPreview(type: LayoutBlockTypes.bigHeadlinePicture),
                   _BlockPreview(type: LayoutBlockTypes.topStories),
-                  Gap(32),
+                  Gap(pu8),
                   Center(child: Text(locals.dynamicArticleCountBlocks)),
                   _BlockPreview(type: LayoutBlockTypes.bigGrid),
                   _BlockPreview(type: LayoutBlockTypes.bigGridPicture),
@@ -66,7 +67,7 @@ class _BlockPreview extends StatelessWidget {
     return InkWell(
       onTap: () => Navigator.of(context).pop(type),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: pu2),
         child: Column(
           children: [
             Text(type.getLabel(locals), style: TextStyle(color: colors.primary)),

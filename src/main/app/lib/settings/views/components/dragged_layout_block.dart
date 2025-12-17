@@ -1,4 +1,5 @@
 import 'package:app/layouts/models/layout_block_types.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class DraggedLayoutBlock extends StatelessWidget {
@@ -13,7 +14,7 @@ class DraggedLayoutBlock extends StatelessWidget {
       opacity: 0.75,
       child: Container(
         decoration: BoxDecoration(color: colors.surfaceContainerHigh, borderRadius: .circular(20)),
-        padding: .all(20),
+        padding: .all(pu5),
         child: type.smallPreview,
       ),
     );

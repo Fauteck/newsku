@@ -10,6 +10,7 @@ import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/router.dart';
 import 'package:app/user/views/components/fancy_side.dart';
 import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/app_logo.dart';
 import 'package:app/utils/views/components/app_name.dart';
 import 'package:app/utils/views/components/conditional_wrap.dart';
@@ -78,7 +79,7 @@ class FeedScreen extends StatelessWidget {
 
     for (int i = 0; i < slivers.length; i++) {
       slivers[i] = SliverPadding(
-        padding: .symmetric(horizontal: 16),
+        padding: .symmetric(horizontal: pu4),
         sliver: SliverStickyHeader.builder(
           builder: (context, state) => DateBar(date: timeRange.end, isPinned: state.isPinned, isFirst: i == 0),
 
@@ -93,11 +94,11 @@ class FeedScreen extends StatelessWidget {
 
       slivers.add(
         SliverPadding(
-          padding: .only(top: 16),
+          padding: .only(top: pu4),
           sliver: SliverToBoxAdapter(
             child: Row(
               mainAxisAlignment: .center,
-              spacing: 8,
+              spacing: pu2,
               children: [
                 Icon(Icons.task_alt, color: colors.secondary, size: 15),
                 Text(locals.readItems(readItems), style: textTheme.bodySmall?.copyWith(color: colors.secondary)),
@@ -176,7 +177,7 @@ class FeedScreen extends StatelessWidget {
                                                   child: Container(
                                                     decoration: BoxDecoration(color: appColor),
                                                     child: Padding(
-                                                      padding: .only(left: 24),
+                                                      padding: .only(left: pu6),
                                                       child: Align(
                                                         alignment: .centerLeft,
                                                         child: AppLogo(color: colors.onSurface, size: 20),
@@ -252,7 +253,7 @@ class FeedScreen extends StatelessWidget {
                                                       height: 500,
                                                       child: Column(
                                                         mainAxisAlignment: .center,
-                                                        spacing: 24,
+                                                        spacing: pu6,
                                                         children: [
                                                           Icon(
                                                             unreadCount == 0 && totalItemCount > 0

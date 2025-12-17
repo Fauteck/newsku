@@ -6,6 +6,7 @@ import 'package:app/l10n/app_localizations.dart';
 import 'package:app/main.dart';
 import 'package:app/settings/states/general.dart';
 import 'package:app/user/models/read_item_handling.dart';
+import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/foundation.dart';
@@ -27,7 +28,7 @@ class GeneralSettingsTab extends StatelessWidget {
     final subTextTheme = textTheme.labelMedium?.copyWith(color: colors.secondary);
 
     return Padding(
-      padding: .symmetric(horizontal: 8),
+      padding: .symmetric(horizontal: pu2),
       child: BlocProvider(
         create: (context) => GeneralSettingsCubit(GeneralSettingsState()),
         child: BlocBuilder<GeneralSettingsCubit, GeneralSettingsState>(
@@ -38,7 +39,7 @@ class GeneralSettingsTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: .start,
                   children: [
-                    Gap(16),
+                    Gap(pu4),
                     Text(locals.articlePreference),
                     TextField(
                       controller: cubit.preferenceController,
@@ -47,7 +48,7 @@ class GeneralSettingsTab extends StatelessWidget {
                         helper: Text(locals.articlePreferencesExplanation, style: subTextTheme),
                       ),
                     ),
-                    Gap(8),
+                    Gap(pu2),
                     Align(
                       alignment: .centerRight,
                       child: FilledButton.tonalIcon(
@@ -65,9 +66,9 @@ class GeneralSettingsTab extends StatelessWidget {
                         icon: Icon(Icons.save),
                       ),
                     ),
-                    Gap(32),
+                    Gap(pu8),
                     Divider(),
-                    Gap(32),
+                    Gap(pu8),
                     Text(locals.minimumNewsScore),
                     Text(locals.minimumNewsScoreExplanation, style: subTextTheme),
                     Slider(
@@ -78,9 +79,9 @@ class GeneralSettingsTab extends StatelessWidget {
                       value: (state.user?.minimumImportance ?? 0).toDouble(),
                       onChanged: (double value) => cubit.setAndSaveImportance(value),
                     ),
-                    Gap(16),
+                    Gap(pu4),
                     Row(
-                      spacing: 8,
+                      spacing: pu2,
                       children: [
                         Expanded(
                           child: Column(
@@ -100,11 +101,11 @@ class GeneralSettingsTab extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Gap(32),
+                    Gap(pu8),
                     Divider(),
-                    Gap(32),
+                    Gap(pu8),
                     Text(locals.appColor),
-                    Gap(8),
+                    Gap(pu2),
                     SwitchListTile(
                       contentPadding: .zero,
                       title: Text(locals.blackBackground),
@@ -112,7 +113,7 @@ class GeneralSettingsTab extends StatelessWidget {
                       value: context.select((LocalPreferencesCubit p) => p.state.blackBackground),
                       onChanged: (value) => getIt.get<LocalPreferencesCubit>().setBlackBackground(value),
                     ),
-                    Gap(8),
+                    Gap(pu2),
                     if (!kIsWeb && Platform.isAndroid) ...[
                       SwitchListTile(
                         contentPadding: .zero,
@@ -121,12 +122,12 @@ class GeneralSettingsTab extends StatelessWidget {
                         value: context.select((LocalPreferencesCubit p) => p.state.dynamicColor),
                         onChanged: (value) => getIt.get<LocalPreferencesCubit>().setDynamicColor(value),
                       ),
-                      Gap(8),
+                      Gap(pu2),
                     ],
                     if (!context.select((LocalPreferencesCubit p) => p.state.dynamicColor))
                       Wrap(
-                        spacing: 16,
-                        runSpacing: 16,
+                        spacing: pu4,
+                        runSpacing: pu4,
                         children:
                             [
                               Colors.deepOrange,
@@ -168,12 +169,12 @@ class GeneralSettingsTab extends StatelessWidget {
                               );
                             }).toList(),
                       ),
-                    Gap(32),
+                    Gap(pu8),
                     Divider(),
-                    Gap(32),
+                    Gap(pu8),
                     Text(locals.newPassword),
                     TextField(controller: cubit.password, obscureText: true),
-                    Gap(8),
+                    Gap(pu2),
                     Text(locals.confirmPassword),
                     TextField(
                       controller: cubit.repeatPassword,
@@ -182,7 +183,7 @@ class GeneralSettingsTab extends StatelessWidget {
                         error: (state.password != state.repeatPassword) ? Text(locals.passwordsNotMatch) : null,
                       ),
                     ),
-                    Gap(8),
+                    Gap(pu2),
                     Align(
                       alignment: .centerRight,
                       child: FilledButton.tonalIcon(

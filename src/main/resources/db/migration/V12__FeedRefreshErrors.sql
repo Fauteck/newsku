@@ -1,0 +1,1 @@
+alter table feeds add last_refresh_errors int default 0;

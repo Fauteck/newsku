@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:motor/motor.dart';
@@ -27,7 +28,7 @@ class DateBar extends StatelessWidget {
       value: isPinned ? 0 : 1,
       builder: (context, value, child) => Container(
         decoration: BoxDecoration(color: Color.lerp(colors.surface, colors.surface.withValues(alpha: 0), value)),
-        padding: .symmetric(vertical: lerpDouble(8, 40, value.clamp(0, 1))!),
+        padding: .symmetric(vertical: lerpDouble(pu2, pu * 10, value.clamp(0, 1))!),
         child: Row(
           mainAxisSize: .max,
           children: [

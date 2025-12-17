@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/layouts/views/components/previews/preview_container.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class SearchResultBig extends StatelessWidget {
@@ -57,14 +58,14 @@ class _GridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: .only(bottom: 8),
+      padding: .only(bottom: pu2),
       child: Row(
-        spacing: 8,
+        spacing: pu2,
         children: [
           PreviewContainer(width: 50, height: 50, borderRadius: .circular(10)),
           Expanded(
             child: Column(
-              spacing: 4,
+              spacing: pu,
               children: [
                 PreviewContainer(height: 10, borderRadius: .circular(10)),
                 PreviewContainer(height: 5, borderRadius: .circular(5)),

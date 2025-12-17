@@ -1,6 +1,7 @@
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/router.dart';
 import 'package:app/user/states/signup.dart';
+import 'package:app/utils/utils.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,7 +22,7 @@ class SignupFormScreen extends StatelessWidget {
         builder: (context, state) {
           final cubit = context.read<SignupCubit>();
           return Padding(
-            padding: .only(right: 24),
+            padding: .only(right: pu6),
             child: Column(
               mainAxisAlignment: .center,
               children: [
@@ -31,14 +32,14 @@ class SignupFormScreen extends StatelessWidget {
                   autofillHints: [AutofillHints.newUsername],
                   autocorrect: false,
                 ),
-                Gap(16),
+                Gap(pu4),
                 Align(alignment: .centerLeft, child: Text(locals.email)),
                 TextField(
                   onChanged: (value) => cubit.setEmail(value),
                   autofillHints: [AutofillHints.email],
                   autocorrect: false,
                 ),
-                Gap(16),
+                Gap(pu4),
                 Align(alignment: .centerLeft, child: Text(locals.password)),
                 TextField(
                   obscureText: true,
@@ -46,14 +47,14 @@ class SignupFormScreen extends StatelessWidget {
                   autofillHints: [AutofillHints.newPassword],
                   autocorrect: false,
                 ),
-                Gap(16),
+                Gap(pu4),
                 Align(alignment: .centerLeft, child: Text(locals.repeatPassword)),
                 TextField(obscureText: true, onChanged: (value) => cubit.setRepeatPassword(value), autocorrect: false),
-                Gap(16),
+                Gap(pu4),
                 if (state.password != state.repeatPassword) ...[
-                  Gap(16),
+                  Gap(pu4),
                   Text(locals.passwordsNotMatch, style: textTheme.bodyMedium?.copyWith(color: colors.error)),
-                  Gap(16),
+                  Gap(pu4),
                 ],
                 Row(
                   children: [

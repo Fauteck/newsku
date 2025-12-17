@@ -4,6 +4,7 @@ import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/layouts/views/components/previews/preview_container.dart';
 import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class SmallGridBig extends StatelessWidget {
@@ -65,11 +66,11 @@ class _GridItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: .center,
-      spacing: 8,
+      spacing: pu2,
       children: [
         Expanded(
           child: Column(
-            spacing: 4,
+            spacing: pu,
             mainAxisAlignment: .center,
             children: [
               PreviewContainer(height: 8, borderRadius: .circular(5)),

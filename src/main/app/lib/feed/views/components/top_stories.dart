@@ -4,6 +4,7 @@ import 'package:app/feed/views/components/feed_item_image.dart';
 import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
 import 'package:app/layouts/models/layout_block.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
@@ -24,12 +25,12 @@ class TopStories extends StatelessWidget {
 
     return Container(
       clipBehavior: .none,
-      constraints: BoxConstraints(maxHeight: 500),
+      // constraints: BoxConstraints(maxHeight: 500),
       decoration: BoxDecoration(color: colors.surfaceContainerHigh, borderRadius: .circular(feedItemBorderRadius)),
-      padding: .all(16),
+      padding: .all(pu4),
       child: Row(
-        spacing: 24,
-        crossAxisAlignment: .stretch,
+        spacing: pu6,
+        crossAxisAlignment: .start,
         children: [
           Align(
             alignment: .topCenter,
@@ -37,7 +38,7 @@ class TopStories extends StatelessWidget {
               quarterTurns: 1,
               child: Container(
                 decoration: BoxDecoration(color: colors.tertiary, borderRadius: .circular(50)),
-                padding: .symmetric(horizontal: 16),
+                padding: .symmetric(horizontal: pu4),
                 child: Text(
                   (block.settings ?? block.type.defaultSettings).title ?? '★ Top Stories',
                   maxLines: 1,
@@ -49,7 +50,8 @@ class TopStories extends StatelessWidget {
           ),
           Expanded(
             child: Column(
-              spacing: 24,
+              mainAxisSize: .min,
+              spacing: pu6,
               children: items
                   .skip(1)
                   .indexed
@@ -59,7 +61,7 @@ class TopStories extends StatelessWidget {
                       child: Column(
                         children: [
                           Row(
-                            spacing: 24,
+                            spacing: pu6,
                             children: [
                               FeedItemImage(
                                 item: e.$2,
@@ -85,7 +87,7 @@ class TopStories extends StatelessWidget {
                             ],
                           ),
                           if (e.$1 < items.skip(1).length - 1) ...[
-                            Gap(24),
+                            Gap(pu6),
                             Align(
                               alignment: .center,
                               child: SizedBox(
@@ -105,26 +107,22 @@ class TopStories extends StatelessWidget {
             Expanded(
               child: ClickableFeedItem(
                 item: items.first,
-                child: SizedBox(
-                  height: 300,
-                  child: Column(
-                    crossAxisAlignment: .stretch,
-                    mainAxisAlignment: .start,
-                    spacing: 24,
-                    children: [
-                      FeedItemImage(item: items.first, height: 200, borderRadius: .circular(feedItemBorderRadius)),
-                      Text(
-                        items.first.title ?? '',
-                        style: textTheme.headlineLarge?.copyWith(height: 1.4),
-                        maxLines: 3,
-                        overflow: .ellipsis,
-                      ),
-                      Expanded(
-                        child: ItemContent(item: items.first, maxLines: 2, overflow: .ellipsis),
-                      ),
-                      InfoBar(item: items.first),
-                    ],
-                  ),
+                child: Column(
+                  mainAxisSize: .min,
+                  crossAxisAlignment: .stretch,
+                  mainAxisAlignment: .start,
+                  spacing: pu6,
+                  children: [
+                    FeedItemImage(item: items.first, height: 200, borderRadius: .circular(feedItemBorderRadius)),
+                    Text(
+                      items.first.title ?? '',
+                      style: textTheme.headlineLarge?.copyWith(height: 1.4),
+                      maxLines: 3,
+                      overflow: .ellipsis,
+                    ),
+                    ItemContent(item: items.first, maxLines: 2, overflow: .ellipsis),
+                    InfoBar(item: items.first),
+                  ],
                 ),
               ),
             ),

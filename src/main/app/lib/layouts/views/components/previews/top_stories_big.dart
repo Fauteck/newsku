@@ -1,5 +1,6 @@
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/layouts/views/components/previews/preview_container.dart';
+import 'package:app/utils/utils.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -44,15 +45,17 @@ class _TopStoriesBigState extends State<TopStoriesBig> {
           controller: controller,
           decoration: InputDecoration(label: Text('Title')),
         ),
-        Gap(16),
+        Gap(pu4),
         Row(
           crossAxisAlignment: .start,
-          spacing: 12,
+          spacing: pu3,
           children: [
-            Expanded(child: Column(spacing: 12, children: [_LeftArticle(), _LeftArticle(), _LeftArticle()])),
+            Expanded(
+              child: Column(spacing: pu3, children: [_LeftArticle(), _LeftArticle(), _LeftArticle()]),
+            ),
             Expanded(
               child: Column(
-                spacing: 8,
+                spacing: pu2,
                 children: [
                   PreviewContainer(height: 100, borderRadius: .circular(5)),
                   PreviewContainer(height: 20, borderRadius: .circular(20)),
@@ -74,12 +77,12 @@ class _LeftArticle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      spacing: 8,
+      spacing: pu2,
       children: [
         PreviewContainer(width: 50, height: 50, borderRadius: .circular(50)),
         Expanded(
           child: Column(
-            spacing: 8,
+            spacing: pu2,
             children: [
               PreviewContainer(height: 15, borderRadius: .circular(15)),
               PreviewContainer(height: 15, borderRadius: .circular(15)),

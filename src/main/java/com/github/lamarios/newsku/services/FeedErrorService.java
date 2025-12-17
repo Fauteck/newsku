@@ -41,17 +41,9 @@ public class FeedErrorService {
         return feedErrorRepository.findByFeed(feed, PageRequest.of(page, pageSize, Sort.by(new Sort.Order(Sort.Direction.DESC, "timeCreated"))));
     }
 
-    public long countLast24HoursErrors(){
-
+    public long countLastRefreshErrors() {
         var user = userService.getCurrentUser();
-
-        long to = System.currentTimeMillis();
-        long from = to - 24 * 60 * 60 * 1000;
-
-        List<Feed> feeds = feedRepository.getFeedsByUser(user);
-
-        return feedErrorRepository.countByFeedInAndTimeCreatedBetween(feeds, from, to);
-
+        return feedRepository.sumFeedsError(user);
     }
 
 }

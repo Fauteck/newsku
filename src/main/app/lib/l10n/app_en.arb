@@ -76,7 +76,7 @@
     "addBlock": "Add block",
     "selectBlock": "Select block type to add to your layout",
     "nErrors": "{count, plural, =0{No errors} =1{1 error} other{{count} errors}}",
-    "inTheLast24Hours": "In the last 24 hours",
+    "duringLastRefreshAttempt": "During last refresh attempt",
     "feedErrorTitle": "{feedName} errors",
     "error": "Error",
     "stackTrace": "Stack trace",

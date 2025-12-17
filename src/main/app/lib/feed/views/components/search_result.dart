@@ -4,6 +4,7 @@ import 'package:app/feed/views/components/feed_item_image.dart';
 import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
 import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
@@ -20,7 +21,7 @@ class SearchResult extends StatelessWidget {
     final breakPoint = BreakPoint.get(context);
 
     return Padding(
-      padding: .symmetric(horizontal: breakPoint == .mobile ? 8 : 32, vertical: 16),
+      padding: .symmetric(horizontal: breakPoint == .mobile ? pu2 : pu8, vertical: pu4),
       child: ClickableFeedItem(
         noDimming: noDimming,
         item: item,
@@ -33,11 +34,11 @@ class SearchResult extends StatelessWidget {
               height: breakPoint == .mobile ? 75 : 100,
               borderRadius: .circular(10),
             ),
-            Gap(breakPoint == .mobile ? 16 : 32),
+            Gap(breakPoint == .mobile ? pu4 : pu8),
             Expanded(
               child: Column(
                 crossAxisAlignment: .stretch,
-                spacing: 8,
+                spacing: pu2,
                 children: [
                   Text(
                     item.title ?? '',

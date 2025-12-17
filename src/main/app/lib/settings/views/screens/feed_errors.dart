@@ -4,6 +4,7 @@ import 'package:app/l10n/app_localizations.dart';
 import 'package:app/settings/states/feed_errors.dart';
 import 'package:app/settings/views/components/feed_error.dart';
 import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/page_switcher.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
@@ -24,13 +25,13 @@ class FeedErrorsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Row(
-          spacing: 16,
+          spacing: pu4,
           children: [
             ClipRRect(
               borderRadius: .circular(50),
               child: FeedImage(item: feed, width: 50, height: 50),
             ),
-            Text(locals.feedErrorTitle(feed.name ?? '')),
+            Expanded(child: Text(locals.feedErrorTitle(feed.name ?? ''), overflow: .ellipsis)),
           ],
         ),
       ),
@@ -45,7 +46,7 @@ class FeedErrorsScreen extends StatelessWidget {
               return Center(
                 child: Column(
                   mainAxisAlignment: .center,
-                  spacing: 16,
+                  spacing: pu4,
                   children: [
                     Icon(Icons.check, size: 100),
                     Text(locals.nErrors(0), style: textTheme.titleLarge),

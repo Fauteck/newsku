@@ -553,11 +553,11 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{No errors} =1{1 error} other{{count} errors}}'**
   String nErrors(num count);
 
-  /// No description provided for @inTheLast24Hours.
+  /// No description provided for @duringLastRefreshAttempt.
   ///
   /// In en, this message translates to:
-  /// **'In the last 24 hours'**
-  String get inTheLast24Hours;
+  /// **'During last refresh attempt'**
+  String get duringLastRefreshAttempt;
 
   /// No description provided for @feedErrorTitle.
   ///

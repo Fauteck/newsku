@@ -1,8 +1,11 @@
+import 'package:app/feed/models/feed.dart';
 import 'package:app/feed/views/components/feed_image.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/router.dart';
 import 'package:app/settings/states/feeds.dart';
 import 'package:app/utils/dialog.dart';
+import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
@@ -17,8 +20,6 @@ class FeedsSettingsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
     final textTheme = Theme.of(context).textTheme;
 
     final locals = AppLocalizations.of(context)!;
@@ -33,9 +34,9 @@ class FeedsSettingsTab extends StatelessWidget {
                 : Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(pu2),
                         child: Row(
-                          spacing: 8,
+                          spacing: pu2,
                           children: [
                             Expanded(
                               child: TextField(
@@ -54,7 +55,7 @@ class FeedsSettingsTab extends StatelessWidget {
                       ),
                       Row(
                         mainAxisAlignment: .start,
-                        spacing: 8,
+                        spacing: pu2,
                         children: [
                           TextButton.icon(
                             onPressed: () => cubit.exportFeed(),
@@ -88,7 +89,7 @@ class FeedsSettingsTab extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: .center,
                                 mainAxisAlignment: .center,
-                                spacing: 24,
+                                spacing: pu6,
                                 children: [
                                   Icon(Icons.sentiment_neutral_outlined, size: 50),
                                   Text(locals.noFeeds, style: textTheme.bodyLarge),
@@ -100,7 +101,6 @@ class FeedsSettingsTab extends StatelessWidget {
                                 itemCount: state.feeds.length,
                                 itemBuilder: (context, index) {
                                   final f = state.feeds[index];
-                                  final hasErrors = f.errorsInLast24Hours > 0;
 
                                   return ListTile(
                                     leading: ClipRRect(
@@ -108,32 +108,13 @@ class FeedsSettingsTab extends StatelessWidget {
                                       child: FeedImage(item: f, width: 50, height: 50),
                                     ),
                                     title: Text(f.name ?? ''),
-                                    subtitle: Text(f.url ?? ''),
+                                    subtitle: SelectableText(f.url ?? ''),
                                     trailing: Row(
                                       mainAxisAlignment: .end,
                                       crossAxisAlignment: .center,
                                       mainAxisSize: .min,
                                       children: [
-                                        Tooltip(
-                                          message: locals.inTheLast24Hours,
-                                          child: TextButton.icon(
-                                            onPressed: () => AutoRouter.of(context).push(FeedErrorsRoute(feed: f)),
-                                            icon: Icon(
-                                              hasErrors ? Icons.error_outline : Icons.check,
-                                              color: hasErrors
-                                                  ? colors.error
-                                                  : Colors.lightGreen.withValues(alpha: 0.5),
-                                            ),
-                                            label: Text(
-                                              locals.nErrors(f.errorsInLast24Hours),
-                                              style: TextStyle(
-                                                color: hasErrors
-                                                    ? colors.error
-                                                    : colors.onSurface.withValues(alpha: 0.5),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                        _ErrorButton(feed: f),
                                         IconButton(
                                           onPressed: () {
                                             okCancelDialog(
@@ -156,6 +137,44 @@ class FeedsSettingsTab extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+}
+
+class _ErrorButton extends StatelessWidget {
+  final Feed feed;
+
+  const _ErrorButton({super.key, required this.feed});
+
+  void openErrors(BuildContext context) {
+    AutoRouter.of(context).push(FeedErrorsRoute(feed: feed));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final device = BreakPoint.get(context);
+    final colors = Theme.of(context).colorScheme;
+
+    final textTheme = Theme.of(context).textTheme;
+
+    final locals = AppLocalizations.of(context)!;
+    final hasErrors = feed.lastRefreshErrors > 0;
+    var icon = Icon(
+      hasErrors ? Icons.error_outline : Icons.check,
+      color: hasErrors ? colors.error : Colors.lightGreen.withValues(alpha: 0.5),
+    );
+    return Tooltip(
+      message: locals.duringLastRefreshAttempt,
+      child: device == .mobile
+          ? IconButton(onPressed: () => openErrors(context), icon: icon)
+          : TextButton.icon(
+              onPressed: () => openErrors(context),
+              icon: icon,
+              label: Text(
+                locals.nErrors(feed.lastRefreshErrors),
+                style: TextStyle(color: hasErrors ? colors.error : colors.onSurface.withValues(alpha: 0.5)),
+              ),
+            ),
     );
   }
 }

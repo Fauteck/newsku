@@ -6,6 +6,7 @@ import 'package:app/settings/views/components/dragged_layout_block.dart';
 import 'package:app/settings/views/components/new_block_dialog.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/states/simple_cubit.dart';
+import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/conditional_wrap.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:app/utils/views/components/simple_cubit_view.dart';
@@ -31,7 +32,7 @@ class LayoutSettingsTab extends StatelessWidget {
     final device = BreakPoint.get(context);
 
     return Padding(
-      padding: .only(bottom: 32),
+      padding: .only(bottom: pu8, left: pu2, right: pu2, top: pu2),
       child: BlocProvider(
         create: (context) => LayoutCubit(LayoutState()),
         child: BlocConsumer<LayoutCubit, LayoutState>(
@@ -45,7 +46,7 @@ class LayoutSettingsTab extends StatelessWidget {
                   Expanded(
                     child: Flex(
                       direction: device == .mobile ? .vertical : .horizontal,
-                      spacing: 8,
+                      spacing: pu2,
                       children: [
                         if (device == .mobile)
                           SimpleCubitView<bool>(
@@ -74,12 +75,12 @@ class LayoutSettingsTab extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: .start,
                               children: [
-                                Gap(8),
+                                Gap(pu2),
                                 Text(locals.layoutExplanation),
                                 Divider(),
                                 Text(locals.availableBlocks, style: textTheme.titleLarge),
                                 Text(locals.dragAndDropInstructions),
-                                Gap(32),
+                                Gap(pu8),
                                 Expanded(
                                   child: ListView(
                                     children: [
@@ -102,7 +103,7 @@ class LayoutSettingsTab extends StatelessWidget {
                                           type: LayoutBlockTypes.topStories,
                                         ),
                                       ),
-                                      Gap(32),
+                                      Gap(pu8),
                                       Text(locals.dynamicArticleCountBlocks),
                                       Center(
                                         child: DraggableLayoutBlock(
@@ -141,7 +142,7 @@ class LayoutSettingsTab extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: .stretch,
                             children: [
-                              Gap(8),
+                              Gap(pu2),
                               Row(
                                 children: [
                                   Expanded(child: Text(locals.currentLayout, style: textTheme.titleLarge)),
@@ -181,7 +182,7 @@ class LayoutSettingsTab extends StatelessWidget {
                                     var isLast = index == state.blocks.length - 1;
                                     return Padding(
                                       key: ValueKey(block),
-                                      padding: .only(bottom: 8),
+                                      padding: .only(bottom: pu2),
                                       child: ConditionalWrap(
                                         wrapIf: index == 0,
                                         wrapper: (child) => Column(
@@ -195,7 +196,7 @@ class LayoutSettingsTab extends StatelessWidget {
                                           crossAxisAlignment: .stretch,
                                           children: [
                                             Row(
-                                              spacing: 16,
+                                              spacing: pu4,
                                               children: [
                                                 ReorderableDragStartListener(
                                                   index: index,

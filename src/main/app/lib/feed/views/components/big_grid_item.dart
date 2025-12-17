@@ -2,6 +2,7 @@ import 'package:app/feed/models/feed_item.dart';
 import 'package:app/feed/views/components/clickable_feed_item.dart';
 import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
@@ -39,13 +40,13 @@ class BigGridItem extends StatelessWidget {
                 decoration: BoxDecoration(color: colors.tertiary),
               ),
             ),
-            Gap(8),
+            Gap(pu2),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(pu2),
                 child: Column(
                   crossAxisAlignment: .stretch,
-                  spacing: 8,
+                  spacing: pu2,
                   children: [
                     Text(
                       item.title ?? '',

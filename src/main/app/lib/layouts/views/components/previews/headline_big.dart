@@ -1,5 +1,6 @@
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/layouts/views/components/previews/preview_container.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class HeadlineBig extends StatelessWidget {
@@ -11,7 +12,7 @@ class HeadlineBig extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      spacing: 8,
+      spacing: pu2,
       children: [
         PreviewContainer(height: 150, borderRadius: .circular(5)),
         PreviewContainer(height: 30, borderRadius: .circular(20)),

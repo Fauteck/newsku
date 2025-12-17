@@ -1,4 +1,5 @@
 import 'package:app/layouts/models/layout_block_types.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 import 'package:app/layouts/views/components/previews/preview_container.dart';
@@ -29,7 +30,7 @@ class _GridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      spacing: 4,
+      spacing: pu,
       children: [
         PreviewContainer(height: 20, borderRadius: .circular(5)),
         PreviewContainer(height: 5, borderRadius: .circular(5)),

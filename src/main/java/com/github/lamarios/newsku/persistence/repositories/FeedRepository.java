@@ -4,6 +4,8 @@ package com.github.lamarios.newsku.persistence.repositories;
 import com.github.lamarios.newsku.persistence.entities.Feed;
 import com.github.lamarios.newsku.persistence.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,4 +21,7 @@ public interface FeedRepository extends JpaRepository<Feed, String> {
 
 
     List<Feed> findFirstByUrlAndUser(String url, User user);
+
+    @Query("select sum(f.lastRefreshErrors) from Feed f where f.user = :user")
+    long sumFeedsError(@Param("user") User user);
 }

@@ -2,6 +2,7 @@ import 'package:app/feed/models/feed_item.dart';
 import 'package:app/feed/views/components/clickable_feed_item.dart';
 import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 import 'package:app/feed/views/screens/feed_screen.dart';
@@ -33,7 +34,7 @@ class BigGridPictureItem extends StatelessWidget {
                 right: 0,
                 top: 0,
                 child: Container(
-                  padding: .symmetric(vertical: 16, horizontal: 24),
+                  padding: .symmetric(vertical: pu4, horizontal: pu6),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Colors.black.withValues(alpha: 0), Colors.black.withValues(alpha: 0.9)],
@@ -42,7 +43,7 @@ class BigGridPictureItem extends StatelessWidget {
                     ),
                   ),
                   child: Column(
-                    spacing: 8,
+                    spacing: pu2,
                     mainAxisSize: .max,
                     mainAxisAlignment: .end,
                     crossAxisAlignment: .stretch,

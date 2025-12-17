@@ -42,7 +42,7 @@ class _FirstTimeSetupDialogState extends State<FirstTimeSetupDialog> {
               mainAxisSize: .min,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 12.0, right: 24, left: 24, bottom: 4),
+                  padding: const EdgeInsets.only(top: pu3, right: pu6, left: pu6, bottom: pu2),
                   child: Align(
                     alignment: .centerLeft,
                     child: switch (page) {
@@ -56,12 +56,15 @@ class _FirstTimeSetupDialogState extends State<FirstTimeSetupDialog> {
                 [
                   Welcome(),
                   Expanded(
-                    child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: FeedsSettingsTab()),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: pu4),
+                      child: FeedsSettingsTab(),
+                    ),
                   ),
                   LlmPreference(),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      padding: const EdgeInsets.symmetric(horizontal: pu6),
                       child: LayoutSettingsTab(fadeColor: colors.surfaceContainerHigh),
                     ),
                   ),
@@ -69,7 +72,7 @@ class _FirstTimeSetupDialogState extends State<FirstTimeSetupDialog> {
                 ][page],
 
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: pu8, vertical: pu2),
                   child: Row(
                     children: [
                       TextButton(
@@ -146,8 +149,8 @@ class _Pager extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(mainAxisAlignment: .center, spacing: 16, children: widgets),
+      padding: const EdgeInsets.all(pu2),
+      child: Row(mainAxisAlignment: .center, spacing: pu4, children: widgets),
     );
   }
 }

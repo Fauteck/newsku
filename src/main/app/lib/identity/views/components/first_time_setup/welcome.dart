@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:app/l10n/app_localizations.dart';
+import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/app_logo.dart';
 import 'package:flutter/material.dart';
 import 'package:motor/motor.dart';
@@ -14,7 +15,7 @@ class Welcome extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: EdgeInsets.all(pu6),
       child: SingleMotionBuilder(
         // motion: Motion.linear(Duration(milliseconds: 250)),
         motion: MaterialSpringMotion.expressiveSpatialSlow(),
@@ -27,7 +28,7 @@ class Welcome extends StatelessWidget {
         child: Column(
           crossAxisAlignment: .center,
           mainAxisAlignment: .center,
-          spacing: 32,
+          spacing: pu8,
           children: [
             AppLogo(size: 100),
             ConstrainedBox(

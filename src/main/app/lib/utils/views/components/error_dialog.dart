@@ -1,3 +1,4 @@
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
@@ -41,11 +42,11 @@ class ErrorDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text('Error', style: textTheme.headlineSmall),
-            const Gap(20),
+            const Gap(pu5),
             Flexible(
               child: SingleChildScrollView(child: Column(children: [...buildError(context, error, trace)])),
             ),
-            const Gap(20),
+            const Gap(pu5),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('ok'))],

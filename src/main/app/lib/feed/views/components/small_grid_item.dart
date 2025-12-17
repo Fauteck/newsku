@@ -5,6 +5,7 @@ import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
 import 'package:app/feed/views/screens/feed_screen.dart';
 import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class SmallGridItem extends StatelessWidget {
@@ -27,10 +28,10 @@ class SmallGridItem extends StatelessWidget {
           children: [
             Expanded(
               child: Padding(
-                padding: .symmetric(horizontal: 16, vertical: 8),
+                padding: .symmetric(horizontal: pu4, vertical: pu2),
                 child: Column(
                   crossAxisAlignment: .stretch,
-                  spacing: 4,
+                  spacing: pu,
                   children: [
                     Text(item.title ?? '', style: textTheme.bodyLarge, overflow: .ellipsis, maxLines: 2),
                     Expanded(

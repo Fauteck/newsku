@@ -4,6 +4,7 @@ import 'package:app/feed/views/components/feed_item_image.dart';
 import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
 import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
@@ -40,7 +41,7 @@ class HeadlinePicture extends StatelessWidget {
               right: 0,
               top: 0,
               child: Container(
-                padding: .symmetric(vertical: 16, horizontal: 24),
+                padding: .symmetric(vertical: pu4, horizontal: pu6),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [Colors.black.withValues(alpha: 0), Colors.black.withValues(alpha: 0.7)],
@@ -53,9 +54,9 @@ class HeadlinePicture extends StatelessWidget {
                   crossAxisAlignment: .stretch,
                   children: [
                     Text(item.title ?? ' ', style: textTheme.displaySmall),
-                    Gap(8),
+                    Gap(pu2),
                     ItemContent(item: item, maxLines: 1, overflow: .ellipsis, style: textTheme.bodyLarge),
-                    Gap(16),
+                    Gap(pu4),
                     InfoBar(item: item),
                   ],
                 ),

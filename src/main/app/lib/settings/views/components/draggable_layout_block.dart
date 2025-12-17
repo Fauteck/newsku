@@ -1,6 +1,7 @@
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block_types.dart';
 import 'package:app/settings/views/components/dragged_layout_block.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
@@ -22,9 +23,9 @@ class DraggableLayoutBlock extends StatelessWidget {
       feedback: DraggedLayoutBlock(type: type),
       data: type,
       child: Column(
-        spacing: 4,
+        spacing: pu,
         children: [
-          Gap(8),
+          Gap(pu2),
           Text(type.getLabel(locals), style: TextStyle(color: colors.primary)),
           type.smallPreview,
         ],

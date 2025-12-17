@@ -1,5 +1,6 @@
 import 'package:app/layouts/models/layout_block_types.dart';
 import 'package:app/layouts/views/components/previews/preview_container.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class SmallGridSmall extends StatelessWidget {
@@ -29,11 +30,11 @@ class _GridItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: .center,
-      spacing: 8,
+      spacing: pu2,
       children: [
         Expanded(
           child: Column(
-            spacing: 4,
+            spacing: pu,
             mainAxisAlignment: .center,
             children: [
               PreviewContainer(height: 5, borderRadius: .circular(5)),

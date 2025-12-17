@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:app/identity/states/identity.dart';
 import 'package:app/user/views/components/fancy_side.dart';
+import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/app_logo.dart';
 import 'package:app/utils/views/components/main_color_provider.dart';
 import 'package:auto_route/auto_route.dart';
@@ -37,10 +38,10 @@ class LoginScreen extends StatelessWidget {
                     color: colors.tertiaryContainer,
                     borderRadius: .only(topLeft: .circular(32), topRight: .circular(32)),
                   ),
-                  padding: .symmetric(horizontal: 36, vertical: 16),
+                  padding: .symmetric(horizontal: pu * 9, vertical: pu4),
                   child: Row(
                     crossAxisAlignment: .center,
-                    spacing: 24,
+                    spacing: pu6,
                     children: [
                       Icon(Icons.info_outline),
                       Expanded(child: Text(announcement)),
@@ -71,7 +72,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(pu6),
                     child: Center(child: AutoRouter()),
                   ),
                 ],

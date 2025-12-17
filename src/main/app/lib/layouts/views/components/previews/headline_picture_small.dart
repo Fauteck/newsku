@@ -1,5 +1,6 @@
 import 'package:app/layouts/models/layout_block_types.dart';
 import 'package:app/layouts/views/components/previews/preview_container.dart';
+import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class HeadlinePictureSmall extends StatelessWidget {
@@ -15,10 +16,10 @@ class HeadlinePictureSmall extends StatelessWidget {
         height: 80,
         borderRadius: .circular(5),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(pu2),
           child: Column(
             mainAxisAlignment: .end,
-            spacing: 4,
+            spacing: pu,
             children: [
               PreviewContainer(height: 10, borderRadius: .circular(10), color: colors.surface),
               PreviewContainer(height: 10, borderRadius: .circular(10), color: colors.surface),

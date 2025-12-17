@@ -36,10 +36,12 @@ class SettingsScreen extends StatelessWidget {
               ],
             ),
           ),
-          body: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: BreakPoint.tablet.maxWidth),
-              child: child,
+          body: SafeArea(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: BreakPoint.tablet.maxWidth),
+                child: child,
+              ),
             ),
           ),
         );

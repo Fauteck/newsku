@@ -28,9 +28,9 @@ public class FeedErrorController {
     }
 
 
-    @GetMapping("/24h-count")
-    public long countPast24HoursErrors(){
-        return feedErrorService.countLast24HoursErrors();
+    @GetMapping("/last-refresh-count")
+    public long countLastRefreshErrors(){
+        return feedErrorService.countLastRefreshErrors();
     }
 
     @GetMapping("{id}")
