@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -56,7 +57,7 @@ public class FeedItemController {
     }
 
     @GetMapping("/{id}/image")
-    public ResponseEntity<byte[]> getArticleImage(@PathVariable String id) throws IOException, SQLException {
+    public ResponseEntity<StreamingResponseBody> getArticleImage(@PathVariable String id) throws IOException, SQLException {
 
         var item = feedItemService.getItem(id);
 
@@ -78,20 +79,28 @@ public class FeedItemController {
         return serveFile(filePath);
     }
 
-    public static ResponseEntity<byte[]> serveFile(Path filePath) throws IOException {
-        try (InputStream in = new FileInputStream(filePath.toFile())) {
-            byte[] imageBytes = in.readAllBytes();
-
-            // Guess content type
-            String contentType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(imageBytes));
-            if (contentType == null) {
-                contentType = "application/octet-stream";
-            }
-
-            return ResponseEntity
-                    .ok()
-                    .header(HttpHeaders.CONTENT_TYPE, contentType)
-                    .body(imageBytes);
+    public static ResponseEntity<StreamingResponseBody> serveFile(Path filePath) throws IOException {
+        String contentType = Files.probeContentType(filePath);
+        if (contentType == null) {
+            contentType = "application/octet-stream";
         }
+
+        long fileSize = Files.size(filePath);
+
+        StreamingResponseBody responseBody = outputStream -> {
+            try (InputStream inputStream = new FileInputStream(filePath.toFile())) {
+                byte[] buffer = new byte[8192]; // 8KB buffer
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+                outputStream.flush();
+            }
+        };
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, contentType)
+                .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(fileSize))
+                .body(responseBody);
     }
 }

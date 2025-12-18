@@ -1,5 +1,4 @@
 import 'package:app/feed/models/feed_error.dart';
-import 'package:app/feed/views/screens/feed_screen.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/utils/states/simple_cubit.dart';
 import 'package:app/utils/utils.dart';
@@ -26,7 +25,7 @@ class FeedErrorView extends StatelessWidget {
 
     return SelectionArea(
       child: Padding(
-        padding: const EdgeInsets.all(pu2),
+        padding: EdgeInsets.all(pu2),
         child: SimpleCubitView<bool>(
           initialValue: false,
           builder: (context, expanded) {
@@ -57,7 +56,7 @@ class FeedErrorView extends StatelessWidget {
                     icon: expanded ? Icon(Icons.expand_more) : Icon(Icons.expand_less),
                   ),
                 ),
-                if (expanded) Padding(padding: const EdgeInsets.all(pu2), child: Text(error.error ?? '')),
+                if (expanded) Padding(padding: EdgeInsets.all(pu2), child: Text(error.error ?? '')),
               ],
             );
           },

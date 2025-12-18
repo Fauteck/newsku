@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:app/feed/models/feed_item.dart';
@@ -41,6 +42,7 @@ class FeedScreen extends StatelessWidget {
     required List<FeedItem> immutableItems,
     required List<LayoutBlock> blocks,
     required int readItems,
+    required double padding,
   }) {
     final locals = AppLocalizations.of(context)!;
 
@@ -79,7 +81,7 @@ class FeedScreen extends StatelessWidget {
 
     for (int i = 0; i < slivers.length; i++) {
       slivers[i] = SliverPadding(
-        padding: .symmetric(horizontal: pu4),
+        padding: .symmetric(horizontal: padding + pu4),
         sliver: SliverStickyHeader.builder(
           builder: (context, state) => DateBar(date: timeRange.end, isPinned: state.isPinned, isFirst: i == 0),
 
@@ -128,204 +130,225 @@ class FeedScreen extends StatelessWidget {
             child: BlocBuilder<MainFeedCubit, MainFeedState>(
               builder: (context, state) {
                 var cubit = context.read<MainFeedCubit>();
-                return Center(
-                  child: Stack(
-                    children: [
-                      ConstrainedBox(
-                        constraints: BoxConstraints(maxWidth: BreakPoint.desktop.maxWidth),
-                        child: Center(
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: .symmetric(horizontal: 0),
-                                  child: RefreshIndicator(
-                                    onRefresh: () => cubit.refresh(),
-                                    child: CustomScrollView(
-                                      controller: cubit.scrollController,
-                                      slivers: [
-                                        SliverAppBar(
-                                          floating: true,
-                                          snap: true,
-                                          elevation: 0,
-                                          scrolledUnderElevation: 0,
-                                          leadingWidth: 150,
-                                          title: AnimatedSwitcher(
-                                            duration: Duration(milliseconds: 250),
-                                            child: state.searchMode
-                                                ? Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: TextField(
-                                                          controller: cubit.searchController,
-                                                          autofocus: true,
-                                                          onChanged: (value) => cubit.search(value),
-                                                          decoration: InputDecoration(
-                                                            border: UnderlineInputBorder(),
-                                                            label: Text(locals.search),
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    final double padding = max(0, (constraints.maxWidth - BreakPoint.desktop.maxWidth) / 2);
+
+                    return Center(
+                      child: Stack(
+                        children: [
+                          Center(
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: .symmetric(horizontal: 0),
+                                    child: RefreshIndicator(
+                                      onRefresh: () => cubit.refresh(),
+                                      child: CustomScrollView(
+                                        controller: cubit.scrollController,
+                                        slivers: [
+                                          SliverAppBar(
+                                            floating: true,
+                                            snap: true,
+                                            elevation: 0,
+                                            scrolledUnderElevation: 0,
+                                            leadingWidth: 150,
+                                            title: AnimatedSwitcher(
+                                              duration: Duration(milliseconds: 250),
+                                              child: state.searchMode
+                                                  ? Row(
+                                                      mainAxisSize: .max,
+                                                      mainAxisAlignment: .center,
+                                                      children: [
+                                                        ConstrainedBox(
+                                                          constraints: BoxConstraints(
+                                                            maxWidth: BreakPoint.tablet.maxWidth,
+                                                          ),
+                                                          child: TextField(
+                                                            controller: cubit.searchController,
+                                                            autofocus: true,
+                                                            onChanged: (value) => cubit.search(value),
+                                                            decoration: InputDecoration(
+                                                              border: UnderlineInputBorder(),
+                                                              label: Text(locals.search),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  : AppName(style: textTheme.titleLarge),
+                                            ),
+                                            leading: state.searchMode
+                                                ? null
+                                                : ClipPath(
+                                                    clipper: FancySide(),
+                                                    child: Container(
+                                                      decoration: BoxDecoration(color: appColor),
+                                                      child: Padding(
+                                                        padding: .only(left: pu6),
+                                                        child: Align(
+                                                          alignment: .centerLeft,
+                                                          child: AppLogo(color: colors.onSurface, size: 20),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                            actions: [
+                                              IconButton(
+                                                onPressed: () => cubit.setSearch(!state.searchMode),
+                                                icon: Icon(state.searchMode ? Icons.close : Icons.search),
+                                              ),
+                                              if (!state.searchMode)
+                                                IconButton(onPressed: () => cubit.refresh(), icon: Icon(Icons.refresh)),
+                                              if (!(context.read<IdentityCubit>().state.config?.demoMode ?? false))
+                                                ConditionalWrap(
+                                                  wrapIf: state.errorCount > 0,
+                                                  wrapper: (child) => Badge(
+                                                    offset: Offset(-3, 3),
+                                                    backgroundColor: colors.errorContainer,
+                                                    textColor: colors.error,
+                                                    label: Text('${state.errorCount}'),
+                                                    child: child,
+                                                  ),
+                                                  child: IconButton(
+                                                    onPressed: () => AutoRouter.of(
+                                                      context,
+                                                    ).push(SettingsRoute()).then((value) => cubit.refresh()),
+                                                    icon: Icon(Icons.settings),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                          if (state.searchMode)
+                                            SliverPadding(
+                                              padding: .symmetric(horizontal: padding),
+                                              sliver: SliverList.builder(
+                                                itemCount: state.searchResults.length,
+                                                itemBuilder: (context, index) {
+                                                  return SearchResult(
+                                                    key: ValueKey(state.searchResults[index]),
+                                                    item: state.searchResults[index],
+                                                    fullDate: true,
+                                                    noDimming: true,
+                                                  );
+                                                },
+                                              ),
+                                            )
+                                          else
+                                            ...state.items.keys.expand((value) {
+                                              var feed = state.items[value] ?? [];
+                                              final totalItemCount = feed.length;
+                                              // if the user wants ti hide read item, we do so
+
+                                              var unreadCount = totalItemCount;
+                                              if (context.read<IdentityCubit>().currentUser?.readItemHandling ==
+                                                  .hide) {
+                                                feed = feed.where((element) => !element.read).toList();
+                                                unreadCount = feed.length;
+                                              }
+
+                                              if (feed.isNotEmpty) {
+                                                return buildSlivers(
+                                                  context: context,
+                                                  timeRange: value,
+                                                  immutableItems: feed,
+                                                  blocks: state.layout,
+                                                  readItems: totalItemCount - unreadCount,
+                                                  padding: padding,
+                                                );
+                                              } else {
+                                                return [
+                                                  SliverPadding(
+                                                    padding: .symmetric(vertical: padding),
+                                                    sliver: SliverStickyHeader.builder(
+                                                      builder: (context, state) => DateBar(
+                                                        date: value.end,
+                                                        isPinned: state.isPinned,
+                                                        isFirst: true,
+                                                      ),
+                                                      sliver: SliverToBoxAdapter(
+                                                        child: SizedBox(
+                                                          height: 500,
+                                                          child: Column(
+                                                            mainAxisAlignment: .center,
+                                                            spacing: pu6,
+                                                            children: [
+                                                              Icon(
+                                                                unreadCount == 0 && totalItemCount > 0
+                                                                    ? Icons.task_alt_outlined
+                                                                    : Icons.newspaper,
+                                                                size: 50,
+                                                                color: colors.onSurface,
+                                                              ),
+                                                              if (totalItemCount == 0)
+                                                                Text(locals.noNews, style: textTheme.titleLarge),
+                                                              // this is our read item count
+                                                              if (unreadCount == 0 && totalItemCount > 0)
+                                                                Text(
+                                                                  locals.readItems(totalItemCount - unreadCount),
+                                                                  style: textTheme.titleLarge,
+                                                                ),
+                                                            ],
                                                           ),
                                                         ),
                                                       ),
-                                                    ],
-                                                  )
-                                                : AppName(style: textTheme.titleLarge),
-                                          ),
-                                          leading: state.searchMode
-                                              ? null
-                                              : ClipPath(
-                                                  clipper: FancySide(),
-                                                  child: Container(
-                                                    decoration: BoxDecoration(color: appColor),
-                                                    child: Padding(
-                                                      padding: .only(left: pu6),
-                                                      child: Align(
-                                                        alignment: .centerLeft,
-                                                        child: AppLogo(color: colors.onSurface, size: 20),
-                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                          actions: [
-                                            IconButton(
-                                              onPressed: () => cubit.setSearch(!state.searchMode),
-                                              icon: Icon(state.searchMode ? Icons.close : Icons.search),
-                                            ),
-                                            if (!state.searchMode)
-                                              IconButton(onPressed: () => cubit.refresh(), icon: Icon(Icons.refresh)),
-                                            if (!(context.read<IdentityCubit>().state.config?.demoMode ?? false))
-                                              ConditionalWrap(
-                                                wrapIf: state.errorCount > 0,
-                                                wrapper: (child) => Badge(
-                                                  offset: Offset(-3, 3),
-                                                  backgroundColor: colors.errorContainer,
-                                                  textColor: colors.error,
-                                                  label: Text('${state.errorCount}'),
-                                                  child: child,
-                                                ),
-                                                child: IconButton(
-                                                  onPressed: () => AutoRouter.of(
-                                                    context,
-                                                  ).push(SettingsRoute()).then((value) => cubit.refresh()),
-                                                  icon: Icon(Icons.settings),
+                                                ];
+                                              }
+                                            }),
+                                          if (state.loading)
+                                            SliverToBoxAdapter(
+                                              child: Center(
+                                                child: SizedBox(width: 50, height: 50, child: LoadingIndicator()),
+                                              ),
+                                            )
+                                          else if (!state.searchMode ||
+                                              (state.searchMode &&
+                                                  state.searchResults.length ==
+                                                      searchPageSize * (state.searchPage + 1)))
+                                            SliverToBoxAdapter(
+                                              child: Center(
+                                                child: FilledButton.tonalIcon(
+                                                  onPressed: () => state.searchMode
+                                                      ? cubit.loadMoreSearchResults()
+                                                      : cubit.getFeed(),
+                                                  label: Text(locals.loadMore),
+                                                  icon: Icon(Icons.expand_more),
                                                 ),
                                               ),
-                                          ],
-                                        ),
-                                        if (state.searchMode)
-                                          SliverList.builder(
-                                            itemCount: state.searchResults.length,
-                                            itemBuilder: (context, index) {
-                                              return SearchResult(
-                                                key: ValueKey(state.searchResults[index]),
-                                                item: state.searchResults[index],
-                                                fullDate: true,
-                                                noDimming: true,
-                                              );
-                                            },
-                                          )
-                                        else
-                                          ...state.items.keys.expand((value) {
-                                            var feed = state.items[value] ?? [];
-                                            final totalItemCount = feed.length;
-                                            // if the user wants ti hide read item, we do so
-
-                                            var unreadCount = totalItemCount;
-                                            if (context.read<IdentityCubit>().currentUser?.readItemHandling == .hide) {
-                                              feed = feed.where((element) => !element.read).toList();
-                                              unreadCount = feed.length;
-                                            }
-
-                                            if (feed.isNotEmpty) {
-                                              return buildSlivers(
-                                                context: context,
-                                                timeRange: value,
-                                                immutableItems: feed,
-                                                blocks: state.layout,
-                                                readItems: totalItemCount - unreadCount,
-                                              );
-                                            } else {
-                                              return [
-                                                SliverStickyHeader.builder(
-                                                  builder: (context, state) =>
-                                                      DateBar(date: value.end, isPinned: state.isPinned, isFirst: true),
-                                                  sliver: SliverToBoxAdapter(
-                                                    child: SizedBox(
-                                                      height: 500,
-                                                      child: Column(
-                                                        mainAxisAlignment: .center,
-                                                        spacing: pu6,
-                                                        children: [
-                                                          Icon(
-                                                            unreadCount == 0 && totalItemCount > 0
-                                                                ? Icons.task_alt_outlined
-                                                                : Icons.newspaper,
-                                                            size: 50,
-                                                            color: colors.onSurface,
-                                                          ),
-                                                          if (totalItemCount == 0)
-                                                            Text(locals.noNews, style: textTheme.titleLarge),
-                                                          // this is our read item count
-                                                          if (unreadCount == 0 && totalItemCount > 0)
-                                                            Text(
-                                                              locals.readItems(totalItemCount - unreadCount),
-                                                              style: textTheme.titleLarge,
-                                                            ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ];
-                                            }
-                                          }),
-                                        if (state.loading)
-                                          SliverToBoxAdapter(
-                                            child: Center(
-                                              child: SizedBox(width: 50, height: 50, child: LoadingIndicator()),
                                             ),
-                                          )
-                                        else if (!state.searchMode ||
-                                            (state.searchMode &&
-                                                state.searchResults.length == searchPageSize * (state.searchPage + 1)))
-                                          SliverToBoxAdapter(
-                                            child: Center(
-                                              child: FilledButton.tonalIcon(
-                                                onPressed: () =>
-                                                    state.searchMode ? cubit.loadMoreSearchResults() : cubit.getFeed(),
-                                                label: Text(locals.loadMore),
-                                                icon: Icon(Icons.expand_more),
-                                              ),
-                                            ),
-                                          ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
+                              ],
+                            ),
+                          ),
+                          SingleMotionBuilder(
+                            motion: MaterialSpringMotion.expressiveSpatialDefault(),
+                            from: 0,
+                            value: state.hasScrolled ? 1 : 0,
+                            builder: (context, value, child) => Positioned(
+                              right: 30,
+                              bottom: lerpDouble(-100, 30, value),
+                              child: Opacity(opacity: value.clamp(0, 1), child: child!),
+                            ),
+                            child: FloatingActionButton(
+                              onPressed: () => cubit.scrollController.animateTo(
+                                0,
+                                duration: Duration(milliseconds: 500),
+                                curve: Curves.easeInOutQuart,
                               ),
-                            ],
+                              child: Icon(Icons.arrow_upward),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                      SingleMotionBuilder(
-                        motion: MaterialSpringMotion.expressiveSpatialDefault(),
-                        from: 0,
-                        value: state.hasScrolled ? 1 : 0,
-                        builder: (context, value, child) => Positioned(
-                          right: 30,
-                          bottom: lerpDouble(-100, 30, value),
-                          child: Opacity(opacity: value.clamp(0, 1), child: child!),
-                        ),
-                        child: FloatingActionButton(
-                          onPressed: () => cubit.scrollController.animateTo(
-                            0,
-                            duration: Duration(milliseconds: 500),
-                            curve: Curves.easeInOutQuart,
-                          ),
-                          child: Icon(Icons.arrow_upward),
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 );
               },
             ),

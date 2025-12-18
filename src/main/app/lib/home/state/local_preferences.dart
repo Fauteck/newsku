@@ -24,7 +24,16 @@ class LocalPreferencesCubit extends Cubit<LocalPreferencesState> {
     var dynamic = prefs.getBool('dynamic-color');
     var blackbackground = prefs.getBool('black-background');
 
-    emit(state.copyWith(themeColor: color, dynamicColor: dynamic ?? false, blackBackground: blackbackground ?? false));
+    var density = prefs.getDouble('density');
+
+    emit(
+      state.copyWith(
+        themeColor: color,
+        dynamicColor: dynamic ?? false,
+        blackBackground: blackbackground ?? false,
+        density: density ?? 4,
+      ),
+    );
   }
 
   Future<void> setDynamicColor(bool bool) async {
@@ -44,6 +53,12 @@ class LocalPreferencesCubit extends Cubit<LocalPreferencesState> {
     prefs.setBool('black-background', bool);
     emit(state.copyWith(blackBackground: bool));
   }
+
+  Future<void> setDensity(double density) async {
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setDouble('density', density);
+    emit(state.copyWith(density: density));
+  }
 }
 
 @freezed
@@ -52,6 +67,7 @@ sealed class LocalPreferencesState with _$LocalPreferencesState {
     @Default(_defaultColor) Color themeColor,
     @Default(false) bool dynamicColor,
     @Default(false) bool blackBackground,
+    @Default(4) double density,
   }) = _LocalPreferencesState;
 
   const LocalPreferencesState._();

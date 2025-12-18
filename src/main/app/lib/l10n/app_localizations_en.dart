@@ -345,4 +345,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get feedbackDisclaimer =>
       'To submit feedback you will need a GitHub account and your screenshot will be submitted to Imgur anonymously.';
+
+  @override
+  String get density => 'UI Density';
+
+  @override
+  String get dense => 'Dense';
+
+  @override
+  String get spacious => 'Spacious';
+
+  @override
+  String get deviceOnlySettings => 'The settings in this section are saved on the device';
 }

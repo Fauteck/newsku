@@ -16,7 +16,7 @@ class LlmPreference extends StatelessWidget {
     var identityCubit = context.read<IdentityCubit>();
     var currentUser = identityCubit.currentUser;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: pu6),
+      padding: EdgeInsets.symmetric(horizontal: pu6),
       child: Column(
         mainAxisSize: .min,
         spacing: pu4,

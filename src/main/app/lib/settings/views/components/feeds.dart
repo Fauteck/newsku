@@ -7,7 +7,6 @@ import 'package:app/utils/dialog.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/error_listener.dart';
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +33,7 @@ class FeedsSettingsTab extends StatelessWidget {
                 : Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(pu2),
+                        padding: EdgeInsets.all(pu2),
                         child: Row(
                           spacing: pu2,
                           children: [
@@ -144,7 +143,7 @@ class FeedsSettingsTab extends StatelessWidget {
 class _ErrorButton extends StatelessWidget {
   final Feed feed;
 
-  const _ErrorButton({super.key, required this.feed});
+  const _ErrorButton({required this.feed});
 
   void openErrors(BuildContext context) {
     AutoRouter.of(context).push(FeedErrorsRoute(feed: feed));
@@ -154,8 +153,6 @@ class _ErrorButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final device = BreakPoint.get(context);
     final colors = Theme.of(context).colorScheme;
-
-    final textTheme = Theme.of(context).textTheme;
 
     final locals = AppLocalizations.of(context)!;
     final hasErrors = feed.lastRefreshErrors > 0;

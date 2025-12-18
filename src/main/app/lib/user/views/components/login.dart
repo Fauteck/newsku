@@ -72,7 +72,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(pu6),
+                    padding: EdgeInsets.all(pu6),
                     child: Center(child: AutoRouter()),
                   ),
                 ],

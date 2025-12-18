@@ -25,7 +25,7 @@ class Done extends StatelessWidget {
             child: Transform.scale(scale: lerpDouble(0.9, 1, value), child: child),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(pu6),
+            padding: EdgeInsets.all(pu6),
             child: Column(
               crossAxisAlignment: .center,
               mainAxisAlignment: .center,

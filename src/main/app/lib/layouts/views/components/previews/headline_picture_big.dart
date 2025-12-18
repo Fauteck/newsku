@@ -17,7 +17,7 @@ class HeadlinePictureBig extends StatelessWidget {
       height: 150,
       borderRadius: .circular(5),
       child: Padding(
-        padding: const EdgeInsets.all(pu2),
+        padding: EdgeInsets.all(pu2),
         child: Column(
           mainAxisAlignment: .end,
           spacing: pu,

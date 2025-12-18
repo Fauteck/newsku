@@ -66,6 +66,8 @@ public class WebSecurityConfig {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
+                .securityContext(context -> context
+                        .requireExplicitSave(false))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(request -> request.getMethod().equalsIgnoreCase("OPTIONS")).permitAll()
                         .requestMatchers("/api/**").authenticated()

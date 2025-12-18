@@ -18,7 +18,7 @@ class NewBlockDialog extends StatelessWidget {
     final locals = AppLocalizations.of(context)!;
     return Dialog(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: pu6),
+        padding: EdgeInsets.symmetric(vertical: pu6),
         child: Column(
           mainAxisSize: .min,
           spacing: pu2,
@@ -67,7 +67,7 @@ class _BlockPreview extends StatelessWidget {
     return InkWell(
       onTap: () => Navigator.of(context).pop(type),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: pu2),
+        padding: EdgeInsets.symmetric(vertical: pu2),
         child: Column(
           children: [
             Text(type.getLabel(locals), style: TextStyle(color: colors.primary)),

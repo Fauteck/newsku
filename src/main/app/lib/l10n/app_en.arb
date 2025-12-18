@@ -92,5 +92,9 @@
     "backendUrl": "Backend URL",
     "submitFeedback": "Submit feedback",
     "submitFeedbackDescription": "Found a bug or have a suggestion? Use this tool to take screenshot of the app, annotate and submit feedback",
-    "feedbackDisclaimer": "To submit feedback you will need a GitHub account and your screenshot will be submitted to Imgur anonymously."
+    "feedbackDisclaimer": "To submit feedback you will need a GitHub account and your screenshot will be submitted to Imgur anonymously.",
+    "density": "UI Density",
+    "dense": "Dense",
+    "spacious": "Spacious",
+    "deviceOnlySettings": "The settings in this section are saved on the device"
 }

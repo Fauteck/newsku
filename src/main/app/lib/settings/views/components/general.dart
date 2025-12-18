@@ -104,6 +104,12 @@ class GeneralSettingsTab extends StatelessWidget {
                     Gap(pu8),
                     Divider(),
                     Gap(pu8),
+                    Container(
+                      padding: .symmetric(horizontal: pu4, vertical: pu2),
+                      decoration: BoxDecoration(borderRadius: .circular(5), color: colors.tertiaryContainer),
+                      child: Row(spacing: pu, children: [Icon(Icons.info_outline), Text(locals.deviceOnlySettings)]),
+                    ),
+                    Gap(pu4),
                     Text(locals.appColor),
                     Gap(pu2),
                     SwitchListTile(
@@ -169,6 +175,27 @@ class GeneralSettingsTab extends StatelessWidget {
                               );
                             }).toList(),
                       ),
+
+                    /*
+                    Gap(pu8),
+                    Text(locals.density),
+                    Row(
+                      children: [
+                        Text(locals.dense, style: textTheme.labelSmall),
+                        Expanded(
+                          child: Slider(
+                            min: 1,
+                            max: 8,
+                            divisions: 8,
+                            value: pu,
+                            onChanged: (double value) => getIt.get<LocalPreferencesCubit>().setDensity(value),
+                          ),
+                        ),
+
+                        Text(locals.spacious, style: textTheme.labelSmall),
+                      ],
+                    ),
+*/
                     Gap(pu8),
                     Divider(),
                     Gap(pu8),

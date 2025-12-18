@@ -1,7 +1,8 @@
 package com.github.lamarios.newsku.services;
 
-import com.apptasticsoftware.rssreader.*;
-import com.apptasticsoftware.rssreader.filter.InvalidXmlCharacterFilter;
+import com.apptasticsoftware.rssreader.Enclosure;
+import com.apptasticsoftware.rssreader.Item;
+import com.apptasticsoftware.rssreader.RssReader;
 import com.github.lamarios.newsku.persistence.entities.Feed;
 import com.github.lamarios.newsku.persistence.entities.FeedError;
 import com.github.lamarios.newsku.persistence.entities.FeedItem;
@@ -11,6 +12,7 @@ import com.github.lamarios.newsku.persistence.repositories.FeedRepository;
 import com.github.lamarios.newsku.utils.TransactionHelper;
 import jakarta.persistence.EntityManager;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -92,11 +94,6 @@ public class FeedItemService {
                             String imageUrl = image.orElse(getImageUrl(item));
 
                             if (existingFeed != null) {
-                                // TODO: remove when stuff is stable
-                                if (imageUrl != null && !imageUrl.isEmpty() && !imageUrl.equals(existingFeed.getImageUrl())) {
-                                    existingFeed.setImageUrl(imageUrl);
-                                    feedItemRepository.save(existingFeed);
-                                }
                                 logger.info("Feed {} already processed", item.getGuid().get());
                                 return;
                             }
@@ -109,9 +106,9 @@ public class FeedItemService {
                                 newItem.setFeed(feed);
                                 newItem.setUrl(item.getLink().orElse(null));
                                 newItem.setGuid(item.getGuid().get());
-                                newItem.setDescription(item.getDescription().orElse(null));
-                                newItem.setTitle(item.getTitle().orElse(null));
-                                newItem.setContent(item.getContent().orElse(null));
+                                newItem.setDescription(item.getDescription().map(StringEscapeUtils::unescapeHtml4).orElse(null));
+                                newItem.setTitle(item.getTitle().map(StringEscapeUtils::unescapeHtml4).orElse(null));
+                                newItem.setContent(item.getContent().map(StringEscapeUtils::unescapeHtml4).orElse(null));
                                 newItem.setImportance(analysis.get().importance());
                                 newItem.setReasoning(analysis.get().reasoning());
                                 newItem.setImageUrl(imageUrl);

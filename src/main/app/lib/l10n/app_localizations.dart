@@ -654,6 +654,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'To submit feedback you will need a GitHub account and your screenshot will be submitted to Imgur anonymously.'**
   String get feedbackDisclaimer;
+
+  /// No description provided for @density.
+  ///
+  /// In en, this message translates to:
+  /// **'UI Density'**
+  String get density;
+
+  /// No description provided for @dense.
+  ///
+  /// In en, this message translates to:
+  /// **'Dense'**
+  String get dense;
+
+  /// No description provided for @spacious.
+  ///
+  /// In en, this message translates to:
+  /// **'Spacious'**
+  String get spacious;
+
+  /// No description provided for @deviceOnlySettings.
+  ///
+  /// In en, this message translates to:
+  /// **'The settings in this section are saved on the device'**
+  String get deviceOnlySettings;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

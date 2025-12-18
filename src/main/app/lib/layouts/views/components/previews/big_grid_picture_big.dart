@@ -71,7 +71,7 @@ class _GridItem extends StatelessWidget {
     return PreviewContainer(
       borderRadius: .circular(10),
       child: Padding(
-        padding: const EdgeInsets.all(pu2),
+        padding: EdgeInsets.all(pu2),
         child: Column(
           mainAxisAlignment: .end,
           spacing: pu,

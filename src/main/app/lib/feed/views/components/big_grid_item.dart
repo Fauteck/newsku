@@ -44,7 +44,7 @@ class BigGridItem extends StatelessWidget {
             Gap(pu2),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(pu2),
+                padding: EdgeInsets.all(pu2),
                 child: Column(
                   crossAxisAlignment: .stretch,
                   spacing: pu2,

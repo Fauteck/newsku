@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.net.URL;
 
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -95,7 +96,7 @@ public class FeedController {
 
 
     @GetMapping("/export")
-    public ResponseEntity<byte[]> exportFeeds() throws IOException, OpmlWriteException {
+    public ResponseEntity<StreamingResponseBody> exportFeeds() throws IOException, OpmlWriteException {
         if (demoMode) {
             throw new AccessDeniedException("App in demoMode");
         }
@@ -112,7 +113,7 @@ public class FeedController {
 
 
     @GetMapping("/{id}/image")
-    public ResponseEntity<byte[]> getFeedImage(@PathVariable String id) throws IOException, SQLException {
+    public ResponseEntity<StreamingResponseBody> getFeedImage(@PathVariable String id) throws IOException, SQLException {
 
         Feed item = feedService.getFeed(id);
 

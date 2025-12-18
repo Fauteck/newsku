@@ -113,7 +113,7 @@ class TopStories extends StatelessWidget {
                   mainAxisSize: .min,
                   crossAxisAlignment: .stretch,
                   mainAxisAlignment: .start,
-                  spacing: pu6,
+                  spacing: pu,
                   children: [
                     FeedItemImage(item: items.first, height: 200, borderRadius: .circular(feedItemBorderRadius)),
                     ItemTitle(
