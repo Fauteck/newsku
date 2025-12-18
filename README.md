@@ -1,6 +1,6 @@
 # Newsku
 
-Newsku is a self-hosted, privacy-first RSS reader that uses LLMs to sort your items by importance based on your preferences.
+Newsku is a self-hosted  RSS reader that uses LLMs to sort your items by importance based on your preferences.
 
 [Demo instance](https://newsku.ftpix.com)
 
