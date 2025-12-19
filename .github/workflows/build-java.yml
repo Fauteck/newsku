@@ -62,22 +62,17 @@ jobs:
       - name: build web
         working-directory: src/main/app
         run: |
-          git submodule init
-          git submodule update
-          ./submodules/flutter/bin/flutter doctor
-          ./submodules/flutter/bin/flutter pub get
-          ./submodules/flutter/bin/flutter doctor
-          ./submodules/flutter/bin/flutter build web --release --build-number ${{ env.TAG_NAME }}
+          nix-shell --run "flutter build web --release --build-number ${{ env.TAG_NAME }}"
           cp -R build/web ../resources/public
       # build backend
 
       - name: Set application version
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          mvn versions:set -DnewVersion=${{ env.TAG_NAME }}
-          mvn versions:commit
+          nix-shell --run "mvn versions:set -DnewVersion=${{ env.TAG_NAME }}"
+          nix-shell --run "mvn versions:commit"
       - name: Build Java app
-        run: mvn clean install
+        run: nix-shell --run "mvn clean install"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
