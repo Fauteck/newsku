@@ -36,7 +36,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'adopt'
-      - uses: cachix/install-nix-action@v22
+      - uses: cachix/install-nix-action@v31
         with:
           nix_path: nixpkgs=channel:nixos-25.11
       - name: Extract tag name
