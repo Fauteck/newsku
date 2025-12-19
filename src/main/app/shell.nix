@@ -12,40 +12,11 @@ let
  aliases = [
      ];
 
- dynamicInputs = with pkgs; [
-            libepoxy
-            fontconfig
-];
+
 in
 pkgs.mkShell {
   buildInputs = with pkgs; builtins.concatLists [
-    [ flutter git http-server
-
-    # flutter desktop
-    clang
-    cmake
-    gtk3
-    libepoxy
-    ninja
-    pkg-config
-    mesa-demos
-
-    xorg.libX11.dev
-    xorg.libX11
-    xorg.libXScrnSaver
-    xorg.libXcomposite
-    xorg.libXcursor
-    xorg.libXdamage
-    xorg.libXext
-    xorg.libXfixes
-    xorg.libXi
-    xorg.libXrandr
-    xorg.libXrender
-    xorg.libXtst
-    xorg.libxkbfile
-    xorg.libxshmfence
-
-    ]
+    [ flutter git http-server ]
   ];
 
   # What to run when the shell starts
@@ -70,7 +41,6 @@ pkgs.mkShell {
 
   echo -e "\nAll done 🎉 \nAvailable aliases:"
 
-
   ''+
           pkgs.lib.concatStrings (map (x: ''echo "${x.name}: ${x.description}";'') aliases);
 
@@ -85,8 +55,6 @@ pkgs.mkShell {
   ####################################################################
 
   LOCALE_ARCHIVE = if pkgs.stdenv.isLinux then "${pkgs.glibcLocales}/lib/locale/locale-archive" else "";
-  LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath dynamicInputs}";
-  DESTDIR="build/install";
 }
 
 # vim: set tabstop=2 shiftwidth=2 expandtab:
