@@ -19,8 +19,7 @@ let
 in
 pkgs.mkShell {
   buildInputs = with pkgs; builtins.concatLists [
-    [
-    git
+    [ flutter git http-server
 
     # flutter desktop
     clang
