@@ -702,6 +702,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This page show how many times you clicked on articles from a given feed in the last 30 days'**
   String get feedStatsExplanation;
+
+  /// No description provided for @noStats.
+  ///
+  /// In en, this message translates to:
+  /// **'No stats available, stats are only recorded once you click on an article in your feed'**
+  String get noStats;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

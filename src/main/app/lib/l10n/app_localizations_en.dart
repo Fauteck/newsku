@@ -371,4 +371,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get feedStatsExplanation =>
       'This page show how many times you clicked on articles from a given feed in the last 30 days';
+
+  @override
+  String get noStats => 'No stats available, stats are only recorded once you click on an article in your feed';
 }
