@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
- java -Xmx128M -Dfile.encoding=UTF-8 -Dserver.port=8080 -jar /app/newsku.jar
+ java -XX:MaxRAM=128m -Xmx92m -XX:+UseSerialGC -jar /app/newsku.jar
