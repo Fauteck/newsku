@@ -14,7 +14,7 @@ let
 in
 pkgs.mkShell {
   buildInputs = with pkgs; builtins.concatLists [
-    [ corretto21 maven gnumake python313Packages.pip ]
+    [ jdk21_headless maven gnumake python313Packages.pip ]
   ];
 
   # to run CI or DB migrations

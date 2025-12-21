@@ -62,12 +62,12 @@ jobs:
       - name: build web
         working-directory: src/main/app
         run: |
-          git submodule init
-          git submodule update
-          ./submodules/flutter/bin/flutter doctor
-          ./submodules/flutter/bin/flutter pub get
-          ./submodules/flutter/bin/flutter doctor
-          ./submodules/flutter/bin/flutter build web --release --build-number ${{ env.TAG_NAME }}
+         # git submodule init
+         # git submodule update
+         # ./submodules/flutter/bin/flutter doctor
+         # ./submodules/flutter/bin/flutter pub get
+         # ./submodules/flutter/bin/flutter doctor
+         nix-shell --run "flutter build web --release --build-number ${{ env.TAG_NAME }}"
           cp -R build/web ../resources/public
       # build backend
 
