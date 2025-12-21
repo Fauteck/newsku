@@ -2,8 +2,6 @@ FROM amazoncorretto:25
 
 RUN mkdir /app
 
-RUN yum install -y curl && yum clean all
-
 COPY ./target/newsku-*.jar  /app/newsku.jar
 
 ADD ./docker/run.sh /run.sh
