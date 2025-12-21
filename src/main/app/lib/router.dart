@@ -10,6 +10,9 @@ import 'package:app/settings/views/components/info.dart';
 import 'package:app/settings/views/components/layout.dart';
 import 'package:app/settings/views/screens/feed_errors.dart';
 import 'package:app/settings/views/screens/settings.dart';
+import 'package:app/stats/views/screens/stats_screen.dart';
+import 'package:app/stats/views/tabs/feed_stats.dart';
+import 'package:app/stats/views/tabs/tag_stats.dart';
 import 'package:app/user/views/components/login.dart';
 import 'package:app/user/views/components/login_form.dart';
 import 'package:app/user/views/components/server_url.dart';
@@ -64,6 +67,14 @@ class AppRouter extends RootStackRouter {
           AutoRoute(page: LayoutSettingsRoute.page),
           AutoRoute(page: GeneralSettingsRoute.page),
           AutoRoute(page: InfoRoute.page),
+        ],
+      ),
+      AutoRoute.guarded(
+        page: StatsRoute.page,
+        onNavigation: loginRequired,
+        children: [
+          AutoRoute(page: TagStatsRoute.page, initial: true),
+          AutoRoute(page: FeedStatsRoute.page),
         ],
       ),
       AutoRoute(

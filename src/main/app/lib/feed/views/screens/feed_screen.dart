@@ -199,8 +199,13 @@ class FeedScreen extends StatelessWidget {
                                                 onPressed: () => cubit.setSearch(!state.searchMode),
                                                 icon: Icon(state.searchMode ? Icons.close : Icons.search),
                                               ),
-                                              if (!state.searchMode)
+                                              if (!state.searchMode) ...[
                                                 IconButton(onPressed: () => cubit.refresh(), icon: Icon(Icons.refresh)),
+                                                IconButton(
+                                                  onPressed: () => AutoRouter.of(context).push(StatsRoute()),
+                                                  icon: Icon(Icons.show_chart),
+                                                ),
+                                              ],
                                               if (!(context.read<IdentityCubit>().state.config?.demoMode ?? false))
                                                 ConditionalWrap(
                                                   wrapIf: state.errorCount > 0,

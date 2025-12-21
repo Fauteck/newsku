@@ -56,6 +56,11 @@ public class FeedItemController {
         return feedItemService.readItems(ids);
     }
 
+    @PutMapping("/{id}/click")
+    public void clickItem(@PathVariable String id) {
+        feedItemService.itemClicked(id);
+    }
+
     @GetMapping("/{id}/image")
     public ResponseEntity<StreamingResponseBody> getArticleImage(@PathVariable String id) throws IOException, SQLException {
 

@@ -1,6 +1,11 @@
 package com.github.lamarios.newsku.persistence.entities;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
+
+import java.util.List;
 
 @Entity
 @Table(name = "feed_items")
@@ -23,6 +28,9 @@ public class FeedItem {
     @ManyToOne
     @JoinColumn(name = "feed_id")
     private Feed feed;
+
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    private List<String> tags;
 
     public Feed getFeed() {
         return feed;
@@ -118,5 +126,13 @@ public class FeedItem {
 
     public void setRead(boolean read) {
         this.read = read;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 }

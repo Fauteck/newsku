@@ -2,6 +2,8 @@ package com.github.lamarios.newsku.services;
 
 import com.apptasticsoftware.rssreader.Item;
 import com.github.lamarios.newsku.models.OpenAiFeedResponse;
+import com.github.lamarios.newsku.models.TagClickStat;
+import com.github.lamarios.newsku.persistence.entities.TagClick;
 import com.github.lamarios.newsku.persistence.entities.User;
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
@@ -10,6 +12,8 @@ import com.openai.models.chat.completions.StructuredChatCompletionCreateParams;
 import com.openai.models.models.Model;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +21,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OpenaiService {
@@ -26,7 +31,8 @@ public class OpenaiService {
     private final String apiKey;
     private final String model;
 
-    public OpenaiService(@Value("${OPENAI_URL}") String url, @Value("${OPENAI_API_KEY:}") String apiKey, @Value("${OPENAI_MODEL}") String model) {
+    @Autowired
+    public OpenaiService(@Value("${OPENAI_URL}") String url, @Value("${OPENAI_API_KEY:}") String apiKey, @Value("${OPENAI_MODEL}") String model, ClickService clickService) {
         this.url = url;
         this.apiKey = apiKey;
         this.model = model;
@@ -63,7 +69,17 @@ public class OpenaiService {
         return client.build();
     }
 
-    public Optional<OpenAiFeedResponse> processFeedItem(Item item, User user) {
+    public Optional<OpenAiFeedResponse> processFeedItem(Item item, User user, List<TagClickStat> clickStats) {
+
+
+        String tagPrompt = """
+                  These are the tags the user clicked on the most in the past 30 days ordered from the most clicked to the least clicked. Those tags may slightly affect your scoring:
+                  %s
+                """.formatted(clickStats.stream()
+                .sorted((o1, o2) -> Long.compare(o2.clicks(), o1.clicks()))
+                .map(TagClickStat::tag)
+                .limit(10)
+                .collect(Collectors.joining(",")));
 
         var start = System.currentTimeMillis();
         String prompt = """
@@ -73,16 +89,24 @@ public class OpenaiService {
                 also you will try to figure out if this feed item is an ad or not
                 
                 You will use the name and description of the source to understand what an important news is for a user.
+                You will also tag the article with up to 4 tags
                 
                 The user has the following preferences. You will refer to it to figure out how to rate a news item:
                 %s
-
+                
+                %s
+                
                 Here is the news item:
                 
                 title: %s
                 content: %s
                 
-                """.formatted(Optional.ofNullable(user.getFeedItemPreference()).filter(s -> !s.isBlank()).orElse("The user has no particular preferences"), item.getTitle().orElse("no title"), item.getDescription()
+                """.formatted(Optional.ofNullable(user.getFeedItemPreference())
+                        .filter(s -> !s.isBlank())
+                        .orElse("The user has no particular preferences"),
+                clickStats.isEmpty() ? "" : tagPrompt,
+                item.getTitle()
+                        .orElse("no title"), item.getDescription()
                         .filter(s -> !s.isBlank())
                         .orElse(item.getContent().orElse("no content")));
 
@@ -107,8 +131,8 @@ public class OpenaiService {
 
 
         Optional<OpenAiFeedResponse> first = analysis.stream().findFirst();
-        first.ifPresent(openAiFeedResponse -> logger.info("Analysis results for feed item: {}:\nimportance: {}\npossible ad: {}\nreasoning: {}\ntime: {}s", item.getGuid(), openAiFeedResponse
-                .importance(), openAiFeedResponse.possibleAd(), openAiFeedResponse.reasoning(), (System.currentTimeMillis() - start) / 1000));
+        first.ifPresent(openAiFeedResponse -> logger.info("Analysis results for feed item: {}:\nimportance: {}\npossible ad: {}\nreasoning: {}\ntags: {}\ntime: {}s", item.getGuid(), openAiFeedResponse
+                .importance(), openAiFeedResponse.possibleAd(), openAiFeedResponse.reasoning(), String.join(",", openAiFeedResponse.tags()), (System.currentTimeMillis() - start) / 1000));
         return first;
     }
 }

@@ -62,6 +62,26 @@ class FeedRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [FeedStatsTab]
+class FeedStatsRoute extends PageRouteInfo<void> {
+  const FeedStatsRoute({List<PageRouteInfo>? children})
+    : super(
+        FeedStatsRoute.name,
+        initialChildren: children,
+        argsEquality: false,
+      );
+
+  static const String name = 'FeedStatsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const FeedStatsTab();
+    },
+  );
+}
+
+/// generated route for
 /// [FeedsSettingsTab]
 class FeedsSettingsRoute extends PageRouteInfo<void> {
   const FeedsSettingsRoute({List<PageRouteInfo>? children})
@@ -277,6 +297,38 @@ class SignupFormRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const SignupFormScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [StatsScreen]
+class StatsRoute extends PageRouteInfo<void> {
+  const StatsRoute({List<PageRouteInfo>? children})
+    : super(StatsRoute.name, initialChildren: children, argsEquality: false);
+
+  static const String name = 'StatsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const StatsScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [TagStatsTab]
+class TagStatsRoute extends PageRouteInfo<void> {
+  const TagStatsRoute({List<PageRouteInfo>? children})
+    : super(TagStatsRoute.name, initialChildren: children, argsEquality: false);
+
+  static const String name = 'TagStatsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const TagStatsTab();
     },
   );
 }

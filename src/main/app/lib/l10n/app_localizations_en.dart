@@ -357,4 +357,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deviceOnlySettings => 'The settings in this section are saved on the device';
+
+  @override
+  String get stats => 'Stats';
+
+  @override
+  String get tags => 'Tags';
+
+  @override
+  String get tagStatsExplanation =>
+      'This page show how many times you clicked on articles with the following tags in the last 30 days. Those stats are used when the AI model scores the importance of an article';
+
+  @override
+  String get feedStatsExplanation =>
+      'This page show how many times you clicked on articles from a given feed in the last 30 days';
 }

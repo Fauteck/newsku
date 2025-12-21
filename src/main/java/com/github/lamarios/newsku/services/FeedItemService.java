@@ -3,12 +3,8 @@ package com.github.lamarios.newsku.services;
 import com.apptasticsoftware.rssreader.Enclosure;
 import com.apptasticsoftware.rssreader.Item;
 import com.apptasticsoftware.rssreader.RssReader;
-import com.github.lamarios.newsku.persistence.entities.Feed;
-import com.github.lamarios.newsku.persistence.entities.FeedError;
-import com.github.lamarios.newsku.persistence.entities.FeedItem;
-import com.github.lamarios.newsku.persistence.repositories.FeedErrorRepository;
-import com.github.lamarios.newsku.persistence.repositories.FeedItemRepository;
-import com.github.lamarios.newsku.persistence.repositories.FeedRepository;
+import com.github.lamarios.newsku.persistence.entities.*;
+import com.github.lamarios.newsku.persistence.repositories.*;
 import com.github.lamarios.newsku.utils.TransactionHelper;
 import jakarta.persistence.EntityManager;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -35,8 +31,10 @@ import java.util.concurrent.Executors;
 @Service
 public class FeedItemService {
     private final static Logger logger = LogManager.getLogger();
+    private final static long PROMPT_TAG_TIME_FRAME = 30 * 24 * 60 * 60 * 1000L; // 30 days
     private final FeedService feedService;
     private final ExecutorService exec = Executors.newSingleThreadExecutor();
+
 
     private final FeedItemRepository feedItemRepository;
 
@@ -46,9 +44,12 @@ public class FeedItemService {
     private final EntityManager entityManager;
     private final FeedRepository feedRepository;
     private final FeedErrorRepository feedErrorRepository;
+    private final FeedClicksRepository feedClicksRepository;
+    private final TagClicksRepository tagClicksRepository;
+    private final ClickService clickService;
 
     @Autowired
-    public FeedItemService(FeedItemRepository feedItemRepository, PlatformTransactionManager transactionManager, OpenaiService openaiService, FeedService feedService, UserService userService, EntityManager entityManager, FeedRepository feedRepository, FeedErrorRepository feedErrorRepository) {
+    public FeedItemService(FeedItemRepository feedItemRepository, PlatformTransactionManager transactionManager, OpenaiService openaiService, FeedService feedService, UserService userService, EntityManager entityManager, FeedRepository feedRepository, FeedErrorRepository feedErrorRepository, FeedClicksRepository feedClicksRepository, TagClicksRepository tagClicksRepository, ClickService clickService) {
         this.feedItemRepository = feedItemRepository;
         this.transactionManager = transactionManager;
         this.openaiService = openaiService;
@@ -57,6 +58,9 @@ public class FeedItemService {
         this.entityManager = entityManager;
         this.feedRepository = feedRepository;
         this.feedErrorRepository = feedErrorRepository;
+        this.feedClicksRepository = feedClicksRepository;
+        this.tagClicksRepository = tagClicksRepository;
+        this.clickService = clickService;
     }
 
     public void refreshFeed(Feed feed) {
@@ -69,8 +73,7 @@ public class FeedItemService {
             logger.info("Refreshing feed {}", feed.getId());
             RssReader reader;
             reader = new RssReader();
-            List<Item> items = FeedService.DEFAULT_READER
-                    .read(feed.getUrl())
+            List<Item> items = FeedService.DEFAULT_READER.read(feed.getUrl())
                     .sorted()
                     .filter(item -> item.getGuid().isPresent())
                     .toList();
@@ -98,7 +101,9 @@ public class FeedItemService {
                                 return;
                             }
 
-                            var analysis = openaiService.processFeedItem(item, feed.getUser());
+                            var clicks = clickService.tagClicks(System.currentTimeMillis() - PROMPT_TAG_TIME_FRAME, System.currentTimeMillis(), feed.getUser());
+
+                            var analysis = openaiService.processFeedItem(item, feed.getUser(), clicks);
                             if (analysis.isPresent()) {
 
                                 FeedItem newItem = new FeedItem();
@@ -106,15 +111,26 @@ public class FeedItemService {
                                 newItem.setFeed(feed);
                                 newItem.setUrl(item.getLink().orElse(null));
                                 newItem.setGuid(item.getGuid().get());
-                                newItem.setDescription(item.getDescription().map(StringEscapeUtils::unescapeHtml4).orElse(null));
+                                newItem.setDescription(item.getDescription()
+                                        .map(StringEscapeUtils::unescapeHtml4)
+                                        .orElse(null));
                                 newItem.setTitle(item.getTitle().map(StringEscapeUtils::unescapeHtml4).orElse(null));
-                                newItem.setContent(item.getContent().map(StringEscapeUtils::unescapeHtml4).orElse(null));
+                                newItem.setContent(item.getContent()
+                                        .map(StringEscapeUtils::unescapeHtml4)
+                                        .orElse(null));
                                 newItem.setImportance(analysis.get().importance());
                                 newItem.setReasoning(analysis.get().reasoning());
                                 newItem.setImageUrl(imageUrl);
                                 newItem.setTimeCreated(item.getPubDateZonedDateTime()
                                         .map(zonedDateTime -> zonedDateTime.toInstant().toEpochMilli())
                                         .orElse(System.currentTimeMillis()));
+                                newItem.setTags(analysis.get()
+                                        .tags()
+                                        .stream()
+                                        .map(String::toLowerCase)
+                                        .map(s -> s.replaceAll("[^a-zA-Z0-9 ]", ""))
+                                        .filter(s -> !s.isEmpty())
+                                        .toList());
 
                                 feedItemRepository.save(newItem);
                             }
@@ -169,6 +185,34 @@ public class FeedItemService {
             imageUrl = doc.getElementsByTag("img").attr("src");
         }
         return Optional.ofNullable(imageUrl).filter(s -> !s.isBlank()).orElse(null);
+
+    }
+
+    @Transactional
+    public void itemClicked(String id) {
+        User user = userService.getCurrentUser();
+        List<Feed> feeds = feedRepository.getFeedsByUser(user);
+        FeedItem feedItem = feedItemRepository.getFirstByIdAndFeedIn(id, feeds);
+
+        if (feedItem == null) {
+            return;
+        }
+
+        FeedClick feedClick = new FeedClick();
+        feedClick.setId(UUID.randomUUID().toString());
+        feedClick.setFeed(feedItem.getFeed());
+        feedClick.setTimeCreated(System.currentTimeMillis());
+        feedClicksRepository.save(feedClick);
+
+        for (String tag : feedItem.getTags()) {
+            TagClick tagClick = new TagClick();
+            tagClick.setId(UUID.randomUUID().toString());
+            tagClick.setTag(tag);
+            tagClick.setTimeCreated(System.currentTimeMillis());
+            tagClick.setUser(user);
+            tagClicksRepository.save(tagClick);
+        }
+
 
     }
 

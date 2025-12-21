@@ -103,7 +103,7 @@ enum LayoutBlockTypes {
             .mobile => 1,
             _ => 2,
           },
-          mainAxisExtent: 120,
+          mainAxisExtent: 150,
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
         ),

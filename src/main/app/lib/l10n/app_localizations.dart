@@ -678,6 +678,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The settings in this section are saved on the device'**
   String get deviceOnlySettings;
+
+  /// No description provided for @stats.
+  ///
+  /// In en, this message translates to:
+  /// **'Stats'**
+  String get stats;
+
+  /// No description provided for @tags.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get tags;
+
+  /// No description provided for @tagStatsExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'This page show how many times you clicked on articles with the following tags in the last 30 days. Those stats are used when the AI model scores the importance of an article'**
+  String get tagStatsExplanation;
+
+  /// No description provided for @feedStatsExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'This page show how many times you clicked on articles from a given feed in the last 30 days'**
+  String get feedStatsExplanation;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

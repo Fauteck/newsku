@@ -65,6 +65,14 @@ class FeedService extends BaseService {
     return Feed.fromJson(feed);
   }
 
+  Future<void> click(String id) async {
+    var uri = await formatUrl('/api/feeds/items/$id/click');
+
+    var response = await http.put(uri, headers: await headers, body: url);
+
+    processResponse(response);
+  }
+
   Future<Paginated<FeedItem>> getFeedItems({
     required int page,
     required int pageSize,

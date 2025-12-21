@@ -19,6 +19,7 @@ sealed class FeedItem with _$FeedItem {
     @Default(false) bool read,
     @Default(0) int importance,
     @Default(0) int timeCreated,
+    @Default([]) List<String> tags,
     Feed? feed,
   }) = _FeedItem;
 

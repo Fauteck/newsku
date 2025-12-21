@@ -1,12 +1,13 @@
 import 'package:app/feed/models/feed_item.dart';
+import 'package:app/feed/services/feed_service.dart';
 import 'package:app/feed/states/main_feed.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/utils/states/simple_cubit.dart';
+import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/conditional_wrap.dart';
 import 'package:app/utils/views/components/simple_cubit_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:motor/motor.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -44,7 +45,13 @@ class ClickableFeedItem extends StatelessWidget {
               },
               child: child,
             ),
-            child: GestureDetector(onTap: () => launchUrl(Uri.parse(item.url!)), child: builder(hovered)),
+            child: GestureDetector(
+              onTap: () {
+                FeedService(serverUrl!).click(item.id ?? '');
+                launchUrl(Uri.parse(item.url!));
+              },
+              child: builder(hovered),
+            ),
           ),
         );
       },

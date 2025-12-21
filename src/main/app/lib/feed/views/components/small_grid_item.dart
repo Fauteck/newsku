@@ -41,12 +41,11 @@ class SmallGridItem extends StatelessWidget {
                       overflow: .ellipsis,
                       maxLines: 2,
                     ),
-                    Expanded(
-                      child: Align(
-                        alignment: .centerLeft,
-                        child: ItemContent(item: item, maxLines: 1, overflow: .ellipsis),
-                      ),
+                    Align(
+                      alignment: .centerLeft,
+                      child: ItemContent(item: item, maxLines: 1, overflow: .ellipsis),
                     ),
+                    Spacer(),
                     InfoBar(item: item),
                   ],
                 ),
