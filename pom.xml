@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.github.lamarios.newsku</groupId>
@@ -27,7 +27,7 @@
         <url/>
     </scm>
     <properties>
-        <java.version>21</java.version>
+        <java.version>25</java.version>
     </properties>
     <dependencies>
         <dependency>
@@ -77,13 +77,13 @@
         <dependency>
             <groupId>com.apptasticsoftware</groupId>
             <artifactId>rssreader</artifactId>
-            <version>3.11.0</version>
+            <version>3.12.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.openai</groupId>
             <artifactId>openai-java</artifactId>
-            <version>3.4.1</version>
+            <version>4.13.0</version>
         </dependency>
 
         <dependency>
@@ -100,7 +100,7 @@
         <dependency>
             <groupId>com.konghq</groupId>
             <artifactId>unirest-java-core</artifactId>
-            <version>4.6.0</version>
+            <version>4.7.0</version>
             <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.konghq/unirest-objectmapper-jackson -->
@@ -153,6 +153,12 @@
 
     <build>
         <plugins>
+<!--
+            <plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+            </plugin>
+-->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -164,6 +170,17 @@
                         </goals>
                     </execution>
                 </executions>
+<!--
+                <configuration>
+                    <image>
+                        <builder>paketobuildpacks/builder-jammy-buildpackless-tiny</builder>
+                        <buildpacks>
+                            <buildpack>paketobuildpacks/oracle</buildpack>
+                            <buildpack>paketobuildpacks/java-native-image</buildpack>
+                        </buildpacks>
+                    </image>
+                </configuration>
+-->
             </plugin>
         </plugins>
     </build>

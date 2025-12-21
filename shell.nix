@@ -14,7 +14,7 @@ let
 in
 pkgs.mkShell {
   buildInputs = with pkgs; builtins.concatLists [
-    [ jdk21_headless maven gnumake python313Packages.pip ]
+    [ jdk25 maven gnumake python313Packages.pip ]
   ];
 
   # to run CI or DB migrations
@@ -25,6 +25,8 @@ pkgs.mkShell {
   pip install -r mkdocs/requirements.txt
 
   # to install new plugin dependencies, pip install <package> then pip freeze > mkdocs/requirements.txt to add it to the requirement file
+
+  export JAVA_HOME=${pkgs.jdk25}/lib/openjdk
 
   echo -e "\nAll done 🎉 \nAvailable aliases:"
   ''+
