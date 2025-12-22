@@ -77,9 +77,9 @@ public class OpenaiService {
                   %s
                 """.formatted(clickStats.stream()
                 .sorted((o1, o2) -> Long.compare(o2.clicks(), o1.clicks()))
-                .map(TagClickStat::tag)
                 .limit(10)
-                .collect(Collectors.joining(",")));
+                .map(s -> "%s (%d clicks)".formatted(s.tag(), s.clicks()))
+                .collect(Collectors.joining(", ")));
 
         var start = System.currentTimeMillis();
         String prompt = """

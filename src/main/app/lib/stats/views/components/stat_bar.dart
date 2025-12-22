@@ -32,7 +32,7 @@ class StatBar extends StatelessWidget {
                 alignment: .centerLeft,
                 child: child,
               ),
-              motion: MaterialSpringMotion.expressiveSpatialDefault(),
+              motion: MaterialSpringMotion.expressiveSpatialSlow(),
               child: Container(
                 decoration: BoxDecoration(color: colors.primary, borderRadius: .circular(10)),
               ),

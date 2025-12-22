@@ -2,6 +2,8 @@ import 'package:app/l10n/app_localizations.dart';
 import 'package:app/router.dart';
 import 'package:app/stats/states/stats_state.dart';
 import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/utils/utils.dart';
+import 'package:app/utils/views/components/conditional_wrap.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +43,14 @@ class StatsScreen extends StatelessWidget {
                       if (state.loading) {
                         return Center(child: LoadingIndicator());
                       } else {
-                        return child;
+                        return ConditionalWrap(
+                          wrapIf: BreakPoint.get(context) == .mobile,
+                          wrapper: (child) => Padding(
+                            padding: .symmetric(horizontal: pu2),
+                            child: child,
+                          ),
+                          child: child,
+                        );
                       }
                     },
                   ),

@@ -36,7 +36,7 @@ class FeedsSettingsCubit extends Cubit<FeedsSettingsState> {
       newFeedController.text = '';
       getFeeds();
     } catch (e, s) {
-      emit(state.copyWith(error: e, stackTrace: s));
+      emit(state.copyWith(error: e, stackTrace: s, loading: false));
     }
   }
 

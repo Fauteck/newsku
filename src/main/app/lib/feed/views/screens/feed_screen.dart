@@ -8,8 +8,10 @@ import 'package:app/feed/views/components/search_result.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
+import 'package:app/main.dart';
 import 'package:app/router.dart';
 import 'package:app/user/views/components/fancy_side.dart';
+import 'package:app/user/views/components/user_profile_picture.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/app_logo.dart';
@@ -157,25 +159,14 @@ class FeedScreen extends StatelessWidget {
                                             title: AnimatedSwitcher(
                                               duration: Duration(milliseconds: 250),
                                               child: state.searchMode
-                                                  ? Row(
-                                                      mainAxisSize: .max,
-                                                      mainAxisAlignment: .center,
-                                                      children: [
-                                                        ConstrainedBox(
-                                                          constraints: BoxConstraints(
-                                                            maxWidth: BreakPoint.tablet.maxWidth,
-                                                          ),
-                                                          child: TextField(
-                                                            controller: cubit.searchController,
-                                                            autofocus: true,
-                                                            onChanged: (value) => cubit.search(value),
-                                                            decoration: InputDecoration(
-                                                              border: UnderlineInputBorder(),
-                                                              label: Text(locals.search),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
+                                                  ? TextField(
+                                                      controller: cubit.searchController,
+                                                      autofocus: true,
+                                                      onChanged: (value) => cubit.search(value),
+                                                      decoration: InputDecoration(
+                                                        border: UnderlineInputBorder(),
+                                                        label: Text(locals.search),
+                                                      ),
                                                     )
                                                   : AppName(style: textTheme.titleLarge),
                                             ),
@@ -201,28 +192,46 @@ class FeedScreen extends StatelessWidget {
                                               ),
                                               if (!state.searchMode) ...[
                                                 IconButton(onPressed: () => cubit.refresh(), icon: Icon(Icons.refresh)),
-                                                IconButton(
-                                                  onPressed: () => AutoRouter.of(context).push(StatsRoute()),
-                                                  icon: Icon(Icons.show_chart),
-                                                ),
                                               ],
-                                              if (!(context.read<IdentityCubit>().state.config?.demoMode ?? false))
-                                                ConditionalWrap(
-                                                  wrapIf: state.errorCount > 0,
-                                                  wrapper: (child) => Badge(
-                                                    offset: Offset(-3, 3),
-                                                    backgroundColor: colors.errorContainer,
-                                                    textColor: colors.error,
-                                                    label: Text('${state.errorCount}'),
-                                                    child: child,
-                                                  ),
-                                                  child: IconButton(
-                                                    onPressed: () => AutoRouter.of(
-                                                      context,
-                                                    ).push(SettingsRoute()).then((value) => cubit.refresh()),
-                                                    icon: Icon(Icons.settings),
-                                                  ),
+                                              MenuAnchor(
+                                                builder: (context, controller, child) => IconButton(
+                                                  onPressed: () =>
+                                                      controller.isOpen ? controller.close() : controller.open(),
+                                                  icon: UserProfilePicture(),
                                                 ),
+                                                menuChildren: [
+                                                  MenuItemButton(
+                                                    leadingIcon: Icon(Icons.show_chart),
+                                                    onPressed: () => AutoRouter.of(context).push(StatsRoute()),
+                                                    child: Text(locals.stats),
+                                                  ),
+                                                  if (!(context.read<IdentityCubit>().state.config?.demoMode ?? false))
+                                                    MenuItemButton(
+                                                      leadingIcon: ConditionalWrap(
+                                                        wrapIf: state.errorCount > 0,
+                                                        wrapper: (child) => Badge(
+                                                          offset: Offset(5, 0),
+                                                          backgroundColor: colors.errorContainer,
+                                                          textColor: colors.error,
+                                                          label: Text('${state.errorCount}'),
+                                                          child: child,
+                                                        ),
+
+                                                        child: Icon(Icons.settings),
+                                                      ),
+                                                      child: Text(locals.settings),
+                                                      onPressed: () => AutoRouter.of(
+                                                        context,
+                                                      ).push(SettingsRoute()).then((value) => cubit.refresh()),
+                                                    ),
+                                                  Divider(),
+                                                  MenuItemButton(
+                                                    leadingIcon: Icon(Icons.logout),
+                                                    onPressed: () => getIt.get<IdentityCubit>().logout(),
+                                                    child: Text(locals.logout),
+                                                  ),
+                                                ],
+                                              ),
                                             ],
                                           ),
                                           if (state.searchMode)
