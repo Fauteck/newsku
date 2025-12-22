@@ -2,7 +2,6 @@ package com.github.lamarios.newsku.services;
 
 import com.apptasticsoftware.rssreader.Enclosure;
 import com.apptasticsoftware.rssreader.Item;
-import com.apptasticsoftware.rssreader.RssReader;
 import com.github.lamarios.newsku.persistence.entities.*;
 import com.github.lamarios.newsku.persistence.repositories.*;
 import com.github.lamarios.newsku.utils.TransactionHelper;
@@ -67,12 +66,11 @@ public class FeedItemService {
         exec.submit(() -> refreshFeedWorker(feed));
     }
 
-    private void refreshFeedWorker(Feed feed) {
+    public void refreshFeedWorker(Feed feed) {
         int errors = 0;
         try {
             logger.info("Refreshing feed {}", feed.getId());
-            RssReader reader;
-            reader = new RssReader();
+
             List<Item> items = FeedService.DEFAULT_READER.read(feed.getUrl())
                     .sorted()
                     .filter(item -> item.getGuid().isPresent())
@@ -121,7 +119,7 @@ public class FeedItemService {
                                 newItem.setImportance(analysis.get().importance());
                                 newItem.setReasoning(analysis.get().reasoning());
                                 newItem.setImageUrl(imageUrl);
-                                newItem.setTimeCreated(item.getPubDateZonedDateTime()
+                                newItem.setTimeCreated(item.getPubDateAsZonedDateTime()
                                         .map(zonedDateTime -> zonedDateTime.toInstant().toEpochMilli())
                                         .orElse(System.currentTimeMillis()));
                                 newItem.setTags(analysis.get()
@@ -217,7 +215,7 @@ public class FeedItemService {
     }
 
     @Transactional(readOnly = true)
-    public Page<FeedItem> getItems(Long from, Long to, int page, int pageSize) throws SQLException {
+    public Page<FeedItem> getItems(Long from, Long to, int page, int pageSize) {
 
         List<Feed> feeds = feedService.getFeeds();
         var user = userService.getCurrentUser();
@@ -228,7 +226,7 @@ public class FeedItemService {
     @Transactional(readOnly = true)
     public List<FeedItem> search(String query, int page, int pageSize) {
         var feeds = feedRepository.getFeedsByUser(userService.getCurrentUser());
-        return entityManager.createNativeQuery(String.format("select * from feed_items where search_terms @@ websearch_to_tsquery(:textQuery) and feed_id in :feeds limit :pageSize offset :page"), FeedItem.class)
+        return entityManager.createNativeQuery("select * from feed_items where search_terms @@ websearch_to_tsquery(:textQuery) and feed_id in :feeds limit :pageSize offset :page", FeedItem.class)
                 .setParameter("textQuery", query)
                 .setParameter("feeds", feeds.stream().map(Feed::getId).toList())
                 .setParameter("pageSize", pageSize)
