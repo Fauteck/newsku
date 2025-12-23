@@ -14,6 +14,7 @@ import com.github.lamarios.newsku.Constants;
 import com.github.lamarios.newsku.persistence.entities.Feed;
 import com.github.lamarios.newsku.persistence.entities.User;
 import com.github.lamarios.newsku.persistence.repositories.FeedRepository;
+import com.github.lamarios.newsku.utils.TemporaryInvalidXmlCharacterFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class FeedService {
 
     public final static AbstractRssReader<Channel, Item> DEFAULT_READER = new RssReader()
             .setUserAgent(Constants.USER_AGENT)
-            .addFeedFilter(new InvalidXmlCharacterFilter())
+            .addFeedFilter(new TemporaryInvalidXmlCharacterFilter())
             .addItemExtension("media:thumbnail", "url", (item, s) -> {
                 Enclosure enclosure = new Enclosure();
                 enclosure.setType("image");
