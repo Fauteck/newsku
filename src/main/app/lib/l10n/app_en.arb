@@ -58,7 +58,7 @@
     "readItemHandlingExplanation": "While you scroll through the feed, items will be set as read. Select how you want to handle the read items in your feed",
     "appColor": "App color",
     "blackBackground": "Black background",
-    "blackBackgroundExplanation": "User black background for the dark theme",
+    "blackBackgroundExplanation": "Use black background for the dark theme",
     "dynamicColor": "Dynamic color",
     "dynamicColorExplanation": "User device accent color",
     "newPassword": "New password",
