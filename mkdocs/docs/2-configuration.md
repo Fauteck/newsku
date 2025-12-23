@@ -21,6 +21,24 @@ Newsku requires a connection to an Openai API compatible server
 | OPENAI_API_KEY | (none)  | **Yes**  | API Key to talk to the open ai compatible server |
 | OPENAI_MODEL   | (none)  | **Yes**  | I tested openai gpt oss 20B with good results    | 
 
+### SMTP Server
+
+Newsku needs a SMTP server for the following features:
+
+- Password resets
+
+Here are the required environment variables
+
+| Name                    | Default               | Required (based on if you want SMTP services enabled) | Comments                                              |
+|-------------------------|-----------------------|-------------------------------------------------------|-------------------------------------------------------|
+| ROOT_URL                | http://localhost:8080 | No                                                    | The base URL used in the links in email sent to users |
+| SMTP_HOST               | (none)                | **Yes**                                               |                                                       |
+| SMTP_PORT               | 0                     | **Yes**                                               |                                                       |
+| SMTP_USERNAME           | (none)                | No                                                    |                                                       |
+| SMTP_PASSWORD           | (none)                | No                                                    |                                                       |
+| SMTP_FROM               | (none)                | **Yes**                                               | Who will be the sender of the email                   | 
+| SMTP_TRANSPORT_STRATEGY | SMTP                  | **Yes**                                               | Possible values: SMTP, SMTPS, SMTP_TLS                |
+
 ### OIDC
 
 Newsku Supports SSO by implementing OIDC. You will need to set up your OIDC client as a Public Client and enable PKCE.
