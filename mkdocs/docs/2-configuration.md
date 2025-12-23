@@ -27,7 +27,7 @@ Newsku needs a SMTP server for the following features:
 
 - Password resets
 
-Here are the required environment variables
+Here are the environment variables to set that up
 
 | Name                    | Default               | Required (based on if you want SMTP services enabled) | Comments                                              |
 |-------------------------|-----------------------|-------------------------------------------------------|-------------------------------------------------------|

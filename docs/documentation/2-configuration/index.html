@@ -300,6 +300,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#smtp-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SMTP Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#oidc" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -427,6 +438,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#smtp-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SMTP Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#oidc" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -538,6 +560,66 @@
 <td>(none)</td>
 <td><strong>Yes</strong></td>
 <td>I tested openai gpt oss 20B with good results</td>
+</tr>
+</tbody>
+</table>
+<h3 id="smtp-server">SMTP Server</h3>
+<p>Newsku needs a SMTP server for the following features:</p>
+<ul>
+<li>Password resets</li>
+</ul>
+<p>Here are the environment variables to set that up</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Default</th>
+<th>Required (based on if you want SMTP services enabled)</th>
+<th>Comments</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ROOT_URL</td>
+<td>http://localhost:8080</td>
+<td>No</td>
+<td>The base URL used in the links in email sent to users</td>
+</tr>
+<tr>
+<td>SMTP_HOST</td>
+<td>(none)</td>
+<td><strong>Yes</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>SMTP_PORT</td>
+<td>0</td>
+<td><strong>Yes</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>SMTP_USERNAME</td>
+<td>(none)</td>
+<td>No</td>
+<td></td>
+</tr>
+<tr>
+<td>SMTP_PASSWORD</td>
+<td>(none)</td>
+<td>No</td>
+<td></td>
+</tr>
+<tr>
+<td>SMTP_FROM</td>
+<td>(none)</td>
+<td><strong>Yes</strong></td>
+<td>Who will be the sender of the email</td>
+</tr>
+<tr>
+<td>SMTP_TRANSPORT_STRATEGY</td>
+<td>SMTP</td>
+<td><strong>Yes</strong></td>
+<td>Possible values: SMTP, SMTPS, SMTP_TLS</td>
 </tr>
 </tbody>
 </table>
