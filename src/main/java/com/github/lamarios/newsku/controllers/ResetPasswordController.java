@@ -9,7 +9,7 @@ import java.io.IOException;
 
 @RestController
 @Tag(name = "Reset password")
-@RequestMapping("/reset-password")
+@RequestMapping("/")
 public class ResetPasswordController {
 
 
@@ -19,12 +19,12 @@ public class ResetPasswordController {
         this.resetPasswordService = resetPasswordService;
     }
 
-    @PostMapping
+    @PostMapping("/forgot-password")
     public void forgotPassword(@RequestBody String email) throws TemplateException, IOException {
         resetPasswordService.forgotPassword(email);
     }
 
-    @PostMapping
+    @PostMapping("/reset-password")
     public void resetPassword(@RequestBody String password, @RequestParam("token") String token){
         resetPasswordService.resetPassword(token, password);
     }

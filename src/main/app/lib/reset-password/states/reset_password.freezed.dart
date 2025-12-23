@@ -200,8 +200,8 @@ return $default(_that.password,_that.repeatPassword);case _:
 /// @nodoc
 
 
-class _ResetPasswordState implements ResetPasswordState {
-  const _ResetPasswordState({this.password = "", this.repeatPassword = ""});
+class _ResetPasswordState extends ResetPasswordState {
+  const _ResetPasswordState({this.password = "", this.repeatPassword = ""}): super._();
   
 
 @override@JsonKey() final  String password;

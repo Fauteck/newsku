@@ -10,6 +10,7 @@ sealed class Config with _$Config {
     @Default(false) bool demoMode,
     required String backendVersion,
     required bool allowSignup,
+    @Default(false) bool canResetPassword,
     OidcConfig? oidcConfig,
     @Default("") String announcement,
   }) = _Config;

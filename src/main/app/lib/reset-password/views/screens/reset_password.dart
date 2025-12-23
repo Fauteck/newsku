@@ -1,11 +1,18 @@
+import 'package:app/identity/states/identity.dart';
 import 'package:app/l10n/app_localizations.dart';
+import 'package:app/main.dart';
+import 'package:app/reset-password/services/reset_password_service.dart';
 import 'package:app/reset-password/states/reset_password.dart';
+import 'package:app/router.dart';
+import 'package:app/utils/dialog.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
 import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 @RoutePage()
 class ResetPasswordScreen extends StatelessWidget {
@@ -18,6 +25,28 @@ class ResetPasswordScreen extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
     final locals = AppLocalizations.of(context)!;
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      bool error = false;
+      if (token == null || JwtDecoder.isExpired(token!)) {
+        error = true;
+      }
+
+      if (error) {
+        okCancelDialog(
+          context,
+          title: locals.invalidLink,
+          content: Text(locals.invalidLink),
+          onOk: () => AutoRouter.of(context).replaceAll([LandingRoute()]),
+          showCancel: false,
+        );
+      }
+
+      var claims = JwtDecoder.decode(token!);
+      print('claims: $claims');
+      getIt.get<IdentityCubit>().setUrl(claims['server-url']);
+    });
+
     return BlocProvider(
       create: (context) => ResetPasswordCubit(ResetPasswordState()),
       child: Scaffold(
@@ -26,7 +55,7 @@ class ResetPasswordScreen extends StatelessWidget {
             child: ConstrainedBox(
               constraints: BoxConstraints(maxWidth: BreakPoint.tablet.maxWidth),
               child: Column(
-                crossAxisAlignment: .center,
+                crossAxisAlignment: .stretch,
                 mainAxisAlignment: .center,
                 spacing: pu3,
                 children: [
@@ -34,6 +63,7 @@ class ResetPasswordScreen extends StatelessWidget {
                   BlocBuilder<ResetPasswordCubit, ResetPasswordState>(
                     builder: (context, state) {
                       final cubit = context.read<ResetPasswordCubit>();
+                      final serverUrl = context.select((IdentityCubit c) => c.state.serverUrl);
                       return Container(
                         decoration: BoxDecoration(color: colors.surfaceContainerHigh, borderRadius: .circular(10)),
                         padding: .all(pu5),
@@ -54,7 +84,28 @@ class ResetPasswordScreen extends StatelessWidget {
                             Gap(pu4),
                             Align(
                               alignment: .centerRight,
-                              child: FilledButton.tonalIcon(onPressed: () {}, label: Text(locals.save)),
+                              child: FilledButton.tonalIcon(
+                                onPressed: state.validPassword
+                                    ? () async {
+                                        if (serverUrl != null && token != null) {
+                                          await ResetPasswordService(
+                                            serverUrl,
+                                          ).setPassword(password: state.password, token: token!);
+
+                                          if (context.mounted) {
+                                            okCancelDialog(
+                                              context,
+                                              title: locals.passwordReset,
+                                              content: Text(locals.passwordResetExplanation),
+                                              onOk: () => AutoRouter.of(context).replaceAll([LandingRoute()]),
+                                              showCancel: false,
+                                            );
+                                          }
+                                        }
+                                      }
+                                    : null,
+                                label: Text(locals.save),
+                              ),
                             ),
                           ],
                         ),

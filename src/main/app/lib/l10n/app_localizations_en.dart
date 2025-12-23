@@ -380,4 +380,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get save => 'Save';
+
+  @override
+  String get invalidLink => 'Invalid link';
+
+  @override
+  String get invalidLinkExplanation => 'This reset password link is invalid. It might also be expired.';
+
+  @override
+  String get passwordReset => 'Password reset';
+
+  @override
+  String get passwordResetExplanation => 'Your password has been reset, you can now log in with your new password';
+
+  @override
+  String get forgotPassword => 'Forgot password ?';
+
+  @override
+  String get submit => 'Submit';
+
+  @override
+  String get submitted => 'Submitted';
+
+  @override
+  String get passwordResetRequestSubmitted => 'Password reset request submitted';
 }

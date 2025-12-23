@@ -102,6 +102,13 @@ class LoginFormScreen extends StatelessWidget {
                       child: Text(locals.loginWith(config?.oidcConfig?.name ?? '')),
                     ),
                   ],
+                  if (config?.canResetPassword ?? false) ...[
+                    Gap(pu2),
+                    TextButton(
+                      onPressed: () => AutoRouter.of(context).push(ForgotPasswordRoute()),
+                      child: Text(locals.forgotPassword),
+                    ),
+                  ],
                 ],
               ),
             ),

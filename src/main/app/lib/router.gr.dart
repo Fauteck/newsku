@@ -102,6 +102,26 @@ class FeedsSettingsRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ForgotPasswordScreen]
+class ForgotPasswordRoute extends PageRouteInfo<void> {
+  const ForgotPasswordRoute({List<PageRouteInfo>? children})
+    : super(
+        ForgotPasswordRoute.name,
+        initialChildren: children,
+        argsEquality: false,
+      );
+
+  static const String name = 'ForgotPasswordRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ForgotPasswordScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [GeneralSettingsTab]
 class GeneralSettingsRoute extends PageRouteInfo<void> {
   const GeneralSettingsRoute({List<PageRouteInfo>? children})

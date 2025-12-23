@@ -57,7 +57,7 @@ public class ResetPasswordService {
         emailService.sendTemplate(user.getEmail(), "[Newsku] Reset password request", "email/reset-password.ftl", templateData);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional()
     public void resetPassword(String token, String password) {
         try {
             var claims = jwtTokenUtil.getAllClaimsFromToken(token);

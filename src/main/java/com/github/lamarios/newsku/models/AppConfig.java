@@ -6,6 +6,7 @@ public class AppConfig {
     private String announcement;
     private boolean demoMode;
     private String backendVersion;
+    private boolean canResetPassword;
 
     public String getAnnouncement() {
         return announcement;
@@ -45,5 +46,13 @@ public class AppConfig {
 
     public void setBackendVersion(String backendVersion) {
         this.backendVersion = backendVersion;
+    }
+
+    public boolean isCanResetPassword() {
+        return canResetPassword;
+    }
+
+    public void setCanResetPassword(boolean canResetPassword) {
+        this.canResetPassword = canResetPassword;
     }
 }

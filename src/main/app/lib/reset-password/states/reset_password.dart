@@ -25,4 +25,8 @@ class ResetPasswordCubit extends Cubit<ResetPasswordState> {
 sealed class ResetPasswordState with _$ResetPasswordState {
   const factory ResetPasswordState({@Default("") String password, @Default("") String repeatPassword}) =
       _ResetPasswordState;
+
+  const ResetPasswordState._();
+
+  bool get validPassword => password.trim().isNotEmpty && password == repeatPassword;
 }

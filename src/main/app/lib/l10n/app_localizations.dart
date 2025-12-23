@@ -720,6 +720,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save'**
   String get save;
+
+  /// No description provided for @invalidLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid link'**
+  String get invalidLink;
+
+  /// No description provided for @invalidLinkExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'This reset password link is invalid. It might also be expired.'**
+  String get invalidLinkExplanation;
+
+  /// No description provided for @passwordReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset'**
+  String get passwordReset;
+
+  /// No description provided for @passwordResetExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been reset, you can now log in with your new password'**
+  String get passwordResetExplanation;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password ?'**
+  String get forgotPassword;
+
+  /// No description provided for @submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get submit;
+
+  /// No description provided for @submitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted'**
+  String get submitted;
+
+  /// No description provided for @passwordResetRequestSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset request submitted'**
+  String get passwordResetRequestSubmitted;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
