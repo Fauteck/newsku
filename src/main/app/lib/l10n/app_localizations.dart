@@ -708,6 +708,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No stats available, stats are only recorded once you click on an article in your feed'**
   String get noStats;
+
+  /// No description provided for @resetPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset password'**
+  String get resetPassword;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -374,4 +374,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noStats => 'No stats available, stats are only recorded once you click on an article in your feed';
+
+  @override
+  String get resetPassword => 'Reset password';
+
+  @override
+  String get save => 'Save';
 }

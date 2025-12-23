@@ -1,10 +1,16 @@
 package com.github.lamarios.newsku;
 
 
+import freemarker.template.TemplateExceptionHandler;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.flywaydb.core.Flyway;
+import org.hazlewood.connor.bottema.emailaddress.EmailAddressCriteria;
+import org.simplejavamail.api.mailer.Mailer;
+import org.simplejavamail.api.mailer.config.TransportStrategy;
+import org.simplejavamail.mailer.MailerBuilder;
+import org.simplejavamail.mailer.internal.MailerRegularBuilderImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +20,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 
 @Configuration
 @SecurityScheme(
@@ -26,6 +33,24 @@ import javax.sql.DataSource;
 )
 public class Config {
 
+    @Value("${SMTP_USERNAME:}")
+    private String smtpUsername;
+    @Value("${SMTP_PASSWORD:}")
+    private String smtpPassword;
+    @Value("${SMTP_HOST:}")
+    private String smtpHost;
+    @Value("${SMTP_PORT:0}")
+    private int smtpPort;
+    @Value("${SMTP_TRANSPORT_STRATEGY:SMTP}")
+    private TransportStrategy transportStrategy;
+
+    @Value("${ROOT_URL:http://localhost:8080}")
+    private String rootUrl;
+
+    @Bean
+    public String rootUrl() {
+        return rootUrl;
+    }
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
@@ -60,5 +85,67 @@ public class Config {
 
         flyway.migrate(); // Force migration to run
         return flyway;
+    }
+
+
+    @Bean
+    public Mailer mailer() {
+        MailerRegularBuilderImpl mailer;
+        if (smtpHost == null || smtpPort == 0 || smtpHost.trim().isEmpty()) {
+            return null;
+        }
+
+        if (smtpUsername != null && !smtpUsername.isEmpty()) {
+            if (smtpPassword == null || smtpPassword.trim().isEmpty()) {
+                mailer = MailerBuilder.withSMTPServer(smtpHost, smtpPort, smtpUsername);
+            } else {
+                mailer = MailerBuilder.withSMTPServer(smtpHost, smtpPort, smtpUsername, smtpPassword);
+            }
+        } else {
+            mailer = MailerBuilder.withSMTPServer(smtpHost, smtpPort);
+        }
+
+
+        mailer = mailer.withTransportStrategy(transportStrategy);
+
+        mailer = mailer.clearEmailAddressCriteria()
+                .async()
+                .withEmailAddressCriteria(EmailAddressCriteria.RFC_COMPLIANT);
+        return mailer.buildMailer();
+    }
+
+
+    @Bean
+    public freemarker.template.Configuration templateEngine() throws IOException {
+        // Create your Configuration instance, and specify if up to what FreeMarker
+        // version (here 2.3.29) do you want to apply the fixes that are not 100%
+        // backward-compatible. See the Configuration JavaDoc for details.
+        freemarker.template.Configuration cfg = new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_29);
+
+        // Specify the source where the template files come from. Here I set a
+        // plain directory for it, but non-file-system sources are possible too:
+        cfg.setClassForTemplateLoading(this.getClass(), "/templates/");
+
+        // From here we will set the settings recommended for new projects. These
+        // aren't the defaults for backward compatibilty.
+
+        // Set the preferred charset template files are stored in. UTF-8 is
+        // a good choice in most applications:
+        cfg.setDefaultEncoding("UTF-8");
+
+        // Sets how errors will appear.
+        // During web page *development* TemplateExceptionHandler.HTML_DEBUG_HANDLER is better.
+        cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+
+        // Don't log exceptions inside FreeMarker that it will thrown at you anyway:
+        cfg.setLogTemplateExceptions(false);
+
+        // Wrap unchecked exceptions thrown during template processing into TemplateException-s:
+        cfg.setWrapUncheckedExceptions(true);
+
+        // Do not fall back to higher scopes when reading a null loop variable:
+        cfg.setFallbackOnNullLoopVariable(false);
+
+        return cfg;
     }
 }

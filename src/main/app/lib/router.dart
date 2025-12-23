@@ -5,6 +5,7 @@ import 'package:app/feed/views/screens/feed_screen.dart';
 import 'package:app/home/views/screens/home.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
+import 'package:app/reset-password/views/screens/reset_password.dart';
 import 'package:app/settings/views/components/feeds.dart';
 import 'package:app/settings/views/components/info.dart';
 import 'package:app/settings/views/components/layout.dart';
@@ -77,6 +78,7 @@ class AppRouter extends RootStackRouter {
           AutoRoute(page: FeedStatsRoute.page),
         ],
       ),
+      AutoRoute(page: ResetPasswordRoute.page, path: "/reset-password"),
       AutoRoute(
         page: LandingRoute.page,
         initial: !loggedInOnStart,

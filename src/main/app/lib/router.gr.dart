@@ -246,6 +246,46 @@ class LoginRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ResetPasswordScreen]
+class ResetPasswordRoute extends PageRouteInfo<ResetPasswordRouteArgs> {
+  ResetPasswordRoute({Key? key, String? token, List<PageRouteInfo>? children})
+    : super(
+        ResetPasswordRoute.name,
+        args: ResetPasswordRouteArgs(key: key, token: token),
+        rawQueryParams: {'token': token},
+        initialChildren: children,
+        argsEquality: false,
+      );
+
+  static const String name = 'ResetPasswordRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final queryParams = data.queryParams;
+      final args = data.argsAs<ResetPasswordRouteArgs>(
+        orElse: () =>
+            ResetPasswordRouteArgs(token: queryParams.optString('token')),
+      );
+      return ResetPasswordScreen(key: args.key, token: args.token);
+    },
+  );
+}
+
+class ResetPasswordRouteArgs {
+  const ResetPasswordRouteArgs({this.key, this.token});
+
+  final Key? key;
+
+  final String? token;
+
+  @override
+  String toString() {
+    return 'ResetPasswordRouteArgs{key: $key, token: $token}';
+  }
+}
+
+/// generated route for
 /// [ServerUrlScreen]
 class ServerUrlRoute extends PageRouteInfo<void> {
   const ServerUrlRoute({List<PageRouteInfo>? children})

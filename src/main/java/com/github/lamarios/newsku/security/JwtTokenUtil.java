@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Component
-public class JwtTokenUtil  {
+public class JwtTokenUtil {
     private final SecretKey key;
 
     public static final long JWT_TOKEN_VALIDITY = 90 * 24 * 60 * 60;
@@ -79,7 +79,7 @@ public class JwtTokenUtil  {
         return claimsResolver.apply(claims);
     }
 
-    private Claims getAllClaimsFromToken(String token) {
+    public Claims getAllClaimsFromToken(String token) {
         try {
             return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
         } catch (Exception e) {
@@ -88,7 +88,7 @@ public class JwtTokenUtil  {
                 return oidcService.getParser().parseSignedClaims(token).getPayload();
             } else {
 */
-                throw e;
+            throw e;
 //            }
         }
     }
@@ -120,11 +120,16 @@ public class JwtTokenUtil  {
         }
     }
 
-    private String doGenerateToken(Map<String, Object> claims, String subject) {
+
+    public String doGenerateToken(Map<String, Object> claims, String subject) {
+        return doGenerateToken(claims, subject, JWT_TOKEN_VALIDITY * 1000);
+    }
+
+    public String doGenerateToken(Map<String, Object> claims, String subject, long expiresIn) {
         return Jwts.builder()
                 .claims(claims).subject(subject).issuedAt(new Date(System.currentTimeMillis()))
                 .issuer("newsku")
-                .expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000)).signWith(key).compact();
+                .expiration(new Date(System.currentTimeMillis() + expiresIn)).signWith(key).compact();
     }
 
     public Boolean canTokenBeRefreshed(String token) {
