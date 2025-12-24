@@ -219,7 +219,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get blackBackground => 'Black background';
 
   @override
-  String get blackBackgroundExplanation => 'User black background for the dark theme';
+  String get blackBackgroundExplanation => 'Use black background for the dark theme';
 
   @override
   String get dynamicColor => 'Dynamic color';
@@ -404,4 +404,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordResetRequestSubmitted => 'Password reset request submitted';
+
+  @override
+  String get theme => 'Theme';
+
+  @override
+  String appTheme(String theme) {
+    String _temp0 = intl.Intl.selectLogic(theme, {'light': 'Light', 'dark': 'Dark', 'other': 'Follow system'});
+    return '$_temp0';
+  }
 }

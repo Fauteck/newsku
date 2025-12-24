@@ -110,8 +110,6 @@ class GeneralSettingsTab extends StatelessWidget {
                       child: Row(spacing: pu, children: [Icon(Icons.info_outline), Text(locals.deviceOnlySettings)]),
                     ),
                     Gap(pu4),
-                    Text(locals.appColor),
-                    Gap(pu2),
                     SwitchListTile(
                       contentPadding: .zero,
                       title: Text(locals.blackBackground),
@@ -119,6 +117,7 @@ class GeneralSettingsTab extends StatelessWidget {
                       value: context.select((LocalPreferencesCubit p) => p.state.blackBackground),
                       onChanged: (value) => getIt.get<LocalPreferencesCubit>().setBlackBackground(value),
                     ),
+                    Text(locals.appColor),
                     Gap(pu2),
                     if (!kIsWeb && Platform.isAndroid) ...[
                       SwitchListTile(
@@ -130,6 +129,20 @@ class GeneralSettingsTab extends StatelessWidget {
                       ),
                       Gap(pu2),
                     ],
+                    Row(
+                      spacing: pu2,
+                      children: [
+                        Expanded(child: Text(locals.theme)),
+                        DropdownMenu<ThemeMode>(
+                          initialSelection: context.select((LocalPreferencesCubit p) => p.state.theme),
+                          onSelected: (value) =>
+                              getIt.get<LocalPreferencesCubit>().setBrightness(value ?? ThemeMode.system),
+                          dropdownMenuEntries: ThemeMode.values
+                              .map((h) => DropdownMenuEntry(value: h, label: locals.appTheme(h.name)))
+                              .toList(),
+                        ),
+                      ],
+                    ),
                     if (!context.select((LocalPreferencesCubit p) => p.state.dynamicColor))
                       Wrap(
                         spacing: pu4,

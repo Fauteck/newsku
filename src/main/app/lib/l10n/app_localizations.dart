@@ -448,7 +448,7 @@ abstract class AppLocalizations {
   /// No description provided for @blackBackgroundExplanation.
   ///
   /// In en, this message translates to:
-  /// **'User black background for the dark theme'**
+  /// **'Use black background for the dark theme'**
   String get blackBackgroundExplanation;
 
   /// No description provided for @dynamicColor.
@@ -768,6 +768,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password reset request submitted'**
   String get passwordResetRequestSubmitted;
+
+  /// No description provided for @theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
+
+  /// No description provided for @appTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'{theme, select, light{Light} dark{Dark} other{Follow system}}'**
+  String appTheme(String theme);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
