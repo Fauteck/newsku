@@ -111,5 +111,7 @@
     "forgotPassword": "Forgot password ?",
     "submit": "Submit",
     "submitted": "Submitted",
-    "passwordResetRequestSubmitted": "Password reset request submitted"
+    "passwordResetRequestSubmitted": "Password reset request submitted",
+    "theme": "Theme",
+    "appTheme": "{theme, select, light{Light} dark{Dark} other{Follow system}}"
 }

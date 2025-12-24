@@ -56,6 +56,7 @@ class MyApp extends StatelessWidget {
                 localizationsDelegates: AppLocalizations.localizationsDelegates,
                 supportedLocales: AppLocalizations.supportedLocales,
                 routerConfig: _appRouter.config(),
+
                 darkTheme: ThemeData(
                   colorScheme: .fromSeed(
                     seedColor: appColor,
@@ -66,7 +67,7 @@ class MyApp extends StatelessWidget {
                   ),
                   inputDecorationTheme: inputTheme,
                 ),
-
+                themeMode: preferences.theme,
                 theme: ThemeData(
                   // This is the theme of your application.
                   //
