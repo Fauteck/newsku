@@ -1,5 +1,6 @@
 package com.github.lamarios.newsku.services;
 
+import com.github.lamarios.newsku.errors.NewskuUserException;
 import com.github.lamarios.newsku.persistence.entities.User;
 import com.github.lamarios.newsku.persistence.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,14 +38,27 @@ public class UserService {
     public User getCurrentUser() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        assert authentication != null;
         org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
 
+        assert user != null;
         return getUser(user.getUsername()).orElseThrow();
     }
 
     @Transactional
-    public User createUser(User user) {
+    public User createUser(User user) throws NewskuUserException {
         user.setId(UUID.randomUUID().toString());
+
+        boolean emailUsed = userRepository.countUserByEmail(user.getEmail()) > 0;
+        boolean usernameUsed = userRepository.countUserByUsername(user.getUsername()) > 0;
+
+        if (emailUsed) {
+            throw new NewskuUserException("Email already taken");
+        }
+
+        if (usernameUsed) {
+            throw new NewskuUserException("Username already taken");
+        }
 
         // hash password
         if (user.getPassword() != null) {
@@ -63,7 +77,7 @@ public class UserService {
     }
 
     @Transactional
-    public User updateSelf(User user) throws SQLException {
+    public User updateSelf(User user) {
         User currentUser = getCurrentUser();
         if (currentUser.getId().equalsIgnoreCase(user.getId())) {
             // we update the password if it has changed

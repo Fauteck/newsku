@@ -1,10 +1,14 @@
 import 'package:app/user/models/user.dart';
 import 'package:app/user/services/login_service.dart';
+import 'package:app/utils/models/with_error.dart';
 import 'package:app/utils/utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'signup.freezed.dart';
+
+const String emailRegex =
+    r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
 
 class SignupCubit extends Cubit<SignupState> {
   SignupCubit(super.initialState);
@@ -26,22 +30,36 @@ class SignupCubit extends Cubit<SignupState> {
   }
 
   Future<void> signup() async {
-    await LoginService(serverUrl!).signup(User(username: state.username, email: state.email, password: state.password));
+    try {
+      await LoginService(
+        serverUrl!,
+      ).signup(User(username: state.username, email: state.email, password: state.password));
+    } catch (e, s) {
+      emit(state.copyWith(error: e, stackTrace: s));
+      rethrow;
+    }
   }
 }
 
 @freezed
-sealed class SignupState with _$SignupState {
+sealed class SignupState with _$SignupState implements WithError {
+  @Implements<WithError>()
   const factory SignupState({
     @Default(false) bool loading,
     String? username,
     String? email,
     String? password,
     String? repeatPassword,
+    dynamic error,
+    StackTrace? stackTrace,
   }) = _SignupState;
 
   const SignupState._();
 
   bool get invalidForm =>
-      (password ?? '').isEmpty || password != repeatPassword || (username ?? '').isEmpty || (email ?? '').isEmpty;
+      (password ?? '').isEmpty ||
+      password != repeatPassword ||
+      (username ?? '').isEmpty ||
+      (email ?? '').isEmpty ||
+      !RegExp(emailRegex).hasMatch(email ?? '');
 }

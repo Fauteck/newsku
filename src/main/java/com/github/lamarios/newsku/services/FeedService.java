@@ -9,8 +9,8 @@ import be.ceau.opml.entity.Head;
 import be.ceau.opml.entity.Opml;
 import be.ceau.opml.entity.Outline;
 import com.apptasticsoftware.rssreader.*;
-import com.apptasticsoftware.rssreader.filter.InvalidXmlCharacterFilter;
 import com.github.lamarios.newsku.Constants;
+import com.github.lamarios.newsku.errors.NewskuException;
 import com.github.lamarios.newsku.persistence.entities.Feed;
 import com.github.lamarios.newsku.persistence.entities.User;
 import com.github.lamarios.newsku.persistence.repositories.FeedRepository;
@@ -56,16 +56,21 @@ public class FeedService {
 
 
     @Transactional
-    public Feed addFeed(String url) throws SQLException, IOException {
+    public Feed addFeed(String url) throws NewskuException {
         User currentUser = userService.getCurrentUser();
 
-        List<Item> list = DEFAULT_READER
-                .read(url)
-                .sorted()
-                .toList();
+        List<Item> list;
+        try {
+            list = DEFAULT_READER
+                    .read(url)
+                    .sorted()
+                    .toList();
+        } catch (Exception e) {
+            throw new NewskuException("Couldn't read feed URL");
+        }
 
         if (list.isEmpty()) {
-            throw new RuntimeException("Feed is empty");
+            throw new NewskuException("Feed is empty");
         }
 
         var item = list.getFirst().getChannel();
@@ -87,7 +92,7 @@ public class FeedService {
     }
 
     @Transactional
-    public Feed updateFeed(Feed feed) throws SQLException {
+    public Feed updateFeed(Feed feed) {
 
         var oldFeed = feedRepository.getFirstById(feed.getId());
         var user = userService.getCurrentUser();
@@ -100,7 +105,7 @@ public class FeedService {
     }
 
     @Transactional
-    public boolean deleteFeed(String id) throws SQLException {
+    public boolean deleteFeed(String id) {
         Feed firstById = feedRepository.getFirstById(id);
         var user = userService.getCurrentUser();
 
@@ -116,28 +121,32 @@ public class FeedService {
     }
 
     @Transactional
-    public List<Feed> importFeed(MultipartFile file) throws IOException, OpmlParseException, SQLException {
-        log.info("Importing feed");
-        var user = userService.getCurrentUser();
-        Path tempDirectory = Files.createTempDirectory("newsku-opml-import");
-        Path p = tempDirectory.resolve("import.opml");
-        file.transferTo(p);
-        List<Feed> newFeeds = new ArrayList<>();
+    public List<Feed> importFeed(MultipartFile file) throws NewskuException {
+        try {
+            log.info("Importing feed");
+            var user = userService.getCurrentUser();
+            Path tempDirectory = Files.createTempDirectory("newsku-opml-import");
+            Path p = tempDirectory.resolve("import.opml");
+            file.transferTo(p);
+            List<Feed> newFeeds = new ArrayList<>();
 
-        try (var is = new FileInputStream(p.toFile())) {
-            var parser = new OpmlParser().parse(is);
-            for (Outline outline : parser.getBody().getOutlines()) {
-                newFeeds.addAll(importFeed(outline, user));
+            try (var is = new FileInputStream(p.toFile())) {
+                var parser = new OpmlParser().parse(is);
+                for (Outline outline : parser.getBody().getOutlines()) {
+                    newFeeds.addAll(importFeed(outline, user));
+                }
+
+
+                return newFeeds;
+            } catch (SQLException | OpmlParseException e) {
+                log.error("Failed to parse opml file", e);
+                throw new NewskuException("Failed to parse OPML file");
+            } finally {
+                Files.deleteIfExists(p);
+                Files.deleteIfExists(tempDirectory);
             }
-
-
-            return newFeeds;
-        } catch (SQLException | OpmlParseException e) {
-            log.error("Failed to parse opml file", e);
-            throw e;
-        } finally {
-            Files.deleteIfExists(p);
-            Files.deleteIfExists(tempDirectory);
+        }catch (IOException e) {
+            throw  new NewskuException("Failed to read file");
         }
     }
 

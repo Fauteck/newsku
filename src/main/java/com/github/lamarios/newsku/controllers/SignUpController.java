@@ -1,5 +1,6 @@
 package com.github.lamarios.newsku.controllers;
 
+import com.github.lamarios.newsku.errors.NewskuUserException;
 import com.github.lamarios.newsku.persistence.entities.User;
 import com.github.lamarios.newsku.services.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,8 +28,8 @@ public class SignUpController {
     }
 
     @PutMapping
-    public User signup(@RequestBody  User user) throws java.nio.file.AccessDeniedException {
-        if(demoMode){
+    public User signup(@RequestBody User user) throws java.nio.file.AccessDeniedException, NewskuUserException {
+        if (demoMode) {
             throw new AccessDeniedException("App in demoMode");
         }
         if (allowSignUp) {

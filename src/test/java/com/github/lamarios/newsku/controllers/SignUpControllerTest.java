@@ -2,6 +2,7 @@ package com.github.lamarios.newsku.controllers;
 
 import com.github.lamarios.newsku.TestConfig;
 import com.github.lamarios.newsku.TestContainerTest;
+import com.github.lamarios.newsku.errors.NewskuUserException;
 import com.github.lamarios.newsku.models.ReadItemHandling;
 import com.github.lamarios.newsku.persistence.entities.User;
 import org.junit.jupiter.api.Test;
@@ -10,8 +11,7 @@ import org.springframework.context.annotation.Import;
 
 import java.nio.file.AccessDeniedException;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Import(TestConfig.class)
 public class SignUpControllerTest extends TestContainerTest {
@@ -19,7 +19,7 @@ public class SignUpControllerTest extends TestContainerTest {
     private SignUpController signUpController;
 
     @Test
-    public void signUpTest() throws AccessDeniedException {
+    public void signUpTest() throws AccessDeniedException, NewskuUserException {
         User newUser = new User();
         newUser.setPassword("somePassword");
         newUser.setEmail("someEmail@eai.com");
@@ -30,6 +30,28 @@ public class SignUpControllerTest extends TestContainerTest {
         assertNotNull(user.getId());
         // password should be hashed
         assertNotEquals("samePassword", user.getPassword());
+    }
+
+    @Test
+    public void signupValidationTest() {
+        // test email already taken
+        User newUser = new User();
+        newUser.setPassword("somePassword");
+        newUser.setEmail("test@test.com");
+        newUser.setUsername("testUsername");
+        newUser.setReadItemHandling(ReadItemHandling.none);
+
+        assertThrows(NewskuUserException.class, () -> signUpController.signup(newUser));
+
+
+        //test username already taken
+        newUser.setEmail("randomestoff@fdsfsdfsd.com");
+        newUser.setUsername("test");
+
+
+        assertThrows(NewskuUserException.class, () -> signUpController.signup(newUser));
+
 
     }
+
 }

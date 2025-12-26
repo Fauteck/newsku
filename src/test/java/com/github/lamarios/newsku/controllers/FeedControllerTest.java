@@ -2,9 +2,9 @@ package com.github.lamarios.newsku.controllers;
 
 import be.ceau.opml.OpmlParseException;
 import be.ceau.opml.OpmlParser;
-import be.ceau.opml.OpmlWriteException;
 import com.github.lamarios.newsku.TestConfig;
 import com.github.lamarios.newsku.TestContainerTest;
+import com.github.lamarios.newsku.errors.NewskuException;
 import com.github.lamarios.newsku.persistence.repositories.FeedRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ public class FeedControllerTest extends TestContainerTest {
     }
 
     @Test
-    public void testFeedCrud() throws SQLException, IOException {
+    public void testFeedCrud() throws SQLException, NewskuException {
         String url = "https://feeds.arstechnica.com/arstechnica/index";
 
         var feed = feedController.addFeed(url);
@@ -56,7 +56,12 @@ public class FeedControllerTest extends TestContainerTest {
     }
 
     @Test
-    public void testImportFeeds() throws SQLException, OpmlParseException, IOException {
+    public void testAddingInvalidFeed() {
+        assertThrows(NewskuException.class, () -> feedController.addFeed("somegarbageurl"));
+    }
+
+    @Test
+    public void testImportFeeds() throws NewskuException, IOException {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         try (InputStream is = classloader.getResourceAsStream("feeds.opml")) {
             MultipartFile file = new MockMultipartFile("file", "feeds.opml", "text/plain", is);
@@ -65,9 +70,18 @@ public class FeedControllerTest extends TestContainerTest {
         }
     }
 
+    @Test
+    public void testImportInvalidOPML() throws IOException {
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        try (InputStream is = classloader.getResourceAsStream("rubish_feeds.opml")) {
+            MultipartFile file = new MockMultipartFile("file", "feeds.opml", "text/plain", is);
+            assertThrows(NewskuException.class, () -> feedController.importFeed(file));
+        }
+    }
+
 
     @Test
-    public void testExportFeeds() throws SQLException, IOException, OpmlParseException, OpmlWriteException {
+    public void testExportFeeds() throws IOException, OpmlParseException, NewskuException {
         testImportFeeds();
 
 
@@ -77,6 +91,7 @@ public class FeedControllerTest extends TestContainerTest {
         var file = Files.createTempFile("newskutest", ".opml");
 
         try (FileOutputStream fos = new FileOutputStream(file.toAbsolutePath().toString())) {
+            assert response.getBody() != null;
             response.getBody().writeTo(fos);
 
             assertTrue(Files.exists(file.toAbsolutePath()));

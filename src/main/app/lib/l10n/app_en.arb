@@ -113,5 +113,6 @@
     "submitted": "Submitted",
     "passwordResetRequestSubmitted": "Password reset request submitted",
     "theme": "Theme",
-    "appTheme": "{theme, select, light{Light} dark{Dark} other{Follow system}}"
+    "appTheme": "{theme, select, light{Light} dark{Dark} other{Follow system}}",
+    "invalidEmail": "Invalid email"
 }
