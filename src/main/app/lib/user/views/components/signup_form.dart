@@ -30,6 +30,7 @@ class SignupFormScreen extends StatelessWidget {
                 children: [
                   Align(alignment: .centerLeft, child: Text(locals.username)),
                   TextField(
+                    enabled: !state.loading,
                     onChanged: (value) => cubit.setUsername(value),
                     autofillHints: [AutofillHints.newUsername],
                     autocorrect: false,
@@ -37,6 +38,7 @@ class SignupFormScreen extends StatelessWidget {
                   Gap(pu4),
                   Align(alignment: .centerLeft, child: Text(locals.email)),
                   TextField(
+                    enabled: !state.loading,
                     onChanged: (value) => cubit.setEmail(value),
                     autofillHints: [AutofillHints.email],
                     autocorrect: false,
@@ -49,6 +51,7 @@ class SignupFormScreen extends StatelessWidget {
                   Gap(pu4),
                   Align(alignment: .centerLeft, child: Text(locals.password)),
                   TextField(
+                    enabled: !state.loading,
                     obscureText: true,
                     onChanged: (value) => cubit.setPassword(value),
                     autofillHints: [AutofillHints.newPassword],
@@ -57,6 +60,7 @@ class SignupFormScreen extends StatelessWidget {
                   Gap(pu4),
                   Align(alignment: .centerLeft, child: Text(locals.repeatPassword)),
                   TextField(
+                    enabled: !state.loading,
                     obscureText: true,
                     onChanged: (value) => cubit.setRepeatPassword(value),
                     autocorrect: false,
@@ -70,7 +74,7 @@ class SignupFormScreen extends StatelessWidget {
                   Row(
                     children: [
                       TextButton(
-                        onPressed: () => AutoRouter.of(context).replace(LoginFormRoute()),
+                        onPressed: state.loading ? null : () => AutoRouter.of(context).replace(LoginFormRoute()),
                         child: Text(locals.login),
                       ),
                       Spacer(),

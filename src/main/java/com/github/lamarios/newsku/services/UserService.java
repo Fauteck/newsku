@@ -53,10 +53,22 @@ public class UserService {
         boolean usernameUsed = userRepository.countUserByUsername(user.getUsername()) > 0;
 
         if (emailUsed) {
+            try {
+                // we sleep to limit email scanning
+                Thread.sleep(2000);
+            } catch (InterruptedException _) {
+
+            }
             throw new NewskuUserException("Email already taken");
         }
 
         if (usernameUsed) {
+            try {
+                // we sleep to limit email scanning
+                Thread.sleep(2000);
+            } catch (InterruptedException _) {
+
+            }
             throw new NewskuUserException("Username already taken");
         }
 

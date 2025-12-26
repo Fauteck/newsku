@@ -31,12 +31,15 @@ class SignupCubit extends Cubit<SignupState> {
 
   Future<void> signup() async {
     try {
+      emit(state.copyWith(loading: true));
       await LoginService(
         serverUrl!,
       ).signup(User(username: state.username, email: state.email, password: state.password));
     } catch (e, s) {
       emit(state.copyWith(error: e, stackTrace: s));
       rethrow;
+    } finally {
+      emit(state.copyWith(loading: false));
     }
   }
 }

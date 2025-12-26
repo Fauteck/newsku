@@ -41,16 +41,22 @@ public class SignUpControllerTest extends TestContainerTest {
         newUser.setUsername("testUsername");
         newUser.setReadItemHandling(ReadItemHandling.none);
 
+        var now = System.currentTimeMillis();
+
         assertThrows(NewskuUserException.class, () -> signUpController.signup(newUser));
 
+        // we make sure we slept at least 2 seconds to avoid email scanning
+        assertTrue(System.currentTimeMillis() - now >= 2000);
 
         //test username already taken
         newUser.setEmail("randomestoff@fdsfsdfsd.com");
         newUser.setUsername("test");
 
 
+        now = System.currentTimeMillis();
         assertThrows(NewskuUserException.class, () -> signUpController.signup(newUser));
 
+        assertTrue(System.currentTimeMillis() - now >= 2000);
 
     }
 
