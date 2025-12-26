@@ -780,6 +780,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{theme, select, light{Light} dark{Dark} other{Follow system}}'**
   String appTheme(String theme);
+
+  /// No description provided for @invalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email'**
+  String get invalidEmail;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

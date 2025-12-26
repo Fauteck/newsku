@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
+import 'package:app/utils/models/newsku_error.dart';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -69,6 +72,20 @@ abstract class BaseService {
     _processStatusCode(response.statusCode, body: response.body, logoutOn401: logoutOn401);
   }
 
+  void _processNewskuError(String? body) {
+    if (body == null) {
+      return;
+    }
+    late NewskuError error;
+    try {
+      error = NewskuError.fromJson(jsonDecode(body));
+    } catch (e) {
+      _log.fine("Not a Newsku error");
+      return;
+    }
+    throw error;
+  }
+
   void _processStatusCode(int statusCode, {bool logoutOn401 = true, String? body}) {
     switch (statusCode) {
       case 200:
@@ -77,8 +94,10 @@ abstract class BaseService {
         if (logoutOn401) {
           getIt.get<IdentityCubit>().logout();
         }
+        _processNewskuError(body);
         throw Exception("Couldn't execute request, unauthorized}");
       default:
+        _processNewskuError(body);
         throw Exception("Couldn't execute request $statusCode -> $body");
     }
   }

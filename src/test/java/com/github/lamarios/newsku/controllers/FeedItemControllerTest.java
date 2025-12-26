@@ -2,6 +2,7 @@ package com.github.lamarios.newsku.controllers;
 
 import com.github.lamarios.newsku.TestConfig;
 import com.github.lamarios.newsku.TestContainerTest;
+import com.github.lamarios.newsku.errors.NewskuException;
 import com.github.lamarios.newsku.persistence.entities.FeedItem;
 import com.github.lamarios.newsku.services.FeedItemService;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ public class FeedItemControllerTest extends TestContainerTest {
 
 
     @Test
-    public void testFeedItems() throws SQLException, IOException {
+    public void testFeedItems() throws SQLException, NewskuException {
         var feed = feedController.addFeed("https://feeds.arstechnica.com/arstechnica/index");
 
         feedItemService.refreshFeedWorker(feed);

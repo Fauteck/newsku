@@ -1,3 +1,5 @@
+import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/utils/models/newsku_error.dart';
 import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -28,8 +30,12 @@ class ErrorDialog extends StatelessWidget {
   }
 
   static List<Widget> buildError(BuildContext context, dynamic error, StackTrace? trace) {
+    if (error is NewskuError) {
+      return [Text(error.message)];
+    } else {
+      return [Text(error.toString())];
+    }
     // we really don't know what's going on
-    return [Text(error.toString())];
   }
 
   @override
@@ -37,11 +43,15 @@ class ErrorDialog extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     return Dialog(
       child: Container(
+        constraints: BoxConstraints(maxWidth: BreakPoint.mobile.maxWidth),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Error', style: textTheme.headlineSmall),
+            Padding(
+              padding: .only(top: pu4, left: pu4),
+              child: Text('Error', style: textTheme.headlineSmall),
+            ),
             Gap(pu5),
             Flexible(
               child: SingleChildScrollView(child: Column(children: [...buildError(context, error, trace)])),
@@ -49,7 +59,7 @@ class ErrorDialog extends StatelessWidget {
             Gap(pu5),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('ok'))],
+              children: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))],
             ),
           ],
         ),

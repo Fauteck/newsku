@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SignupState {
 
- bool get loading; String? get username; String? get email; String? get password; String? get repeatPassword;
+ bool get loading; String? get username; String? get email; String? get password; String? get repeatPassword; dynamic get error; StackTrace? get stackTrace;
 /// Create a copy of SignupState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $SignupStateCopyWith<SignupState> get copyWith => _$SignupStateCopyWithImpl<Sign
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignupState&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.username, username) || other.username == username)&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.repeatPassword, repeatPassword) || other.repeatPassword == repeatPassword));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignupState&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.username, username) || other.username == username)&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.repeatPassword, repeatPassword) || other.repeatPassword == repeatPassword)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loading,username,email,password,repeatPassword);
+int get hashCode => Object.hash(runtimeType,loading,username,email,password,repeatPassword,const DeepCollectionEquality().hash(error),stackTrace);
 
 @override
 String toString() {
-  return 'SignupState(loading: $loading, username: $username, email: $email, password: $password, repeatPassword: $repeatPassword)';
+  return 'SignupState(loading: $loading, username: $username, email: $email, password: $password, repeatPassword: $repeatPassword, error: $error, stackTrace: $stackTrace)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $SignupStateCopyWith<$Res>  {
   factory $SignupStateCopyWith(SignupState value, $Res Function(SignupState) _then) = _$SignupStateCopyWithImpl;
 @useResult
 $Res call({
- bool loading, String? username, String? email, String? password, String? repeatPassword
+ bool loading, String? username, String? email, String? password, String? repeatPassword, dynamic error, StackTrace? stackTrace
 });
 
 
@@ -62,14 +62,16 @@ class _$SignupStateCopyWithImpl<$Res>
 
 /// Create a copy of SignupState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? loading = null,Object? username = freezed,Object? email = freezed,Object? password = freezed,Object? repeatPassword = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? loading = null,Object? username = freezed,Object? email = freezed,Object? password = freezed,Object? repeatPassword = freezed,Object? error = freezed,Object? stackTrace = freezed,}) {
   return _then(_self.copyWith(
 loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,username: freezed == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String?,password: freezed == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String?,repeatPassword: freezed == repeatPassword ? _self.repeatPassword : repeatPassword // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as dynamic,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
+as StackTrace?,
   ));
 }
 
@@ -151,10 +153,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool loading,  String? username,  String? email,  String? password,  String? repeatPassword)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool loading,  String? username,  String? email,  String? password,  String? repeatPassword,  dynamic error,  StackTrace? stackTrace)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SignupState() when $default != null:
-return $default(_that.loading,_that.username,_that.email,_that.password,_that.repeatPassword);case _:
+return $default(_that.loading,_that.username,_that.email,_that.password,_that.repeatPassword,_that.error,_that.stackTrace);case _:
   return orElse();
 
 }
@@ -172,10 +174,10 @@ return $default(_that.loading,_that.username,_that.email,_that.password,_that.re
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool loading,  String? username,  String? email,  String? password,  String? repeatPassword)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool loading,  String? username,  String? email,  String? password,  String? repeatPassword,  dynamic error,  StackTrace? stackTrace)  $default,) {final _that = this;
 switch (_that) {
 case _SignupState():
-return $default(_that.loading,_that.username,_that.email,_that.password,_that.repeatPassword);}
+return $default(_that.loading,_that.username,_that.email,_that.password,_that.repeatPassword,_that.error,_that.stackTrace);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -189,10 +191,10 @@ return $default(_that.loading,_that.username,_that.email,_that.password,_that.re
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool loading,  String? username,  String? email,  String? password,  String? repeatPassword)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool loading,  String? username,  String? email,  String? password,  String? repeatPassword,  dynamic error,  StackTrace? stackTrace)?  $default,) {final _that = this;
 switch (_that) {
 case _SignupState() when $default != null:
-return $default(_that.loading,_that.username,_that.email,_that.password,_that.repeatPassword);case _:
+return $default(_that.loading,_that.username,_that.email,_that.password,_that.repeatPassword,_that.error,_that.stackTrace);case _:
   return null;
 
 }
@@ -203,8 +205,8 @@ return $default(_that.loading,_that.username,_that.email,_that.password,_that.re
 /// @nodoc
 
 
-class _SignupState extends SignupState {
-  const _SignupState({this.loading = false, this.username, this.email, this.password, this.repeatPassword}): super._();
+class _SignupState extends SignupState implements WithError {
+  const _SignupState({this.loading = false, this.username, this.email, this.password, this.repeatPassword, this.error, this.stackTrace}): super._();
   
 
 @override@JsonKey() final  bool loading;
@@ -212,6 +214,8 @@ class _SignupState extends SignupState {
 @override final  String? email;
 @override final  String? password;
 @override final  String? repeatPassword;
+@override final  dynamic error;
+@override final  StackTrace? stackTrace;
 
 /// Create a copy of SignupState
 /// with the given fields replaced by the non-null parameter values.
@@ -223,16 +227,16 @@ _$SignupStateCopyWith<_SignupState> get copyWith => __$SignupStateCopyWithImpl<_
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SignupState&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.username, username) || other.username == username)&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.repeatPassword, repeatPassword) || other.repeatPassword == repeatPassword));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SignupState&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.username, username) || other.username == username)&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.repeatPassword, repeatPassword) || other.repeatPassword == repeatPassword)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loading,username,email,password,repeatPassword);
+int get hashCode => Object.hash(runtimeType,loading,username,email,password,repeatPassword,const DeepCollectionEquality().hash(error),stackTrace);
 
 @override
 String toString() {
-  return 'SignupState(loading: $loading, username: $username, email: $email, password: $password, repeatPassword: $repeatPassword)';
+  return 'SignupState(loading: $loading, username: $username, email: $email, password: $password, repeatPassword: $repeatPassword, error: $error, stackTrace: $stackTrace)';
 }
 
 
@@ -243,7 +247,7 @@ abstract mixin class _$SignupStateCopyWith<$Res> implements $SignupStateCopyWith
   factory _$SignupStateCopyWith(_SignupState value, $Res Function(_SignupState) _then) = __$SignupStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool loading, String? username, String? email, String? password, String? repeatPassword
+ bool loading, String? username, String? email, String? password, String? repeatPassword, dynamic error, StackTrace? stackTrace
 });
 
 
@@ -260,14 +264,16 @@ class __$SignupStateCopyWithImpl<$Res>
 
 /// Create a copy of SignupState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? loading = null,Object? username = freezed,Object? email = freezed,Object? password = freezed,Object? repeatPassword = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? loading = null,Object? username = freezed,Object? email = freezed,Object? password = freezed,Object? repeatPassword = freezed,Object? error = freezed,Object? stackTrace = freezed,}) {
   return _then(_SignupState(
 loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,username: freezed == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String?,password: freezed == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String?,repeatPassword: freezed == repeatPassword ? _self.repeatPassword : repeatPassword // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as dynamic,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
+as StackTrace?,
   ));
 }
 

@@ -413,4 +413,7 @@ class AppLocalizationsEn extends AppLocalizations {
     String _temp0 = intl.Intl.selectLogic(theme, {'light': 'Light', 'dark': 'Dark', 'other': 'Follow system'});
     return '$_temp0';
   }
+
+  @override
+  String get invalidEmail => 'Invalid email';
 }

@@ -1,7 +1,7 @@
 package com.github.lamarios.newsku;
 
 import com.github.lamarios.newsku.controllers.SignUpController;
-import com.github.lamarios.newsku.controllers.UserController;
+import com.github.lamarios.newsku.errors.NewskuUserException;
 import com.github.lamarios.newsku.models.ReadItemHandling;
 import com.github.lamarios.newsku.persistence.entities.User;
 import com.github.lamarios.newsku.persistence.repositories.UserRepository;
@@ -54,7 +54,7 @@ abstract public class TestContainerTest {
     }
 
     @BeforeEach
-    public void insertBaseData() throws AccessDeniedException {
+    public void insertBaseData() throws AccessDeniedException, NewskuUserException {
         User user = new User();
         user.setPassword("test");
         user.setUsername("test");

@@ -1,6 +1,7 @@
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/reset-password/services/reset_password_service.dart';
 import 'package:app/router.dart';
+import 'package:app/user/states/signup.dart';
 import 'package:app/utils/dialog.dart';
 import 'package:app/utils/utils.dart';
 import 'package:auto_route/annotations.dart';
@@ -17,6 +18,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController controller = TextEditingController();
 
   @override
@@ -29,33 +31,48 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     final locals = AppLocalizations.of(context)!;
 
-    return Column(
-      crossAxisAlignment: .stretch,
-      children: [
-        Align(alignment: .centerLeft, child: Text(locals.email)),
-        TextField(autocorrect: false, controller: controller),
-        Gap(pu2),
-        Align(
-          alignment: .centerRight,
-          child: FilledButton.tonal(
-            onPressed: () async {
-              await ResetPasswordService(serverUrl!).submitRequest(email: controller.value.text);
-              if (context.mounted) {
-                okCancelDialog(
-                  context,
-                  title: locals.submitted,
-                  content: Text(locals.passwordResetRequestSubmitted),
-                  showCancel: false,
-                  onOk: () {
-                    AutoRouter.of(context).replace(LoginFormRoute());
-                  },
-                );
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: .stretch,
+        children: [
+          Align(alignment: .centerLeft, child: Text(locals.email)),
+          TextFormField(
+            autocorrect: false,
+            controller: controller,
+            validator: (value) {
+              print(value);
+              if ((value ?? '').trim().isNotEmpty && !RegExp(emailRegex).hasMatch(value!)) {
+                return locals.invalidEmail;
               }
+              return null;
             },
-            child: Text(locals.submit),
           ),
-        ),
-      ],
+          Gap(pu2),
+          Align(
+            alignment: .centerRight,
+            child: FilledButton.tonal(
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  await ResetPasswordService(serverUrl!).submitRequest(email: controller.value.text);
+                  if (context.mounted) {
+                    okCancelDialog(
+                      context,
+                      title: locals.submitted,
+                      content: Text(locals.passwordResetRequestSubmitted),
+                      showCancel: false,
+                      onOk: () {
+                        AutoRouter.of(context).replace(LoginFormRoute());
+                      },
+                    );
+                  }
+                }
+              },
+              child: Text(locals.submit),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
