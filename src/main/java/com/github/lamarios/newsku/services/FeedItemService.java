@@ -4,12 +4,14 @@ import com.apptasticsoftware.rssreader.Enclosure;
 import com.apptasticsoftware.rssreader.Item;
 import com.github.lamarios.newsku.persistence.entities.*;
 import com.github.lamarios.newsku.persistence.repositories.*;
+import com.github.lamarios.newsku.utils.HtmlUtils;
 import com.github.lamarios.newsku.utils.TransactionHelper;
 import jakarta.persistence.EntityManager;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,10 +113,14 @@ public class FeedItemService {
                                 newItem.setGuid(item.getGuid().get());
                                 newItem.setDescription(item.getDescription()
                                         .map(StringEscapeUtils::unescapeHtml4)
+                                        .map(HtmlUtils::getTextContent)
                                         .orElse(null));
-                                newItem.setTitle(item.getTitle().map(StringEscapeUtils::unescapeHtml4).orElse(null));
+                                newItem.setTitle(item.getTitle().map(StringEscapeUtils::unescapeHtml4)
+                                        .map(HtmlUtils::getTextContent)
+                                        .orElse(null));
                                 newItem.setContent(item.getContent()
                                         .map(StringEscapeUtils::unescapeHtml4)
+                                        .map(HtmlUtils::getTextContent)
                                         .orElse(null));
                                 newItem.setImportance(analysis.get().importance());
                                 newItem.setReasoning(analysis.get().reasoning());
@@ -215,7 +221,7 @@ public class FeedItemService {
     }
 
     @Transactional(readOnly = true)
-    public Page<FeedItem> getItems(Long from, Long to, int page, int pageSize) {
+    public Page<@NotNull FeedItem> getItems(Long from, Long to, int page, int pageSize) {
 
         List<Feed> feeds = feedService.getFeeds();
         var user = userService.getCurrentUser();

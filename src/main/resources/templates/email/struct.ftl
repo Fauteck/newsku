@@ -5,7 +5,7 @@
     <title>[Newsku] ${title}</title>
     <style>
         h1 {
-            color: #2196f3;
+            color: #ff5722;
         }
 
         .footer {
@@ -24,16 +24,9 @@
             list-style: none;
         }
 
-        .cat {
-            display: inline-block;
-            width: 30px;
-            font-size: 20px;
-            color: #2196f3;
-            text-align: center;
-        }
-
-        .amount {
-            font-size: 20px;
+        .article-image{
+            object-fit: cover;
+            border-radius: 10px;
         }
     </style>
 </head>

@@ -228,6 +228,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dynamicColorExplanation => 'User device accent color';
 
   @override
+  String get changePassword => 'Change password';
+
+  @override
   String get newPassword => 'New password';
 
   @override
@@ -416,4 +419,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidEmail => 'Invalid email';
+
+  @override
+  String get user => 'User';
+
+  @override
+  String get emailDigestTitle => 'Email digest';
+
+  @override
+  String emailDigest(String digest) {
+    String _temp0 = intl.Intl.selectLogic(digest, {
+      'daily': 'Daily',
+      'weekly': 'Weekly',
+      'monthly': 'Montly',
+      'other': '$digest',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get emailDigestExplanation =>
+      'Receive periodic emails with the top rated articles in the past selected period';
 }

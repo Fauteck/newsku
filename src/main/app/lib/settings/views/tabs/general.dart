@@ -212,35 +212,6 @@ class GeneralSettingsTab extends StatelessWidget {
                     Gap(pu8),
                     Divider(),
                     Gap(pu8),
-                    Text(locals.newPassword),
-                    TextField(controller: cubit.password, obscureText: true),
-                    Gap(pu2),
-                    Text(locals.confirmPassword),
-                    TextField(
-                      controller: cubit.repeatPassword,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        error: (state.password != state.repeatPassword) ? Text(locals.passwordsNotMatch) : null,
-                      ),
-                    ),
-                    Gap(pu2),
-                    Align(
-                      alignment: .centerRight,
-                      child: FilledButton.tonalIcon(
-                        onPressed: state.loading || state.password != state.repeatPassword || state.password.isEmpty
-                            ? null
-                            : () async {
-                                await cubit.resetPassword();
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(
-                                    context,
-                                  ).showSnackBar(SnackBar(content: Text(locals.passwordUpdated)));
-                                }
-                              },
-                        label: Text(locals.update),
-                        icon: Icon(Icons.save),
-                      ),
-                    ),
                   ],
                 ),
               ),

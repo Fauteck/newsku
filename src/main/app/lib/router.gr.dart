@@ -392,3 +392,23 @@ class TagStatsRoute extends PageRouteInfo<void> {
     },
   );
 }
+
+/// generated route for
+/// [UserSettingsTab]
+class UserSettingsRoute extends PageRouteInfo<void> {
+  const UserSettingsRoute({List<PageRouteInfo>? children})
+    : super(
+        UserSettingsRoute.name,
+        initialChildren: children,
+        argsEquality: false,
+      );
+
+  static const String name = 'UserSettingsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const UserSettingsTab();
+    },
+  );
+}

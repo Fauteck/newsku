@@ -21,6 +21,8 @@ LocalPreferencesState get localPreferences => getIt.get<LocalPreferencesCubit>()
 
 Config? get config => getIt.get<IdentityCubit>().state.config;
 
+IdentityCubit get identityCubit => getIt.get<IdentityCubit>();
+
 void addAppLicense() {
   LicenseRegistry.addLicense(
     () => Stream<LicenseEntry>.value(

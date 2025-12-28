@@ -16,6 +16,9 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
   minimumImportance: (json['minimumImportance'] as num?)?.toInt() ?? 0,
   firstTimeSetupDone: json['firstTimeSetupDone'] as bool? ?? false,
   readItemHandling: $enumDecodeNullable(_$ReadItemHandlingEnumMap, json['readItemHandling']) ?? ReadItemHandling.none,
+  emailDigest:
+      (json['emailDigest'] as List<dynamic>?)?.map((e) => $enumDecode(_$EmailDigestFrequencyEnumMap, e)).toList() ??
+      const [],
 );
 
 Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
@@ -28,6 +31,7 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'minimumImportance': instance.minimumImportance,
   'firstTimeSetupDone': instance.firstTimeSetupDone,
   'readItemHandling': _$ReadItemHandlingEnumMap[instance.readItemHandling]!,
+  'emailDigest': instance.emailDigest.map((e) => _$EmailDigestFrequencyEnumMap[e]!).toList(),
 };
 
 const _$ReadItemHandlingEnumMap = {
@@ -35,4 +39,10 @@ const _$ReadItemHandlingEnumMap = {
   ReadItemHandling.dim: 'dim',
   ReadItemHandling.hide: 'hide',
   ReadItemHandling.unreadFirstThenDim: 'unreadFirstThenDim',
+};
+
+const _$EmailDigestFrequencyEnumMap = {
+  EmailDigestFrequency.daily: 'daily',
+  EmailDigestFrequency.weekly: 'weekly',
+  EmailDigestFrequency.monthly: 'monthly',
 };

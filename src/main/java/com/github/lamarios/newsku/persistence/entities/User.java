@@ -1,8 +1,13 @@
 package com.github.lamarios.newsku.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.lamarios.newsku.models.EmailDigestFrequency;
 import com.github.lamarios.newsku.models.ReadItemHandling;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -28,6 +33,10 @@ public class User {
     @Column(name = "first_time_setup_done")
     private boolean firstTimeSetupDone;
 
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "email_digest")
+    @Enumerated(EnumType.STRING)
+    private List<EmailDigestFrequency> emailDigest;
 
     public String getId() {
         return id;
@@ -100,5 +109,13 @@ public class User {
 
     public void setFirstTimeSetupDone(boolean firstTimeSetupDone) {
         this.firstTimeSetupDone = firstTimeSetupDone;
+    }
+
+    public List<EmailDigestFrequency> getEmailDigest() {
+        return emailDigest;
+    }
+
+    public void setEmailDigest(List<EmailDigestFrequency> emailDigest) {
+        this.emailDigest = emailDigest;
     }
 }
