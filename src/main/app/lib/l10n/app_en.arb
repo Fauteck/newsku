@@ -61,6 +61,7 @@
     "blackBackgroundExplanation": "Use black background for the dark theme",
     "dynamicColor": "Dynamic color",
     "dynamicColorExplanation": "User device accent color",
+    "changePassword": "Change password",
     "newPassword": "New password",
     "confirmPassword": "Confirm password",
     "passwordUpdated": "Password updated",
@@ -114,5 +115,9 @@
     "passwordResetRequestSubmitted": "Password reset request submitted",
     "theme": "Theme",
     "appTheme": "{theme, select, light{Light} dark{Dark} other{Follow system}}",
-    "invalidEmail": "Invalid email"
+    "invalidEmail": "Invalid email",
+    "user": "User",
+    "emailDigestTitle": "Email digest",
+    "emailDigest": "{digest, select, daily{Daily} weekly{Weekly} monthly{Montly} other{{digest}}}",
+    "emailDigestExplanation": "Receive periodic emails with the top rated articles in the past selected period"
 }

@@ -1,3 +1,4 @@
+import 'package:app/user/models/email_digest_frequency.dart';
 import 'package:app/user/models/read_item_handling.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -17,6 +18,7 @@ sealed class User with _$User {
     @Default(0) int minimumImportance,
     @Default(false) bool firstTimeSetupDone,
     @Default(ReadItemHandling.none) ReadItemHandling readItemHandling,
+    @Default([]) List<EmailDigestFrequency> emailDigest,
   }) = _User;
 
   factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);

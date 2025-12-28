@@ -14,21 +14,14 @@ part 'general.freezed.dart';
 
 class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
   final TextEditingController preferenceController = TextEditingController(text: '');
-  final TextEditingController password = TextEditingController(text: '');
-  final TextEditingController repeatPassword = TextEditingController(text: '');
 
   GeneralSettingsCubit(super.initialState) {
     getUser();
-
-    password.addListener(() => emit(state.copyWith(password: password.value.text)));
-    repeatPassword.addListener(() => emit(state.copyWith(repeatPassword: repeatPassword.value.text)));
   }
 
   @override
   Future<void> close() async {
     preferenceController.dispose();
-    password.dispose();
-    repeatPassword.dispose();
     super.close();
   }
 
@@ -61,16 +54,6 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
     if (state.user != null && pref != null) {
       emit(state.copyWith.user!(readItemHandling: pref));
       await updateUser();
-    }
-  }
-
-  Future<void> resetPassword() async {
-    if (state.user != null) {
-      emit(state.copyWith.user!(password: password.value.text));
-      await updateUser();
-      emit(state.copyWith(password: '', repeatPassword: ''));
-      repeatPassword.text = '';
-      password.text = '';
     }
   }
 

@@ -463,6 +463,12 @@ abstract class AppLocalizations {
   /// **'User device accent color'**
   String get dynamicColorExplanation;
 
+  /// No description provided for @changePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change password'**
+  String get changePassword;
+
   /// No description provided for @newPassword.
   ///
   /// In en, this message translates to:
@@ -786,6 +792,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid email'**
   String get invalidEmail;
+
+  /// No description provided for @user.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get user;
+
+  /// No description provided for @emailDigestTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Email digest'**
+  String get emailDigestTitle;
+
+  /// No description provided for @emailDigest.
+  ///
+  /// In en, this message translates to:
+  /// **'{digest, select, daily{Daily} weekly{Weekly} monthly{Montly} other{{digest}}}'**
+  String emailDigest(String digest);
+
+  /// No description provided for @emailDigestExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive periodic emails with the top rated articles in the past selected period'**
+  String get emailDigestExplanation;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
