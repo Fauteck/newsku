@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -54,7 +55,7 @@ public class FeedController {
     }
 
     @PostMapping
-    public Feed updateFeed(Feed feed) throws SQLException, AccessDeniedException {
+    public Feed updateFeed(Feed feed) throws AccessDeniedException {
         if (demoMode) {
             throw new AccessDeniedException("App in demoMode");
         }
@@ -63,16 +64,30 @@ public class FeedController {
 
     @PutMapping
     public Feed addFeed(@RequestBody String url) throws NewskuException {
+        return addFeed(url, false);
+    }
+
+    /**
+     * Adds a new RSS feed for the logged in user
+     *
+     * @param url         the url of the feed
+     * @param skipRefresh skip refreshing the feed, mostly used for unit test
+     * @return the newly added feed
+     * @throws NewskuException if anything goes wrong while adding the feed
+     */
+    public Feed addFeed(String url, boolean skipRefresh) throws NewskuException {
         if (demoMode) {
             throw new AccessDeniedException("App in demoMode");
         }
         var feed = feedService.addFeed(url);
-        feedItemService.refreshFeed(feed);
+        if (!skipRefresh) {
+            feedItemService.refreshFeed(feed);
+        }
         return feed;
     }
 
     @DeleteMapping("{id}")
-    public boolean deleteFeed(@PathVariable String id) throws SQLException, AccessDeniedException {
+    public boolean deleteFeed(@PathVariable String id) throws AccessDeniedException {
         if (demoMode) {
             throw new AccessDeniedException("App in demoMode");
         }
@@ -92,7 +107,7 @@ public class FeedController {
 
 
     @GetMapping("/export")
-    public ResponseEntity<StreamingResponseBody> exportFeeds() throws NewskuException {
+    public ResponseEntity<@NotNull StreamingResponseBody> exportFeeds() throws NewskuException {
         try {
             if (demoMode) {
                 throw new AccessDeniedException("App in demoMode");
@@ -113,7 +128,7 @@ public class FeedController {
 
 
     @GetMapping("/{id}/image")
-    public ResponseEntity<StreamingResponseBody> getFeedImage(@PathVariable String id) throws IOException {
+    public ResponseEntity<@NotNull StreamingResponseBody> getFeedImage(@PathVariable String id) throws IOException {
 
         Feed item = feedService.getFeed(id);
 

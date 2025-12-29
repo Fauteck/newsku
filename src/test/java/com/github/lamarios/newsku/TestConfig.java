@@ -4,6 +4,7 @@ import com.github.lamarios.newsku.persistence.repositories.UserRepository;
 import com.github.lamarios.newsku.services.EmailService;
 import com.github.lamarios.newsku.services.OpenaiService;
 import com.github.lamarios.newsku.services.UserService;
+import com.github.lamarios.newsku.utils.FakeRssFeedController;
 import com.github.lamarios.newsku.utils.MockEmailService;
 import com.github.lamarios.newsku.utils.MockOpenaiService;
 import com.github.lamarios.newsku.utils.TestUserService;
@@ -30,6 +31,11 @@ public class TestConfig {
     @Bean
     public UserService userService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return new TestUserService(userRepository, passwordEncoder);
+    }
+
+    @Bean
+    public FakeRssFeedController fakeRssFeedController() {
+        return new FakeRssFeedController();
     }
 
 }

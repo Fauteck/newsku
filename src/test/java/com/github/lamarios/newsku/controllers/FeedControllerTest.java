@@ -9,6 +9,7 @@ import com.github.lamarios.newsku.persistence.repositories.FeedRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +30,8 @@ public class FeedControllerTest extends TestContainerTest {
     @Autowired
     private FeedRepository feedRepository;
 
+    @LocalServerPort
+    private int port;
 
     @AfterEach
     public void tearDown() {
@@ -37,9 +40,9 @@ public class FeedControllerTest extends TestContainerTest {
 
     @Test
     public void testFeedCrud() throws SQLException, NewskuException {
-        String url = "https://feeds.arstechnica.com/arstechnica/index";
+        String url = "http://localhost:" + port + "/test/rss/one-month-feed";
 
-        var feed = feedController.addFeed(url);
+        var feed = feedController.addFeed(url, true);
 
         assertNotNull(feed);
         assertEquals(url, feed.getUrl());

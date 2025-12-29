@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.github.lamarios.newsku.Constants.ONE_DAY_MS;
-
 @Service
 public class EmailDigestService {
     private final UserRepository userRepository;
@@ -81,7 +79,7 @@ public class EmailDigestService {
         log.info("Sending {} digest for user {}", frequency.name(), user.getId());
         var feeds = feedRepository.getFeedsByUser(user);
         var to = System.currentTimeMillis();
-        var from = to - frequency.getDays() * ONE_DAY_MS;
+        var from = to - frequency.getDaysMs();
 
         var items = feedItemRepository.findallByTimeAndFeeds(0, from, to, feeds, PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "importance")));
 

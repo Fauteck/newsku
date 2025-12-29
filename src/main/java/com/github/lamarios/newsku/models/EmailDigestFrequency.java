@@ -1,5 +1,7 @@
 package com.github.lamarios.newsku.models;
 
+import static com.github.lamarios.newsku.Constants.ONE_DAY_MS;
+
 public enum EmailDigestFrequency {
     daily(1, "Daily digest"),
     weekly(7, "Weekly digest"), monthly(30, "Monthly digest");
@@ -18,5 +20,9 @@ public enum EmailDigestFrequency {
 
     public String getEmailTitle() {
         return emailTitle;
+    }
+
+    public long getDaysMs() {
+        return days * ONE_DAY_MS;
     }
 }

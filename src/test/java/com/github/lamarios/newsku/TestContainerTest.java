@@ -19,7 +19,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.nio.file.AccessDeniedException;
 
 
-@SpringBootTest(classes = Application.class, properties = {"spring.main.allow-bean-definition-overriding=true", "ALLOW_SIGNUP=1"})
+@SuppressWarnings("SpringBootApplicationProperties")
+@SpringBootTest(classes = Application.class, properties = {"spring.main.allow-bean-definition-overriding=true", "ALLOW_SIGNUP=1"}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 abstract public class TestContainerTest {
 
