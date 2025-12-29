@@ -8,8 +8,11 @@
 <table cellpadding="10">
     <#list items as item>
         <tr>
-            <td><img width="100" height="100" class="article-image" src="${item.imageUrl}"
+            <td>
+                <#if item.imageUrl?? >
+                <img width="100" height="100" class="article-image" src="${item.imageUrl}"
                      alt="Image for article: ${item.title}"/></td>
+            </#if>
             <td>
                 <a href="${item.url}" target="_blank"><strong>${item.title}</strong></a><br/>
                 <#if item.description?blank_to_null??>
@@ -17,7 +20,8 @@
                 <#elseif item.content?blank_to_null??>
                     ${item.content?truncate(400, "...")}
                 </#if><br/>
-                <i>${item.feed.name} | Score: ${item.importance} | ${item.timeCreated?number_to_datetime?string("yyyy-MM-dd HH:mm")}</i>
+                <i>${item.feed.name} | Score: ${item.importance}
+                    | ${item.timeCreated?number_to_datetime?string("yyyy-MM-dd HH:mm")}</i>
             </td>
         </tr>
     </#list>

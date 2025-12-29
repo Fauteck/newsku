@@ -7,9 +7,9 @@ import com.github.lamarios.newsku.persistence.entities.FeedItem;
 import com.github.lamarios.newsku.services.FeedItemService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 
-import java.io.IOException;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,10 +25,13 @@ public class FeedItemControllerTest extends TestContainerTest {
     @Autowired
     private FeedController feedController;
 
+    @LocalServerPort
+    private int port;
 
     @Test
     public void testFeedItems() throws SQLException, NewskuException {
-        var feed = feedController.addFeed("https://feeds.arstechnica.com/arstechnica/index");
+        String url = "http://localhost:" + port + "/test/rss/one-month-feed";
+        var feed = feedController.addFeed(url, true);
 
         feedItemService.refreshFeedWorker(feed);
 
