@@ -58,6 +58,11 @@ public class SignUpControllerTest extends TestContainerTest {
 
         assertTrue(System.currentTimeMillis() - now >= 2000);
 
+        // test invalid email address
+        newUser.setEmail("invalidEmail");
+        newUser.setUsername("testUsername");
+        assertThrows(NewskuUserException.class, () -> signUpController.signup(newUser));
+
     }
 
 }

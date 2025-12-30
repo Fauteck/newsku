@@ -1,6 +1,7 @@
 package com.github.lamarios.newsku.controllers;
 
 
+import com.github.lamarios.newsku.errors.NewskuUserException;
 import com.github.lamarios.newsku.persistence.entities.User;
 import com.github.lamarios.newsku.services.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -28,7 +29,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User updateUser(@RequestBody User user) throws SQLException {
+    public User updateUser(@RequestBody User user) throws NewskuUserException {
         if (demoMode) {
             throw new AccessDeniedException("App in demoMode");
         }
@@ -36,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping
-    public User getCurrentUser(){
+    public User getCurrentUser() {
         return userService.getCurrentUser();
     }
 
