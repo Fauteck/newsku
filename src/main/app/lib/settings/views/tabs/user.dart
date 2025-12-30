@@ -17,7 +17,12 @@ class UserSettingsTab extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final locals = AppLocalizations.of(context)!;
     return BlocProvider(
-      create: (context) => UserSettingsCubit(UserSettingsState(digest: identityCubit.currentUser?.emailDigest ?? [])),
+      create: (context) => UserSettingsCubit(
+        UserSettingsState(
+          email: identityCubit.currentUser?.email ?? '',
+          digest: identityCubit.currentUser?.emailDigest ?? [],
+        ),
+      ),
       child: BlocBuilder<UserSettingsCubit, UserSettingsState>(
         builder: (context, state) {
           final cubit = context.read<UserSettingsCubit>();
@@ -51,6 +56,30 @@ class UserSettingsTab extends StatelessWidget {
                   ),
                   Gap(pu8),
                 ],
+                Text(locals.changeEmail, style: textTheme.titleMedium),
+                Gap(pu4),
+                Text(locals.newEmail),
+                TextField(
+                  controller: cubit.email,
+                  decoration: InputDecoration(error: state.validEmail ? null : Text(locals.invalidEmail)),
+                ),
+                Gap(pu2),
+                Align(
+                  alignment: .centerRight,
+                  child: FilledButton.tonalIcon(
+                    onPressed: state.loading || !state.validEmail
+                        ? null
+                        : () async {
+                            await cubit.updateEmail();
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(locals.emailUpdated)));
+                            }
+                          },
+                    label: Text(locals.update),
+                    icon: Icon(Icons.save),
+                  ),
+                ),
+                Gap(pu8),
                 Text(locals.changePassword, style: textTheme.titleMedium),
                 Gap(pu4),
                 Text(locals.newPassword),

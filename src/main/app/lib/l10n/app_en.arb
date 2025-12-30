@@ -119,5 +119,8 @@
     "user": "User",
     "emailDigestTitle": "Email digest",
     "emailDigest": "{digest, select, daily{Daily} weekly{Weekly} monthly{Montly} other{{digest}}}",
-    "emailDigestExplanation": "Receive periodic emails with the top rated articles in the past selected period"
+    "emailDigestExplanation": "Receive periodic emails with the top rated articles in the past selected period",
+    "changeEmail": "Change email",
+    "newEmail": "New email",
+    "emailUpdated": "Email updated"
 }

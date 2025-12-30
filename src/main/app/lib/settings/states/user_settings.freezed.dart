@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserSettingsState {
 
- bool get loading; String get password; String get repeatPassword; List<EmailDigestFrequency> get digest; dynamic get error; StackTrace? get stackTrace;
+ bool get loading; String get password; String get repeatPassword; String get email; List<EmailDigestFrequency> get digest; dynamic get error; StackTrace? get stackTrace;
 /// Create a copy of UserSettingsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $UserSettingsStateCopyWith<UserSettingsState> get copyWith => _$UserSettingsStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserSettingsState&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.password, password) || other.password == password)&&(identical(other.repeatPassword, repeatPassword) || other.repeatPassword == repeatPassword)&&const DeepCollectionEquality().equals(other.digest, digest)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserSettingsState&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.password, password) || other.password == password)&&(identical(other.repeatPassword, repeatPassword) || other.repeatPassword == repeatPassword)&&(identical(other.email, email) || other.email == email)&&const DeepCollectionEquality().equals(other.digest, digest)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loading,password,repeatPassword,const DeepCollectionEquality().hash(digest),const DeepCollectionEquality().hash(error),stackTrace);
+int get hashCode => Object.hash(runtimeType,loading,password,repeatPassword,email,const DeepCollectionEquality().hash(digest),const DeepCollectionEquality().hash(error),stackTrace);
 
 @override
 String toString() {
-  return 'UserSettingsState(loading: $loading, password: $password, repeatPassword: $repeatPassword, digest: $digest, error: $error, stackTrace: $stackTrace)';
+  return 'UserSettingsState(loading: $loading, password: $password, repeatPassword: $repeatPassword, email: $email, digest: $digest, error: $error, stackTrace: $stackTrace)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $UserSettingsStateCopyWith<$Res>  {
   factory $UserSettingsStateCopyWith(UserSettingsState value, $Res Function(UserSettingsState) _then) = _$UserSettingsStateCopyWithImpl;
 @useResult
 $Res call({
- bool loading, String password, String repeatPassword, List<EmailDigestFrequency> digest, dynamic error, StackTrace? stackTrace
+ bool loading, String password, String repeatPassword, String email, List<EmailDigestFrequency> digest, dynamic error, StackTrace? stackTrace
 });
 
 
@@ -62,11 +62,12 @@ class _$UserSettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of UserSettingsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? loading = null,Object? password = null,Object? repeatPassword = null,Object? digest = null,Object? error = freezed,Object? stackTrace = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? loading = null,Object? password = null,Object? repeatPassword = null,Object? email = null,Object? digest = null,Object? error = freezed,Object? stackTrace = freezed,}) {
   return _then(_self.copyWith(
 loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,repeatPassword: null == repeatPassword ? _self.repeatPassword : repeatPassword // ignore: cast_nullable_to_non_nullable
+as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,digest: null == digest ? _self.digest : digest // ignore: cast_nullable_to_non_nullable
 as List<EmailDigestFrequency>,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
 as dynamic,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
@@ -152,10 +153,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool loading,  String password,  String repeatPassword,  List<EmailDigestFrequency> digest,  dynamic error,  StackTrace? stackTrace)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool loading,  String password,  String repeatPassword,  String email,  List<EmailDigestFrequency> digest,  dynamic error,  StackTrace? stackTrace)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserSettingsState() when $default != null:
-return $default(_that.loading,_that.password,_that.repeatPassword,_that.digest,_that.error,_that.stackTrace);case _:
+return $default(_that.loading,_that.password,_that.repeatPassword,_that.email,_that.digest,_that.error,_that.stackTrace);case _:
   return orElse();
 
 }
@@ -173,10 +174,10 @@ return $default(_that.loading,_that.password,_that.repeatPassword,_that.digest,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool loading,  String password,  String repeatPassword,  List<EmailDigestFrequency> digest,  dynamic error,  StackTrace? stackTrace)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool loading,  String password,  String repeatPassword,  String email,  List<EmailDigestFrequency> digest,  dynamic error,  StackTrace? stackTrace)  $default,) {final _that = this;
 switch (_that) {
 case _UserSettingsState():
-return $default(_that.loading,_that.password,_that.repeatPassword,_that.digest,_that.error,_that.stackTrace);}
+return $default(_that.loading,_that.password,_that.repeatPassword,_that.email,_that.digest,_that.error,_that.stackTrace);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -190,10 +191,10 @@ return $default(_that.loading,_that.password,_that.repeatPassword,_that.digest,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool loading,  String password,  String repeatPassword,  List<EmailDigestFrequency> digest,  dynamic error,  StackTrace? stackTrace)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool loading,  String password,  String repeatPassword,  String email,  List<EmailDigestFrequency> digest,  dynamic error,  StackTrace? stackTrace)?  $default,) {final _that = this;
 switch (_that) {
 case _UserSettingsState() when $default != null:
-return $default(_that.loading,_that.password,_that.repeatPassword,_that.digest,_that.error,_that.stackTrace);case _:
+return $default(_that.loading,_that.password,_that.repeatPassword,_that.email,_that.digest,_that.error,_that.stackTrace);case _:
   return null;
 
 }
@@ -204,13 +205,14 @@ return $default(_that.loading,_that.password,_that.repeatPassword,_that.digest,_
 /// @nodoc
 
 
-class _UserSettingsState implements UserSettingsState, WithError {
-  const _UserSettingsState({this.loading = false, this.password = "", this.repeatPassword = "", final  List<EmailDigestFrequency> digest = const [], this.error, this.stackTrace}): _digest = digest;
+class _UserSettingsState extends UserSettingsState implements WithError {
+  const _UserSettingsState({this.loading = false, this.password = "", this.repeatPassword = "", this.email = "", final  List<EmailDigestFrequency> digest = const [], this.error, this.stackTrace}): _digest = digest,super._();
   
 
 @override@JsonKey() final  bool loading;
 @override@JsonKey() final  String password;
 @override@JsonKey() final  String repeatPassword;
+@override@JsonKey() final  String email;
  final  List<EmailDigestFrequency> _digest;
 @override@JsonKey() List<EmailDigestFrequency> get digest {
   if (_digest is EqualUnmodifiableListView) return _digest;
@@ -231,16 +233,16 @@ _$UserSettingsStateCopyWith<_UserSettingsState> get copyWith => __$UserSettingsS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserSettingsState&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.password, password) || other.password == password)&&(identical(other.repeatPassword, repeatPassword) || other.repeatPassword == repeatPassword)&&const DeepCollectionEquality().equals(other._digest, _digest)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserSettingsState&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.password, password) || other.password == password)&&(identical(other.repeatPassword, repeatPassword) || other.repeatPassword == repeatPassword)&&(identical(other.email, email) || other.email == email)&&const DeepCollectionEquality().equals(other._digest, _digest)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,loading,password,repeatPassword,const DeepCollectionEquality().hash(_digest),const DeepCollectionEquality().hash(error),stackTrace);
+int get hashCode => Object.hash(runtimeType,loading,password,repeatPassword,email,const DeepCollectionEquality().hash(_digest),const DeepCollectionEquality().hash(error),stackTrace);
 
 @override
 String toString() {
-  return 'UserSettingsState(loading: $loading, password: $password, repeatPassword: $repeatPassword, digest: $digest, error: $error, stackTrace: $stackTrace)';
+  return 'UserSettingsState(loading: $loading, password: $password, repeatPassword: $repeatPassword, email: $email, digest: $digest, error: $error, stackTrace: $stackTrace)';
 }
 
 
@@ -251,7 +253,7 @@ abstract mixin class _$UserSettingsStateCopyWith<$Res> implements $UserSettingsS
   factory _$UserSettingsStateCopyWith(_UserSettingsState value, $Res Function(_UserSettingsState) _then) = __$UserSettingsStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool loading, String password, String repeatPassword, List<EmailDigestFrequency> digest, dynamic error, StackTrace? stackTrace
+ bool loading, String password, String repeatPassword, String email, List<EmailDigestFrequency> digest, dynamic error, StackTrace? stackTrace
 });
 
 
@@ -268,11 +270,12 @@ class __$UserSettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of UserSettingsState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? loading = null,Object? password = null,Object? repeatPassword = null,Object? digest = null,Object? error = freezed,Object? stackTrace = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? loading = null,Object? password = null,Object? repeatPassword = null,Object? email = null,Object? digest = null,Object? error = freezed,Object? stackTrace = freezed,}) {
   return _then(_UserSettingsState(
 loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,repeatPassword: null == repeatPassword ? _self.repeatPassword : repeatPassword // ignore: cast_nullable_to_non_nullable
+as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,digest: null == digest ? _self._digest : digest // ignore: cast_nullable_to_non_nullable
 as List<EmailDigestFrequency>,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
 as dynamic,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable

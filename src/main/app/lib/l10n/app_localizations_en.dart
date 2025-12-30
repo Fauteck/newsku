@@ -440,4 +440,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get emailDigestExplanation =>
       'Receive periodic emails with the top rated articles in the past selected period';
+
+  @override
+  String get changeEmail => 'Change email';
+
+  @override
+  String get newEmail => 'New email';
+
+  @override
+  String get emailUpdated => 'Email updated';
 }
