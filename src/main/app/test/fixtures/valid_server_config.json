@@ -14,7 +14,7 @@
         ],
         "issuer": "https://id.ftpix.com",
         "jwks_uri": "https://id.ftpix.com/.well-known/jwks.json",
-        "name": "Pocket ID",
+        "name": "Test OIDC",
         "token_endpoint": "https://id.ftpix.com/api/oidc/token",
         "userinfo_endpoint": "https://id.ftpix.com/api/oidc/userinfo",
         "usernameClaim": "preferred_username"

@@ -1,0 +1,15 @@
+{
+    "email": "test@test.com",
+    "emailDigest": [
+        "weekly",
+        "monthly",
+        "daily"
+    ],
+    "feedItemPreference": "I really enjoy PC gaming, PC hardware and linux especially NixOS.\nGlobal technology news are also somewhat interesting\nI do not care about politics.\n\nAnything that looks like an advertisement or product discount must be scored 0",
+    "firstTimeSetupDone": true,
+    "id": "10f5a36c-c82a-4d16-8085-647ab0d3fc55",
+    "minimumImportance": 5,
+    "oidcSub": "ff73c9e2-48be-4b07-a9bd-42c538f2171d",
+    "readItemHandling": "unreadFirstThenDim",
+    "username": "test"
+}

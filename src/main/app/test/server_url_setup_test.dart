@@ -5,13 +5,10 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:app/main.dart';
-import 'package:app/router.dart';
 import 'package:app/user/views/components/server_url.dart';
 import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import 'package:nock/nock.dart';
 
 import 'helper_widget/test_app_setup_widget.dart';
@@ -23,7 +20,7 @@ void main() {
   });
 
   setUp(() async {
-    await setupTests();
+    await setupTests(withConfig: false);
     nock.cleanAll();
   });
 
@@ -37,10 +34,9 @@ void main() {
     expect(textField, findsOneWidget);
 
     final wrongServerUrl = "http://localhost:111";
-    final correctServerUrl = "http://localhost:123";
     var interceptor = nock(wrongServerUrl).get("/config")..reply(404, '');
 
-    var correctUrlInterceptor = nock(correctServerUrl).get('/config')
+    var correctUrlInterceptor = nock(validServerUrl).get('/config')
       ..reply(200, loadFixture('valid_server_config.json'));
 
     // let's do a simple test with an invalid server for example
@@ -57,7 +53,7 @@ void main() {
 
     expect(continueButtonWidget.enabled, isFalse);
 
-    await tester.enterText(textField, correctServerUrl);
+    await tester.enterText(textField, validServerUrl);
     await tester.pump(const Duration(milliseconds: 600));
 
     await tester.pumpAndSettle();
@@ -72,6 +68,6 @@ void main() {
     await tester.tap(continueButton);
     await tester.pumpAndSettle();
 
-    expect(correctServerUrl, identityCubit.state.serverUrl);
+    expect(validServerUrl, identityCubit.state.serverUrl);
   });
 }

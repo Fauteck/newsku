@@ -8,6 +8,9 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:logging/logging.dart';
+
+final _log = Logger('LoginFormScreen');
 
 @RoutePage()
 class LoginFormScreen extends StatelessWidget {
@@ -34,6 +37,7 @@ class LoginFormScreen extends StatelessWidget {
                 children: [
                   Align(alignment: .centerLeft, child: Text(locals.username)),
                   TextField(
+                    key: Key('username'),
                     onChanged: (value) => cubit.setUser(value),
                     autofillHints: [AutofillHints.username],
                     autocorrect: false,
@@ -41,6 +45,7 @@ class LoginFormScreen extends StatelessWidget {
                   Gap(pu4),
                   Align(alignment: .centerLeft, child: Text(locals.password)),
                   TextField(
+                    key: Key('password'),
                     obscureText: true,
                     onChanged: (value) => cubit.setPassword(value),
                     autofillHints: [AutofillHints.password],
@@ -62,6 +67,7 @@ class LoginFormScreen extends StatelessWidget {
                         ),
                       Spacer(),
                       FilledButton.tonalIcon(
+                        key: Key('login-button'),
                         onPressed: state.loading
                             ? null
                             : () async {
@@ -74,6 +80,8 @@ class LoginFormScreen extends StatelessWidget {
                                       AutoRouter.of(context).replaceAll([HomeRoute()]);
                                     }
                                   }
+                                } catch (e) {
+                                  _log.severe('Log in failed', e);
                                 } finally {
                                   if (context.mounted) {
                                     cubit.setLoading(false);
