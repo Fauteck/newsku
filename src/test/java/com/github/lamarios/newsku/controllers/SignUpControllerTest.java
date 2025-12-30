@@ -22,7 +22,7 @@ public class SignUpControllerTest extends TestContainerTest {
     public void signUpTest() throws AccessDeniedException, NewskuUserException {
         User newUser = new User();
         newUser.setPassword("somePassword");
-        newUser.setEmail("someEmail@eai.com");
+        newUser.setEmail("someemail@eai.com");
         newUser.setUsername("someUsername");
         newUser.setReadItemHandling(ReadItemHandling.none);
 
@@ -57,6 +57,11 @@ public class SignUpControllerTest extends TestContainerTest {
         assertThrows(NewskuUserException.class, () -> signUpController.signup(newUser));
 
         assertTrue(System.currentTimeMillis() - now >= 2000);
+
+        // test invalid email address
+        newUser.setEmail("invalidEmail");
+        newUser.setUsername("testUsername");
+        assertThrows(NewskuUserException.class, () -> signUpController.signup(newUser));
 
     }
 

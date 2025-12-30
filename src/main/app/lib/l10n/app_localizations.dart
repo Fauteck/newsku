@@ -816,6 +816,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Receive periodic emails with the top rated articles in the past selected period'**
   String get emailDigestExplanation;
+
+  /// No description provided for @changeEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Change email'**
+  String get changeEmail;
+
+  /// No description provided for @newEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'New email'**
+  String get newEmail;
+
+  /// No description provided for @emailUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Email updated'**
+  String get emailUpdated;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
