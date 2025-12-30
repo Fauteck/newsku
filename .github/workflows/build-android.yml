@@ -57,6 +57,10 @@ jobs:
           echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> /tmp/key.properties
           echo "storeFile=/tmp/keystore.jks" >> /tmp/key.properties
       - run: set -e
+      - name: Run tests
+        working-directory: src/main/app
+        run: |
+          nix-shell --run "flutter test"
       - name: Build app
         working-directory: src/main/app
         run: |

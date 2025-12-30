@@ -1,0 +1,22 @@
+{
+    "allowSignup": true,
+    "announcement": "",
+    "backendVersion": "31",
+    "canResetPassword": true,
+    "demoMode": false,
+    "oidcConfig": {
+        "authorization_endpoint": "https://my.oidc.com/authorize",
+        "clientId": "a0b7a5af-296a-478a-8469-4b54283ec548",
+        "discoveryUrl": "https://my.oidc.com/.well-known/openid-configuration",
+        "emailClaim": "email",
+        "id_token_signing_alg_values_supported": [
+            "RS256"
+        ],
+        "issuer": "https://id.ftpix.com",
+        "jwks_uri": "https://id.ftpix.com/.well-known/jwks.json",
+        "name": "Test OIDC",
+        "token_endpoint": "https://id.ftpix.com/api/oidc/token",
+        "userinfo_endpoint": "https://id.ftpix.com/api/oidc/userinfo",
+        "usernameClaim": "preferred_username"
+    }
+}

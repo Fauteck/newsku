@@ -23,5 +23,5 @@ public interface FeedRepository extends JpaRepository<Feed, String> {
     List<Feed> findFirstByUrlAndUser(String url, User user);
 
     @Query("select sum(f.lastRefreshErrors) from Feed f where f.user = :user")
-    long sumFeedsError(@Param("user") User user);
+    Long sumFeedsError(@Param("user") User user);
 }
