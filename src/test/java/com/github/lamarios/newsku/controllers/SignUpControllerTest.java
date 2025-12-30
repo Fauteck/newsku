@@ -22,7 +22,7 @@ public class SignUpControllerTest extends TestContainerTest {
     public void signUpTest() throws AccessDeniedException, NewskuUserException {
         User newUser = new User();
         newUser.setPassword("somePassword");
-        newUser.setEmail("someEmail@eai.com");
+        newUser.setEmail("someemail@eai.com");
         newUser.setUsername("someUsername");
         newUser.setReadItemHandling(ReadItemHandling.none);
 
