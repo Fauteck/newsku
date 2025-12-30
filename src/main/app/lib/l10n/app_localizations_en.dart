@@ -18,7 +18,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get continueToLogin => 'Continue';
 
   @override
-  String get serverUrlUnreachable => 'Couldn\'t ead server or get its config';
+  String get serverUrlUnreachable => 'Couldn\'t read server or get its config';
 
   @override
   String get username => 'Username';

@@ -12,7 +12,7 @@ import 'package:logging/logging.dart';
 
 import 'package:app/l10n/app_localizations.dart';
 
-late final _appRouter;
+late final appRouter;
 
 final getIt = GetIt.instance;
 
@@ -29,7 +29,7 @@ Future<void> main() async {
 
   getIt.registerSingleton<LocalPreferencesCubit>(LocalPreferencesCubit(LocalPreferencesState()));
 
-  _appRouter = AppRouter(loggedInOnStart: identityCubit.isLoggedIn);
+  appRouter = AppRouter(loggedInOnStart: identityCubit.isLoggedIn);
 
   runApp(BetterFeedback(child: const MyApp()));
 }
@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
                 title: 'Newsku',
                 localizationsDelegates: AppLocalizations.localizationsDelegates,
                 supportedLocales: AppLocalizations.supportedLocales,
-                routerConfig: _appRouter.config(),
+                routerConfig: appRouter.config(),
 
                 darkTheme: ThemeData(
                   colorScheme: .fromSeed(

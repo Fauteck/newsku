@@ -112,7 +112,7 @@ abstract class AppLocalizations {
   /// No description provided for @serverUrlUnreachable.
   ///
   /// In en, this message translates to:
-  /// **'Couldn\'t ead server or get its config'**
+  /// **'Couldn\'t read server or get its config'**
   String get serverUrlUnreachable;
 
   /// No description provided for @username.

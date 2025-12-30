@@ -59,6 +59,7 @@ class ServerUrlScreen extends StatelessWidget {
               Align(
                 alignment: .centerRight,
                 child: FilledButton.tonalIcon(
+                  key: Key('continue-button'),
                   onPressed: state.loading || state.config == null || state.error
                       ? null
                       : () {

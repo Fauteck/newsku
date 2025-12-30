@@ -2,7 +2,7 @@
     "articlePreference": "Article preferences",
     "server": "Server",
     "continueToLogin": "Continue",
-    "serverUrlUnreachable": "Couldn't ead server or get its config",
+    "serverUrlUnreachable": "Couldn't read server or get its config",
     "username": "Username",
     "password": "Password",
     "signUp": "Sign up",
