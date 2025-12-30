@@ -1,5 +1,4 @@
 import 'package:app/user/views/components/login_form.dart';
-import 'package:app/user/views/components/server_url.dart';
 import 'package:app/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,7 +7,7 @@ import 'package:nock/nock.dart';
 import 'helper_widget/test_app_setup_widget.dart';
 import 'test_utils.dart';
 
-main() {
+void main() {
   setUpAll(() {
     nock.init();
   });

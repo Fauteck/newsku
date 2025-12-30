@@ -5,7 +5,6 @@ import 'package:app/config/models/config.dart';
 import 'package:app/home/state/local_preferences.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
-import 'package:app/router.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';

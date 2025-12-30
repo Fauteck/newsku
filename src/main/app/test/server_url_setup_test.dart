@@ -34,10 +34,9 @@ void main() {
     expect(textField, findsOneWidget);
 
     final wrongServerUrl = "http://localhost:111";
-    var interceptor = nock(wrongServerUrl).get("/config")..reply(404, '');
+    nock(wrongServerUrl).get("/config").reply(404, '');
 
-    var correctUrlInterceptor = nock(validServerUrl).get('/config')
-      ..reply(200, loadFixture('valid_server_config.json'));
+    nock(validServerUrl).get('/config').reply(200, loadFixture('valid_server_config.json'));
 
     // let's do a simple test with an invalid server for example
     await tester.enterText(textField, wrongServerUrl);
