@@ -4,7 +4,6 @@ import 'package:app/router.dart';
 import 'package:app/user/states/signup.dart';
 import 'package:app/utils/dialog.dart';
 import 'package:app/utils/utils.dart';
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -38,10 +37,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         children: [
           Align(alignment: .centerLeft, child: Text(locals.email)),
           TextFormField(
+            key: Key('email'),
             autocorrect: false,
             controller: controller,
             validator: (value) {
-              print(value);
               if ((value ?? '').trim().isNotEmpty && !RegExp(emailRegex).hasMatch(value!)) {
                 return locals.invalidEmail;
               }
@@ -52,6 +51,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           Align(
             alignment: .centerRight,
             child: FilledButton.tonal(
+              key: Key('submit'),
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   await ResetPasswordService(serverUrl!).submitRequest(email: controller.value.text);

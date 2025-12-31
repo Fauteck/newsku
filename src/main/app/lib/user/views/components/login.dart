@@ -33,6 +33,7 @@ class LoginScreen extends StatelessWidget {
                   child: Transform.translate(offset: Offset(0, lerpDouble(0, 50, 1 - value)!), child: child),
                 ),
                 child: Container(
+                  key: Key('announcement'),
                   margin: .symmetric(horizontal: 64),
                   decoration: BoxDecoration(
                     color: colors.tertiaryContainer,

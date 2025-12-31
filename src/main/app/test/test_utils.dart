@@ -8,17 +8,18 @@ import 'package:app/main.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
+import 'package:nock/nock.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final String validServerUrl = 'http://localhost:123';
 
-Future<void> setupTests({bool withConfig = true}) async {
+Future<void> setupTests({bool withConfig = true, bool loggedIn = false}) async {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen((record) {
     print('${record.level.name}: ${record.time}: ${record.message}');
   });
 
-  getIt.reset(dispose: true);
+  await getIt.reset(dispose: true);
 
   SharedPreferences.setMockInitialValues({});
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +32,15 @@ Future<void> setupTests({bool withConfig = true}) async {
   if (withConfig) {
     final config = Config.fromJson(jsonDecode(loadFixture('valid_server_config.json')));
     identityCubit.setUrl(validServerUrl, config: config);
+  }
+
+  if (loggedIn) {
+    nock(validServerUrl).get('/api/users').reply(200, loadFixture('user.json'));
+    final token = generateTestUserToken();
+
+    await identityCubit.setToken(token);
+
+    nock.cleanAll();
   }
 }
 

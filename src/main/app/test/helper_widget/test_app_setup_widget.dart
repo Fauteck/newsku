@@ -31,3 +31,24 @@ class TestSetup extends StatelessWidget {
     );
   }
 }
+
+class DeepLinkTestSetup extends StatelessWidget {
+  final PageRouteInfo route;
+
+  const DeepLinkTestSetup({super.key, required this.route});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => getIt.get<LocalPreferencesCubit>()),
+        BlocProvider(create: (context) => getIt.get<IdentityCubit>()),
+      ],
+      child: MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        routerConfig: AppRouter(loggedInOnStart: false).config(deepLinkBuilder: (deepLink) => DeepLink.single(route)),
+      ),
+    );
+  }
+}

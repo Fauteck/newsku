@@ -1,0 +1,29 @@
+[
+    {
+        "id": "6a9cd320-bf63-4cce-a553-3a1067565678",
+        "order": 0,
+        "settings": {
+            "items": null,
+            "title": "★ Top Stories"
+        },
+        "type": "topStories"
+    },
+    {
+        "id": "341a3490-d37f-44ee-85d4-81c3c78dc508",
+        "order": 1,
+        "settings": {
+            "items": 6,
+            "title": null
+        },
+        "type": "bigGrid"
+    },
+    {
+        "id": "e94143b4-ce02-4cd6-b101-0cc92e0d9b0f",
+        "order": 2,
+        "settings": {
+            "items": 2,
+            "title": null
+        },
+        "type": "smallGrid"
+    }
+]

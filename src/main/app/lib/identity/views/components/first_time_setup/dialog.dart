@@ -36,7 +36,7 @@ class _FirstTimeSetupDialogState extends State<FirstTimeSetupDialog> {
       initialValue: 0,
       builder: (context, page) => Center(
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: BreakPoint.tablet.maxWidth),
+          constraints: BoxConstraints(maxWidth: BreakPoint.tablet.maxWidth, maxHeight: 1000),
           child: Dialog(
             child: Column(
               mainAxisSize: .min,
@@ -76,6 +76,7 @@ class _FirstTimeSetupDialogState extends State<FirstTimeSetupDialog> {
                   child: Row(
                     children: [
                       TextButton(
+                        key: Key('back'),
                         onPressed: page == 0 ? null : () => context.read<SimpleCubit<int>>().setValue(page - 1),
                         child: Text(locals.back),
                       ),
@@ -84,11 +85,13 @@ class _FirstTimeSetupDialogState extends State<FirstTimeSetupDialog> {
                       ),
                       if (page < maxPages - 1)
                         TextButton(
+                          key: Key('next'),
                           onPressed: () => context.read<SimpleCubit<int>>().setValue(page + 1),
                           child: Text(locals.next),
                         )
                       else
                         TextButton(
+                          key: Key('done'),
                           onPressed: () {
                             final user = context.read<IdentityCubit>().state.currentUser;
                             if (user != null) {

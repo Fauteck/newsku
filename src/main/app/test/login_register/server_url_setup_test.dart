@@ -11,8 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nock/nock.dart';
 
-import 'helper_widget/test_app_setup_widget.dart';
-import 'test_utils.dart';
+import '../helper_widget/test_app_setup_widget.dart';
+import '../test_utils.dart';
 
 void main() {
   setUpAll(() {

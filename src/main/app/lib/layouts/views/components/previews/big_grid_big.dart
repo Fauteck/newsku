@@ -27,7 +27,7 @@ class BigGridBig extends StatelessWidget {
           crossAxisCount: 3,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          childAspectRatio: 16 / (device == .mobile ? 17 : 15),
+          childAspectRatio: 16 / (device == .mobile ? 17 : 16),
           children: List.generate(
             last ? 6 : (block.settings ?? block.type.defaultSettings).items ?? 6,
             (index) => _GridItem(),
