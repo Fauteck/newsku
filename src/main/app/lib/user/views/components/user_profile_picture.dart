@@ -10,7 +10,8 @@ class UserProfilePicture extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
 
-    final text = (getIt.get<IdentityCubit>().currentUser?.username ?? '').substring(0, 1).toUpperCase();
+    var username2 = getIt.get<IdentityCubit>().currentUser?.username;
+    final text = (username2 ?? '').substring(0, 1).toUpperCase();
 
     return Container(
       width: 25,

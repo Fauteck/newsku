@@ -75,7 +75,7 @@ void main() {
 
     expect(backButtonWidget.enabled, false);
 
-    await snap(name: 'first-time-set-up-page-1', matchToGolden: true);
+    await snap(name: 'first_time_set_up_page_1', matchToGolden: true);
 
     final feedsInterceptor = nock(validServerUrl).get('/api/feeds')..reply(200, '[]');
 
@@ -94,7 +94,7 @@ void main() {
     backButtonWidget = tester.widget(backButton);
     expect(backButtonWidget.enabled, true);
 
-    await snap(name: 'first-time-set-up-page-2', matchToGolden: true);
+    await snap(name: 'first_time_set_up_page_2', matchToGolden: true);
 
     await tester.pumpAndSettle();
     await tester.tap(nextButton);
@@ -119,7 +119,7 @@ void main() {
     await tester.tap(nextButton);
     await tester.pumpAndSettle();
 
-    await snap(name: 'first-time-set-up-page-3', matchToGolden: true);
+    await snap(name: 'first_time_set_up_page_3', matchToGolden: true);
 
     expect(layoutInterceptor.isDone, true);
     expect(firstLayoutSaveInterceptor.isDone, true);
@@ -132,7 +132,7 @@ void main() {
     await tester.tap(nextButton);
     await tester.pumpAndSettle();
 
-    await snap(name: 'first-time-set-up-page-4', matchToGolden: true);
+    await snap(name: 'first_time_set_up_page_4', matchToGolden: true);
 
     final setupComplete = find.descendant(of: dialog, matching: find.text('Setup complete !'));
     expect(setupComplete, findsOneWidget);
@@ -152,6 +152,6 @@ void main() {
 
     expect(setupUser.isDone, true);
     expect(dialog, findsNothing);
-    await snap(name: 'first-time-set-up-done', matchToGolden: true);
+    await snap(name: 'first_time_set_up_done', matchToGolden: true);
   });
 }

@@ -14,3 +14,7 @@ web-build:
 
 web-serve:
 	http-server build/web -p 8888  --proxy http://localhost:8888? -c-1
+
+
+generate-goldens:
+	flutter test --update-goldens

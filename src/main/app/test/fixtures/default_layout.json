@@ -4,9 +4,9 @@
         "order": 0,
         "settings": {
             "items": null,
-            "title": "★ Top Stories"
+            "title": "Top Stories"
         },
-        "type": "topStories"
+        "type": "bigHeadline"
     },
     {
         "id": "341a3490-d37f-44ee-85d4-81c3c78dc508",

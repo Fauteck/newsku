@@ -148,9 +148,11 @@ class FeedScreen extends StatelessWidget {
                                     child: RefreshIndicator(
                                       onRefresh: () => cubit.refresh(),
                                       child: CustomScrollView(
+                                        key: Key('scrollable-feed'),
                                         controller: cubit.scrollController,
                                         slivers: [
                                           SliverAppBar(
+                                            key: Key('app-bar'),
                                             floating: true,
                                             snap: true,
                                             elevation: 0,
@@ -194,6 +196,7 @@ class FeedScreen extends StatelessWidget {
                                                 IconButton(onPressed: () => cubit.refresh(), icon: Icon(Icons.refresh)),
                                               ],
                                               MenuAnchor(
+                                                key: Key('profile-button'),
                                                 builder: (context, controller, child) => IconButton(
                                                   onPressed: () =>
                                                       controller.isOpen ? controller.close() : controller.open(),
@@ -207,6 +210,7 @@ class FeedScreen extends StatelessWidget {
                                                   ),
                                                   if (!(context.read<IdentityCubit>().state.config?.demoMode ?? false))
                                                     MenuItemButton(
+                                                      key: Key('settings-button'),
                                                       leadingIcon: ConditionalWrap(
                                                         wrapIf: state.errorCount > 0,
                                                         wrapper: (child) => Badge(
