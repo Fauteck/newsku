@@ -13,6 +13,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_loading_indicator/loading_indicator.dart';
 
+const _validUrl = r"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)";
+
+final _formKey = GlobalKey<FormState>();
+
 @RoutePage()
 class FeedsSettingsTab extends StatelessWidget {
   const FeedsSettingsTab({super.key});
@@ -34,22 +38,36 @@ class FeedsSettingsTab extends StatelessWidget {
                     children: [
                       Padding(
                         padding: EdgeInsets.all(pu2),
-                        child: Row(
-                          spacing: pu2,
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: cubit.newFeedController,
-                                autofillHints: [AutofillHints.url],
-                                decoration: InputDecoration(label: Text(locals.newFeedUrl)),
+                        child: Form(
+                          key: _formKey,
+                          child: Row(
+                            crossAxisAlignment: .center,
+                            spacing: pu2,
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: cubit.newFeedController,
+                                  autofillHints: [AutofillHints.url],
+                                  decoration: InputDecoration(label: Text(locals.newFeedUrl)),
+                                  validator: (value) {
+                                    if (!RegExp(_validUrl).hasMatch(value ?? '')) {
+                                      return locals.invalidUrl;
+                                    }
+                                    return null;
+                                  },
+                                ),
                               ),
-                            ),
-                            FilledButton.tonalIcon(
-                              onPressed: () => cubit.addFeed(),
-                              label: Text(locals.addFeed),
-                              icon: Icon(Icons.add),
-                            ),
-                          ],
+                              FilledButton.tonalIcon(
+                                onPressed: () {
+                                  if (_formKey.currentState!.validate()) {
+                                    cubit.addFeed();
+                                  }
+                                },
+                                label: Text(locals.addFeed),
+                                icon: Icon(Icons.add),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       Row(

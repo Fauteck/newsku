@@ -1,0 +1,38 @@
+[
+    {
+        "description": "All Ars Technica stories",
+        "id": "1",
+        "image": null,
+        "itemPreference": null,
+        "lastRefreshErrors": 0,
+        "name": "Ars Technica - All content",
+        "url": "https://feeds.arstechnica.com/arstechnica/index"
+    },
+    {
+        "description": "This is a feed of the latest articles from Rock Paper Shotgun.",
+        "id": "2",
+        "image": null,
+        "itemPreference": null,
+        "lastRefreshErrors": 0,
+        "name": "Rock Paper Shotgun Latest Articles Feed",
+        "url": "https://www.rockpapershotgun.com/feed"
+    },
+    {
+        "description": "",
+        "id": "3",
+        "image": null,
+        "itemPreference": null,
+        "lastRefreshErrors": 0,
+        "name": "Digital Foundry | Latest Updates",
+        "url": "https://www.digitalfoundry.net/feeds/latest"
+    },
+    {
+        "description": "The latest articles from GamingOnLinux",
+        "id": "4",
+        "image": null,
+        "itemPreference": null,
+        "lastRefreshErrors": 1337,
+        "name": "GamingOnLinux Latest Articles",
+        "url": "https://www.gamingonlinux.com/article_rss.php"
+    }
+]

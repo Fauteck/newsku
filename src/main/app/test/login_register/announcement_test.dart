@@ -21,6 +21,7 @@ void main() {
 
   testWidgets('Test whether the announcement text is displaying when it should', (WidgetTester tester) async {
     await tester.binding.setSurfaceSize(Size(800, 1024));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
 
     // we remove the announcement
     identityCubit.setUrl(validServerUrl, config: identityCubit.state.config?.copyWith(announcement: ''));

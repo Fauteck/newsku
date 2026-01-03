@@ -2,7 +2,9 @@ import 'package:app/feed/views/components/big_grid_item.dart';
 import 'package:app/feed/views/components/headline.dart';
 import 'package:app/feed/views/components/small_grid_item.dart';
 import 'package:app/feed/views/screens/feed_screen.dart';
+import 'package:app/user/views/components/user_profile_picture.dart';
 import 'package:app/utils/utils.dart';
+import 'package:app/utils/views/components/error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nock/nock.dart';
@@ -62,6 +64,7 @@ void main() {
   testWidgets('Test whether getting feed data will actually display something', (WidgetTester tester) async {
     // this should be big enough for one day of feed
     await tester.binding.setSurfaceSize(Size(800, 3000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
 
     nock(validServerUrl).get('/api/layout')
       ..reply(200, loadFixture('default_layout.json'))
@@ -112,5 +115,75 @@ void main() {
       expect(score < currentScore, true);
       currentScore = score;
     }
+  });
+
+  testWidgets('Test error getting layout', (WidgetTester tester) async {
+    nock(validServerUrl).get('/api/layout').reply(500, '');
+    nock(validServerUrl).get('/api/feed-errors/last-refresh-count').reply(200, '0');
+    nock(validServerUrl).get('/api/feeds/items')
+      ..query((Map<String, String> params) {
+        return true;
+      })
+      ..reply(200, '{"content":[]}');
+
+    await tester.pumpWidget(TestSetup(child: FeedScreen()));
+    await tester.pumpAndSettle();
+    await snap();
+
+    expect(find.byType(ErrorDialog), findsOneWidget);
+  });
+
+  testWidgets('Test error getting error count', (WidgetTester tester) async {
+    nock(validServerUrl).get('/api/layout').reply(200, loadFixture('default_layout.json'));
+    nock(validServerUrl).get('/api/feed-errors/last-refresh-count').reply(500, '');
+    nock(validServerUrl).get('/api/feeds/items')
+      ..query((Map<String, String> params) {
+        return true;
+      })
+      ..reply(200, '{"content":[]}')
+      ..persist(true);
+
+    await tester.pumpWidget(TestSetup(child: FeedScreen()));
+    await tester.pumpAndSettle();
+    await snap();
+
+    expect(find.byType(ErrorDialog), findsOneWidget);
+  });
+
+  testWidgets('Test error getting feed', (WidgetTester tester) async {
+    nock(validServerUrl).get('/api/layout').reply(200, loadFixture('default_layout.json'));
+    nock(validServerUrl).get('/api/feed-errors/last-refresh-count').reply(200, '0');
+    nock(validServerUrl).get('/api/feeds/items')
+      ..query((Map<String, String> params) {
+        return true;
+      })
+      ..reply(500, '')
+      ..persist(true);
+
+    await tester.pumpWidget(TestSetup(child: FeedScreen()));
+    await tester.pumpAndSettle();
+    await snap();
+
+    expect(find.byType(ErrorDialog), findsOneWidget);
+  });
+
+  testWidgets('Test feed error count badge', (WidgetTester tester) async {
+    nock(validServerUrl).get('/api/layout').reply(200, loadFixture('default_layout.json'));
+    nock(validServerUrl).get('/api/feed-errors/last-refresh-count').reply(200, '1337');
+    nock(validServerUrl).get('/api/feeds/items')
+      ..query((Map<String, String> params) {
+        return true;
+      })
+      ..reply(200, '{"content":[]}')
+      ..persist(true);
+
+    await tester.pumpWidget(TestSetup(child: FeedScreen()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(UserProfilePicture));
+    await tester.pumpAndSettle();
+    await snap(name: 'feeds_error_badge');
+
+    expect(find.text('1337'), findsOneWidget);
   });
 }

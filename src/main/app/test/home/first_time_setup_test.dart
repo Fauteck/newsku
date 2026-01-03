@@ -50,6 +50,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.binding.setSurfaceSize(Size(1000, 1300));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
 
     final userInterceptor = nock(validServerUrl).get('/api/users')
       ..reply(200, loadFixture('user_first_time_setup.json'));

@@ -134,12 +134,18 @@ class MainFeedCubit extends Cubit<MainFeedState> {
       );
     } catch (e, s) {
       emit(state.copyWith(error: e, stackTrace: s, loading: false));
-      rethrow;
+      _log.severe("Error getting layout or error count", e);
+      return;
     }
-    // loading 3 to have a minimum of things to see
-    await getFeed();
-    await getFeed();
-    await getFeed();
+
+    try {
+      // loading 3 to have a minimum of things to see
+      await getFeed();
+      await getFeed();
+      await getFeed();
+    } catch (e) {
+      _log.severe('Couldn\'t refresh feed', e);
+    }
   }
 
   Future<void> search(String value) async {

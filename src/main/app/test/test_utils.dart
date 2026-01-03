@@ -9,7 +9,10 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
 import 'package:nock/nock.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'utils/path_provider.dart';
 
 final String validServerUrl = 'http://localhost:123';
 
@@ -42,6 +45,8 @@ Future<void> setupTests({bool withConfig = true, bool loggedIn = false}) async {
 
     nock.cleanAll();
   }
+
+  PathProviderPlatform.instance = FakePathProviderPlatform();
 }
 
 String loadFixture(String name) {
