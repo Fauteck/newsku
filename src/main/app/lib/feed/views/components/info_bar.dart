@@ -54,6 +54,7 @@ class InfoBar extends StatelessWidget {
               style: textTheme.labelMedium?.copyWith(color: colors.onSecondaryContainer),
             ),
             InkWell(
+              key: Key('reasoning-button'),
               onTap: () => okCancelDialog(
                 context,
                 title: locals.reasoning,

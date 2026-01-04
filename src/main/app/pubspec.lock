@@ -281,6 +281,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.11"
+  device_frame:
+    dependency: transitive
+    description:
+      name: device_frame
+      sha256: "7b2ebb2a09d6cc0f086b51bd1412d7be83e0170056a7290349169be41164c86a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.0"
   device_info_plus:
     dependency: "direct main"
     description:
@@ -749,14 +757,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-  mockito:
+  mocktail:
     dependency: "direct dev"
     description:
-      name: mockito
-      sha256: dac24d461418d363778d53198d9ac0510b9d073869f078450f195766ec48d05e
+      name: mocktail
+      sha256: "890df3f9688106f25755f26b1c60589a92b3ab91a22b8b224947ad041bf172d8"
       url: "https://pub.dev"
     source: hosted
-    version: "5.6.1"
+    version: "1.0.4"
   motor:
     dependency: "direct main"
     description:
@@ -1250,6 +1258,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  snaptest:
+    dependency: "direct dev"
+    description:
+      name: snaptest
+      sha256: d9adbcad3994b24df944a3e3b1151810f733d99962d699f2c708745a447e5891
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.2+1"
   source_gen:
     dependency: transitive
     description:

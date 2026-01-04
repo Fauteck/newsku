@@ -3,29 +3,26 @@ import 'dart:ui';
 import 'package:app/feed/models/feed.dart';
 import 'package:app/feed/views/screens/feed_screen.dart';
 import 'package:app/home/views/screens/home.dart';
-import 'package:app/identity/states/identity.dart';
-import 'package:app/main.dart';
-import 'package:app/settings/views/tabs/user.dart';
-import 'package:app/user/views/components/forgot_password.dart';
 import 'package:app/reset-password/views/screens/reset_password.dart';
-import 'package:app/settings/views/tabs/feeds.dart';
-import 'package:app/settings/views/tabs/info.dart';
-import 'package:app/settings/views/tabs/layout.dart';
 import 'package:app/settings/views/screens/feed_errors.dart';
 import 'package:app/settings/views/screens/settings.dart';
+import 'package:app/settings/views/tabs/feeds.dart';
+import 'package:app/settings/views/tabs/general.dart';
+import 'package:app/settings/views/tabs/info.dart';
+import 'package:app/settings/views/tabs/layout.dart';
+import 'package:app/settings/views/tabs/user.dart';
 import 'package:app/stats/views/screens/stats_screen.dart';
 import 'package:app/stats/views/tabs/feed_stats.dart';
 import 'package:app/stats/views/tabs/tag_stats.dart';
+import 'package:app/user/views/components/forgot_password.dart';
 import 'package:app/user/views/components/login.dart';
 import 'package:app/user/views/components/login_form.dart';
 import 'package:app/user/views/components/server_url.dart';
+import 'package:app/user/views/components/signup_form.dart';
 import 'package:app/user/views/screen/landing.dart';
 import 'package:app/utils/utils.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
-
-import 'package:app/settings/views/tabs/general.dart';
-import 'package:app/user/views/components/signup_form.dart';
 
 part 'router.gr.dart';
 
@@ -36,7 +33,7 @@ class AppRouter extends RootStackRouter {
   AppRouter({required this.loggedInOnStart});
 
   void loginRequired(NavigationResolver resolver, StackRouter router) {
-    if (getIt.get<IdentityCubit>().isLoggedIn) {
+    if (identityCubit.isLoggedIn) {
       resolver.next(true);
     } else {
       resolver.redirectUntil(!kIsWeb || kDebugMode ? ServerUrlRoute() : LoginFormRoute(), replace: true);

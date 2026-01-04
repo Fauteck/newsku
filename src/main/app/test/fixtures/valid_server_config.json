@@ -1,6 +1,6 @@
 {
     "allowSignup": true,
-    "announcement": "",
+    "announcement": "Newsku test",
     "backendVersion": "31",
     "canResetPassword": true,
     "demoMode": false,

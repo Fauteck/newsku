@@ -1,0 +1,9 @@
+{
+    "description": "This is a feed of the latest articles from Rock Paper Shotgun.",
+    "id": "f5800890-b9cc-41c6-ac40-6c771c3ed241",
+    "image": null,
+    "itemPreference": null,
+    "lastRefreshErrors": 0,
+    "name": "Rock Paper Shotgun Latest Articles Feed",
+    "url": "https://www.rockpapershotgun.com/feed"
+}

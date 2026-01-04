@@ -1,0 +1,329 @@
+{
+    "content": [
+        {
+            "content": null,
+            "description": "Test",
+            "feed": {
+                "description": "My feed",
+                "id": "f5800890-b9cc-41c6-ac40-6c771c3ed241",
+                "image": null,
+                "itemPreference": null,
+                "lastRefreshErrors": 0,
+                "name": "Thew newsku test feed",
+                "url": "https://www.test.com"
+            },
+            "guid": "1",
+            "id": "1",
+            "imageUrl": null,
+            "importance": 100,
+            "read": true,
+            "reasoning": "There is no reasoning",
+            "tags": [
+                "gaming"
+            ],
+            "timeCreated": 1767189600000,
+            "title": "Score: 100",
+            "url": "https://www.tetst.com/1"
+        },
+        {
+            "content": null,
+            "description": "Test",
+            "feed": {
+                "description": "My feed",
+                "id": "f5800890-b9cc-41c6-ac40-6c771c3ed241",
+                "image": null,
+                "itemPreference": null,
+                "lastRefreshErrors": 0,
+                "name": "Thew newsku test feed",
+                "url": "https://www.test.com"
+            },
+            "guid": "2",
+            "id": "2",
+            "imageUrl": null,
+            "importance": 95,
+            "read": true,
+            "reasoning": "There is no reasoning",
+            "tags": [
+                "gaming"
+            ],
+            "timeCreated": 1767189600000,
+            "title": "Score: 95",
+            "url": "https://www.tetst.com/1"
+        },
+        {
+            "content": null,
+            "description": "Test",
+            "feed": {
+                "description": "My feed",
+                "id": "f5800890-b9cc-41c6-ac40-6c771c3ed241",
+                "image": null,
+                "itemPreference": null,
+                "lastRefreshErrors": 0,
+                "name": "Thew newsku test feed",
+                "url": "https://www.test.com"
+            },
+            "guid": "3",
+            "id": "3",
+            "imageUrl": null,
+            "importance": 90,
+            "read": true,
+            "reasoning": "There is no reasoning",
+            "tags": [
+                "gaming"
+            ],
+            "timeCreated": 1767189600000,
+            "title": "Score: 90",
+            "url": "https://www.tetst.com/1"
+        },
+        {
+            "content": null,
+            "description": "Test",
+            "feed": {
+                "description": "My feed",
+                "id": "f5800890-b9cc-41c6-ac40-6c771c3ed241",
+                "image": null,
+                "itemPreference": null,
+                "lastRefreshErrors": 0,
+                "name": "Thew newsku test feed",
+                "url": "https://www.test.com"
+            },
+            "guid": "4",
+            "id": "4",
+            "imageUrl": null,
+            "importance": 85,
+            "read": true,
+            "reasoning": "There is no reasoning",
+            "tags": [
+                "gaming"
+            ],
+            "timeCreated": 1767189600000,
+            "title": "Score: 85",
+            "url": "https://www.tetst.com/1"
+        },
+        {
+            "content": null,
+            "description": "Test",
+            "feed": {
+                "description": "My feed",
+                "id": "f5800890-b9cc-41c6-ac40-6c771c3ed241",
+                "image": null,
+                "itemPreference": null,
+                "lastRefreshErrors": 0,
+                "name": "Thew newsku test feed",
+                "url": "https://www.test.com"
+            },
+            "guid": "5",
+            "id": "5",
+            "imageUrl": null,
+            "importance": 80,
+            "read": true,
+            "reasoning": "There is no reasoning",
+            "tags": [
+                "gaming"
+            ],
+            "timeCreated": 1767189600000,
+            "title": "Score: 80",
+            "url": "https://www.tetst.com/1"
+        },
+        {
+            "content": null,
+            "description": "Test",
+            "feed": {
+                "description": "My feed",
+                "id": "f5800890-b9cc-41c6-ac40-6c771c3ed241",
+                "image": null,
+                "itemPreference": null,
+                "lastRefreshErrors": 0,
+                "name": "Thew newsku test feed",
+                "url": "https://www.test.com"
+            },
+            "guid": "6",
+            "id": "6",
+            "imageUrl": null,
+            "importance": 77,
+            "read": true,
+            "reasoning": "There is no reasoning",
+            "tags": [
+                "gaming"
+            ],
+            "timeCreated": 1767189600000,
+            "title": "Score: 77",
+            "url": "https://www.tetst.com/1"
+        },
+        {
+            "content": null,
+            "description": "Test",
+            "feed": {
+                "description": "My feed",
+                "id": "f5800890-b9cc-41c6-ac40-6c771c3ed241",
+                "image": null,
+                "itemPreference": null,
+                "lastRefreshErrors": 0,
+                "name": "Thew newsku test feed",
+                "url": "https://www.test.com"
+            },
+            "guid": "7",
+            "id": "7",
+            "imageUrl": null,
+            "importance": 75,
+            "read": true,
+            "reasoning": "There is no reasoning",
+            "tags": [
+                "gaming"
+            ],
+            "timeCreated": 1767189600000,
+            "title": "Score: 75",
+            "url": "https://www.tetst.com/1"
+        },
+        {
+            "content": null,
+            "description": "Test",
+            "feed": {
+                "description": "My feed",
+                "id": "f5800890-b9cc-41c6-ac40-6c771c3ed241",
+                "image": null,
+                "itemPreference": null,
+                "lastRefreshErrors": 0,
+                "name": "Thew newsku test feed",
+                "url": "https://www.test.com"
+            },
+            "guid": "8",
+            "id": "8",
+            "imageUrl": null,
+            "importance": 70,
+            "read": true,
+            "reasoning": "There is no reasoning",
+            "tags": [
+                "gaming"
+            ],
+            "timeCreated": 1767189600000,
+            "title": "Score: 70",
+            "url": "https://www.tetst.com/1"
+        },
+        {
+            "content": null,
+            "description": "Test",
+            "feed": {
+                "description": "My feed",
+                "id": "f5800890-b9cc-41c6-ac40-6c771c3ed241",
+                "image": null,
+                "itemPreference": null,
+                "lastRefreshErrors": 0,
+                "name": "Thew newsku test feed",
+                "url": "https://www.test.com"
+            },
+            "guid": "9",
+            "id": "9",
+            "imageUrl": null,
+            "importance": 65,
+            "read": true,
+            "reasoning": "There is no reasoning",
+            "tags": [
+                "gaming"
+            ],
+            "timeCreated": 1767189600000,
+            "title": "Score: 65",
+            "url": "https://www.tetst.com/1"
+        },
+        {
+            "content": null,
+            "description": "Test",
+            "feed": {
+                "description": "My feed",
+                "id": "f5800890-b9cc-41c6-ac40-6c771c3ed241",
+                "image": null,
+                "itemPreference": null,
+                "lastRefreshErrors": 0,
+                "name": "Thew newsku test feed",
+                "url": "https://www.test.com"
+            },
+            "guid": "10",
+            "id": "10",
+            "imageUrl": null,
+            "importance": 60,
+            "read": true,
+            "reasoning": "There is no reasoning",
+            "tags": [
+                "gaming"
+            ],
+            "timeCreated": 1767189600000,
+            "title": "Score: 60",
+            "url": "https://www.tetst.com/1"
+        },
+        {
+            "content": null,
+            "description": "Test",
+            "feed": {
+                "description": "My feed",
+                "id": "f5800890-b9cc-41c6-ac40-6c771c3ed241",
+                "image": null,
+                "itemPreference": null,
+                "lastRefreshErrors": 0,
+                "name": "Thew newsku test feed",
+                "url": "https://www.test.com"
+            },
+            "guid": "11",
+            "id": "11",
+            "imageUrl": null,
+            "importance": 55,
+            "read": true,
+            "reasoning": "There is no reasoning",
+            "tags": [
+                "gaming"
+            ],
+            "timeCreated": 1767189600000,
+            "title": "Score: 55",
+            "url": "https://www.tetst.com/1"
+        },
+        {
+            "content": null,
+            "description": "Test",
+            "feed": {
+                "description": "My feed",
+                "id": "f5800890-b9cc-41c6-ac40-6c771c3ed241",
+                "image": null,
+                "itemPreference": null,
+                "lastRefreshErrors": 0,
+                "name": "Thew newsku test feed",
+                "url": "https://www.test.com"
+            },
+            "guid": "12",
+            "id": "12",
+            "imageUrl": null,
+            "importance": 50,
+            "read": true,
+            "reasoning": "There is no reasoning",
+            "tags": [
+                "gaming"
+            ],
+            "timeCreated": 1767189600000,
+            "title": "Score: 50",
+            "url": "https://www.tetst.com/1"
+        }
+    ],
+    "empty": false,
+    "first": true,
+    "last": true,
+    "number": 0,
+    "numberOfElements": 6,
+    "pageable": {
+        "offset": 0,
+        "pageNumber": 0,
+        "pageSize": 999999,
+        "paged": true,
+        "sort": {
+            "empty": false,
+            "sorted": true,
+            "unsorted": false
+        },
+        "unpaged": false
+    },
+    "size": 999999,
+    "sort": {
+        "empty": false,
+        "sorted": true,
+        "unsorted": false
+    },
+    "totalElements": 6,
+    "totalPages": 1
+}

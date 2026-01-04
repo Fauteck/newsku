@@ -122,5 +122,6 @@
     "emailDigestExplanation": "Receive periodic emails with the top rated articles in the past selected period",
     "changeEmail": "Change email",
     "newEmail": "New email",
-    "emailUpdated": "Email updated"
+    "emailUpdated": "Email updated",
+    "invalidUrl": "Invalid URL"
 }

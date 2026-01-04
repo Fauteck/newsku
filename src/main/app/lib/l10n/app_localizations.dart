@@ -834,6 +834,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Email updated'**
   String get emailUpdated;
+
+  /// No description provided for @invalidUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid URL'**
+  String get invalidUrl;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

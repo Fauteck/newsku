@@ -30,6 +30,7 @@ class SignupFormScreen extends StatelessWidget {
                 children: [
                   Align(alignment: .centerLeft, child: Text(locals.username)),
                   TextField(
+                    key: Key('username-field'),
                     enabled: !state.loading,
                     onChanged: (value) => cubit.setUsername(value),
                     autofillHints: [AutofillHints.newUsername],
@@ -38,6 +39,7 @@ class SignupFormScreen extends StatelessWidget {
                   Gap(pu4),
                   Align(alignment: .centerLeft, child: Text(locals.email)),
                   TextField(
+                    key: Key('email-field'),
                     enabled: !state.loading,
                     onChanged: (value) => cubit.setEmail(value),
                     autofillHints: [AutofillHints.email],
@@ -51,6 +53,7 @@ class SignupFormScreen extends StatelessWidget {
                   Gap(pu4),
                   Align(alignment: .centerLeft, child: Text(locals.password)),
                   TextField(
+                    key: Key('password-field'),
                     enabled: !state.loading,
                     obscureText: true,
                     onChanged: (value) => cubit.setPassword(value),
@@ -60,6 +63,7 @@ class SignupFormScreen extends StatelessWidget {
                   Gap(pu4),
                   Align(alignment: .centerLeft, child: Text(locals.repeatPassword)),
                   TextField(
+                    key: Key('repeat-password-field'),
                     enabled: !state.loading,
                     obscureText: true,
                     onChanged: (value) => cubit.setRepeatPassword(value),
@@ -79,6 +83,7 @@ class SignupFormScreen extends StatelessWidget {
                       ),
                       Spacer(),
                       FilledButton.tonalIcon(
+                        key: Key('signup-button'),
                         onPressed: state.loading || state.invalidForm
                             ? null
                             : () async {

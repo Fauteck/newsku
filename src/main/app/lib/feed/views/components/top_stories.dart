@@ -4,12 +4,11 @@ import 'package:app/feed/views/components/feed_item_image.dart';
 import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
 import 'package:app/feed/views/components/item_title.dart';
+import 'package:app/feed/views/screens/feed_screen.dart';
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-
-import 'package:app/feed/views/screens/feed_screen.dart';
 
 const double _roundImageSize = 100;
 
@@ -59,6 +58,7 @@ class TopStories extends StatelessWidget {
                   .map(
                     (e) => ClickableFeedItem(
                       item: e.$2,
+                      key: Key('top-stories-${e.$1}'),
                       builder: (hovered) => Column(
                         children: [
                           Row(
@@ -107,6 +107,7 @@ class TopStories extends StatelessWidget {
           ),
           if (items.isNotEmpty)
             Expanded(
+              key: Key('top-stories-headline'),
               child: ClickableFeedItem(
                 item: items.first,
                 builder: (hovered) => Column(

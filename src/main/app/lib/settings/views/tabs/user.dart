@@ -14,7 +14,6 @@ class UserSettingsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final colors = Theme.of(context).colorScheme;
     final locals = AppLocalizations.of(context)!;
     return BlocProvider(
       create: (context) => UserSettingsCubit(
@@ -29,89 +28,96 @@ class UserSettingsTab extends StatelessWidget {
           final serverConfig = config;
           return Padding(
             padding: .symmetric(horizontal: pu2),
-            child: Column(
-              crossAxisAlignment: .stretch,
-              children: [
-                Gap(pu4),
-                if (serverConfig?.canResetPassword ?? false) ...[
-                  Text(locals.emailDigestTitle, style: textTheme.titleMedium),
-                  Text(locals.emailDigestExplanation),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: .stretch,
+                children: [
                   Gap(pu4),
-                  SegmentedButton<EmailDigestFrequency>(
-                    multiSelectionEnabled: true,
-                    emptySelectionAllowed: true,
-                    onSelectionChanged: (values) =>
-                        cubit.setDigestPreference(values.whereType<EmailDigestFrequency>().toList()),
-                    segments: EmailDigestFrequency.values
-                        .map(
-                          (e) => ButtonSegment<EmailDigestFrequency>(
-                            value: e,
-                            enabled: serverConfig?.canResetPassword ?? false,
-                            label: Text(locals.emailDigest(e.name)),
-                            icon: Icon(Icons.close),
-                          ),
-                        )
-                        .toList(),
-                    selected: state.digest.toSet(),
+                  if (serverConfig?.canResetPassword ?? false) ...[
+                    Text(locals.emailDigestTitle, style: textTheme.titleMedium),
+                    Text(locals.emailDigestExplanation),
+                    Gap(pu4),
+                    SegmentedButton<EmailDigestFrequency>(
+                      multiSelectionEnabled: true,
+                      emptySelectionAllowed: true,
+                      onSelectionChanged: (values) =>
+                          cubit.setDigestPreference(values.whereType<EmailDigestFrequency>().toList()),
+                      segments: EmailDigestFrequency.values
+                          .map(
+                            (e) => ButtonSegment<EmailDigestFrequency>(
+                              value: e,
+                              enabled: serverConfig?.canResetPassword ?? false,
+                              label: Text(locals.emailDigest(e.name)),
+                              icon: Icon(Icons.close),
+                            ),
+                          )
+                          .toList(),
+                      selected: state.digest.toSet(),
+                    ),
+                    Gap(pu8),
+                  ],
+                  Text(locals.changeEmail, style: textTheme.titleMedium),
+                  Gap(pu4),
+                  Text(locals.newEmail),
+                  TextField(
+                    key: Key('email'),
+                    controller: cubit.email,
+                    decoration: InputDecoration(error: state.validEmail ? null : Text(locals.invalidEmail)),
+                  ),
+                  Gap(pu2),
+                  Align(
+                    alignment: .centerRight,
+                    child: FilledButton.tonalIcon(
+                      onPressed: state.loading || !state.validEmail
+                          ? null
+                          : () async {
+                              await cubit.updateEmail();
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(SnackBar(content: Text(locals.emailUpdated)));
+                              }
+                            },
+                      label: Text(locals.update),
+                      icon: Icon(Icons.save),
+                    ),
                   ),
                   Gap(pu8),
+                  Text(locals.changePassword, style: textTheme.titleMedium),
+                  Gap(pu4),
+                  Text(locals.newPassword),
+                  TextField(key: Key('new-password'), controller: cubit.password, obscureText: true),
+                  Gap(pu2),
+                  Text(locals.confirmPassword),
+                  TextField(
+                    key: Key('repeat-password'),
+                    controller: cubit.repeatPassword,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      error: (state.password != state.repeatPassword) ? Text(locals.passwordsNotMatch) : null,
+                    ),
+                  ),
+                  Gap(pu2),
+                  Align(
+                    alignment: .centerRight,
+                    child: FilledButton.tonalIcon(
+                      key: Key('password-update-button'),
+                      onPressed: state.loading || state.password != state.repeatPassword || state.password.isEmpty
+                          ? null
+                          : () async {
+                              await cubit.resetPassword();
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(SnackBar(content: Text(locals.passwordUpdated)));
+                              }
+                            },
+                      label: Text(locals.update),
+                      icon: Icon(Icons.save),
+                    ),
+                  ),
                 ],
-                Text(locals.changeEmail, style: textTheme.titleMedium),
-                Gap(pu4),
-                Text(locals.newEmail),
-                TextField(
-                  controller: cubit.email,
-                  decoration: InputDecoration(error: state.validEmail ? null : Text(locals.invalidEmail)),
-                ),
-                Gap(pu2),
-                Align(
-                  alignment: .centerRight,
-                  child: FilledButton.tonalIcon(
-                    onPressed: state.loading || !state.validEmail
-                        ? null
-                        : () async {
-                            await cubit.updateEmail();
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(locals.emailUpdated)));
-                            }
-                          },
-                    label: Text(locals.update),
-                    icon: Icon(Icons.save),
-                  ),
-                ),
-                Gap(pu8),
-                Text(locals.changePassword, style: textTheme.titleMedium),
-                Gap(pu4),
-                Text(locals.newPassword),
-                TextField(controller: cubit.password, obscureText: true),
-                Gap(pu2),
-                Text(locals.confirmPassword),
-                TextField(
-                  controller: cubit.repeatPassword,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    error: (state.password != state.repeatPassword) ? Text(locals.passwordsNotMatch) : null,
-                  ),
-                ),
-                Gap(pu2),
-                Align(
-                  alignment: .centerRight,
-                  child: FilledButton.tonalIcon(
-                    onPressed: state.loading || state.password != state.repeatPassword || state.password.isEmpty
-                        ? null
-                        : () async {
-                            await cubit.resetPassword();
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(
-                                context,
-                              ).showSnackBar(SnackBar(content: Text(locals.passwordUpdated)));
-                            }
-                          },
-                    label: Text(locals.update),
-                    icon: Icon(Icons.save),
-                  ),
-                ),
-              ],
+              ),
             ),
           );
         },

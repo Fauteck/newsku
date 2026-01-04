@@ -1,7 +1,4 @@
-import 'dart:ui';
-
 import 'package:app/feed/models/feed_item.dart';
-import 'package:app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:motor/motor.dart';
 
@@ -25,6 +22,7 @@ class ItemTitle extends StatelessWidget {
       from: 0,
       builder: (context, value, child) {
         return Text(
+          key: Key('item-title'),
           item.title ?? '',
           style: (textStyle)?.copyWith(color: Color.lerp(textStyle.color, colors.primary, value)),
           maxLines: maxLines,

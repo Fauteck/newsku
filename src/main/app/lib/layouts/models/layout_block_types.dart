@@ -117,6 +117,7 @@ enum LayoutBlockTypes {
 
   Widget _bigGridSliver({required BreakPoint breakPoint, required List<FeedItem> items, required LayoutBlock block}) {
     return SliverGrid.builder(
+      key: Key(items.firstOrNull?.id ?? ''),
       itemCount: items.length,
       itemBuilder: (context, index) => BigGridItem(key: ValueKey(items[index]), item: items[index]),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

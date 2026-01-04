@@ -1,3 +1,4 @@
+import 'package:app/l10n/app_localizations.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/models/newsku_error.dart';
 import 'package:app/utils/utils.dart';
@@ -40,6 +41,8 @@ class ErrorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final locals = AppLocalizations.of(context)!;
+
     final textTheme = Theme.of(context).textTheme;
     return Dialog(
       child: Container(
@@ -59,7 +62,7 @@ class ErrorDialog extends StatelessWidget {
             Gap(pu5),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))],
+              children: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(locals.ok))],
             ),
           ],
         ),

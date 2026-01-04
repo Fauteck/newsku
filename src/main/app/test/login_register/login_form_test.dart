@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nock/nock.dart';
 
-import 'helper_widget/test_app_setup_widget.dart';
-import 'test_utils.dart';
+import '../helper_widget/test_app_setup_widget.dart';
+import '../test_utils.dart';
 
 void main() {
   setUpAll(() {
@@ -72,6 +72,7 @@ void main() {
 
     await tester.enterText(password, 'correct password');
     await tester.tap(loginButton);
+
     // we wait for page change
     await tester.pump(Duration(seconds: 1));
 
