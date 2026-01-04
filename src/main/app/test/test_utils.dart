@@ -67,3 +67,12 @@ String generateTestUserToken() {
   // Sign it (default with HS256 algorithm)
   return jwt.sign(SecretKey('secret passphrase'), expiresIn: Duration(days: 1));
 }
+
+extension SlideTo on WidgetTester {
+  Future<void> slideToValue(Finder slider, double value, {double paddingOffset = 24.0}) async {
+    final zeroPoint = this.getTopLeft(slider) + Offset(paddingOffset, this.getSize(slider).height / 2);
+    final totalWidth = this.getSize(slider).width - (2 * paddingOffset);
+    final calculatdOffset = value * (totalWidth / 100);
+    await this.dragFrom(zeroPoint, Offset(calculatdOffset, 0));
+  }
+}

@@ -42,6 +42,7 @@ class GeneralSettingsTab extends StatelessWidget {
                     Gap(pu4),
                     Text(locals.articlePreference),
                     TextField(
+                      key: Key('article-preferences'),
                       controller: cubit.preferenceController,
                       maxLines: 5,
                       decoration: InputDecoration(
@@ -93,6 +94,7 @@ class GeneralSettingsTab extends StatelessWidget {
                           ),
                         ),
                         DropdownMenu<ReadItemHandling>(
+                          key: Key('read-item-handling'),
                           initialSelection: state.user?.readItemHandling ?? ReadItemHandling.none,
                           onSelected: cubit.setReadItemPreference,
                           dropdownMenuEntries: ReadItemHandling.values
