@@ -28,8 +28,6 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  flutter:
-    sdk: flutter
   auto_route: 11.1.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -38,29 +36,30 @@ dependencies:
   device_info_plus: 12.3.0
   dynamic_color: 1.8.1
   easy_debounce: 2.0.3
-  gap: 3.0.1
-  html_unescape: 2.0.0
-  http: 1.6.0
-
-  intl: any
-  json_annotation: 4.11.0
-  jwt_decoder: 2.0.1
   feedback: 3.2.0
   file_picker: 10.3.10
   file_saver: 0.3.1
+  flutter:
+    sdk: flutter
   flutter_bloc: 9.1.1
   flutter_localizations:
     sdk: flutter
   flutter_sticky_header: 0.8.0
   flutter_svg: 2.2.3
   freezed_annotation: 3.1.0
+  gap: 3.0.1
   get_it: 9.2.1
+  html_unescape: 2.0.0
+  http: 1.6.0
+  intl: any
+  json_annotation: 4.11.0
+  jwt_decoder: 2.0.1
   logging: 1.3.0
-  package_info_plus: 9.0.0
   material_loading_indicator: 1.0.0
   motor: 1.1.0
   oidc: 0.14.0+2
   oidc_default_store: 0.6.0+2
+  package_info_plus: 9.0.0
   shared_preferences: 2.5.4
   url_launcher: 6.3.2
   visibility_detector: 0.4.0+2
@@ -69,21 +68,15 @@ dependencies:
 
 dev_dependencies:
   auto_route_generator: any
-  flutter_test:
-    sdk: flutter
   build_runner: 2.11.1
   dart_jsonwebtoken: 3.3.1
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+  freezed: 3.2.5
+  json_serializable: 6.13.0
   mocktail: 1.0.4
   nock: 1.2.3
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
-  flutter_lints: ^6.0.0
-  json_serializable: 6.13.0
-  freezed: 3.2.5
   snaptest: 0.2.3
 
 # For information on the generic Dart part of this file, see the
