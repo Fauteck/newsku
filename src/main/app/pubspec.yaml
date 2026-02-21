@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  auto_route: 11.0.0
+  auto_route: 11.1.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cached_network_image: 3.4.1
@@ -43,10 +43,10 @@ dependencies:
   http: 1.6.0
 
   intl: any
-  json_annotation: ^4.9.0
+  json_annotation: 4.11.0
   jwt_decoder: 2.0.1
   feedback: 3.2.0
-  file_picker: 10.3.7
+  file_picker: 10.3.10
   file_saver: 0.3.1
   flutter_bloc: 9.1.1
   flutter_localizations:
@@ -54,13 +54,13 @@ dependencies:
   flutter_sticky_header: 0.8.0
   flutter_svg: 2.2.3
   freezed_annotation: 3.1.0
-  get_it: 9.2.0
+  get_it: 9.2.1
   logging: 1.3.0
   package_info_plus: 9.0.0
   material_loading_indicator: 1.0.0
   motor: 1.1.0
-  oidc: 0.13.0
-  oidc_default_store: 0.5.0
+  oidc: 0.14.0+2
+  oidc_default_store: 0.6.0+2
   shared_preferences: 2.5.4
   url_launcher: 6.3.2
   visibility_detector: 0.4.0+2
@@ -71,7 +71,7 @@ dev_dependencies:
   auto_route_generator: any
   flutter_test:
     sdk: flutter
-  build_runner: ^2.10.4
+  build_runner: 2.11.1
   dart_jsonwebtoken: 3.3.1
   mocktail: 1.0.4
   nock: 1.2.3
@@ -82,9 +82,9 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
-  json_serializable: 6.11.2
-  freezed: 3.2.3
-  snaptest: 0.2.2+1
+  json_serializable: 6.13.0
+  freezed: 3.2.5
+  snaptest: 0.2.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
