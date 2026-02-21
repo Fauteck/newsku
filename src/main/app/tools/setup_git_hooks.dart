@@ -9,6 +9,7 @@ Future<void> main() async {
 set -e
 exec ./src/main/app/submodules/flutter/bin/dart format --set-exit-if-changed ./src/main/app/lib
 exec ./src/main/app/submodules/flutter/bin/dart analyze ./src/main/app/lib
+exec ./src/main/app/submodules/flutter/bin/dart analyze --fatal-infos ./src/main/app/pubspec.yaml
 ''',
   );
 

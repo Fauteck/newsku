@@ -4,18 +4,18 @@ import 'dart:io';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/utils/models/imgur_error.dart';
 import 'package:app/utils/service/imgur_service.dart';
-import 'package:feedback/feedback.dart';
 import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/app_logo.dart';
 import 'package:app/utils/views/components/app_name.dart';
 import 'package:auto_route/annotations.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:feedback/feedback.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:logging/logging.dart';
 import 'package:material_loading_indicator/loading_indicator.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final _log = Logger('InfoTab');
@@ -32,7 +32,7 @@ class InfoTab extends StatelessWidget {
 
       BetterFeedback.of(context).hide();
 
-      final deviceInfo = await DeviceInfoPlugin();
+      final deviceInfo = DeviceInfoPlugin();
       final packageInfo = await PackageInfo.fromPlatform();
 
       String deviceLine = '';

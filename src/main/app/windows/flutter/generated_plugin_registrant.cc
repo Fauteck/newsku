@@ -8,10 +8,9 @@
 
 #include <dynamic_color/dynamic_color_plugin_c_api.h>
 #include <file_saver/file_saver_plugin.h>
+#include <flutter_secure_storage_windows/flutter_secure_storage_windows_plugin.h>
 #include <oidc_windows/oidc_windows.h>
-#include <simple_secure_storage_windows/simple_secure_storage_windows_plugin_c_api.h>
 #include <url_launcher_windows/url_launcher_windows.h>
-#include <webcrypto/webcrypto_plugin.h>
 #include <window_to_front/window_to_front_plugin.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
@@ -19,14 +18,12 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("DynamicColorPluginCApi"));
   FileSaverPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FileSaverPlugin"));
+  FlutterSecureStorageWindowsPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("FlutterSecureStorageWindowsPlugin"));
   OidcWindowsRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("OidcWindows"));
-  SimpleSecureStorageWindowsPluginCApiRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("SimpleSecureStorageWindowsPluginCApi"));
   UrlLauncherWindowsRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("UrlLauncherWindows"));
-  WebcryptoPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("WebcryptoPlugin"));
   WindowToFrontPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("WindowToFrontPlugin"));
 }
