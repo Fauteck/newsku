@@ -1,5 +1,3 @@
-import 'package:app/identity/states/identity.dart';
-import 'package:app/main.dart';
 import 'package:app/user/models/email_digest_frequency.dart';
 import 'package:app/user/models/user.dart';
 import 'package:app/user/services/user_service.dart';

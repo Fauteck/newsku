@@ -3,7 +3,6 @@ import 'package:app/feed/views/components/feed_image.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/settings/states/feed_errors.dart';
 import 'package:app/settings/views/components/feed_error.dart';
-import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/page_switcher.dart';
 import 'package:auto_route/annotations.dart';

@@ -49,7 +49,7 @@ class _Page extends StatelessWidget {
   final int currentPage;
   final void Function(int page) switchPage;
 
-  const _Page({super.key, required this.page, required this.currentPage, required this.switchPage});
+  const _Page({required this.page, required this.currentPage, required this.switchPage});
 
   @override
   Widget build(BuildContext context) {
