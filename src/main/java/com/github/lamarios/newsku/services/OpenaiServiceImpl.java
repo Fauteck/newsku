@@ -8,7 +8,6 @@ import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.openai.models.chat.completions.StructuredChatCompletionCreateParams;
-import com.openai.models.models.Model;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,22 +41,7 @@ public class OpenaiServiceImpl implements OpenaiService {
         this.model = model;
         this.maxRetries = maxRetries;
         this.timeoutMinutes = timeoutMinutes;
-
-        var models = getClient().models().list();
-        List<String> modelList = new ArrayList<>();
-        while (models.hasNextPage() || !models.data().isEmpty()) {
-            modelList.addAll(models.data().stream().map(Model::id).toList());
-            if (models.hasNextPage()) {
-                models = models.nextPage();
-            } else {
-                break;
-            }
-        }
-
-        logger.info("Available models: {}", String.join(",", modelList));
-        if (!modelList.contains(model)) {
-            throw new RuntimeException("Model " + model + " not available");
-        }
+        logger.info("OpenAI service initialized with model={}, url={}", model, url);
     }
 
     private OpenAIClient getClient() {
