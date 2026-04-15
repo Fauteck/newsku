@@ -8,10 +8,20 @@
 
 | Tool | Version | Zweck |
 |------|---------|-------|
-| Node.js | >= 18 | Runtime |
-| npm | >= 9 | Package Manager (Workspaces) |
-| Python | >= 3.10 | Keep-Sync Sidecar (optional) |
-| Docker | >= 24 | Lokale Container-Entwicklung (optional) |
+| JDK | 25 (Amazon Corretto) | Backend Runtime + Build |
+| Maven | 3.9+ | Build-Tool |
+| PostgreSQL | 18 | Datenbank |
+| Flutter SDK | ^3.10.0 | Frontend Build |
+| Docker | 24+ | Lokale Container-Entwicklung |
+| Python | 3.10+ | MkDocs Dokumentation (optional) |
+
+### Nix-Shell (empfohlen)
+
+Das Repository enthaelt eine `shell.nix` mit JDK 25, Maven und Python:
+
+```bash
+nix-shell   # Stellt JDK 25 + Maven + Python bereit
+```
 
 ---
 
@@ -19,106 +29,133 @@
 
 ```bash
 # Repository klonen
-git clone git@github.com:fauteck/todo.git
-cd todo
-
-# Dependencies installieren (alle Workspaces)
-npm install
+git clone git@github.com:fauteck/newsku.git
+cd newsku
 
 # .env-Datei erstellen
 cp .env.example .env
 # Pflichtfelder setzen:
-#   JWT_SECRET          → Starker Zufallswert (min. 32 Zeichen)
-#   JWT_REFRESH_SECRET  → Starker Zufallswert (anders als JWT_SECRET)
-#   SEED_PASSWORD_NIKLAS → Passwort fuer Benutzer "niklas"
-#   SEED_PASSWORD_AYLIN  → Passwort fuer Benutzer "aylin"
+#   DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD
+#   OPENAI_API_KEY, OPENAI_MODEL
+#   SALT  (min. 32 Zeichen Zufallsstring)
 ```
 
 ---
 
-## Dev-Server starten
+## Backend starten (Spring Boot)
+
+### Option A: Mit lokaler PostgreSQL-Instanz
 
 ```bash
-# API starten (Port 3000)
-npm run dev:api
+# Umgebungsvariablen setzen (oder in .env und mit source laden)
+export DB_HOST=localhost
+export DB_PORT=5432
+export DB_DATABASE=newsku
+export DB_USER=newsku
+export DB_PASSWORD=secret
+export OPENAI_API_KEY=sk-...
+export OPENAI_MODEL=gpt-4o
+export SALT=mein-random-salt-mindestens-32-zeichen
 
-# Web starten (Port 5173, Vite)
-npm run dev:web
+# JAR bauen
+mvn clean package -DskipTests
 
-# Beide gleichzeitig (in separaten Terminals)
-npm run dev:api &
-npm run dev:web
+# Starten
+java -jar target/newsku-*.jar
 ```
 
-Die Web-App proxied `/api/*` automatisch an den API-Server (Vite Proxy-Config).
+Server laeuft auf `http://localhost:8080`
+Swagger UI: `http://localhost:8080/swagger-ui.html`
+
+### Option B: Nur PostgreSQL per Docker, Backend lokal
+
+```bash
+# Nur die Datenbank starten
+docker run -d \
+  --name newsku_postgres \
+  -e POSTGRES_DB=newsku \
+  -e POSTGRES_USER=newsku \
+  -e POSTGRES_PASSWORD=secret \
+  -p 5432:5432 \
+  postgres:18-alpine
+
+# Backend wie in Option A starten
+```
 
 ---
 
-## Datenbank
+## Datenbank-Migrationen
+
+Flyway laeuft **automatisch beim Start** und fuehrt alle ausstehenden Migrationen aus.
+Keine manuelle Ausfuehrung noetig.
+
+Neue Migration anlegen:
 
 ```bash
-# Migrationen ausfuehren (automatisch beim API-Start)
-cd apps/api
-npm run db:migrate
-
-# Neue Migration generieren (nach Schema-Aenderung in schema.ts)
-npx drizzle-kit generate
-
-# Passwort zuruecksetzen
-npm run reset-password -- <email>
+# Naechste Versionsnummer waehlen (aktuell: V16)
+touch src/main/resources/db/migration/V17__meine_aenderung.sql
 ```
 
-Die DB-Datei liegt standardmaessig unter dem Pfad aus `DATABASE_PATH` (`.env`).
+```sql
+-- V17__meine_aenderung.sql
+ALTER TABLE users ADD COLUMN language VARCHAR(10) DEFAULT 'de';
+```
+
+---
+
+## Frontend starten (Flutter)
+
+```bash
+cd src/main/app
+
+# Flutter-Abhaengigkeiten installieren
+flutter pub get
+
+# Code-Generierung (Routing, nach Aenderungen an router.dart)
+flutter pub run build_runner build --delete-conflicting-outputs
+
+# Web Dev-Server (zeigt auf http://localhost:8080 als Backend)
+flutter run -d chrome
+
+# Oder: Web Build fuer Produktion (Ausgabe: build/web/)
+flutter build web
+```
+
+Der Web Build wird dann vom Spring Boot Backend ausgeliefert.
+Fuer Produktion: `build/web/` in `src/main/resources/static/` kopieren, dann `mvn package`.
 
 ---
 
 ## Docker-basierte Entwicklung
 
 ```bash
-# Alle Services starten (API, Web, Keep-Sync, Backup)
+# .env-Datei benoetigt (oder Variablen direkt setzen)
+cp .env.example .env
+
+# JAR bauen (wird ins Docker Image kopiert)
+mvn clean package -DskipTests
+
+# Alle Services starten (App + PostgreSQL)
 docker compose up -d
 
 # Logs ansehen
-docker compose logs -f todo_api
+docker compose logs -f newsku
 
-# Neubauen nach Code-Aenderungen
-docker compose build
-docker compose up -d
+# Services stoppen
+docker compose down
 ```
 
 ---
 
-## Scripts (package.json)
+## Maven Build
 
-### Root (`/home/user/todo/package.json`)
-
-| Script | Befehl |
-|--------|--------|
-| `npm run dev:api` | API Dev-Server (tsx watch) |
-| `npm run dev:web` | Web Dev-Server (Vite) |
-| `npm run build` | Alle Workspaces bauen (shared-types → api → web) |
-| `npm run test` | Tests aller Workspaces ausfuehren |
-| `npm run reset-password -- <email>` | Passwort zuruecksetzen |
-
-### API (`apps/api/package.json`)
-
-| Script | Befehl |
-|--------|--------|
-| `npm run dev` | `tsx watch src/index.ts` |
-| `npm run build` | `tsc` |
-| `npm run start` | `node dist/index.js` |
-| `npm run db:generate` | `drizzle-kit generate` |
-| `npm run db:migrate` | `tsx src/db/migrate.ts` |
-| `npm run test` | `vitest run` |
-
-### Web (`apps/web/package.json`)
-
-| Script | Befehl |
-|--------|--------|
-| `npm run dev` | `vite` |
-| `npm run build` | `tsc && vite build` |
-| `npm run preview` | `vite preview` |
-| `npm run test` | `vitest run` |
+| Befehl | Beschreibung |
+|--------|-------------|
+| `mvn clean package` | JAR bauen (inkl. Tests) |
+| `mvn clean package -DskipTests` | JAR bauen (Tests ueberspringen) |
+| `mvn test` | Nur Tests ausfuehren |
+| `mvn spring-boot:run` | Backend direkt starten (ohne JAR) |
+| `mvn dependency:tree` | Abhaengigkeitsbaum anzeigen |
 
 ---
 
@@ -128,93 +165,100 @@ Vollstaendige Liste in `.env.example`:
 
 | Variable | Pflicht | Beschreibung |
 |----------|---------|-------------|
-| `DATABASE_PATH` | Ja | Pfad zur SQLite-Datei |
-| `JWT_SECRET` | Ja | JWT Access Token Secret |
-| `JWT_REFRESH_SECRET` | Ja | JWT Refresh Token Secret |
-| `JWT_ACCESS_EXPIRES` | Nein | Access Token Lebensdauer (Standard: `15m`) |
-| `JWT_REFRESH_EXPIRES` | Nein | Refresh Token Lebensdauer (Standard: `90d`) |
-| `CORS_ORIGIN` | Prod: Ja | Erlaubte Origins (komma-separiert) |
-| `PORT` | Nein | API-Port (Standard: `3000`) |
-| `SEED_PASSWORD_NIKLAS` | Erststart | Passwort fuer initialen Benutzer |
-| `SEED_PASSWORD_AYLIN` | Erststart | Passwort fuer initialen Benutzer |
-| `GOOGLE_TOKEN_ENCRYPTION_KEY` | Nein | 32-Byte Hex (AES-256) fuer Keep-Sync |
-| `GOOGLE_CALENDAR_URLS` | Nein | Google Calendar iCal-URLs |
-| `AUTHELIA_ENABLED` | Nein | SSO aktivieren (`true`/`false`) |
-| `ACTIVITY_LOG_RETENTION_DAYS` | Nein | Log-Aufbewahrung (Standard: `90`) |
+| `DB_HOST` | Ja | PostgreSQL Hostname |
+| `DB_PORT` | Ja | PostgreSQL Port (Standard: 5432) |
+| `DB_DATABASE` | Ja | Datenbankname |
+| `DB_USER` | Ja | Datenbankbenutzer |
+| `DB_PASSWORD` | Ja | Datenbankpasswort |
+| `OPENAI_API_KEY` | Ja | API-Key fuer LLM-Ranking |
+| `OPENAI_MODEL` | Ja | Modellname (z. B. `gpt-4o`) |
+| `OPENAI_URL` | Nein | Eigener API-Endpunkt (Standard: OpenAI) |
+| `SALT` | Ja | Passwort-Hashing Salt (min. 32 Zeichen) |
+| `ALLOW_SIGNUP` | Nein | `0` = deaktiviert (Standard), `1` = aktiv |
+| `TZ` | Nein | Zeitzone (Standard: `Europe/Berlin`) |
 
 ---
 
-## Feature-Walkthrough: "Neues Feld an Aufgabe"
-
-Beispiel: Feld `estimated_minutes` an Aufgaben hinzufuegen.
-
-### 1. Schema erweitern
-
-```typescript
-// apps/api/src/db/schema.ts — in tasks Table:
-estimated_minutes: integer('estimated_minutes'),
-```
-
-### 2. Migration generieren
+## Dokumentation bauen (MkDocs)
 
 ```bash
-cd apps/api
-npx drizzle-kit generate
+# Python-Umgebung einrichten (oder via nix-shell)
+python -m venv .venv
+source .venv/bin/activate
+pip install -r mkdocs/requirements.txt
+
+# Vorschau
+cd mkdocs && mkdocs serve
+
+# Build
+make docs-build
+# Ausgabe: docs/documentation/
 ```
 
-### 3. Shared Types aktualisieren
+---
 
-```typescript
-// packages/shared-types/src/index.ts — in Task Interface:
-estimated_minutes?: number | null;
+## Feature-Walkthrough: "Neues Feld an FeedItem"
 
-// In UpdateTaskPayload:
-estimated_minutes?: number | null;
+Beispiel: Feld `estimated_read_time` (Lesedauer in Sekunden) hinzufuegen.
+
+### 1. Flyway-Migration erstellen
+
+```sql
+-- src/main/resources/db/migration/V17__add_read_time.sql
+ALTER TABLE feed_items ADD COLUMN estimated_read_time INTEGER;
 ```
 
-### 4. Zod-Schema anpassen
+### 2. JPA Entity erweitern
 
-```typescript
-// apps/api/src/routes/tasks.ts
-const updateTaskSchema = z.object({
-  // ... bestehende Felder
-  estimated_minutes: z.number().int().min(0).optional().nullable(),
-});
+```java
+// src/main/java/com/github/lamarios/newsku/persistence/entities/FeedItem.java
+private Integer estimatedReadTime;
 ```
 
-### 5. Service anpassen (falls noetig)
+### 3. Service-Logik ergaenzen
 
-```typescript
-// apps/api/src/services/taskService.ts
-// In buildTaskUpdates(): Feld wird automatisch via Drizzle-Update uebernommen
+```java
+// FeedItemService.java oder FeedService.java
+// Feld beim Parsen des RSS-Inhalts berechnen und setzen
+feedItem.setEstimatedReadTime(calculateReadTime(content));
 ```
 
-### 6. Frontend: Komponente erweitern
+### 4. Flutter-Modell aktualisieren
 
-```typescript
-// apps/web/src/components/TaskEditModal.tsx
-// Neues Input-Feld hinzufuegen
+```dart
+// lib/feed/models/feed_item.dart
+class FeedItem {
+  final int? estimatedReadTime;
+  // ...
+  factory FeedItem.fromJson(Map<String, dynamic> json) => FeedItem(
+    estimatedReadTime: json['estimatedReadTime'],
+    // ...
+  );
+}
 ```
 
-### 7. Tests anpassen
+### 5. UI anzeigen
 
-```bash
-npm run test
+```dart
+// In der Feed-Item-Ansicht
+if (item.estimatedReadTime != null)
+  Text('Lesezeit: ~${item.estimatedReadTime}s'),
 ```
 
 ---
 
 ## Debugging
 
-- **API-Logs:** Fastify Logger (JSON) → `fastify.log.info()`, `fastify.log.error()`
-- **DB-Queries:** In Dev-Mode sind Drizzle-Queries in der Konsole sichtbar
-- **Frontend:** React DevTools + Browser Network Tab
-- **WebSockets:** Socket.io Debug: `DEBUG=socket.io* npm run dev:api`
+- **Backend-Logs:** Spring Boot Logback → Konsole (Level INFO, in `application.yml` konfigurierbar)
+- **Flyway-Debug:** In `application.yml` aktiviert (`logging.level.org.flywaydb: DEBUG`)
+- **DB-Queries:** In `application.yml` auskommentiert: `jpa.show-sql: true` einkommentieren
+- **Swagger UI:** `http://localhost:8080/swagger-ui.html` fuer API-Exploration
+- **Flutter:** Browser DevTools + `flutter logs`
 
 ---
 
 ## Verwandte Dokumente
 
-- [README.md](../README.md) — Ausfuehrliche Setup-Anleitung, Android-APK-Build
-- [docs/datenbank.md](datenbank.md) — Schema-Details, Migration-Workflow
-- [docs/testing.md](testing.md) — Test-Ausfuehrung, Patterns
+- [README.md](../README.md) — Installations-Kurzanleitung
+- [docs/datenbank.md](datenbank.md) — Schema-Details, Migrations-Workflow
+- [docs/testing.md](testing.md) — Test-Ausfuehrung

@@ -6,157 +6,307 @@
 
 ## Uebersicht
 
-| App | Framework | Testverzeichnis | Befehl |
-|-----|-----------|----------------|--------|
-| API | Vitest 1.x | `apps/api/src/__tests__/` | `npm run test --workspace=apps/api` |
-| Web | Vitest | `apps/web/src/__tests__/` | `npm run test --workspace=apps/web` |
-| Alle | Vitest | — | `npm run test` (Root) |
+| Schicht | Framework | Ort | Befehl |
+|---------|-----------|-----|--------|
+| Backend (Unit) | JUnit 5 + Mockito | `src/test/java/` | `mvn test` |
+| Backend (Integration) | Spring Boot Test + TestContainers | `src/test/java/` | `mvn verify` |
+| Frontend | Flutter Test | `src/main/app/test/` | `flutter test` |
 
 ---
 
-## Test-Befehle
+## Backend-Tests (Java)
+
+### Voraussetzungen
+
+TestContainers startet automatisch eine echte PostgreSQL-Instanz fuer Integrationstests.
+Docker muss auf dem Entwicklungsrechner laufen.
+
+### Test-Befehle
 
 ```bash
-# Alle Tests (alle Workspaces)
-npm run test
+# Alle Tests (Unit + Integration)
+mvn test
 
-# Nur API-Tests
-npm run test --workspace=apps/api
+# Nur Tests, kein Package
+mvn test -pl .
 
-# Nur Web-Tests
-npm run test --workspace=apps/web
+# Tests ueberspringen (fuer schnellen Build)
+mvn clean package -DskipTests
 
-# Tests im Watch-Modus (Entwicklung)
-cd apps/api && npx vitest
+# Einzelne Test-Klasse ausfuehren
+mvn test -Dtest=FeedServiceTest
 
-# Einzelnen Test ausfuehren
-cd apps/api && npx vitest run src/__tests__/auth.test.ts
+# Einzelne Test-Methode
+mvn test -Dtest=FeedServiceTest#shouldReturnFeedsForUser
+```
+
+### Unit-Test-Pattern
+
+```java
+// src/test/java/com/github/lamarios/newsku/services/FeedServiceTest.java
+
+@ExtendWith(MockitoExtension.class)
+class FeedServiceTest {
+
+    @Mock
+    private FeedRepository feedRepository;
+
+    @Mock
+    private OpenaiService openaiService;
+
+    @InjectMocks
+    private FeedService feedService;
+
+    @Test
+    void shouldReturnFeedsForUser() {
+        // Arrange
+        String userId = "user-123";
+        Feed feed = new Feed();
+        feed.setId("feed-1");
+        feed.setUserId(userId);
+
+        when(feedRepository.findByUserId(userId)).thenReturn(List.of(feed));
+
+        // Act
+        List<Feed> result = feedService.getFeedsForUser(userId);
+
+        // Assert
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getId()).isEqualTo("feed-1");
+        verify(feedRepository).findByUserId(userId);
+    }
+
+    @Test
+    void shouldThrowWhenFeedNotFound() {
+        // Arrange
+        when(feedRepository.findByIdAndUserId(anyString(), anyString()))
+            .thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThatThrownBy(() -> feedService.getFeed("user-1", "unknown-id"))
+            .isInstanceOf(FeedNotFoundException.class);
+    }
+}
+```
+
+### Integrations-Test-Pattern (TestContainers)
+
+```java
+// src/test/java/com/github/lamarios/newsku/integration/FeedControllerIT.java
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Testcontainers
+class FeedControllerIT {
+
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:18-alpine")
+        .withDatabaseName("newsku_test")
+        .withUsername("test")
+        .withPassword("test");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Test
+    void shouldReturnEmptyFeedsForNewUser() {
+        // JWT-Token fuer Testbenutzer generieren (oder Mock-Auth)
+        ResponseEntity<List> response = restTemplate.exchange(
+            "/api/feeds",
+            HttpMethod.GET,
+            new HttpEntity<>(authHeaders()),
+            List.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEmpty();
+    }
+}
+```
+
+### Controller-Test (MockMvc)
+
+```java
+@WebMvcTest(FeedController.class)
+class FeedControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private FeedService feedService;
+
+    @Test
+    @WithMockUser(username = "user-123")
+    void getFeeds_shouldReturn200() throws Exception {
+        when(feedService.getFeedsForUser("user-123"))
+            .thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/api/feeds"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$").isArray());
+    }
+}
 ```
 
 ---
 
-## API-Tests
+## Frontend-Tests (Flutter)
 
-### Vorhandene Tests
+### Test-Befehle
 
-| Datei | Beschreibung |
-|-------|-------------|
-| `apps/api/src/__tests__/setup.ts` | Test-Setup: In-Memory SQLite DB, Fastify-Instanz |
-| `apps/api/src/__tests__/auth.test.ts` | Auth-Routen (Login, Refresh, Passwort) |
-| `apps/api/src/__tests__/health.test.ts` | Health-Endpunkt `/health` |
-| `apps/api/src/__tests__/pagination.test.ts` | Pagination Helper (paginationSchema, paginatedResponse) |
-| `apps/api/src/__tests__/searchService.test.ts` | Such-Service (FTS, LIKE-Fallback) |
-| `apps/api/src/__tests__/importService.test.ts` | Import-Service (Markdown → Tiptap) |
+```bash
+cd src/main/app
 
-### Test-Setup
+# Alle Tests ausfuehren
+flutter test
 
-Das Setup (`setup.ts`) erstellt eine In-Memory SQLite-Datenbank und eine Fastify-Instanz mit allen Plugins und Routen:
+# Einzelne Test-Datei
+flutter test test/feed_service_test.dart
 
-```typescript
-// apps/api/src/__tests__/setup.ts
-// Stellt bereit:
-// - Fastify-Instanz (app) mit allen Plugins
-// - In-Memory DB (kein Dateisystem)
-// - Test-User fuer Auth-Tests
+# Mit Coverage
+flutter test --coverage
 ```
 
-### Test-Pattern (API)
+### Unit-Test-Pattern (Dart)
 
-```typescript
-import { describe, it, expect } from 'vitest';
+```dart
+// src/main/app/test/feed_item_test.dart
 
-describe('GET /health', () => {
-  it('should return ok status', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: '/health',
+import 'package:flutter_test/flutter_test.dart';
+import 'package:newsku/feed/models/feed_item.dart';
+
+void main() {
+  group('FeedItem', () {
+    test('fromJson parses correctly', () {
+      final json = {
+        'id': 'item-1',
+        'title': 'Test Artikel',
+        'imageUrl': null,
+        'importanceScore': 0.85,
+        'read': false,
+      };
+
+      final item = FeedItem.fromJson(json);
+
+      expect(item.id, equals('item-1'));
+      expect(item.title, equals('Test Artikel'));
+      expect(item.imageUrl, isNull);
+      expect(item.importanceScore, closeTo(0.85, 0.001));
+      expect(item.read, isFalse);
     });
-    expect(response.statusCode).toBe(200);
-    expect(response.json()).toEqual({ status: 'ok', database: 'ok' });
+
+    test('toJson serializes correctly', () {
+      final item = FeedItem(
+        id: 'item-1',
+        title: 'Test',
+        read: true,
+      );
+
+      final json = item.toJson();
+
+      expect(json['id'], equals('item-1'));
+      expect(json['read'], isTrue);
+    });
   });
-});
+}
 ```
 
-API-Tests nutzen `app.inject()` (Fastify's Lightweight Testing) statt HTTP-Requests.
+### BLoC-Test-Pattern
 
----
+```dart
+// src/main/app/test/feed_bloc_test.dart
 
-## Web-Tests
+import 'package:bloc_test/bloc_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:flutter_test/flutter_test.dart';
 
-### Vorhandene Tests
+class MockFeedService extends Mock implements FeedService {}
 
-| Datei | Beschreibung |
-|-------|-------------|
-| `apps/web/src/__tests__/dateParser.test.ts` | Datum-Parsing + Formatierung |
-| `apps/web/src/__tests__/markdownPaste.test.ts` | Markdown-Paste im Editor |
+void main() {
+  late MockFeedService mockFeedService;
 
-### Test-Pattern (Web)
-
-```typescript
-import { describe, it, expect } from 'vitest';
-import { toDateStr } from '../utils/dateParser';
-
-describe('dateParser', () => {
-  it('should format date correctly', () => {
-    expect(toDateStr(new Date('2026-03-15'))).toBe('2026-03-15');
+  setUp(() {
+    mockFeedService = MockFeedService();
   });
-});
+
+  group('FeedBloc', () {
+    blocTest<FeedBloc, FeedState>(
+      'emits [FeedLoading, FeedLoaded] when LoadFeeds succeeds',
+      build: () {
+        when(() => mockFeedService.getFeeds())
+            .thenAnswer((_) async => [Feed(id: '1', title: 'Feed 1')]);
+        return FeedBloc(mockFeedService);
+      },
+      act: (bloc) => bloc.add(LoadFeeds()),
+      expect: () => [
+        isA<FeedLoading>(),
+        isA<FeedLoaded>(),
+      ],
+    );
+  });
+}
 ```
 
-Web-Tests testen primaer Utility-Funktionen. Komponenten-Tests sind noch nicht implementiert.
+### Widget-Test-Pattern
+
+```dart
+// src/main/app/test/widgets/feed_tile_test.dart
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  testWidgets('FeedTile zeigt Titel an', (WidgetTester tester) async {
+    final feed = Feed(id: '1', title: 'Mein Test-Feed');
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: FeedTile(feed: feed),
+        ),
+      ),
+    );
+
+    expect(find.text('Mein Test-Feed'), findsOneWidget);
+  });
+}
+```
 
 ---
 
 ## How-To: Neuen Test schreiben
 
-### API-Test
+### Backend (Service-Test)
 
-1. Datei erstellen: `apps/api/src/__tests__/meinTest.test.ts`
+1. Datei erstellen: `src/test/java/com/github/lamarios/newsku/services/MeinServiceTest.java`
+2. `@ExtendWith(MockitoExtension.class)` verwenden
+3. Abhaengigkeiten mit `@Mock` mocken
+4. Service mit `@InjectMocks` instanziieren
 
-```typescript
-import { describe, it, expect, beforeAll } from 'vitest';
-// Setup importieren (erstellt App + DB)
-import { app, testUser } from './setup';
+### Backend (Integrations-Test)
 
-describe('GET /api/mein-endpoint', () => {
-  it('should require authentication', async () => {
-    const res = await app.inject({ method: 'GET', url: '/api/mein-endpoint' });
-    expect(res.statusCode).toBe(401);
-  });
+1. Datei erstellen: `src/test/java/com/github/lamarios/newsku/integration/MeinIT.java`
+2. `@SpringBootTest` + `@Testcontainers` nutzen
+3. PostgreSQL Container via `@Container` starten
+4. Properties via `@DynamicPropertySource` einfuegen
 
-  it('should return data', async () => {
-    const res = await app.inject({
-      method: 'GET',
-      url: '/api/mein-endpoint',
-      headers: { authorization: `Bearer ${testUser.token}` },
-    });
-    expect(res.statusCode).toBe(200);
-  });
-});
-```
+### Flutter (Unit-Test)
 
-2. Test ausfuehren: `cd apps/api && npx vitest run`
-
-### Web-Test (Utility)
-
-1. Datei erstellen: `apps/web/src/__tests__/meinUtil.test.ts`
-
-```typescript
-import { describe, it, expect } from 'vitest';
-import { meineFunction } from '../utils/meinUtil';
-
-describe('meineFunction', () => {
-  it('should work correctly', () => {
-    expect(meineFunction('input')).toBe('expected');
-  });
-});
-```
-
-2. Test ausfuehren: `cd apps/web && npx vitest run`
+1. Datei erstellen: `src/main/app/test/mein_test.dart`
+2. `flutter_test` importieren
+3. `group()` + `test()` / `testWidgets()` nutzen
 
 ---
 
 ## Verwandte Dokumente
 
-- [docs/entwicklung.md](entwicklung.md) — Dev-Setup, Scripts
-- [docs/api-patterns.md](api-patterns.md) — API-Struktur (was getestet wird)
+- [docs/entwicklung.md](entwicklung.md) — Dev-Setup, Build-Befehle
+- [docs/api-patterns.md](api-patterns.md) — Was getestet werden soll
