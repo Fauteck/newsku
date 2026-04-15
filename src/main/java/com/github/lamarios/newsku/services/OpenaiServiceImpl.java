@@ -28,13 +28,21 @@ public class OpenaiServiceImpl implements OpenaiService {
     private final String url;
     private final String apiKey;
     private final String model;
+    private final int maxRetries;
+    private final long timeoutMinutes;
 
     @Autowired
-    public OpenaiServiceImpl(@Value("${OPENAI_URL}") String url, @Value("${OPENAI_API_KEY:}") String apiKey, @Value("${OPENAI_MODEL}") String model) {
+    public OpenaiServiceImpl(
+            @Value("${OPENAI_URL}") String url,
+            @Value("${OPENAI_API_KEY:}") String apiKey,
+            @Value("${OPENAI_MODEL}") String model,
+            @Value("${OPENAI_MAX_RETRIES:3}") int maxRetries,
+            @Value("${OPENAI_TIMEOUT_MINUTES:2}") long timeoutMinutes) {
         this.url = url;
         this.apiKey = apiKey;
         this.model = model;
-
+        this.maxRetries = maxRetries;
+        this.timeoutMinutes = timeoutMinutes;
 
         var models = getClient().models().list();
         List<String> modelList = new ArrayList<>();
@@ -59,15 +67,39 @@ public class OpenaiServiceImpl implements OpenaiService {
 
         if (apiKey != null && !apiKey.trim().isBlank()) {
             client = client.apiKey(apiKey);
-
         }
 
-        client.timeout(Duration.ofMinutes(2));
+        // Fix: reassign builder result so timeout is actually applied
+        client = client.timeout(Duration.ofMinutes(timeoutMinutes));
 
         return client.build();
     }
 
     public Optional<OpenAiFeedResponse> processFeedItem(Item item, User user, List<TagClickStat> clickStats) {
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                return processFeedItemAttempt(item, user, clickStats);
+            } catch (Exception e) {
+                if (attempt >= maxRetries) {
+                    logger.error("OpenAI API call failed after {} attempts for item {}: {}",
+                            maxRetries, item.getGuid().orElse("unknown"), e.getMessage());
+                    return Optional.empty();
+                }
+                long backoffMs = (1L << attempt) * 1000; // 2s, 4s, 8s …
+                logger.warn("OpenAI API call failed (attempt {}/{}), retrying in {}ms: {}",
+                        attempt, maxRetries, backoffMs, e.getMessage());
+                try {
+                    Thread.sleep(backoffMs);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    return Optional.empty();
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<OpenAiFeedResponse> processFeedItemAttempt(Item item, User user, List<TagClickStat> clickStats) {
 
 
         String tagPrompt = """

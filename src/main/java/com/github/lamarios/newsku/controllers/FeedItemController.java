@@ -2,7 +2,7 @@ package com.github.lamarios.newsku.controllers;
 
 import com.github.lamarios.newsku.persistence.entities.FeedItem;
 import com.github.lamarios.newsku.services.FeedItemService;
-import com.github.lamarios.newsku.utils.ImageHelper;
+import com.github.lamarios.newsku.services.ImageCacheService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.logging.log4j.LogManager;
@@ -15,12 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.InvalidParameterException;
@@ -33,13 +30,13 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class FeedItemController {
     private final FeedItemService feedItemService;
+    private final ImageCacheService imageCacheService;
     private final Logger log = LogManager.getLogger();
-    private final Path tempDir;
 
     @Autowired
-    public FeedItemController(FeedItemService feedItemService) throws IOException {
+    public FeedItemController(FeedItemService feedItemService, ImageCacheService imageCacheService) {
         this.feedItemService = feedItemService;
-        this.tempDir = Files.createTempDirectory("newsku-feed-item-images-");
+        this.imageCacheService = imageCacheService;
     }
 
     @GetMapping
@@ -70,17 +67,8 @@ public class FeedItemController {
             return ResponseEntity.status(404).build();
         }
 
-        var filePath = tempDir.resolve(id);
+        var filePath = imageCacheService.getCachedImage(id, item.getImageUrl());
 
-        if (!filePath.toFile().exists()) {
-            log.info("File doesn't exist in cache, caching it...");
-            ImageHelper.downloadImageToPath(item.getImageUrl(), filePath);
-        } else {
-            log.info("Serving from cache");
-        }
-
-
-        // Fetch from remote URL
         return serveFile(filePath);
     }
 
