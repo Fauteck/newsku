@@ -259,4 +259,23 @@ public class FeedItemService {
 
         return true;
     }
+
+    @Transactional
+    public FeedItem toggleSaved(String id) {
+        var feeds = feedRepository.getFeedsByUser(userService.getCurrentUser());
+        var item = feedItemRepository.getFirstByIdAndFeedIn(id, feeds);
+
+        if (item == null) {
+            return null;
+        }
+
+        item.setSaved(!item.isSaved());
+        return feedItemRepository.save(item);
+    }
+
+    @Transactional(readOnly = true)
+    public List<FeedItem> getSavedItems() {
+        var feeds = feedRepository.getFeedsByUser(userService.getCurrentUser());
+        return feedItemRepository.findBySavedTrueAndFeedIn(feeds);
+    }
 }

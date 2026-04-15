@@ -112,6 +112,62 @@ class GeneralSettingsTab extends StatelessWidget {
                       child: Row(spacing: pu, children: [Icon(Icons.info_outline), Text(locals.deviceOnlySettings)]),
                     ),
                     Gap(pu4),
+                    // ---- Text truncation settings ----
+                    BlocBuilder<LocalPreferencesCubit, LocalPreferencesState>(
+                      bloc: getIt.get<LocalPreferencesCubit>(),
+                      builder: (context, prefsState) => Column(
+                        crossAxisAlignment: .start,
+                        children: [
+                          SwitchListTile(
+                            contentPadding: .zero,
+                            title: Text(locals.truncateText),
+                            subtitle: Text(locals.truncateTextExplanation, style: subTextTheme),
+                            value: prefsState.truncateText,
+                            onChanged: (value) => getIt.get<LocalPreferencesCubit>().setTruncateText(value),
+                          ),
+                          if (prefsState.truncateText) ...[
+                            Gap(pu2),
+                            Text(locals.titleMaxLines),
+                            Row(
+                              children: [
+                                Text('1', style: textTheme.labelSmall),
+                                Expanded(
+                                  child: Slider(
+                                    min: 1,
+                                    max: 6,
+                                    divisions: 5,
+                                    label: prefsState.titleMaxLines.toString(),
+                                    value: prefsState.titleMaxLines.toDouble(),
+                                    onChanged: (v) =>
+                                        getIt.get<LocalPreferencesCubit>().setTitleMaxLines(v.round()),
+                                  ),
+                                ),
+                                Text('6', style: textTheme.labelSmall),
+                              ],
+                            ),
+                            Text(locals.contentMaxLines),
+                            Row(
+                              children: [
+                                Text('1', style: textTheme.labelSmall),
+                                Expanded(
+                                  child: Slider(
+                                    min: 1,
+                                    max: 8,
+                                    divisions: 7,
+                                    label: prefsState.contentMaxLines.toString(),
+                                    value: prefsState.contentMaxLines.toDouble(),
+                                    onChanged: (v) =>
+                                        getIt.get<LocalPreferencesCubit>().setContentMaxLines(v.round()),
+                                  ),
+                                ),
+                                Text('8', style: textTheme.labelSmall),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    Gap(pu4),
                     SwitchListTile(
                       contentPadding: .zero,
                       title: Text(locals.blackBackground),

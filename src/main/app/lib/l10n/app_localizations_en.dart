@@ -481,4 +481,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get layoutBlockCategoryExplanation => 'This block will only display blocks of the selected category';
+
+  @override
+  String get truncateText => 'Truncate article text';
+
+  @override
+  String get truncateTextExplanation => 'Clamp article titles and teasers to a fixed number of lines in the feed view';
+
+  @override
+  String get titleMaxLines => 'Title lines';
+
+  @override
+  String get contentMaxLines => 'Teaser lines';
+
+  @override
+  String get savedArticles => 'Saved articles';
+
+  @override
+  String get saveArticle => 'Save for later';
+
+  @override
+  String get unsaveArticle => 'Remove from saved';
+
+  @override
+  String get noSavedArticles => 'No saved articles yet';
+
+  @override
+  String get swipeToRead => 'Mark as read';
+
+  @override
+  String get keyboardShortcutsTitle => 'Keyboard shortcuts';
+
+  @override
+  String get insightsTitle => 'Insights (last 7 days)';
+
+  @override
+  String get insightsTopTags => 'Top tags';
+
+  @override
+  String get insightsTopSources => 'Top sources';
 }

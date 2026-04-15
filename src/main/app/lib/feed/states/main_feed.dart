@@ -10,6 +10,7 @@ import 'package:app/utils/utils.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:logging/logging.dart';
@@ -30,7 +31,51 @@ class MainFeedCubit extends Cubit<MainFeedState> {
     init();
   }
 
+  bool _handleKeyEvent(KeyEvent event) {
+    if (event is! KeyDownEvent) return false;
+
+    // When search is active, only handle Escape
+    if (state.searchMode) {
+      if (event.logicalKey == LogicalKeyboardKey.escape) {
+        setSearch(false);
+        return true;
+      }
+      return false;
+    }
+
+    switch (event.logicalKey) {
+      case LogicalKeyboardKey.keyR:
+        refresh();
+        return true;
+      case LogicalKeyboardKey.slash:
+        setSearch(true);
+        return true;
+      case LogicalKeyboardKey.keyJ:
+      case LogicalKeyboardKey.arrowDown:
+        if (scrollController.hasClients) {
+          scrollController.animateTo(
+            (scrollController.offset + 300).clamp(0.0, scrollController.position.maxScrollExtent),
+            duration: Duration(milliseconds: 150),
+            curve: Curves.easeOut,
+          );
+        }
+        return true;
+      case LogicalKeyboardKey.keyK:
+      case LogicalKeyboardKey.arrowUp:
+        if (scrollController.hasClients) {
+          scrollController.animateTo(
+            (scrollController.offset - 300).clamp(0.0, scrollController.position.maxScrollExtent),
+            duration: Duration(milliseconds: 150),
+            curve: Curves.easeOut,
+          );
+        }
+        return true;
+    }
+    return false;
+  }
+
   Future<void> init() async {
+    HardwareKeyboard.instance.addHandler(_handleKeyEvent);
     scrollController.addListener(() {
       if (!state.hasScrolled && scrollController.position.pixels > 0) {
         emit(state.copyWith(hasScrolled: true));
@@ -52,6 +97,7 @@ class MainFeedCubit extends Cubit<MainFeedState> {
 
   @override
   Future<void> close() async {
+    HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
     scrollController.dispose();
     searchController.dispose();
     super.close();
@@ -68,6 +114,40 @@ class MainFeedCubit extends Cubit<MainFeedState> {
       FeedService(serverUrl!).readItems(List.from(readItems));
       readItems.clear();
     });
+  }
+
+  Future<void> toggleSave(String id) async {
+    try {
+      final updated = await FeedService(serverUrl!).toggleSaved(id);
+      // Update the item in all date buckets
+      final newItems = state.items.map((range, list) {
+        final newList = list.map((item) => item.id == id ? updated : item).toList();
+        return MapEntry(range, newList);
+      });
+      emit(state.copyWith(items: newItems));
+    } catch (e, s) {
+      _log.severe('Could not toggle save for item $id', e);
+      emit(state.copyWith(error: e, stackTrace: s));
+    }
+  }
+
+  Future<void> setSavedFilter(bool value) async {
+    if (value) {
+      try {
+        emit(state.copyWith(loading: true, showSavedOnly: true));
+        final saved = await FeedService(serverUrl!).getSavedItems();
+        final key = DateTimeRange(
+          start: DateTime.fromMillisecondsSinceEpoch(0),
+          end: DateTime.now(),
+        );
+        emit(state.copyWith(loading: false, items: {key: saved}));
+      } catch (e, s) {
+        emit(state.copyWith(loading: false, showSavedOnly: false, error: e, stackTrace: s));
+      }
+    } else {
+      emit(state.copyWith(showSavedOnly: false));
+      refresh();
+    }
   }
 
   Future<void> getFeed() async {
@@ -193,6 +273,7 @@ sealed class MainFeedState with _$MainFeedState implements WithError {
     @Default(0) int searchPage,
     @Default([]) List<LayoutBlock> layout,
     @Default(0) int errorCount,
+    @Default(false) bool showSavedOnly,
     dynamic error,
     StackTrace? stackTrace,
   }) = _MainFeedState;

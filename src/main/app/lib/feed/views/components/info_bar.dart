@@ -1,10 +1,13 @@
 import 'package:app/feed/models/feed_item.dart';
+import 'package:app/feed/services/feed_service.dart';
+import 'package:app/feed/states/main_feed.dart';
 import 'package:app/feed/views/components/feed_image.dart';
 import 'package:app/feed/views/screens/feed_screen.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/utils/dialog.dart';
 import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class InfoBar extends StatelessWidget {
   final FeedItem item;
@@ -52,6 +55,19 @@ class InfoBar extends StatelessWidget {
                 DateTime.fromMillisecondsSinceEpoch(item.timeCreated),
               ),
               style: textTheme.labelMedium?.copyWith(color: colors.onSecondaryContainer),
+            ),
+            // Bookmark / save button
+            InkWell(
+              key: Key('save-button-${item.id}'),
+              onTap: () => context.read<MainFeedCubit>().toggleSave(item.id ?? ''),
+              child: Tooltip(
+                message: item.saved ? locals.unsaveArticle : locals.saveArticle,
+                child: Icon(
+                  item.saved ? Icons.bookmark : Icons.bookmark_border,
+                  size: 16,
+                  color: item.saved ? colors.primary : colors.onSecondaryContainer,
+                ),
+              ),
             ),
             InkWell(
               key: Key('reasoning-button'),

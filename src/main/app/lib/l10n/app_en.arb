@@ -132,5 +132,18 @@
     "deleteCategoryExplanation": "Deleting a category will also delete all the feeds it contains. This cannot be undone",
     "any": "Any",
     "feedCategory": "Category",
-    "layoutBlockCategoryExplanation": "This block will only display blocks of the selected category"
+    "layoutBlockCategoryExplanation": "This block will only display blocks of the selected category",
+    "truncateText": "Truncate article text",
+    "truncateTextExplanation": "Clamp article titles and teasers to a fixed number of lines in the feed view",
+    "titleMaxLines": "Title lines",
+    "contentMaxLines": "Teaser lines",
+    "savedArticles": "Saved articles",
+    "saveArticle": "Save for later",
+    "unsaveArticle": "Remove from saved",
+    "noSavedArticles": "No saved articles yet",
+    "swipeToRead": "Mark as read",
+    "keyboardShortcutsTitle": "Keyboard shortcuts",
+    "insightsTitle": "Insights (last 7 days)",
+    "insightsTopTags": "Top tags",
+    "insightsTopSources": "Top sources"
 }
