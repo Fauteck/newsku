@@ -6,63 +6,60 @@
 
 ## Monorepo-Uebersicht
 
-Todoteck ist ein Monorepo mit npm Workspaces, bestehend aus 3 Anwendungen und 1 Shared-Package:
+Newsku ist ein selbst-gehosteter RSS-Reader, der LLMs (OpenAI) nutzt, um Feed-Beitraege nach Relevanz zu sortieren.
+Das Repository ist ein Monorepo mit Backend (Java/Spring Boot) und Frontend (Flutter):
 
 ```
-apps/
-  api/          → Fastify REST API + Socket.io (Node.js/TypeScript)
-  web/          → React SPA + Android App (Vite + Tailwind + Capacitor)
-  keep-sync/    → Google Keep Sync Sidecar (Python/FastAPI)
-packages/
-  shared-types/ → Gemeinsame TypeScript-Interfaces (API & Web)
+newsku/
+  src/main/java/   → Spring Boot REST API (Java 25)
+  src/main/app/    → Flutter App (Web + Android)
+  src/main/resources/db/migration/  → Flyway SQL-Migrationen
+  docker/          → Dockerfile + Entrypoint
 ```
 
 ---
 
 ## Tech Stack
 
-### Backend (`apps/api/`)
+### Backend (`src/main/java/com/github/lamarios/newsku/`)
 
 | Technologie | Version | Zweck |
 |-------------|---------|-------|
-| Fastify | 5.x | HTTP-Server |
-| Drizzle ORM | 0.30.x | TypeScript-first ORM |
-| SQLite (better-sqlite3) | 12.x | Datenbank |
-| Zod | 3.x | Request-Validierung |
-| @fastify/jwt | 10.x | JWT-Authentifizierung |
-| Socket.io | 4.x | Echtzeit-WebSockets |
-| bcryptjs | 2.x | Passwort-Hashing |
-| ical-generator | 8.x | Kalender-Export (.ics) |
-| fastify-plugin | 5.x | Plugin-Registrierung |
+| Spring Boot | 4.0.1 | HTTP-Server, DI, Auto-Konfiguration |
+| Spring Data JPA | — | ORM, Repository-Pattern |
+| Spring Security | — | JWT-Authentifizierung, OIDC |
+| Flyway | — | Datenbank-Migrationen |
+| PostgreSQL JDBC | — | Datenbank-Treiber |
+| OpenAI Java SDK | 4.13.0 | LLM-Integration (Ranking) |
+| Apptastic RSS Reader | 3.12.0 | RSS/Atom Feed Parsing |
+| JJWT | 0.13.0 | JWT-Tokens |
+| jsoup | 1.21.2 | HTML-Parsing & -Bereinigung |
+| Simple Java Mail | 6.6.1 | E-Mail Digest & Passwort-Reset |
+| SpringDoc OpenAPI | 3.0.0 | Swagger-UI (`/swagger-ui.html`) |
+| Spring Actuator | — | Health-Endpunkt (`/actuator/health`) |
+| TestContainers | 1.21.0 | Integrationstests mit echter DB |
 
-### Frontend (`apps/web/`)
+### Frontend (`src/main/app/`)
 
 | Technologie | Version | Zweck |
 |-------------|---------|-------|
-| React | 18.x | UI-Framework |
-| React Router | 6.x | Client-side Routing |
-| Vite | 5.x | Build Tool + Dev Server |
-| Tailwind CSS | 3.x | Utility-First CSS |
-| Zustand | — | State Management |
-| Axios | — | HTTP-Client |
-| Tiptap | 3.x | Rich-Text-Editor |
-| @dnd-kit | 6.x | Drag & Drop |
-| Capacitor | 8.x | Native Android-App |
-| idb | — | IndexedDB (Offline) |
-| vite-plugin-pwa | — | PWA / Service Worker |
+| Flutter | ^3.10.0 | UI-Framework (Web + Android) |
+| flutter_bloc | — | State Management (BLoC-Pattern) |
+| auto_route | — | Deklaratives Routing |
+| http | — | HTTP-Client fuer API-Aufrufe |
+| jwt_decoder | — | JWT-Token Dekodierung |
+| oidc | — | OpenID Connect Authentifizierung |
+| cached_network_image | — | Bild-Caching |
+| dynamic_color | — | Material Design 3 Dynamic Color |
+| shared_preferences | — | Lokale Einstellungen |
+| intl | — | Internationalisierung |
 
-### Keep-Sync Sidecar (`apps/keep-sync/`)
+### Datenbank
 
-| Technologie | Zweck |
-|-------------|-------|
-| FastAPI (Python) | HTTP-Server |
-| gkeepapi | Google Keep API (inoffiziell) |
-
-### Shared Types (`packages/shared-types/`)
-
-| Datei | Inhalt |
-|-------|--------|
-| `packages/shared-types/src/index.ts` | Alle TypeScript-Interfaces (User, Project, Task, Label, Comment, Filter, etc.) |
+| Technologie | Version | Zweck |
+|-------------|---------|-------|
+| PostgreSQL | 18-alpine | Relationale Datenbank |
+| Flyway | — | Schema-Migrationen (V1–V16) |
 
 ---
 
@@ -71,26 +68,24 @@ packages/
 ```
 HTTP Request
   │
-  ├─ Fastify Middleware: Helmet, CORS, Rate Limit, Cookie
+  ├─ Spring Security Filter Chain
+  │     ├─ JwtAuthFilter (JWT validieren, SecurityContext setzen)
+  │     └─ OidcFilter (optional, OIDC-Token validieren)
   │
-  ├─ Auth: request.jwtVerify() via preHandler
+  ├─ REST Controller (controllers/*.java)
+  │     │
+  │     ├─ Spring Validation (@Valid, @RequestBody)
+  │     │
+  │     ├─ Service Layer (services/*.java)
+  │     │     ├─ Geschaeftslogik
+  │     │     ├─ OpenAI-Integration (OpenaiService)
+  │     │     ├─ RSS-Parsing (FeedService)
+  │     │     └─ JPA-Repositories (persistence/repositories/)
+  │     │
+  │     └─ Response (JSON via Jackson)
   │
-  ├─ Route Handler (apps/api/src/routes/*.ts)
-  │     │
-  │     ├─ Zod-Validierung (Request Body/Query)
-  │     │
-  │     ├─ Autorisierung (apps/api/src/lib/authorization.ts)
-  │     │     → checkProjectAccess(userId, projectId)
-  │     │     → checkProjectWriteAccess(userId, projectId)
-  │     │     → getAccessibleProjectIds(userId)
-  │     │
-  │     ├─ Service Layer (apps/api/src/services/*.ts)
-  │     │     → Geschaeftslogik + DB-Zugriff via Drizzle
-  │     │
-  │     └─ Response (JSON)
-  │
-  └─ Socket.io Broadcast (bei Mutationen)
-       → io.to(`project:${projectId}`).emit('task:updated', ...)
+  └─ Statische Inhalte (Flutter Web Build)
+       → StaticContentController
 ```
 
 ---
@@ -99,61 +94,38 @@ HTTP Request
 
 ### JWT-Flow
 
-1. **Login:** `POST /api/auth/login` → Access Token (15 min) + Refresh Token (90 Tage, httpOnly Cookie)
-2. **Refresh:** `POST /api/auth/refresh` → Neuer Access Token + Refresh Token Rotation
-3. **Jeder Request:** `Authorization: Bearer <access_token>` → `preHandler: [fastify.authenticate]`
-4. **Socket.io:** Token via `handshake.auth.token`, JWT-Verifizierung im `io.use()` Middleware
+1. **Login:** `POST /api/users/login` → JWT Access Token
+2. **Jeder Request:** `Authorization: Bearer <token>` → JwtAuthFilter validiert
+3. **Token-Payload:** `{ sub: userId, email: "..." }`
 
-### Authelia SSO (optional)
+### OIDC (optional)
 
-- Aktivierung: `AUTHELIA_ENABLED=true`
-- Forward-Auth-Proxy setzt Header `Remote-User`
-- Route: `POST /api/auth/sso`
+- Aktivierung via Konfiguration: OIDC-Provider-URL setzen
+- Forward-Auth via OpenID Connect Token
+- Route: `POST /api/users/oidc`
 
-### Autorisierung
+### Passwort-Hashing
 
-Definiert in `apps/api/src/lib/authorization.ts`:
-
-- **Projekt-Zugriff:** Eigentümer ODER Mitglied ODER `is_shared=1`
-- **Schreibzugriff:** Eigentümer ODER Mitglied mit Rolle `owner`/`editor`
-- **Rollen:** `owner` | `editor` | `viewer`
+- BCrypt mit konfigurierbarem `SALT`
+- Niemals Klartextpasswoerter speichern
 
 ---
 
-## WebSocket-Architektur
+## LLM-Integration (OpenAI)
 
 ```
-Client (React)
+FeedService (RSS abrufen + Items speichern)
   │
-  ├─ socket.emit('join:project', projectId)
-  │     → Server prueft Zugriffsberechtigung
-  │     → socket.join(`project:${projectId}`)
-  │
-  └─ socket.on('task:updated', callback)
-       → Echtzeit-Updates innerhalb des Projekt-Raums
+  └─ OpenaiService.rankItems(userId, items)
+       │
+       ├─ Benutzer-Praeferenzen laden (UserService)
+       ├─ OpenAI API aufrufen (Chat Completion)
+       │     → Model: OPENAI_MODEL (env)
+       │     → Endpoint: OPENAI_URL (env, default: openai.com)
+       └─ importance_score pro Item speichern
 ```
 
-- **Server:** `apps/api/src/index.ts` (Zeile 147–200)
-- **Authentifizierung:** JWT-Verifizierung bei jeder Connection
-- **Rooms:** Pro Projekt (`project:<id>`)
-
----
-
-## Keep-Sync Sidecar
-
-```
-apps/api (Fastify)
-  │
-  ├─ Timer: alle 2 Minuten → syncAllKeepMappings()
-  │     → HTTP-Calls an apps/keep-sync (FastAPI)
-  │
-  └─ apps/keep-sync/main.py
-       → Google Keep API via gkeepapi
-       → Sync: Keep-Listen ↔ Todoteck-Notizen/Aufgaben
-```
-
-- Verschluesselung: AES-256-GCM fuer Google-Token (`GOOGLE_TOKEN_ENCRYPTION_KEY`)
-- Konfiguration: `google_keep_accounts`, `google_keep_sync_mappings`, `google_keep_todo_config` Tabellen
+Der `ScheduleService` triggert Feed-Updates und LLM-Ranking periodisch.
 
 ---
 
@@ -165,7 +137,8 @@ Developer
   ├─ Feature-Branch → PR → Merge in main
   │
   ├─ GitHub Actions (Self-Hosted Runner)
-  │     → Build: 3 Docker-Images (api, web, keep-sync)
+  │     → mvn clean package -DskipTests
+  │     → Docker Build (docker/Dockerfile)
   │     → Push nach GHCR (Tags: latest + SHA)
   │
   └─ Portainer (GitOps Polling)
@@ -173,14 +146,16 @@ Developer
        → Automatisches Redeploy bei Aenderungen
 ```
 
-- **Registry:** `ghcr.io/fauteck/todo-api`, `ghcr.io/fauteck/todo-web`, `ghcr.io/fauteck/todo-keep-sync`
+- **Registry:** `ghcr.io/fauteck/newsku`
 - **Image-Tags:** `latest` + kurzer SHA-Commit-Hash
 - **Kein SemVer / keine Git-Tags** fuer Image-Releases
+- **Laufzeit:** Amazon Corretto 25 (JVM), Port 8080
 
 ---
 
 ## Verwandte Dokumente
 
-- [README.md](../README.md) — Architektur-Diagramm (ASCII), Feature-Uebersicht
-- [docs/datenbank.md](datenbank.md) — Drizzle-Schema, Tabellen, Beziehungen
-- [docs/api-patterns.md](api-patterns.md) — Route-Struktur, Services, Plugins
+- [README.md](../README.md) — Feature-Uebersicht, Setup
+- [docs/datenbank.md](datenbank.md) — Flyway-Schema, Tabellen, Beziehungen
+- [docs/api-patterns.md](api-patterns.md) — Controller-Struktur, Services
+- [docs/entwicklung.md](entwicklung.md) — Lokales Setup

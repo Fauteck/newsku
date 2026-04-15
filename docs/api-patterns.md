@@ -6,230 +6,284 @@
 
 ## Uebersicht
 
-Die API folgt einem 3-Schicht-Muster:
+Die API folgt einem klassischen Spring Boot Schicht-Muster:
 
 ```
-Route (HTTP-Handler)  →  Service (Geschaeftslogik)  →  Drizzle (DB-Zugriff)
-     ↑                         ↑                           ↑
-  Zod-Validierung        Authorization-Lib           Schema (schema.ts)
+Controller (HTTP-Handler)
+  │
+  ├─ Spring Validation (@Valid, @RequestBody)
+  ├─ Spring Security (@PreAuthorize / SecurityContext)
+  │
+  └─ Service (Geschaeftslogik)
+       │
+       └─ JPA Repository (Datenbankzugriff via Spring Data)
 ```
+
+API-Dokumentation (Swagger UI) erreichbar unter: `/swagger-ui.html`
 
 ---
 
-## Route-Dateien
+## Controller-Uebersicht
 
-Alle Route-Dateien liegen in `apps/api/src/routes/`:
+Alle Controller liegen in `src/main/java/com/github/lamarios/newsku/controllers/`:
 
-| Datei | Prefix | Beschreibung |
-|-------|--------|-------------|
-| `auth.ts` | `/api/auth/*` | Login, Logout, Refresh, SSO, Passwort aendern |
-| `projects.ts` | `/api/projects/*` | CRUD Projekte, Mitglieder, Archivierung |
-| `tasks.ts` | `/api/projects/:id/tasks/*`, `/api/notes`, `/api/today`, `/api/upcoming` | Aufgaben + Notizen |
-| `labels.ts` | `/api/labels/*` | CRUD Labels, Label-Aufgaben-Zuordnung |
-| `filters.ts` | `/api/filters/*` | Benutzerdefinierte Filter |
-| `search.ts` | `/api/search` | Volltextsuche |
-| `activity.ts` | `/api/activity/*` | Aktivitaets-Feed |
-| `ics.ts` | `/api/ics/*` | iCalendar-Export |
-| `public.ts` | `/api/public/*` | Public API (Token-Auth) |
-| `widget.ts` | `/api/widget/*` | Android Widget Endpunkte |
-| `import.ts` | `/api/import/*` | Markdown-Import |
-| `keep.ts` | `/api/keep/*` | Google Keep Sync |
-| `google-calendar.ts` | `/api/google-calendar/*` | Google Calendar iCal |
+| Klasse | Prefix | Beschreibung |
+|--------|--------|-------------|
+| `UserController` | `/api/users` | Login, OIDC-Auth, Profil, Einstellungen |
+| `SignUpController` | `/api/signup` | Benutzerregistrierung (nur wenn `ALLOW_SIGNUP=1`) |
+| `ResetPasswordController` | `/api/reset-password` | Passwort-Reset via E-Mail |
+| `FeedController` | `/api/feeds` | CRUD RSS-Feeds |
+| `FeedItemController` | `/api/feed-items` | Feed-Beitraege abrufen, als gelesen markieren |
+| `FeedCategoryController` | `/api/feed-categories` | CRUD Feed-Kategorien |
+| `FeedErrorController` | `/api/feed-errors` | Feed-Fehlerprotokoll abrufen |
+| `LayoutController` | `/api/layouts` | CRUD Layout-Bloecke (Startseiten-Konfiguration) |
+| `ClickController` | `/api/clicks` | Klick-Tracking fuer Statistiken |
+| `SearchController` | `/api/search` | Volltextsuche ueber Feed-Beitraege |
+| `ConfigController` | `/api/config` | Anwendungskonfiguration (Signup erlaubt?) |
+| `StaticContentController` | `/**` | Flutter Web Build ausliefern |
 
 ---
 
-## Route-Registrierung
+## Controller-Pattern
 
-Routen werden als Fastify-Plugins registriert (`apps/api/src/index.ts`):
+Spring Boot REST Controller mit JWT-Absicherung:
 
-```typescript
-// apps/api/src/index.ts
-await fastify.register(authRoutes);
-await fastify.register(projectRoutes);
-await fastify.register(taskRoutes);
-// ... weitere Routes
-```
+```java
+// src/main/java/com/github/lamarios/newsku/controllers/FeedController.java
 
-Jede Route-Datei exportiert eine async Funktion:
+@RestController
+@RequestMapping("/api/feeds")
+public class FeedController {
 
-```typescript
-// apps/api/src/routes/tasks.ts
-export async function taskRoutes(fastify: FastifyInstance) {
-  fastify.get('/notes', { preHandler: [fastify.authenticate] }, async (request) => {
-    // ...
-  });
+    private final FeedService feedService;
+
+    public FeedController(FeedService feedService) {
+        this.feedService = feedService;
+    }
+
+    // Alle Feeds des authentifizierten Benutzers
+    @GetMapping
+    public List<Feed> getFeeds(Authentication auth) {
+        String userId = auth.getName();
+        return feedService.getFeedsForUser(userId);
+    }
+
+    // Neuen Feed erstellen
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Feed createFeed(@RequestBody @Valid CreateFeedRequest request, Authentication auth) {
+        String userId = auth.getName();
+        return feedService.createFeed(userId, request);
+    }
+
+    // Feed aktualisieren
+    @PutMapping("/{id}")
+    public Feed updateFeed(@PathVariable String id,
+                           @RequestBody @Valid UpdateFeedRequest request,
+                           Authentication auth) {
+        String userId = auth.getName();
+        return feedService.updateFeed(userId, id, request);
+    }
+
+    // Feed loeschen
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFeed(@PathVariable String id, Authentication auth) {
+        String userId = auth.getName();
+        feedService.deleteFeed(userId, id);
+    }
 }
 ```
 
 ---
 
-## Authentifizierung in Routes
+## Authentifizierung
 
-Geschuetzte Routen nutzen den `preHandler`:
+Geschuetzte Endpunkte werden via Spring Security + JWT-Filter abgesichert.
+Der `JwtAuthFilter` setzt den `SecurityContext` bei gueltigem Bearer-Token.
 
-```typescript
-fastify.get('/endpoint', { preHandler: [fastify.authenticate] }, async (request) => {
-  const userId = request.user.sub;  // JWT-Payload: { sub: userId, username: email }
-  // ...
-});
+Der authentifizierte Benutzer ist in `Authentication auth` verfuegbar:
+
+```java
+// Benutzer-ID aus JWT-Subject holen
+String userId = auth.getName();
+
+// Alternativ: Vollstaendiges Principal-Objekt
+UserDetails user = (UserDetails) auth.getPrincipal();
 ```
 
-Das Auth-Plugin (`apps/api/src/plugins/auth.ts`) dekoriert `fastify.authenticate`, das `request.jwtVerify()` aufruft.
+Fuer OIDC-Authentifizierung: `OidcService` validiert den OIDC-Token und gibt den lokalen Benutzer zurueck.
 
 ---
 
-## Validierung mit Zod
+## Validierung
 
-Request-Bodies werden mit Zod-Schemas validiert:
+Request-Bodies werden via Jakarta Validation validiert:
 
-```typescript
-// apps/api/src/routes/tasks.ts
-const createTaskSchema = z.object({
-  title: z.string().min(1).max(500),
-  type: z.enum(['todo', 'note']).optional(),
-  description: z.string().max(1000000).optional().nullable(),
-  due_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
-  priority: z.number().int().min(1).max(4).optional(),
-  // ...
-});
+```java
+// Request DTO
+public class CreateFeedRequest {
+    @NotBlank
+    @URL
+    private String feedUrl;
 
-// Verwendung im Handler:
-fastify.post('/projects/:projectId/tasks', { preHandler: [fastify.authenticate] }, async (request, reply) => {
-  const body = createTaskSchema.parse(request.body);
-  // ...
-});
+    @NotBlank
+    @Size(max = 255)
+    private String title;
+
+    // Getter/Setter oder Lombok @Data
+}
+
+// Im Controller
+@PostMapping
+public Feed createFeed(@RequestBody @Valid CreateFeedRequest request, ...) {
+    // Bei Validierungsfehler: 400 Bad Request (automatisch durch Spring)
+}
 ```
 
 ---
 
 ## Service-Layer
 
-Services kapseln die Geschaeftslogik und DB-Zugriffe:
+Services kapseln die Geschaeftslogik und Datenbank-Zugriffe:
 
-| Datei | Funktionen |
-|-------|-----------|
-| `apps/api/src/services/taskService.ts` | `getNotesForUser()`, `getTasksForProject()`, `getTodayTasks()`, `getUpcomingTasks()`, `createTask()`, `buildTaskUpdates()`, `deleteTask()`, `getTaskLabelsMap()`, `batchMoveOverdueToToday()`, `bulkArchiveDone()`, `exportTaskAsMarkdown()`, `logActivity()` |
-| `apps/api/src/services/projectService.ts` | Projekt-Logik |
-| `apps/api/src/services/searchService.ts` | Volltextsuche (FTS5 / LIKE-Fallback) |
-| `apps/api/src/services/importService.ts` | Markdown → Tiptap JSON Konvertierung |
-| `apps/api/src/services/keepService.ts` | Google-Keep-Integration: Account-Verwaltung, Sync-Mappings, Checklist-Widget-Endpoints, To-Do-Liste-Config. Wirft `KeepServiceError` mit `status`/`code`, die Route mappt sie auf HTTP-Responses. |
+| Klasse | Wichtige Methoden |
+|--------|------------------|
+| `FeedService` | `getFeedsForUser()`, `createFeed()`, `refreshFeed()`, `deleteFeed()` |
+| `FeedItemService` | `getItemsForUser()`, `markAsRead()`, `getUnreadCount()` |
+| `UserService` | `login()`, `createUser()`, `updateSettings()` |
+| `OpenaiServiceImpl` | `rankItems(userId, items)` → importance_score |
+| `ScheduleService` | `refreshAllFeeds()`, `sendDigests()` (Scheduled) |
+| `EmailServiceImpl` | `sendDigest()`, `sendPasswordReset()` |
+| `ClickService` | `trackClick()`, `getStats()` |
 
-### Beispiel: Service-Nutzung in Route
+### Beispiel: Service-Implementierung
 
-```typescript
-// apps/api/src/routes/tasks.ts
-import { getTodayTasks, createTask, logActivity } from '../services/taskService';
+```java
+// src/main/java/com/github/lamarios/newsku/services/FeedService.java
 
-fastify.get('/today', { preHandler: [fastify.authenticate] }, async (request) => {
-  const userId = request.user.sub;
-  const { limit, offset } = paginationSchema.parse(request.query);
-  const allTasks = getTodayTasks(userId);
-  return paginatedResponse(allTasks.slice(offset, offset + limit), allTasks.length, limit, offset);
-});
-```
+@Service
+@Transactional
+public class FeedService {
 
----
+    private final FeedRepository feedRepository;
+    private final FeedItemRepository feedItemRepository;
+    private final OpenaiService openaiService;
 
-## Autorisierung
+    public FeedService(FeedRepository feedRepository,
+                       FeedItemRepository feedItemRepository,
+                       OpenaiService openaiService) {
+        this.feedRepository = feedRepository;
+        this.feedItemRepository = feedItemRepository;
+        this.openaiService = openaiService;
+    }
 
-Definiert in `apps/api/src/lib/authorization.ts`:
+    public List<Feed> getFeedsForUser(String userId) {
+        return feedRepository.findByUserId(userId);
+    }
 
-| Funktion | Beschreibung |
-|----------|-------------|
-| `checkProjectAccess(userId, projectId)` | Prueft Lese-Zugriff (Owner, Member, oder is_shared) |
-| `checkProjectWriteAccess(userId, projectId)` | Prueft Schreib-Zugriff (Owner oder Editor-Rolle) |
-| `getAccessibleProjectIds(userId)` | Gibt alle Projekt-IDs zurueck, auf die der User Zugriff hat |
-
-Verwendung in Routen:
-
-```typescript
-if (!await checkProjectAccess(userId, projectId)) {
-  return reply.code(403).send({ error: 'Access denied' });
+    public Feed createFeed(String userId, CreateFeedRequest request) {
+        Feed feed = new Feed();
+        feed.setUserId(userId);
+        feed.setFeedUrl(request.getFeedUrl());
+        feed.setTitle(request.getTitle());
+        return feedRepository.save(feed);
+    }
 }
 ```
 
 ---
 
-## Pagination
+## JPA Repositories
 
-Definiert in `apps/api/src/lib/pagination.ts`:
+Repositories erweitern `JpaRepository` und koennen Spring Data Query-Methods nutzen:
 
-```typescript
-import { paginationSchema, paginatedResponse } from '../lib/pagination';
+```java
+// src/main/java/com/github/lamarios/newsku/persistence/repositories/FeedRepository.java
 
-// Query-Parameter: ?limit=20&offset=0
-const { limit, offset } = paginationSchema.parse(request.query);
-
-// Response-Format: { data: [...], total: 42, has_more: true }
-return paginatedResponse(items, total, limit, offset);
-```
-
----
-
-## Plugins
-
-| Datei | Beschreibung |
-|-------|-------------|
-| `apps/api/src/plugins/auth.ts` | JWT-Authentifizierung, dekoriert `fastify.authenticate` |
-
-Weitere Fastify-Plugins werden direkt in `index.ts` registriert:
-- `@fastify/helmet` — Security Headers (CSP, HSTS, etc.)
-- `@fastify/cors` — CORS-Konfiguration
-- `@fastify/cookie` — Cookie-Handling (Refresh Tokens)
-- `@fastify/jwt` — JWT-Verifizierung
-- `@fastify/rate-limit` — Rate Limiting (100 req/min)
-
----
-
-## Lib-Module
-
-| Datei | Beschreibung |
-|-------|-------------|
-| `apps/api/src/lib/authorization.ts` | Zugriffspruefung (Projekt-Rollen) |
-| `apps/api/src/lib/pagination.ts` | Pagination-Schema + Response-Helper |
-| `apps/api/src/lib/recurrence.ts` | Wiederkehrende Aufgaben (naechstes Datum berechnen) |
-| `apps/api/src/lib/tiptapConverter.ts` | Tiptap JSON ↔ Markdown Konvertierung |
-| `apps/api/src/lib/keepClient.ts` | HTTP-Client fuer Keep-Sync Sidecar |
-| `apps/api/src/lib/keepSync.ts` | Keep-Sync Logik (Push, Pull, Timer) |
-| `apps/api/src/lib/icalParser.ts` | Google Calendar iCal Parsing |
-| `apps/api/src/lib/encryption.ts` | AES-256-GCM Token-Verschluesselung |
-
----
-
-## How-To: Neue Route hinzufuegen
-
-1. **Route-Datei erstellen:** `apps/api/src/routes/meine-route.ts`
-
-```typescript
-import { FastifyInstance } from 'fastify';
-import { z } from 'zod';
-
-const mySchema = z.object({ name: z.string().min(1) });
-
-export async function meineRoutes(fastify: FastifyInstance) {
-  fastify.get('/api/mein-endpoint', { preHandler: [fastify.authenticate] }, async (request) => {
-    const userId = request.user.sub;
-    // ...
-    return { data: [] };
-  });
+@Repository
+public interface FeedRepository extends JpaRepository<Feed, String> {
+    List<Feed> findByUserId(String userId);
+    Optional<Feed> findByIdAndUserId(String id, String userId);
 }
 ```
 
-2. **Route registrieren** in `apps/api/src/index.ts`:
+---
 
-```typescript
-import { meineRoutes } from './routes/meine-route';
-// ...
-await fastify.register(meineRoutes);
+## HTTP-Status-Codes
+
+| Code | Verwendung |
+|------|-----------|
+| `200` | Erfolg (GET, PUT) |
+| `201` | Erstellt (POST) |
+| `204` | Kein Inhalt (DELETE) |
+| `400` | Validierungsfehler |
+| `401` | Nicht authentifiziert |
+| `403` | Keine Berechtigung |
+| `404` | Nicht gefunden |
+| `503` | Health Check degraded |
+
+---
+
+## Fehlerbehandlung
+
+Globale Fehlerbehandlung via `@ControllerAdvice`:
+
+```java
+// In errors/ Package
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(EntityNotFoundException ex) {
+        return ResponseEntity.status(404).body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleForbidden(AccessDeniedException ex) {
+        return ResponseEntity.status(403).body(new ErrorResponse("Zugriff verweigert"));
+    }
+}
 ```
 
-3. **Optional: Service erstellen** in `apps/api/src/services/` fuer komplexe Logik
+---
+
+## How-To: Neuen Endpunkt hinzufuegen
+
+1. **Controller erstellen** (oder bestehenden erweitern):
+
+```java
+// src/main/java/com/github/lamarios/newsku/controllers/MeinController.java
+@RestController
+@RequestMapping("/api/mein-resource")
+public class MeinController {
+    private final MeinService meinService;
+
+    @GetMapping
+    public List<MeinDto> getAll(Authentication auth) {
+        return meinService.getAll(auth.getName());
+    }
+}
+```
+
+2. **Service erstellen** in `services/`:
+
+```java
+@Service
+@Transactional
+public class MeinService {
+    // Logik + Repository-Aufrufe
+}
+```
+
+3. **Entity + Repository** in `persistence/` anlegen (falls neue Tabelle)
+
+4. **Flyway-Migration** in `src/main/resources/db/migration/` hinzufuegen
 
 ---
 
 ## Verwandte Dokumente
 
 - [docs/architektur.md](architektur.md) — Request-Flow, Auth-Flow
-- [docs/datenbank.md](datenbank.md) — Drizzle-Schema, Tabellen
+- [docs/datenbank.md](datenbank.md) — JPA Entities, Flyway-Schema
 - [docs/haeufige-aufgaben.md](haeufige-aufgaben.md) — End-to-End Feature-Guide
-- [README.md](../README.md) — Vollstaendige API-Endpunkt-Referenz
