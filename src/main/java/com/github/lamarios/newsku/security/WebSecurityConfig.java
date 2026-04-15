@@ -32,6 +32,9 @@ public class WebSecurityConfig {
     private JwtRequestFilter jwtRequestFilter;
 
     @Autowired
+    private LoginRateLimitFilter loginRateLimitFilter;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -80,6 +83,8 @@ public class WebSecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
 
+        // Rate limit filter runs first, before JWT and authentication processing
+        httpSecurity.addFilterBefore(loginRateLimitFilter, UsernamePasswordAuthenticationFilter.class);
         // Add JWT token filter before the UsernamePasswordAuthenticationFilter
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 

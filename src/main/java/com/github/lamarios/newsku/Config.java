@@ -47,6 +47,9 @@ public class Config {
     @Value("${ROOT_URL:http://localhost:8080}")
     private String rootUrl;
 
+    @Value("${FRONTEND_URL:}")
+    private String frontendUrl;
+
     @Bean
     public String rootUrl() {
         return rootUrl;
@@ -54,11 +57,20 @@ public class Config {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
+        // Determine allowed origins: use FRONTEND_URL if set, otherwise fall back to ROOT_URL.
+        // Multiple URLs can be provided in FRONTEND_URL as a comma-separated list.
+        String[] allowedOrigins = (frontendUrl != null && !frontendUrl.isBlank())
+                ? java.util.Arrays.stream(frontendUrl.split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isBlank())
+                        .toArray(String[]::new)
+                : new String[]{rootUrl};
+
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // apply to all endpoints
-                        .allowedOriginPatterns("*") // frontend URLs
+                registry.addMapping("/**")
+                        .allowedOrigins(allowedOrigins)
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
