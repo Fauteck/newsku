@@ -23,6 +23,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Build Flutter Web
+        working-directory: src/main/app
+        run: |
+          flutter pub get
+          flutter build web --release
+
+      - name: Copy Flutter Web build into Spring Boot static resources
+        run: |
+          mkdir -p src/main/resources/static
+          cp -r src/main/app/build/web/. src/main/resources/static/
+
       - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
