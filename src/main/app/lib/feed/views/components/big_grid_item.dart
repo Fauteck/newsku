@@ -3,8 +3,10 @@ import 'package:app/feed/views/components/clickable_feed_item.dart';
 import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
 import 'package:app/feed/views/components/item_title.dart';
+import 'package:app/home/state/local_preferences.dart';
 import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
 import 'package:app/feed/views/screens/feed_screen.dart';
@@ -19,6 +21,10 @@ class BigGridItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
+    final prefs = context.watch<LocalPreferencesCubit>().state;
+    final titleMaxLines = prefs.truncateText ? prefs.titleMaxLines : null;
+    final contentMaxLines = prefs.truncateText ? prefs.contentMaxLines : null;
+
     return ClickableFeedItem(
       item: item,
       builder: (hovered) => Container(
@@ -53,12 +59,15 @@ class BigGridItem extends StatelessWidget {
                       item: item,
                       hovered: hovered,
                       style: textTheme.headlineSmall,
-                      maxLines: 3,
-                      overflow: .ellipsis,
+                      maxLines: titleMaxLines,
+                      overflow: titleMaxLines != null ? .ellipsis : null,
                     ),
-                    // Expanded(child: Text(item.description ?? item.content ?? '', maxLines: 3,)),
                     Expanded(
-                      child: ItemContent(item: item, maxLines: 4, overflow: .ellipsis),
+                      child: ItemContent(
+                        item: item,
+                        maxLines: contentMaxLines,
+                        overflow: contentMaxLines != null ? .ellipsis : null,
+                      ),
                     ),
                     InfoBar(item: item),
                   ],

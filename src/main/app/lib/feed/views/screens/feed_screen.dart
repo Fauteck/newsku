@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:app/feed/models/feed_item.dart';
 import 'package:app/feed/states/main_feed.dart';
 import 'package:app/feed/views/components/date_bar.dart';
+import 'package:app/feed/views/components/insights_widget.dart';
 import 'package:app/feed/views/components/search_result.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/l10n/app_localizations.dart';
@@ -201,6 +202,15 @@ class FeedScreen extends StatelessWidget {
                                                 icon: Icon(state.searchMode ? Icons.close : Icons.search),
                                               ),
                                               if (!state.searchMode) ...[
+                                                IconButton(
+                                                  key: Key('saved-filter-button'),
+                                                  onPressed: () => cubit.setSavedFilter(!state.showSavedOnly),
+                                                  icon: Icon(
+                                                    state.showSavedOnly ? Icons.bookmarks : Icons.bookmarks_outlined,
+                                                    color: state.showSavedOnly ? colors.primary : null,
+                                                  ),
+                                                  tooltip: locals.savedArticles,
+                                                ),
                                                 IconButton(onPressed: () => cubit.refresh(), icon: Icon(Icons.refresh)),
                                               ],
                                               MenuAnchor(
@@ -246,6 +256,14 @@ class FeedScreen extends StatelessWidget {
                                               ),
                                             ],
                                           ),
+                                          if (!state.searchMode && !state.showSavedOnly)
+                                            SliverPadding(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: padding + pu4,
+                                                vertical: pu2,
+                                              ),
+                                              sliver: SliverToBoxAdapter(child: InsightsWidget()),
+                                            ),
                                           if (state.searchMode)
                                             SliverPadding(
                                               padding: .symmetric(horizontal: padding),
@@ -308,7 +326,10 @@ class FeedScreen extends StatelessWidget {
                                                                 color: colors.onSurface,
                                                               ),
                                                               if (totalItemCount == 0)
-                                                                Text(locals.noNews, style: textTheme.titleLarge),
+                                                                Text(
+                                                                  state.showSavedOnly ? locals.noSavedArticles : locals.noNews,
+                                                                  style: textTheme.titleLarge,
+                                                                ),
                                                               // this is our read item count
                                                               if (unreadCount == 0 && totalItemCount > 0)
                                                                 Text(
@@ -330,10 +351,11 @@ class FeedScreen extends StatelessWidget {
                                                 child: SizedBox(width: 50, height: 50, child: LoadingIndicator()),
                                               ),
                                             )
-                                          else if (!state.searchMode ||
-                                              (state.searchMode &&
-                                                  state.searchResults.length ==
-                                                      searchPageSize * (state.searchPage + 1)))
+                                          else if (!state.showSavedOnly &&
+                                              (!state.searchMode ||
+                                                  (state.searchMode &&
+                                                      state.searchResults.length ==
+                                                          searchPageSize * (state.searchPage + 1))))
                                             SliverToBoxAdapter(
                                               child: Center(
                                                 child: FilledButton.tonalIcon(

@@ -894,6 +894,20 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This block will only display blocks of the selected category'**
   String get layoutBlockCategoryExplanation;
+
+  String get truncateText;
+  String get truncateTextExplanation;
+  String get titleMaxLines;
+  String get contentMaxLines;
+  String get savedArticles;
+  String get saveArticle;
+  String get unsaveArticle;
+  String get noSavedArticles;
+  String get swipeToRead;
+  String get keyboardShortcutsTitle;
+  String get insightsTitle;
+  String get insightsTopTags;
+  String get insightsTopSources;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

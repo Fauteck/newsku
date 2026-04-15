@@ -15,6 +15,9 @@ const _brightness = 'brightness';
 const _themeColor = 'theme-color';
 const _dynamicColor = 'dynamic-color';
 const _blackBackground = 'black-background';
+const _truncateText = 'truncate-text';
+const _titleMaxLines = 'title-max-lines';
+const _contentMaxLines = 'content-max-lines';
 
 class LocalPreferencesCubit extends Cubit<LocalPreferencesState> {
   LocalPreferencesCubit(super.initialState) {
@@ -33,6 +36,10 @@ class LocalPreferencesCubit extends Cubit<LocalPreferencesState> {
 
     var theme = ThemeMode.values.where((v) => v.name == prefs.getString(_brightness)).firstOrNull ?? ThemeMode.system;
 
+    var truncateText = prefs.getBool(_truncateText) ?? true;
+    var titleMaxLines = prefs.getInt(_titleMaxLines) ?? 3;
+    var contentMaxLines = prefs.getInt(_contentMaxLines) ?? 4;
+
     emit(
       state.copyWith(
         themeColor: color,
@@ -40,6 +47,9 @@ class LocalPreferencesCubit extends Cubit<LocalPreferencesState> {
         blackBackground: blackbackground ?? false,
         density: density ?? 4,
         theme: theme,
+        truncateText: truncateText,
+        titleMaxLines: titleMaxLines,
+        contentMaxLines: contentMaxLines,
       ),
     );
   }
@@ -73,6 +83,24 @@ class LocalPreferencesCubit extends Cubit<LocalPreferencesState> {
     prefs.setDouble('density', density);
     emit(state.copyWith(density: density));
   }
+
+  Future<void> setTruncateText(bool value) async {
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setBool(_truncateText, value);
+    emit(state.copyWith(truncateText: value));
+  }
+
+  Future<void> setTitleMaxLines(int value) async {
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setInt(_titleMaxLines, value);
+    emit(state.copyWith(titleMaxLines: value));
+  }
+
+  Future<void> setContentMaxLines(int value) async {
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setInt(_contentMaxLines, value);
+    emit(state.copyWith(contentMaxLines: value));
+  }
 }
 
 @freezed
@@ -83,6 +111,11 @@ sealed class LocalPreferencesState with _$LocalPreferencesState {
     @Default(false) bool blackBackground,
     @Default(4) double density,
     @Default(ThemeMode.system) ThemeMode theme,
+    /// When true, article card titles and teasers are clamped to [titleMaxLines]
+    /// and [contentMaxLines] respectively. When false, full text is shown.
+    @Default(true) bool truncateText,
+    @Default(3) int titleMaxLines,
+    @Default(4) int contentMaxLines,
   }) = _LocalPreferencesState;
 
   const LocalPreferencesState._();

@@ -53,6 +53,17 @@ public class FeedItemController {
         return feedItemService.readItems(ids);
     }
 
+    @GetMapping("/saved")
+    public List<FeedItem> getSavedArticles() {
+        return feedItemService.getSavedItems();
+    }
+
+    @PutMapping("/{id}/saved")
+    public FeedItem toggleSaved(@PathVariable String id) {
+        log.info("Toggling saved status of item {}", id);
+        return feedItemService.toggleSaved(id);
+    }
+
     @PutMapping("/{id}/click")
     public void clickItem(@PathVariable String id) {
         feedItemService.itemClicked(id);

@@ -23,6 +23,7 @@ public class FeedItem {
     @Column(name = "timecreated")
     private long timeCreated;
     private boolean read;
+    private boolean saved;
 
     @ManyToOne
     @JoinColumn(name = "feed_id")
@@ -125,6 +126,14 @@ public class FeedItem {
 
     public void setRead(boolean read) {
         this.read = read;
+    }
+
+    public boolean isSaved() {
+        return saved;
+    }
+
+    public void setSaved(boolean saved) {
+        this.saved = saved;
     }
 
     public List<String> getTags() {

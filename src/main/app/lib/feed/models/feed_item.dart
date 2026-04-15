@@ -17,6 +17,7 @@ sealed class FeedItem with _$FeedItem {
     String? reasoning,
     String? imageUrl,
     @Default(false) bool read,
+    @Default(false) bool saved,
     @Default(0) int importance,
     @Default(0) int timeCreated,
     @Default([]) List<String> tags,

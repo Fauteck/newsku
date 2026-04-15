@@ -147,6 +147,28 @@ class FeedService extends BaseService {
     processResponse(response);
   }
 
+  Future<FeedItem> toggleSaved(String id) async {
+    var uri = await formatUrl('/api/feeds/items/$id/saved');
+
+    var response = await http.put(uri, headers: await headers);
+
+    processResponse(response);
+
+    return FeedItem.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+  }
+
+  Future<List<FeedItem>> getSavedItems() async {
+    var uri = await formatUrl('/api/feeds/items/saved');
+
+    var response = await http.get(uri, headers: await headers);
+
+    processResponse(response);
+
+    Iterable json = jsonDecode(response.body);
+
+    return json.map((e) => FeedItem.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
   Future<List<FeedCategory>> getFeedCategories() async {
     var uri = await formatUrl('/api/feed-categories');
 

@@ -5,9 +5,11 @@ import 'package:app/feed/views/components/info_bar.dart';
 import 'package:app/feed/views/components/item_content.dart';
 import 'package:app/feed/views/components/item_title.dart';
 import 'package:app/feed/views/screens/feed_screen.dart';
+import 'package:app/home/state/local_preferences.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SmallGridItem extends StatelessWidget {
   final FeedItem item;
@@ -18,11 +20,13 @@ class SmallGridItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
+    final prefs = context.watch<LocalPreferencesCubit>().state;
+    final titleMaxLines = prefs.truncateText ? (prefs.titleMaxLines > 1 ? 2 : 1) : null;
+    final contentMaxLines = prefs.truncateText ? 1 : null;
+
     return ClickableFeedItem(
       item: item,
       builder: (hovered) => Container(
-        // constraints: BoxConstraints(maxHeight: 100),
-        // margin: .only(top: 16),
         decoration: BoxDecoration(color: colors.surfaceContainerHigh, borderRadius: .circular(feedItemBorderRadius)),
         child: Row(
           crossAxisAlignment: .stretch,
@@ -38,12 +42,16 @@ class SmallGridItem extends StatelessWidget {
                       item: item,
                       hovered: hovered,
                       style: textTheme.bodyLarge,
-                      overflow: .ellipsis,
-                      maxLines: 2,
+                      overflow: titleMaxLines != null ? .ellipsis : null,
+                      maxLines: titleMaxLines,
                     ),
                     Align(
                       alignment: .centerLeft,
-                      child: ItemContent(item: item, maxLines: 1, overflow: .ellipsis),
+                      child: ItemContent(
+                        item: item,
+                        maxLines: contentMaxLines,
+                        overflow: contentMaxLines != null ? .ellipsis : null,
+                      ),
                     ),
                     Spacer(),
                     InfoBar(item: item),
