@@ -23,15 +23,17 @@ public class ConfigController {
     private final boolean demoMode;
     private final BuildProperties buildProperties;
     private final Optional<Mailer> mailer;
+    private final String freshRssUrl;
 
     @Autowired
-    public ConfigController(OidcService oidcService, @Value("${ALLOW_SIGNUP:0}") boolean allowSignUp, @Value("${ANNOUNCEMENT:}") String announcement, @Value("${DEMO_MODE:0}") boolean demoMode, BuildProperties buildProperties, Optional<Mailer> mailer) {
+    public ConfigController(OidcService oidcService, @Value("${ALLOW_SIGNUP:0}") boolean allowSignUp, @Value("${ANNOUNCEMENT:}") String announcement, @Value("${DEMO_MODE:0}") boolean demoMode, BuildProperties buildProperties, Optional<Mailer> mailer, @Value("${FRESHRSS_URL:}") String freshRssUrl) {
         this.oidcService = oidcService;
         this.allowSignUp = allowSignUp;
         this.announcement = announcement;
         this.demoMode = demoMode;
         this.buildProperties = buildProperties;
         this.mailer = mailer;
+        this.freshRssUrl = freshRssUrl;
     }
 
     @GetMapping
@@ -41,8 +43,11 @@ public class ConfigController {
         config.setAllowSignup(allowSignUp);
         config.setDemoMode(demoMode);
         config.setCanResetPassword(mailer.isPresent());
-
         config.setBackendVersion(buildProperties.getVersion());
+
+        if (!freshRssUrl.isBlank()) {
+            config.setFreshRssUrl(freshRssUrl);
+        }
 
         if (oidcService.getOidcDiscoveryUrl() != null) {
             config.setOidcConfig(oidcService.getOidcConfig());

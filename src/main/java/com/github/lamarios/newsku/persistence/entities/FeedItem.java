@@ -25,6 +25,9 @@ public class FeedItem {
     private boolean read;
     private boolean saved;
 
+    @Column(name = "freshrss_item_id")
+    private String freshRssItemId;
+
     @ManyToOne
     @JoinColumn(name = "feed_id")
     private Feed feed;
@@ -142,5 +145,13 @@ public class FeedItem {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    public String getFreshRssItemId() {
+        return freshRssItemId;
+    }
+
+    public void setFreshRssItemId(String freshRssItemId) {
+        this.freshRssItemId = freshRssItemId;
     }
 }

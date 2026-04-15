@@ -20,6 +20,9 @@ public class Feed {
     @Column(name = "last_refresh_errors")
     private int lastRefreshErrors;
 
+    @Column(name = "freshrss_feed_id")
+    private String freshRssFeedId;
+
     public String getImage() {
         return image;
     }
@@ -100,5 +103,13 @@ public class Feed {
 
     public void setCategory(FeedCategory category) {
         this.category = category;
+    }
+
+    public String getFreshRssFeedId() {
+        return freshRssFeedId;
+    }
+
+    public void setFreshRssFeedId(String freshRssFeedId) {
+        this.freshRssFeedId = freshRssFeedId;
     }
 }

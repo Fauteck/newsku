@@ -27,4 +27,8 @@ public interface FeedItemRepository extends JpaRepository<FeedItem, String> {
     FeedItem getFirstByIdAndFeedIn(String id, Collection<Feed> feeds);
 
     List<FeedItem> findBySavedTrueAndFeedIn(Collection<Feed> feeds);
+
+    FeedItem findByFreshRssItemId(String freshRssItemId);
+
+    List<FeedItem> findByFreshRssItemIdInAndFeedIn(Collection<String> freshRssItemIds, Collection<Feed> feeds);
 }

@@ -38,6 +38,13 @@ public class User {
     @Enumerated(EnumType.STRING)
     private List<EmailDigestFrequency> emailDigest;
 
+    @Column(name = "freshrss_username")
+    private String freshRssUsername;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(name = "freshrss_api_password")
+    private String freshRssApiPassword;
+
     public String getId() {
         return id;
     }
@@ -117,5 +124,21 @@ public class User {
 
     public void setEmailDigest(List<EmailDigestFrequency> emailDigest) {
         this.emailDigest = emailDigest;
+    }
+
+    public String getFreshRssUsername() {
+        return freshRssUsername;
+    }
+
+    public void setFreshRssUsername(String freshRssUsername) {
+        this.freshRssUsername = freshRssUsername;
+    }
+
+    public String getFreshRssApiPassword() {
+        return freshRssApiPassword;
+    }
+
+    public void setFreshRssApiPassword(String freshRssApiPassword) {
+        this.freshRssApiPassword = freshRssApiPassword;
     }
 }

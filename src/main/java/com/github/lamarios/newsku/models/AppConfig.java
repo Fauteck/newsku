@@ -55,4 +55,14 @@ public class AppConfig {
     public void setCanResetPassword(boolean canResetPassword) {
         this.canResetPassword = canResetPassword;
     }
+
+    private String freshRssUrl;
+
+    public String getFreshRssUrl() {
+        return freshRssUrl;
+    }
+
+    public void setFreshRssUrl(String freshRssUrl) {
+        this.freshRssUrl = freshRssUrl;
+    }
 }
