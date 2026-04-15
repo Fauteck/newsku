@@ -13,6 +13,7 @@ sealed class Config with _$Config {
     @Default(false) bool canResetPassword,
     OidcConfig? oidcConfig,
     @Default("") String announcement,
+    String? freshRssUrl,
   }) = _Config;
 
   factory Config.fromJson(Map<String, Object?> json) => _$ConfigFromJson(json);
