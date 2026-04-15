@@ -11,4 +11,6 @@ public interface FeedCategoryRepository extends JpaRepository<FeedCategory, Stri
     FeedCategory getFeedCategoriesByIdAndUser(String id, User user);
 
     List<FeedCategory> getAllByUser(User user, Sort sort);
+
+    FeedCategory findByFreshRssCategoryIdAndUser(String freshRssCategoryId, User user);
 }

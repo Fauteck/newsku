@@ -58,14 +58,23 @@ public class OpenaiServiceImpl implements OpenaiService {
         return client.build();
     }
 
+    @Override
     public Optional<OpenAiFeedResponse> processFeedItem(Item item, User user, List<TagClickStat> clickStats) {
+        String content = item.getDescription()
+                .filter(s -> !s.isBlank())
+                .orElseGet(() -> item.getContent().orElse("no content"));
+        return processFeedItem(item.getGuid().orElse("unknown"), item.getTitle().orElse("no title"), content, user, clickStats);
+    }
+
+    @Override
+    public Optional<OpenAiFeedResponse> processFeedItem(String guid, String title, String content, User user, List<TagClickStat> clickStats) {
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                return processFeedItemAttempt(item, user, clickStats);
+                return processFeedItemAttempt(guid, title, content, user, clickStats);
             } catch (Exception e) {
                 if (attempt >= maxRetries) {
                     logger.error("OpenAI API call failed after {} attempts for item {}: {}",
-                            maxRetries, item.getGuid().orElse("unknown"), e.getMessage());
+                            maxRetries, guid, e.getMessage());
                     return Optional.empty();
                 }
                 long backoffMs = (1L << attempt) * 1000; // 2s, 4s, 8s …
@@ -82,8 +91,7 @@ public class OpenaiServiceImpl implements OpenaiService {
         return Optional.empty();
     }
 
-    private Optional<OpenAiFeedResponse> processFeedItemAttempt(Item item, User user, List<TagClickStat> clickStats) {
-
+    private Optional<OpenAiFeedResponse> processFeedItemAttempt(String guid, String title, String content, User user, List<TagClickStat> clickStats) {
 
         String tagPrompt = """
                   These are the tags the user clicked on the most in the past 30 days ordered from the most clicked to the least clicked. Those tags may slightly affect your scoring:
@@ -100,37 +108,26 @@ public class OpenaiServiceImpl implements OpenaiService {
                 you will rate the importance from 0 to a 100, 100 being the most important, be very granular in the rating
                 Keep in mind that this is a ranking system for a RSS feed reader so the user might have 100s of news on a daily basis so do not be too eager on overrating news
                 also you will try to figure out if this feed item is an ad or not
-                
+
                 You will use the name and description of the source to understand what an important news is for a user.
                 You will also tag the article with up to 4 tags
-                
+
                 The user has the following preferences. You will refer to it to figure out how to rate a news item:
                 %s
-                
+
                 %s
-                
+
                 Here is the news item:
-                
+
                 title: %s
                 content: %s
-                
+
                 """.formatted(Optional.ofNullable(user.getFeedItemPreference())
                         .filter(s -> !s.isBlank())
                         .orElse("The user has no particular preferences"),
                 clickStats.isEmpty() ? "" : tagPrompt,
-                item.getTitle()
-                        .orElse("no title"), item.getDescription()
-                        .filter(s -> !s.isBlank())
-                        .orElse(item.getContent().orElse("no content")));
-
-
-/*
-        System.out.printf("""
-                GUID: %s
-                =====================================
-                %s
-                """, item.getGuid(), prompt);
-*/
+                title,
+                content);
 
         StructuredChatCompletionCreateParams<OpenAiFeedResponse> params = ChatCompletionCreateParams.builder()
                 .addUserMessage(prompt)
@@ -142,10 +139,9 @@ public class OpenaiServiceImpl implements OpenaiService {
                 .flatMap(choice -> choice.message().content().stream())
                 .toList();
 
-
         Optional<OpenAiFeedResponse> first = analysis.stream().findFirst();
-        first.ifPresent(openAiFeedResponse -> logger.info("Analysis results for feed item: {}:\nimportance: {}\npossible ad: {}\nreasoning: {}\ntags: {}\ntime: {}s", item.getGuid(), openAiFeedResponse
-                .importance(), openAiFeedResponse.possibleAd(), openAiFeedResponse.reasoning(), String.join(",", openAiFeedResponse.tags()), (System.currentTimeMillis() - start) / 1000));
+        first.ifPresent(r -> logger.info("Analysis results for feed item: {}:\nimportance: {}\npossible ad: {}\nreasoning: {}\ntags: {}\ntime: {}s",
+                guid, r.importance(), r.possibleAd(), r.reasoning(), String.join(",", r.tags()), (System.currentTimeMillis() - start) / 1000));
         return first;
     }
 }

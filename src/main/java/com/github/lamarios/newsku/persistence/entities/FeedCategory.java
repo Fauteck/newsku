@@ -12,6 +12,9 @@ public class FeedCategory {
     private String id;
     private String name;
 
+    @Column(name = "freshrss_category_id")
+    private String freshRssCategoryId;
+
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -40,5 +43,13 @@ public class FeedCategory {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getFreshRssCategoryId() {
+        return freshRssCategoryId;
+    }
+
+    public void setFreshRssCategoryId(String freshRssCategoryId) {
+        this.freshRssCategoryId = freshRssCategoryId;
     }
 }

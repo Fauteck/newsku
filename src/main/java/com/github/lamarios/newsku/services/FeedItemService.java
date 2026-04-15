@@ -48,9 +48,10 @@ public class FeedItemService {
     private final FeedClicksRepository feedClicksRepository;
     private final TagClicksRepository tagClicksRepository;
     private final ClickService clickService;
+    private final FreshRssApiService freshRssApiService;
 
     @Autowired
-    public FeedItemService(FeedItemRepository feedItemRepository, PlatformTransactionManager transactionManager, OpenaiService openaiService, FeedService feedService, UserService userService, EntityManager entityManager, FeedRepository feedRepository, FeedErrorRepository feedErrorRepository, FeedClicksRepository feedClicksRepository, TagClicksRepository tagClicksRepository, ClickService clickService) {
+    public FeedItemService(FeedItemRepository feedItemRepository, PlatformTransactionManager transactionManager, OpenaiService openaiService, FeedService feedService, UserService userService, EntityManager entityManager, FeedRepository feedRepository, FeedErrorRepository feedErrorRepository, FeedClicksRepository feedClicksRepository, TagClicksRepository tagClicksRepository, ClickService clickService, FreshRssApiService freshRssApiService) {
         this.feedItemRepository = feedItemRepository;
         this.transactionManager = transactionManager;
         this.openaiService = openaiService;
@@ -62,6 +63,7 @@ public class FeedItemService {
         this.feedClicksRepository = feedClicksRepository;
         this.tagClicksRepository = tagClicksRepository;
         this.clickService = clickService;
+        this.freshRssApiService = freshRssApiService;
     }
 
     public void refreshFeed(Feed feed) {
@@ -250,12 +252,25 @@ public class FeedItemService {
 
     @Transactional
     public boolean readItems(List<String> ids) {
-        var feeds = feedRepository.getFeedsByUser(userService.getCurrentUser());
+        User user = userService.getCurrentUser();
+        var feeds = feedRepository.getFeedsByUser(user);
         var items = feedItemRepository.findByIdInAndFeedIn(ids, feeds);
 
         items.forEach(feedItem -> feedItem.setRead(true));
-
         feedItemRepository.saveAll(items);
+
+        // Sync read-status back to FreshRSS (best-effort, non-blocking)
+        List<String> freshRssIds = items.stream()
+                .map(FeedItem::getFreshRssItemId)
+                .filter(fid -> fid != null && !fid.isBlank())
+                .toList();
+        if (!freshRssIds.isEmpty()) {
+            try {
+                freshRssApiService.markAsRead(user, freshRssIds);
+            } catch (Exception e) {
+                logger.warn("Could not sync read-status to FreshRSS for user {}: {}", user.getUsername(), e.getMessage());
+            }
+        }
 
         return true;
     }

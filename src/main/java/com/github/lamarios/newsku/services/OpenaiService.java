@@ -10,4 +10,13 @@ import java.util.Optional;
 
 public interface OpenaiService {
     Optional<OpenAiFeedResponse> processFeedItem(Item item, User user, List<TagClickStat> clickStats);
+
+    /**
+     * Overload for callers that already have plain strings (e.g. FreshRSS sync).
+     *
+     * @param guid    unique identifier used for logging
+     * @param title   article title
+     * @param content article body / description
+     */
+    Optional<OpenAiFeedResponse> processFeedItem(String guid, String title, String content, User user, List<TagClickStat> clickStats);
 }
