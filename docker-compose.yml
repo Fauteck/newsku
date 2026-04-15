@@ -1,0 +1,102 @@
+version: "3.9"
+
+services:
+  todo_api:
+    image: ghcr.io/fauteck/todo-api:latest
+    container_name: todo_api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_PATH: /data/familytodo.db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_ACCESS_EXPIRES: ${JWT_ACCESS_EXPIRES}
+      JWT_REFRESH_EXPIRES: ${JWT_REFRESH_EXPIRES}
+      SEED_PASSWORD_NIKLAS: ${SEED_PASSWORD_NIKLAS}
+      SEED_PASSWORD_AYLIN: ${SEED_PASSWORD_AYLIN}
+      MAX_USERS: ${MAX_USERS}
+      PUBLIC_URL: ${PUBLIC_URL}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      GOOGLE_TOKEN_ENCRYPTION_KEY: ${GOOGLE_TOKEN_ENCRYPTION_KEY}
+      KEEP_SYNC_URL: http://keep_sync:8100
+      KEEP_SYNC_SECRET: ${KEEP_SYNC_SECRET}
+      AUTHELIA_ENABLED: ${AUTHELIA_ENABLED:-false}
+      FF_ENABLE_MCP: ${FF_ENABLE_MCP:-true}
+      PORT: "3000"
+      TZ: "Europe/Berlin"
+    depends_on:
+      - keep_sync
+    volumes:
+      - /srv/docker-data/todo/sqlite:/data
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO /dev/null http://localhost:3000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - proxy
+
+  web:
+    image: ghcr.io/fauteck/todo-web:latest
+    container_name: todo_web
+    restart: unless-stopped
+    depends_on:
+      - todo_api
+    environment:
+      TZ: "Europe/Berlin"
+    expose:
+      - "80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO /dev/null http://localhost:80/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - proxy
+
+  keep_sync:
+    image: ghcr.io/fauteck/todo-keep-sync:latest
+    container_name: todo_keep_sync
+    restart: unless-stopped
+    environment:
+      TZ: "Europe/Berlin"
+      KEEP_SYNC_SECRET: ${KEEP_SYNC_SECRET}
+    expose:
+      - "8100"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8100/health')\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - proxy
+
+  backup:
+    image: alpine:3.19
+    container_name: todo_backup
+    restart: unless-stopped
+    volumes:
+      - /srv/docker-data/todo/sqlite:/data:ro
+      - /srv/docker-data/todo/backup:/backup
+    environment:
+      DATABASE_PATH: /data/familytodo.db
+      TZ: "Europe/Berlin"
+    entrypoint: >
+      sh -c "apk add --no-cache sqlite && while true; do
+        sleep 86400;
+        BACKUP_FILE=/backup/familytodo-$(date +%Y%m%d).db;
+        sqlite3 /data/familytodo.db \".backup '$$BACKUP_FILE'\";
+        echo \"Backup created: $$BACKUP_FILE\";
+        find /backup -name '*.db' -mtime +30 -delete;
+      done"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
