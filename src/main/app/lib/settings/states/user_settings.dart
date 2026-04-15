@@ -14,13 +14,18 @@ class UserSettingsCubit extends Cubit<UserSettingsState> {
   final TextEditingController password = TextEditingController(text: '');
   final TextEditingController repeatPassword = TextEditingController(text: '');
   late final TextEditingController email;
+  late final TextEditingController freshRssUsername;
+  late final TextEditingController freshRssApiPassword;
 
   UserSettingsCubit(super.initialState) {
     email = TextEditingController(text: state.email);
+    freshRssUsername = TextEditingController(text: state.freshRssUsername);
+    freshRssApiPassword = TextEditingController(text: '');
 
     password.addListener(() => emit(state.copyWith(password: password.value.text.trim())));
     repeatPassword.addListener(() => emit(state.copyWith(repeatPassword: repeatPassword.value.text.trim())));
     email.addListener(() => emit(state.copyWith(email: email.value.text.trim())));
+    freshRssUsername.addListener(() => emit(state.copyWith(freshRssUsername: freshRssUsername.value.text.trim())));
   }
 
   @override
@@ -28,6 +33,8 @@ class UserSettingsCubit extends Cubit<UserSettingsState> {
     password.dispose();
     repeatPassword.dispose();
     email.dispose();
+    freshRssUsername.dispose();
+    freshRssApiPassword.dispose();
     return super.close();
   }
 
@@ -69,6 +76,19 @@ class UserSettingsCubit extends Cubit<UserSettingsState> {
       await updateUser(user);
     }
   }
+
+  Future<void> updateFreshRssCredentials() async {
+    var user = identityCubit.currentUser;
+    if (user != null) {
+      final apiPassword = freshRssApiPassword.value.text;
+      user = user.copyWith(
+        freshRssUsername: freshRssUsername.value.text.trim(),
+        freshRssApiPassword: apiPassword.isNotEmpty ? apiPassword : null,
+      );
+      await updateUser(user);
+      freshRssApiPassword.text = '';
+    }
+  }
 }
 
 @freezed
@@ -80,6 +100,7 @@ sealed class UserSettingsState with _$UserSettingsState implements WithError {
     @Default("") String repeatPassword,
     @Default("") String email,
     @Default([]) List<EmailDigestFrequency> digest,
+    @Default("") String freshRssUsername,
     dynamic error,
     StackTrace? stackTrace,
   }) = _UserSettingsState;

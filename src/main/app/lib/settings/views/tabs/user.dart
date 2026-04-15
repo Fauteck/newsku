@@ -6,6 +6,7 @@ import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 @RoutePage()
 class UserSettingsTab extends StatelessWidget {
@@ -113,6 +114,56 @@ class UserSettingsTab extends StatelessWidget {
                               }
                             },
                       label: Text(locals.update),
+                      icon: Icon(Icons.save),
+                    ),
+                  ),
+                  Gap(pu8),
+                  Row(
+                    children: [
+                      Text(locals.freshRssTitle, style: textTheme.titleMedium),
+                      if (serverConfig?.freshRssUrl != null) ...[
+                        Gap(pu2),
+                        IconButton.outlined(
+                          icon: Icon(Icons.open_in_new, size: 16),
+                          tooltip: locals.openInFreshRss,
+                          onPressed: () => launchUrl(Uri.parse(serverConfig!.freshRssUrl!)),
+                        ),
+                      ],
+                    ],
+                  ),
+                  Gap(pu2),
+                  Text(locals.freshRssExplanation),
+                  Gap(pu4),
+                  Text(locals.freshRssUsername),
+                  TextField(
+                    key: Key('freshrss-username'),
+                    controller: cubit.freshRssUsername,
+                    autocorrect: false,
+                  ),
+                  Gap(pu2),
+                  Text(locals.freshRssApiPassword),
+                  TextField(
+                    key: Key('freshrss-api-password'),
+                    controller: cubit.freshRssApiPassword,
+                    obscureText: true,
+                    decoration: InputDecoration(hintText: locals.freshRssApiPasswordHint),
+                  ),
+                  Gap(pu2),
+                  Align(
+                    alignment: .centerRight,
+                    child: FilledButton.tonalIcon(
+                      key: Key('freshrss-save-button'),
+                      onPressed: state.loading
+                          ? null
+                          : () async {
+                              await cubit.updateFreshRssCredentials();
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(SnackBar(content: Text(locals.freshRssUpdated)));
+                              }
+                            },
+                      label: Text(locals.save),
                       icon: Icon(Icons.save),
                     ),
                   ),

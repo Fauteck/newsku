@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$User {
 
- String? get id; String? get username; String? get password; String? get email; String? get feedItemPreference; String? get oidcSub; int get minimumImportance; bool get firstTimeSetupDone; ReadItemHandling get readItemHandling; List<EmailDigestFrequency> get emailDigest;
+ String? get id; String? get username; String? get password; String? get email; String? get feedItemPreference; String? get oidcSub; int get minimumImportance; bool get firstTimeSetupDone; ReadItemHandling get readItemHandling; List<EmailDigestFrequency> get emailDigest; String? get freshRssUsername; String? get freshRssApiPassword;
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $UserCopyWith<User> get copyWith => _$UserCopyWithImpl<User>(this as User, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&(identical(other.email, email) || other.email == email)&&(identical(other.feedItemPreference, feedItemPreference) || other.feedItemPreference == feedItemPreference)&&(identical(other.oidcSub, oidcSub) || other.oidcSub == oidcSub)&&(identical(other.minimumImportance, minimumImportance) || other.minimumImportance == minimumImportance)&&(identical(other.firstTimeSetupDone, firstTimeSetupDone) || other.firstTimeSetupDone == firstTimeSetupDone)&&(identical(other.readItemHandling, readItemHandling) || other.readItemHandling == readItemHandling)&&const DeepCollectionEquality().equals(other.emailDigest, emailDigest));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&(identical(other.email, email) || other.email == email)&&(identical(other.feedItemPreference, feedItemPreference) || other.feedItemPreference == feedItemPreference)&&(identical(other.oidcSub, oidcSub) || other.oidcSub == oidcSub)&&(identical(other.minimumImportance, minimumImportance) || other.minimumImportance == minimumImportance)&&(identical(other.firstTimeSetupDone, firstTimeSetupDone) || other.firstTimeSetupDone == firstTimeSetupDone)&&(identical(other.readItemHandling, readItemHandling) || other.readItemHandling == readItemHandling)&&const DeepCollectionEquality().equals(other.emailDigest, emailDigest)&&(identical(other.freshRssUsername, freshRssUsername) || other.freshRssUsername == freshRssUsername)&&(identical(other.freshRssApiPassword, freshRssApiPassword) || other.freshRssApiPassword == freshRssApiPassword));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,username,password,email,feedItemPreference,oidcSub,minimumImportance,firstTimeSetupDone,readItemHandling,const DeepCollectionEquality().hash(emailDigest));
+int get hashCode => Object.hash(runtimeType,id,username,password,email,feedItemPreference,oidcSub,minimumImportance,firstTimeSetupDone,readItemHandling,const DeepCollectionEquality().hash(emailDigest),freshRssUsername,freshRssApiPassword);
 
 @override
 String toString() {
-  return 'User(id: $id, username: $username, password: $password, email: $email, feedItemPreference: $feedItemPreference, oidcSub: $oidcSub, minimumImportance: $minimumImportance, firstTimeSetupDone: $firstTimeSetupDone, readItemHandling: $readItemHandling, emailDigest: $emailDigest)';
+  return 'User(id: $id, username: $username, password: $password, email: $email, feedItemPreference: $feedItemPreference, oidcSub: $oidcSub, minimumImportance: $minimumImportance, firstTimeSetupDone: $firstTimeSetupDone, readItemHandling: $readItemHandling, emailDigest: $emailDigest, freshRssUsername: $freshRssUsername, freshRssApiPassword: $freshRssApiPassword)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $UserCopyWith<$Res>  {
   factory $UserCopyWith(User value, $Res Function(User) _then) = _$UserCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? username, String? password, String? email, String? feedItemPreference, String? oidcSub, int minimumImportance, bool firstTimeSetupDone, ReadItemHandling readItemHandling, List<EmailDigestFrequency> emailDigest
+ String? id, String? username, String? password, String? email, String? feedItemPreference, String? oidcSub, int minimumImportance, bool firstTimeSetupDone, ReadItemHandling readItemHandling, List<EmailDigestFrequency> emailDigest, String? freshRssUsername, String? freshRssApiPassword
 });
 
 
@@ -65,7 +65,7 @@ class _$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? username = freezed,Object? password = freezed,Object? email = freezed,Object? feedItemPreference = freezed,Object? oidcSub = freezed,Object? minimumImportance = null,Object? firstTimeSetupDone = null,Object? readItemHandling = null,Object? emailDigest = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? username = freezed,Object? password = freezed,Object? email = freezed,Object? feedItemPreference = freezed,Object? oidcSub = freezed,Object? minimumImportance = null,Object? firstTimeSetupDone = null,Object? readItemHandling = null,Object? emailDigest = null,Object? freshRssUsername = freezed,Object? freshRssApiPassword = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,username: freezed == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
@@ -77,7 +77,9 @@ as String?,minimumImportance: null == minimumImportance ? _self.minimumImportanc
 as int,firstTimeSetupDone: null == firstTimeSetupDone ? _self.firstTimeSetupDone : firstTimeSetupDone // ignore: cast_nullable_to_non_nullable
 as bool,readItemHandling: null == readItemHandling ? _self.readItemHandling : readItemHandling // ignore: cast_nullable_to_non_nullable
 as ReadItemHandling,emailDigest: null == emailDigest ? _self.emailDigest : emailDigest // ignore: cast_nullable_to_non_nullable
-as List<EmailDigestFrequency>,
+as List<EmailDigestFrequency>,freshRssUsername: freezed == freshRssUsername ? _self.freshRssUsername : freshRssUsername // ignore: cast_nullable_to_non_nullable
+as String?,freshRssApiPassword: freezed == freshRssApiPassword ? _self.freshRssApiPassword : freshRssApiPassword // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -159,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? username,  String? password,  String? email,  String? feedItemPreference,  String? oidcSub,  int minimumImportance,  bool firstTimeSetupDone,  ReadItemHandling readItemHandling,  List<EmailDigestFrequency> emailDigest)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? username,  String? password,  String? email,  String? feedItemPreference,  String? oidcSub,  int minimumImportance,  bool firstTimeSetupDone,  ReadItemHandling readItemHandling,  List<EmailDigestFrequency> emailDigest,  String? freshRssUsername,  String? freshRssApiPassword)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.id,_that.username,_that.password,_that.email,_that.feedItemPreference,_that.oidcSub,_that.minimumImportance,_that.firstTimeSetupDone,_that.readItemHandling,_that.emailDigest);case _:
+return $default(_that.id,_that.username,_that.password,_that.email,_that.feedItemPreference,_that.oidcSub,_that.minimumImportance,_that.firstTimeSetupDone,_that.readItemHandling,_that.emailDigest,_that.freshRssUsername,_that.freshRssApiPassword);case _:
   return orElse();
 
 }
@@ -180,10 +182,10 @@ return $default(_that.id,_that.username,_that.password,_that.email,_that.feedIte
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? username,  String? password,  String? email,  String? feedItemPreference,  String? oidcSub,  int minimumImportance,  bool firstTimeSetupDone,  ReadItemHandling readItemHandling,  List<EmailDigestFrequency> emailDigest)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? username,  String? password,  String? email,  String? feedItemPreference,  String? oidcSub,  int minimumImportance,  bool firstTimeSetupDone,  ReadItemHandling readItemHandling,  List<EmailDigestFrequency> emailDigest,  String? freshRssUsername,  String? freshRssApiPassword)  $default,) {final _that = this;
 switch (_that) {
 case _User():
-return $default(_that.id,_that.username,_that.password,_that.email,_that.feedItemPreference,_that.oidcSub,_that.minimumImportance,_that.firstTimeSetupDone,_that.readItemHandling,_that.emailDigest);}
+return $default(_that.id,_that.username,_that.password,_that.email,_that.feedItemPreference,_that.oidcSub,_that.minimumImportance,_that.firstTimeSetupDone,_that.readItemHandling,_that.emailDigest,_that.freshRssUsername,_that.freshRssApiPassword);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -197,10 +199,10 @@ return $default(_that.id,_that.username,_that.password,_that.email,_that.feedIte
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? username,  String? password,  String? email,  String? feedItemPreference,  String? oidcSub,  int minimumImportance,  bool firstTimeSetupDone,  ReadItemHandling readItemHandling,  List<EmailDigestFrequency> emailDigest)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? username,  String? password,  String? email,  String? feedItemPreference,  String? oidcSub,  int minimumImportance,  bool firstTimeSetupDone,  ReadItemHandling readItemHandling,  List<EmailDigestFrequency> emailDigest,  String? freshRssUsername,  String? freshRssApiPassword)?  $default,) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.id,_that.username,_that.password,_that.email,_that.feedItemPreference,_that.oidcSub,_that.minimumImportance,_that.firstTimeSetupDone,_that.readItemHandling,_that.emailDigest);case _:
+return $default(_that.id,_that.username,_that.password,_that.email,_that.feedItemPreference,_that.oidcSub,_that.minimumImportance,_that.firstTimeSetupDone,_that.readItemHandling,_that.emailDigest,_that.freshRssUsername,_that.freshRssApiPassword);case _:
   return null;
 
 }
@@ -212,7 +214,7 @@ return $default(_that.id,_that.username,_that.password,_that.email,_that.feedIte
 @JsonSerializable()
 
 class _User implements User {
-  const _User({this.id, this.username, this.password, this.email, this.feedItemPreference, this.oidcSub, this.minimumImportance = 0, this.firstTimeSetupDone = false, this.readItemHandling = ReadItemHandling.none, final  List<EmailDigestFrequency> emailDigest = const []}): _emailDigest = emailDigest;
+  const _User({this.id, this.username, this.password, this.email, this.feedItemPreference, this.oidcSub, this.minimumImportance = 0, this.firstTimeSetupDone = false, this.readItemHandling = ReadItemHandling.none, final  List<EmailDigestFrequency> emailDigest = const [], this.freshRssUsername, this.freshRssApiPassword}): _emailDigest = emailDigest;
   factory _User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
 @override final  String? id;
@@ -231,6 +233,8 @@ class _User implements User {
   return EqualUnmodifiableListView(_emailDigest);
 }
 
+@override final  String? freshRssUsername;
+@override final  String? freshRssApiPassword;
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
@@ -254,7 +258,7 @@ int get hashCode => Object.hash(runtimeType,id,username,password,email,feedItemP
 
 @override
 String toString() {
-  return 'User(id: $id, username: $username, password: $password, email: $email, feedItemPreference: $feedItemPreference, oidcSub: $oidcSub, minimumImportance: $minimumImportance, firstTimeSetupDone: $firstTimeSetupDone, readItemHandling: $readItemHandling, emailDigest: $emailDigest)';
+  return 'User(id: $id, username: $username, password: $password, email: $email, feedItemPreference: $feedItemPreference, oidcSub: $oidcSub, minimumImportance: $minimumImportance, firstTimeSetupDone: $firstTimeSetupDone, readItemHandling: $readItemHandling, emailDigest: $emailDigest, freshRssUsername: $freshRssUsername, freshRssApiPassword: $freshRssApiPassword)';
 }
 
 
@@ -265,7 +269,7 @@ abstract mixin class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
   factory _$UserCopyWith(_User value, $Res Function(_User) _then) = __$UserCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? username, String? password, String? email, String? feedItemPreference, String? oidcSub, int minimumImportance, bool firstTimeSetupDone, ReadItemHandling readItemHandling, List<EmailDigestFrequency> emailDigest
+ String? id, String? username, String? password, String? email, String? feedItemPreference, String? oidcSub, int minimumImportance, bool firstTimeSetupDone, ReadItemHandling readItemHandling, List<EmailDigestFrequency> emailDigest, String? freshRssUsername, String? freshRssApiPassword
 });
 
 
@@ -282,7 +286,7 @@ class __$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? username = freezed,Object? password = freezed,Object? email = freezed,Object? feedItemPreference = freezed,Object? oidcSub = freezed,Object? minimumImportance = null,Object? firstTimeSetupDone = null,Object? readItemHandling = null,Object? emailDigest = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? username = freezed,Object? password = freezed,Object? email = freezed,Object? feedItemPreference = freezed,Object? oidcSub = freezed,Object? minimumImportance = null,Object? firstTimeSetupDone = null,Object? readItemHandling = null,Object? emailDigest = null,Object? freshRssUsername = freezed,Object? freshRssApiPassword = freezed,}) {
   return _then(_User(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,username: freezed == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
@@ -294,7 +298,9 @@ as String?,minimumImportance: null == minimumImportance ? _self.minimumImportanc
 as int,firstTimeSetupDone: null == firstTimeSetupDone ? _self.firstTimeSetupDone : firstTimeSetupDone // ignore: cast_nullable_to_non_nullable
 as bool,readItemHandling: null == readItemHandling ? _self.readItemHandling : readItemHandling // ignore: cast_nullable_to_non_nullable
 as ReadItemHandling,emailDigest: null == emailDigest ? _self._emailDigest : emailDigest // ignore: cast_nullable_to_non_nullable
-as List<EmailDigestFrequency>,
+as List<EmailDigestFrequency>,freshRssUsername: freezed == freshRssUsername ? _self.freshRssUsername : freshRssUsername // ignore: cast_nullable_to_non_nullable
+as String?,freshRssApiPassword: freezed == freshRssApiPassword ? _self.freshRssApiPassword : freshRssApiPassword // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

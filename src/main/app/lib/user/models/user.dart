@@ -19,6 +19,8 @@ sealed class User with _$User {
     @Default(false) bool firstTimeSetupDone,
     @Default(ReadItemHandling.none) ReadItemHandling readItemHandling,
     @Default([]) List<EmailDigestFrequency> emailDigest,
+    String? freshRssUsername,
+    String? freshRssApiPassword,
   }) = _User;
 
   factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);

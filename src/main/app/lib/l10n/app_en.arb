@@ -145,5 +145,12 @@
     "keyboardShortcutsTitle": "Keyboard shortcuts",
     "insightsTitle": "Insights (last 7 days)",
     "insightsTopTags": "Top tags",
-    "insightsTopSources": "Top sources"
+    "insightsTopSources": "Top sources",
+    "freshRssTitle": "FreshRSS Integration",
+    "freshRssExplanation": "Connect to your FreshRSS instance. newsku will use FreshRSS to fetch and manage your feeds, while adding AI scoring on top.",
+    "freshRssUsername": "FreshRSS username",
+    "freshRssApiPassword": "FreshRSS API password",
+    "freshRssApiPasswordHint": "Leave empty to keep existing password",
+    "freshRssUpdated": "FreshRSS credentials saved",
+    "openInFreshRss": "Open in FreshRSS"
 }
