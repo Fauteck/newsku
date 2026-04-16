@@ -1,10 +1,55 @@
+import 'package:app/identity/states/identity.dart';
+import 'package:app/l10n/app_localizations.dart';
+import 'package:app/main.dart';
 import 'package:app/router.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MobileBottomNav extends StatelessWidget {
   const MobileBottomNav({super.key});
+
+  void _showMoreSheet(BuildContext context) {
+    final router = AutoRouter.of(context);
+    final locals = AppLocalizations.of(context)!;
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.settings_outlined),
+              title: Text(locals.settings),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                router.push(const SettingsRoute());
+              },
+            ),
+            if (config?.freshRssUrl != null && config!.freshRssUrl!.isNotEmpty)
+              ListTile(
+                leading: const Icon(Icons.open_in_new),
+                title: Text(locals.openInFreshRss),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  launchUrl(Uri.parse(config!.freshRssUrl!));
+                },
+              ),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: Text(locals.logout),
+              onTap: () => getIt.get<IdentityCubit>().logout(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,11 +59,9 @@ class MobileBottomNav extends StatelessWidget {
 
     final router = AutoRouter.of(context);
 
-    int selected;
+    final int selected;
     if (router.isRouteActive(StatsRoute.name)) {
       selected = 1;
-    } else if (router.isRouteActive(SettingsRoute.name)) {
-      selected = 2;
     } else {
       selected = 0;
     }
@@ -26,15 +69,14 @@ class MobileBottomNav extends StatelessWidget {
     return NavigationBar(
       selectedIndex: selected,
       onDestinationSelected: (i) {
+        if (i == 2) {
+          _showMoreSheet(context);
+          return;
+        }
         if (i == selected) return;
         router.popUntilRouteWithName(HomeRoute.name);
-        switch (i) {
-          case 1:
-            router.push(const StatsRoute());
-            break;
-          case 2:
-            router.push(const SettingsRoute());
-            break;
+        if (i == 1) {
+          router.push(const StatsRoute());
         }
       },
       destinations: const [
@@ -49,9 +91,8 @@ class MobileBottomNav extends StatelessWidget {
           label: 'Stats',
         ),
         NavigationDestination(
-          icon: Icon(Icons.settings_outlined),
-          selectedIcon: Icon(Icons.settings),
-          label: 'Optionen',
+          icon: Icon(Icons.more_horiz),
+          label: 'Mehr',
         ),
       ],
     );
