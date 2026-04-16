@@ -20,6 +20,10 @@ mixin _$LayoutBlockSettings {
   int? get items;
 
   String? get categoryId;
+
+  String? get aiPromptId;
+
+  bool get lastBlockShowAll;
 /// Create a copy of LayoutBlockSettings
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -34,16 +38,18 @@ $LayoutBlockSettingsCopyWith<LayoutBlockSettings> get copyWith => _$LayoutBlockS
 bool operator ==(Object other) {
   return identical(this, other) ||
       (other.runtimeType == runtimeType && other is LayoutBlockSettings && (identical(other.title, title) || other.title == title) && (identical(other.items, items) || other.items == items) &&
-          (identical(other.categoryId, categoryId) || other.categoryId == categoryId));
+          (identical(other.categoryId, categoryId) || other.categoryId == categoryId) &&
+          (identical(other.aiPromptId, aiPromptId) || other.aiPromptId == aiPromptId) &&
+          (identical(other.lastBlockShowAll, lastBlockShowAll) || other.lastBlockShowAll == lastBlockShowAll));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType, title, items, categoryId);
+int get hashCode => Object.hash(runtimeType, title, items, categoryId, aiPromptId, lastBlockShowAll);
 
 @override
 String toString() {
-  return 'LayoutBlockSettings(title: $title, items: $items, categoryId: $categoryId)';
+  return 'LayoutBlockSettings(title: $title, items: $items, categoryId: $categoryId, aiPromptId: $aiPromptId, lastBlockShowAll: $lastBlockShowAll)';
 }
 
 
@@ -54,7 +60,7 @@ abstract mixin class $LayoutBlockSettingsCopyWith<$Res>  {
   factory $LayoutBlockSettingsCopyWith(LayoutBlockSettings value, $Res Function(LayoutBlockSettings) _then) = _$LayoutBlockSettingsCopyWithImpl;
 @useResult
 $Res call({
-  String? title, int? items, String? categoryId
+  String? title, int? items, String? categoryId, String? aiPromptId, bool lastBlockShowAll
 });
 
 
@@ -73,12 +79,14 @@ class _$LayoutBlockSettingsCopyWithImpl<$Res>
 /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? title = freezed, Object? items = freezed, Object? categoryId = freezed,}) {
+  $Res call({Object? title = freezed, Object? items = freezed, Object? categoryId = freezed, Object? aiPromptId = freezed, Object? lastBlockShowAll = null,}) {
   return _then(_self.copyWith(
 title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,items: freezed == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
   as int?, categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
-  as String?,
+  as String?,aiPromptId: freezed == aiPromptId ? _self.aiPromptId : aiPromptId // ignore: cast_nullable_to_non_nullable
+  as String?,lastBlockShowAll: null == lastBlockShowAll ? _self.lastBlockShowAll : lastBlockShowAll // ignore: cast_nullable_to_non_nullable
+  as bool,
   ));
 }
 
@@ -87,18 +95,6 @@ as String?,items: freezed == items ? _self.items : items // ignore: cast_nullabl
 
 /// Adds pattern-matching-related methods to [LayoutBlockSettings].
 extension LayoutBlockSettingsPatterns on LayoutBlockSettings {
-/// A variant of `map` that fallback to returning `orElse`.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case _:
-///     return orElse();
-/// }
-/// ```
-
 @optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _LayoutBlockSettings value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
@@ -108,18 +104,6 @@ return $default(_that);case _:
 
 }
 }
-/// A `switch`-like method, using callbacks.
-///
-/// Callbacks receives the raw object, upcasted.
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case final Subclass2 value:
-///     return ...;
-/// }
-/// ```
 
 @optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _LayoutBlockSettings value)  $default,){
 final _that = this;
@@ -127,17 +111,6 @@ switch (_that) {
 case _LayoutBlockSettings():
 return $default(_that);}
 }
-/// A variant of `map` that fallback to returning `null`.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case _:
-///     return null;
-/// }
-/// ```
 
 @optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _LayoutBlockSettings value)?  $default,){
 final _that = this;
@@ -148,60 +121,26 @@ return $default(_that);case _:
 
 }
 }
-/// A variant of `when` that fallback to an `orElse` callback.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case _:
-///     return orElse();
-/// }
-/// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? title, int? items, String? categoryId)? $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? title, int? items, String? categoryId, String? aiPromptId, bool lastBlockShowAll)? $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LayoutBlockSettings() when $default != null:
-return $default(_that.title,_that.items,_that.categoryId);case _:
+return $default(_that.title,_that.items,_that.categoryId,_that.aiPromptId,_that.lastBlockShowAll);case _:
   return orElse();
 
 }
 }
-/// A `switch`-like method, using callbacks.
-///
-/// As opposed to `map`, this offers destructuring.
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case Subclass2(:final field2):
-///     return ...;
-/// }
-/// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? title, int? items, String? categoryId) $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? title, int? items, String? categoryId, String? aiPromptId, bool lastBlockShowAll) $default,) {final _that = this;
 switch (_that) {
 case _LayoutBlockSettings():
-return $default(_that.title,_that.items,_that.categoryId);}
+return $default(_that.title,_that.items,_that.categoryId,_that.aiPromptId,_that.lastBlockShowAll);}
 }
-/// A variant of `when` that fallback to returning `null`
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case _:
-///     return null;
-/// }
-/// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? title, int? items, String? categoryId)? $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? title, int? items, String? categoryId, String? aiPromptId, bool lastBlockShowAll)? $default,) {final _that = this;
 switch (_that) {
 case _LayoutBlockSettings() when $default != null:
-return $default(_that.title,_that.items,_that.categoryId);case _:
+return $default(_that.title,_that.items,_that.categoryId,_that.aiPromptId,_that.lastBlockShowAll);case _:
   return null;
 
 }
@@ -213,12 +152,14 @@ return $default(_that.title,_that.items,_that.categoryId);case _:
 @JsonSerializable()
 
 class _LayoutBlockSettings implements LayoutBlockSettings {
-  const _LayoutBlockSettings({this.title, this.items, this.categoryId});
+  const _LayoutBlockSettings({this.title, this.items, this.categoryId, this.aiPromptId, this.lastBlockShowAll = true});
   factory _LayoutBlockSettings.fromJson(Map<String, dynamic> json) => _$LayoutBlockSettingsFromJson(json);
 
 @override final  String? title;
 @override final  int? items;
   @override final String? categoryId;
+  @override final String? aiPromptId;
+  @override@JsonKey() final bool lastBlockShowAll;
 
 /// Create a copy of LayoutBlockSettings
 /// with the given fields replaced by the non-null parameter values.
@@ -235,16 +176,18 @@ Map<String, dynamic> toJson() {
 bool operator ==(Object other) {
   return identical(this, other) ||
       (other.runtimeType == runtimeType && other is _LayoutBlockSettings && (identical(other.title, title) || other.title == title) && (identical(other.items, items) || other.items == items) &&
-          (identical(other.categoryId, categoryId) || other.categoryId == categoryId));
+          (identical(other.categoryId, categoryId) || other.categoryId == categoryId) &&
+          (identical(other.aiPromptId, aiPromptId) || other.aiPromptId == aiPromptId) &&
+          (identical(other.lastBlockShowAll, lastBlockShowAll) || other.lastBlockShowAll == lastBlockShowAll));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType, title, items, categoryId);
+int get hashCode => Object.hash(runtimeType, title, items, categoryId, aiPromptId, lastBlockShowAll);
 
 @override
 String toString() {
-  return 'LayoutBlockSettings(title: $title, items: $items, categoryId: $categoryId)';
+  return 'LayoutBlockSettings(title: $title, items: $items, categoryId: $categoryId, aiPromptId: $aiPromptId, lastBlockShowAll: $lastBlockShowAll)';
 }
 
 
@@ -255,7 +198,7 @@ abstract mixin class _$LayoutBlockSettingsCopyWith<$Res> implements $LayoutBlock
   factory _$LayoutBlockSettingsCopyWith(_LayoutBlockSettings value, $Res Function(_LayoutBlockSettings) _then) = __$LayoutBlockSettingsCopyWithImpl;
 @override @useResult
 $Res call({
-  String? title, int? items, String? categoryId
+  String? title, int? items, String? categoryId, String? aiPromptId, bool lastBlockShowAll
 });
 
 
@@ -274,12 +217,14 @@ class __$LayoutBlockSettingsCopyWithImpl<$Res>
 /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $Res call({Object? title = freezed, Object? items = freezed, Object? categoryId = freezed,}) {
+  $Res call({Object? title = freezed, Object? items = freezed, Object? categoryId = freezed, Object? aiPromptId = freezed, Object? lastBlockShowAll = null,}) {
   return _then(_LayoutBlockSettings(
 title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,items: freezed == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
   as int?, categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
-  as String?,
+  as String?,aiPromptId: freezed == aiPromptId ? _self.aiPromptId : aiPromptId // ignore: cast_nullable_to_non_nullable
+  as String?,lastBlockShowAll: null == lastBlockShowAll ? _self.lastBlockShowAll : lastBlockShowAll // ignore: cast_nullable_to_non_nullable
+  as bool,
   ));
 }
 

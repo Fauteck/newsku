@@ -45,6 +45,9 @@ public class User {
     @Column(name = "freshrss_api_password")
     private String gReaderApiPassword;
 
+    @Column(name = "ai_prompt_id")
+    private String aiPromptId;
+
     public String getId() {
         return id;
     }
@@ -140,5 +143,13 @@ public class User {
 
     public void setGReaderApiPassword(String gReaderApiPassword) {
         this.gReaderApiPassword = gReaderApiPassword;
+    }
+
+    public String getAiPromptId() {
+        return aiPromptId;
+    }
+
+    public void setAiPromptId(String aiPromptId) {
+        this.aiPromptId = aiPromptId;
     }
 }

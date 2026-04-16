@@ -6,7 +6,9 @@ import 'package:app/ai/states/ai_prompts.dart';
 import 'package:app/home/state/local_preferences.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
+import 'package:app/layouts/models/layout_block_settings.dart';
 import 'package:app/layouts/models/layout_block_types.dart';
+import 'package:app/layouts/views/components/layout_category_selector.dart';
 import 'package:app/magazine/models/magazine_tab.dart';
 import 'package:app/main.dart';
 import 'package:app/settings/states/general.dart';
@@ -61,379 +63,200 @@ class LayoutSettingsTab extends StatelessWidget {
                 builder: (context, state) {
                   final cubit = context.read<LayoutCubit>();
                   return ErrorHandler<LayoutCubit, LayoutState>(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Single-column info section
-                        Text(locals.layoutExplanation),
-                        const Divider(),
-                        Gap(pu2),
-                        // Single-column display settings (from Darstellung tab)
-                        Row(
-                          spacing: pu2,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Text(locals.readItemHandling),
-                                  Text(locals.readItemHandlingExplanation, style: subTextTheme),
-                                ],
-                              ),
-                            ),
-                            DropdownMenu<ReadItemHandling>(
-                              key: const Key('read-item-handling'),
-                              initialSelection: generalState.user?.readItemHandling ?? ReadItemHandling.none,
-                              onSelected: generalCubit.setReadItemPreference,
-                              dropdownMenuEntries: ReadItemHandling.values
-                                  .map((h) => DropdownMenuEntry(value: h, label: h.getLabel(context)))
-                                  .toList(),
-                            ),
-                          ],
-                        ),
-                        Gap(pu2),
-                        BlocBuilder<LocalPreferencesCubit, LocalPreferencesState>(
-                          bloc: getIt.get<LocalPreferencesCubit>(),
-                          builder: (context, prefsState) => SwitchListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: Text(locals.truncateText),
-                            subtitle: Text(locals.truncateTextExplanation, style: subTextTheme),
-                            value: prefsState.truncateText,
-                            onChanged: (value) => getIt.get<LocalPreferencesCubit>().setTruncateText(value),
-                          ),
-                        ),
-                        SwitchListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(locals.blackBackground),
-                          subtitle: Text(locals.blackBackgroundExplanation, style: subTextTheme),
-                          value: context.select((LocalPreferencesCubit p) => p.state.blackBackground),
-                          onChanged: (value) => getIt.get<LocalPreferencesCubit>().setBlackBackground(value),
-                        ),
-                        Text(locals.appColor),
-                        Gap(pu2),
-                        if (!kIsWeb && Platform.isAndroid) ...[
-                          SwitchListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: Text(locals.dynamicColor),
-                            subtitle: Text(locals.blackBackgroundExplanation, style: subTextTheme),
-                            value: context.select((LocalPreferencesCubit p) => p.state.dynamicColor),
-                            onChanged: (value) => getIt.get<LocalPreferencesCubit>().setDynamicColor(value),
-                          ),
+                    child: SingleChildScrollView(
+                      controller: cubit.scrollController,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(locals.layoutExplanation),
+                          const Divider(),
                           Gap(pu2),
-                        ],
-                        Row(
-                          spacing: pu2,
-                          children: [
-                            Expanded(child: Text(locals.theme)),
-                            DropdownMenu<ThemeMode>(
-                              initialSelection: context.select((LocalPreferencesCubit p) => p.state.theme),
-                              onSelected: (value) =>
-                                  getIt.get<LocalPreferencesCubit>().setBrightness(value ?? ThemeMode.system),
-                              dropdownMenuEntries: ThemeMode.values
-                                  .map((h) => DropdownMenuEntry(value: h, label: locals.appTheme(h.name)))
-                                  .toList(),
-                            ),
-                          ],
-                        ),
-                        if (!context.select((LocalPreferencesCubit p) => p.state.dynamicColor))
-                          Wrap(
-                            spacing: pu4,
-                            runSpacing: pu4,
-                            children: [
-                              Colors.deepOrange,
-                              Colors.deepPurple,
-                              Colors.amber,
-                              Colors.green,
-                              Colors.pink,
-                              Colors.blue,
-                              Colors.grey,
-                              Colors.red,
-                              Colors.teal,
-                            ].map((c) {
-                              return InkWell(
-                                onTap: () => getIt.get<LocalPreferencesCubit>().setColor(c),
-                                child: SingleMotionBuilder(
-                                  from: 0,
-                                  value: context
-                                              .select((LocalPreferencesCubit p) => p.state.themeColor)
-                                              .toARGB32() ==
-                                          c.toARGB32()
-                                      ? 1
-                                      : 0,
-                                  motion: MaterialSpringMotion.expressiveSpatialSlow(),
-                                  builder: (context, value, child) => Transform.scale(
-                                    scale: lerpDouble(1, 1.3, value),
-                                    child: Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                        color: c,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          width: 2,
-                                          color: Color.lerp(colors.surface, colors.tertiary, value)!,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        Gap(pu4),
-                        const Divider(),
-                        Gap(pu2),
-                        // Magazine tabs section
-                        _MagazineTabsSection(cubit: cubit, state: state),
-                        Gap(pu2),
-                        const Divider(),
-                        Gap(pu2),
-                        // Two-column blocks section
-                        Expanded(
-                          child: Flex(
-                            direction: device == BreakPoint.mobile ? Axis.vertical : Axis.horizontal,
+                          Row(
                             spacing: pu2,
                             children: [
-                              if (device != BreakPoint.mobile)
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Gap(pu2),
-                                      Text(locals.availableBlocks, style: textTheme.titleLarge),
-                                      Text(locals.dragAndDropInstructions),
-                                      Gap(pu8),
-                                      Expanded(
-                                        child: ListView(
-                                          children: [
-                                            Text(locals.fixedArticleCountBlocks),
-                                            Center(
-                                              child: DraggableLayoutBlock(
-                                                setDragging: cubit.setDragging,
-                                                type: LayoutBlockTypes.bigHeadline,
-                                              ),
-                                            ),
-                                            Center(
-                                              child: DraggableLayoutBlock(
-                                                setDragging: cubit.setDragging,
-                                                type: LayoutBlockTypes.bigHeadlinePicture,
-                                              ),
-                                            ),
-                                            Center(
-                                              child: DraggableLayoutBlock(
-                                                setDragging: cubit.setDragging,
-                                                type: LayoutBlockTypes.topStories,
-                                              ),
-                                            ),
-                                            Gap(pu8),
-                                            Text(locals.dynamicArticleCountBlocks),
-                                            Center(
-                                              child: DraggableLayoutBlock(
-                                                setDragging: cubit.setDragging,
-                                                type: LayoutBlockTypes.bigGrid,
-                                              ),
-                                            ),
-                                            Center(
-                                              child: DraggableLayoutBlock(
-                                                setDragging: cubit.setDragging,
-                                                type: LayoutBlockTypes.bigGridPicture,
-                                              ),
-                                            ),
-                                            Center(
-                                              child: DraggableLayoutBlock(
-                                                setDragging: cubit.setDragging,
-                                                type: LayoutBlockTypes.smallGrid,
-                                              ),
-                                            ),
-                                            Center(
-                                              child: DraggableLayoutBlock(
-                                                setDragging: cubit.setDragging,
-                                                type: LayoutBlockTypes.searchResult,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              if (device != BreakPoint.mobile) const VerticalDivider(),
                               Expanded(
-                                flex: 2,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
-                                    Gap(pu2),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            state.selectedTab != null
-                                                ? locals.layoutForTab(state.selectedTab!.name)
-                                                : locals.currentLayout,
-                                            style: textTheme.titleLarge,
-                                          ),
-                                        ),
-                                        if (device == BreakPoint.mobile)
-                                          TextButton(
-                                            onPressed: () async {
-                                              final newBlock = await NewBlockDialog.show(context);
-                                              if (newBlock != null) {
-                                                cubit.acceptDrag(
-                                                  state.blocks.length - 1,
-                                                  DragTargetDetails(data: newBlock, offset: Offset.zero),
-                                                );
-                                                cubit.scrollController.animateTo(
-                                                  cubit.scrollController.position.maxScrollExtent +
-                                                      cubit.scrollController.position.viewportDimension,
-                                                  duration: const Duration(seconds: 1),
-                                                  curve: Curves.easeInOutQuart,
-                                                );
-                                              }
-                                            },
-                                            child: Text(locals.addBlock),
-                                          ),
-                                      ],
-                                    ),
-                                    if (state.loading)
-                                      const Expanded(child: Center(child: CircularProgressIndicator()))
-                                    else
-                                      Expanded(
-                                        child: ReorderableListView.builder(
-                                          scrollController: cubit.scrollController,
-                                          proxyDecorator: (child, index, animation) =>
-                                              Center(child: DraggedLayoutBlock(type: state.blocks[index].type)),
-                                          itemCount: state.blocks.length,
-                                          onReorder: (int oldIndex, int newIndex) =>
-                                              cubit.onReorder(oldIndex, newIndex),
-                                          buildDefaultDragHandles: false,
-                                          itemBuilder: (context, index) {
-                                            var block = state.blocks[index];
-                                            var isLast = index == state.blocks.length - 1;
-
-                                            return Padding(
-                                              key: ValueKey(block),
-                                              padding: EdgeInsets.only(bottom: pu2),
-                                              child: ConditionalWrap(
-                                                wrapIf: index == 0,
-                                                wrapper: (child) => Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                  children: [
-                                                    LayoutSeparator(index: -1, dragging: state.dragging),
-                                                    child,
-                                                  ],
-                                                ),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                  children: [
-                                                    _BlockTitleField(
-                                                      block: block,
-                                                      onUpdated: (newBlock) => cubit.updateBlock(block, newBlock),
-                                                    ),
-                                                    Gap(pu2),
-                                                    Row(
-                                                      spacing: pu4,
-                                                      children: [
-                                                        ReorderableDragStartListener(
-                                                          index: index,
-                                                          child: MouseRegion(
-                                                            cursor: SystemMouseCursors.move,
-                                                            child: const Icon(Icons.drag_handle, size: 40),
-                                                          ),
-                                                        ),
-                                                        Expanded(
-                                                          child: ConditionalWrap(
-                                                            wrapIf: isLast && !block.type.fixedSize,
-                                                            wrapper: (child) => Stack(
-                                                              children: [
-                                                                child,
-                                                                Positioned(
-                                                                  left: 0,
-                                                                  right: 0,
-                                                                  bottom: 0,
-                                                                  child: Container(
-                                                                    height: 150,
-                                                                    decoration: BoxDecoration(
-                                                                      gradient: LinearGradient(
-                                                                        colors: [
-                                                                          (fadeColor ?? colors.surface)
-                                                                              .withValues(alpha: 0),
-                                                                          (fadeColor ?? colors.surface),
-                                                                        ],
-                                                                        stops: const [0, 0.90],
-                                                                        begin: Alignment.topCenter,
-                                                                        end: Alignment.bottomCenter,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            child: block.type.getBigPreview(
-                                                              context,
-                                                              block: block,
-                                                              onUpdated: (newBlock) =>
-                                                                  cubit.updateBlock(block, newBlock),
-                                                              last: isLast,
-                                                              categories: state.categories,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        if (state.blocks.length > 1)
-                                                          IconButton(
-                                                            onPressed: () => cubit.removeBlock(block),
-                                                            icon: const Icon(Icons.delete),
-                                                            color: colors.error,
-                                                          ),
-                                                      ],
-                                                    ),
-                                                    if (isLast && !block.type.fixedSize) ...[
-                                                      Gap(pu2),
-                                                      Container(
-                                                        padding:
-                                                            EdgeInsets.symmetric(horizontal: pu3, vertical: pu2),
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(6),
-                                                          color: colors.tertiaryContainer.withValues(alpha: 0.6),
-                                                        ),
-                                                        child: Row(
-                                                          spacing: pu2,
-                                                          children: [
-                                                            Icon(Icons.auto_awesome,
-                                                                size: 16, color: colors.onTertiaryContainer),
-                                                            Expanded(
-                                                              child: Text(
-                                                                locals.lastBlockHint,
-                                                                style: textTheme.bodySmall?.copyWith(
-                                                                  color: colors.onTertiaryContainer,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                    Gap(pu4),
-                                                    const Divider(),
-                                                    LayoutSeparator(index: index, dragging: state.dragging),
-                                                    if (state.dragging) const Divider(),
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
+                                    Text(locals.readItemHandling),
+                                    Text(locals.readItemHandlingExplanation, style: subTextTheme),
                                   ],
                                 ),
                               ),
+                              DropdownMenu<ReadItemHandling>(
+                                key: const Key('read-item-handling'),
+                                initialSelection: generalState.user?.readItemHandling ?? ReadItemHandling.none,
+                                onSelected: generalCubit.setReadItemPreference,
+                                dropdownMenuEntries: ReadItemHandling.values
+                                    .map((h) => DropdownMenuEntry(value: h, label: h.getLabel(context)))
+                                    .toList(),
+                              ),
                             ],
                           ),
-                        ),
-                        if (!state.valid && state.selectedTab == null)
-                          Text(locals.layoutMustFinishWithDynamicBlock, style: TextStyle(color: colors.error)),
-                      ],
+                          Gap(pu2),
+                          BlocBuilder<LocalPreferencesCubit, LocalPreferencesState>(
+                            bloc: getIt.get<LocalPreferencesCubit>(),
+                            builder: (context, prefsState) => SwitchListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(locals.truncateText),
+                              subtitle: Text(locals.truncateTextExplanation, style: subTextTheme),
+                              value: prefsState.truncateText,
+                              onChanged: (value) => getIt.get<LocalPreferencesCubit>().setTruncateText(value),
+                            ),
+                          ),
+                          SwitchListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(locals.blackBackground),
+                            subtitle: Text(locals.blackBackgroundExplanation, style: subTextTheme),
+                            value: context.select((LocalPreferencesCubit p) => p.state.blackBackground),
+                            onChanged: (value) => getIt.get<LocalPreferencesCubit>().setBlackBackground(value),
+                          ),
+                          Text(locals.appColor),
+                          Gap(pu2),
+                          if (!kIsWeb && Platform.isAndroid) ...[
+                            SwitchListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(locals.dynamicColor),
+                              subtitle: Text(locals.blackBackgroundExplanation, style: subTextTheme),
+                              value: context.select((LocalPreferencesCubit p) => p.state.dynamicColor),
+                              onChanged: (value) => getIt.get<LocalPreferencesCubit>().setDynamicColor(value),
+                            ),
+                            Gap(pu2),
+                          ],
+                          Row(
+                            spacing: pu2,
+                            children: [
+                              Expanded(child: Text(locals.theme)),
+                              DropdownMenu<ThemeMode>(
+                                initialSelection: context.select((LocalPreferencesCubit p) => p.state.theme),
+                                onSelected: (value) =>
+                                    getIt.get<LocalPreferencesCubit>().setBrightness(value ?? ThemeMode.system),
+                                dropdownMenuEntries: ThemeMode.values
+                                    .map((h) => DropdownMenuEntry(value: h, label: locals.appTheme(h.name)))
+                                    .toList(),
+                              ),
+                            ],
+                          ),
+                          if (!context.select((LocalPreferencesCubit p) => p.state.dynamicColor))
+                            Wrap(
+                              spacing: pu4,
+                              runSpacing: pu4,
+                              children: [
+                                Colors.deepOrange,
+                                Colors.deepPurple,
+                                Colors.amber,
+                                Colors.green,
+                                Colors.pink,
+                                Colors.blue,
+                                Colors.grey,
+                                Colors.red,
+                                Colors.teal,
+                              ].map((c) {
+                                return InkWell(
+                                  onTap: () => getIt.get<LocalPreferencesCubit>().setColor(c),
+                                  child: SingleMotionBuilder(
+                                    from: 0,
+                                    value: context
+                                                .select((LocalPreferencesCubit p) => p.state.themeColor)
+                                                .toARGB32() ==
+                                            c.toARGB32()
+                                        ? 1
+                                        : 0,
+                                    motion: MaterialSpringMotion.expressiveSpatialSlow(),
+                                    builder: (context, value, child) => Transform.scale(
+                                      scale: lerpDouble(1, 1.3, value),
+                                      child: Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          color: c,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            width: 2,
+                                            color: Color.lerp(colors.surface, colors.tertiary, value)!,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          Gap(pu4),
+                          const Divider(),
+                          Gap(pu2),
+                          _MagazineTabsSection(cubit: cubit, state: state),
+                          Gap(pu2),
+                          const Divider(),
+                          Gap(pu2),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  state.selectedTab != null
+                                      ? locals.layoutForTab(state.selectedTab!.name)
+                                      : locals.currentLayout,
+                                  style: textTheme.titleLarge,
+                                ),
+                              ),
+                              if (device == BreakPoint.mobile)
+                                TextButton(
+                                  onPressed: () async {
+                                    final newBlock = await NewBlockDialog.show(context);
+                                    if (newBlock != null) {
+                                      cubit.acceptDrag(
+                                        state.blocks.length - 1,
+                                        DragTargetDetails(data: newBlock, offset: Offset.zero),
+                                      );
+                                      cubit.scrollController.animateTo(
+                                        cubit.scrollController.position.maxScrollExtent +
+                                            cubit.scrollController.position.viewportDimension,
+                                        duration: const Duration(seconds: 1),
+                                        curve: Curves.easeInOutQuart,
+                                      );
+                                    }
+                                  },
+                                  child: Text(locals.addBlock),
+                                ),
+                            ],
+                          ),
+                          Gap(pu2),
+                          if (device != BreakPoint.mobile)
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: pu2,
+                              children: [
+                                Flexible(
+                                  flex: 1,
+                                  child: _AvailableBlocksPanel(cubit: cubit),
+                                ),
+                                Container(width: 1, color: colors.outlineVariant),
+                                Flexible(
+                                  flex: 2,
+                                  child: _LayoutBlocksList(
+                                    cubit: cubit,
+                                    state: state,
+                                    fadeColor: fadeColor,
+                                  ),
+                                ),
+                              ],
+                            )
+                          else
+                            _LayoutBlocksList(
+                              cubit: cubit,
+                              state: state,
+                              fadeColor: fadeColor,
+                            ),
+                          if (!state.valid && state.selectedTab == null)
+                            Padding(
+                              padding: EdgeInsets.only(top: pu2),
+                              child: Text(
+                                locals.layoutMustFinishWithDynamicBlock,
+                                style: TextStyle(color: colors.error),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -442,6 +265,234 @@ class LayoutSettingsTab extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _AvailableBlocksPanel extends StatelessWidget {
+  final LayoutCubit cubit;
+
+  const _AvailableBlocksPanel({required this.cubit});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final locals = AppLocalizations.of(context)!;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Gap(pu2),
+        Text(locals.availableBlocks, style: textTheme.titleLarge),
+        Text(locals.dragAndDropInstructions),
+        Gap(pu8),
+        Text(locals.fixedArticleCountBlocks),
+        Center(child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigHeadline)),
+        Center(child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigHeadlinePicture)),
+        Center(child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.topStories)),
+        Gap(pu8),
+        Text(locals.dynamicArticleCountBlocks),
+        Center(child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigGrid)),
+        Center(child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.bigGridPicture)),
+        Center(child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.smallGrid)),
+        Center(child: DraggableLayoutBlock(setDragging: cubit.setDragging, type: LayoutBlockTypes.searchResult)),
+      ],
+    );
+  }
+}
+
+class _LayoutBlocksList extends StatelessWidget {
+  final LayoutCubit cubit;
+  final LayoutState state;
+  final Color? fadeColor;
+
+  const _LayoutBlocksList({required this.cubit, required this.state, this.fadeColor});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final locals = AppLocalizations.of(context)!;
+
+    if (state.loading) {
+      return const SizedBox(height: 200, child: Center(child: CircularProgressIndicator()));
+    }
+
+    return ReorderableListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      proxyDecorator: (child, index, animation) =>
+          Center(child: DraggedLayoutBlock(type: state.blocks[index].type)),
+      itemCount: state.blocks.length,
+      onReorder: cubit.onReorder,
+      buildDefaultDragHandles: false,
+      itemBuilder: (context, index) {
+        final block = state.blocks[index];
+        final isLast = index == state.blocks.length - 1;
+        final settings = block.settings ?? block.type.defaultSettings;
+
+        return Padding(
+          key: ValueKey(block),
+          padding: EdgeInsets.only(bottom: pu2),
+          child: ConditionalWrap(
+            wrapIf: index == 0,
+            wrapper: (child) => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                LayoutSeparator(index: -1, dragging: state.dragging),
+                child,
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  spacing: pu4,
+                  children: [
+                    ReorderableDragStartListener(
+                      index: index,
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.move,
+                        child: const Icon(Icons.drag_handle, size: 40),
+                      ),
+                    ),
+                    Expanded(
+                      child: ConditionalWrap(
+                        wrapIf: isLast && !block.type.fixedSize,
+                        wrapper: (child) => Stack(
+                          children: [
+                            child,
+                            Positioned(
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              child: Container(
+                                height: 150,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      (fadeColor ?? colors.surface).withValues(alpha: 0),
+                                      (fadeColor ?? colors.surface),
+                                    ],
+                                    stops: const [0, 0.90],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        child: block.type.getBigPreview(context, block: block, last: isLast),
+                      ),
+                    ),
+                    if (state.blocks.length > 1)
+                      IconButton(
+                        onPressed: () => cubit.removeBlock(block),
+                        icon: const Icon(Icons.delete),
+                        color: colors.error,
+                      ),
+                  ],
+                ),
+                Gap(pu2),
+                _BlockTitleField(
+                  block: block,
+                  onUpdated: (newBlock) => cubit.updateBlock(block, newBlock),
+                ),
+                if (!block.type.fixedSize) ...[
+                  Gap(pu2),
+                  if (isLast)
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                      title: Text(
+                        settings.lastBlockShowAll
+                            ? locals.lastBlockShowAllArticles
+                            : locals.lastBlockLimitArticles,
+                      ),
+                      value: settings.lastBlockShowAll,
+                      onChanged: (v) => cubit.updateBlock(
+                        block,
+                        block.copyWith(settings: settings.copyWith(lastBlockShowAll: v ?? true)),
+                      ),
+                    ),
+                  if (!isLast || !settings.lastBlockShowAll)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: pu2,
+                      children: [
+                        IconButton.outlined(
+                          onPressed: () {
+                            final count =
+                                settings.items ?? block.type.defaultSettings.items ?? 3;
+                            if (count > 1) {
+                              cubit.updateBlock(
+                                block,
+                                block.copyWith(settings: settings.copyWith(items: count - 1)),
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.remove),
+                        ),
+                        Text(
+                          '${settings.items ?? block.type.defaultSettings.items ?? 3}',
+                          style: textTheme.titleMedium,
+                        ),
+                        IconButton.outlined(
+                          onPressed: () {
+                            final count =
+                                settings.items ?? block.type.defaultSettings.items ?? 3;
+                            cubit.updateBlock(
+                              block,
+                              block.copyWith(settings: settings.copyWith(items: count + 1)),
+                            );
+                          },
+                          icon: const Icon(Icons.add),
+                        ),
+                      ],
+                    ),
+                ],
+                if (state.categories.isNotEmpty)
+                  LayoutCategorySelector(
+                    block: block,
+                    categories: state.categories,
+                    onUpdated: (newBlock) => cubit.updateBlock(block, newBlock),
+                  ),
+                Gap(pu2),
+                Text(locals.blockAiPromptLabel, style: textTheme.bodyMedium),
+                Gap(pu1),
+                BlocBuilder<AiPromptsCubit, AiPromptsState>(
+                  builder: (context, promptsState) => DropdownMenu<String?>(
+                    key: ValueKey('block-prompt-${block.id}-${settings.aiPromptId}'),
+                    initialSelection: settings.aiPromptId,
+                    onSelected: (value) {
+                      final newSettings = value != null
+                          ? settings.copyWith(aiPromptId: value)
+                          : LayoutBlockSettings(
+                              title: settings.title,
+                              items: settings.items,
+                              categoryId: settings.categoryId,
+                              aiPromptId: null,
+                              lastBlockShowAll: settings.lastBlockShowAll,
+                            );
+                      cubit.updateBlock(block, block.copyWith(settings: newSettings));
+                    },
+                    dropdownMenuEntries: [
+                      DropdownMenuEntry<String?>(value: null, label: locals.globalPrompt),
+                      ...promptsState.prompts
+                          .map((p) => DropdownMenuEntry<String?>(value: p.id, label: p.name)),
+                    ],
+                  ),
+                ),
+                Gap(pu4),
+                const Divider(),
+                LayoutSeparator(index: index, dragging: state.dragging),
+                if (state.dragging) const Divider(),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -499,14 +550,15 @@ class _MagazineTabsSection extends StatelessWidget {
                 )),
           ],
         ),
-        if (state.selectedTab != null) ...[
-          Gap(pu3),
+        Gap(pu3),
+        if (state.selectedTab != null)
           _SelectedTabSettings(
             key: ValueKey(state.selectedTab!.id),
             tab: state.selectedTab!,
             cubit: cubit,
-          ),
-        ],
+          )
+        else
+          const _StandardTabSettings(),
       ],
     );
   }
@@ -563,6 +615,81 @@ class _MagazineTabsSection extends StatelessWidget {
     if (confirmed == true) {
       cubit.deleteMagazineTab(tab);
     }
+  }
+}
+
+class _StandardTabSettings extends StatelessWidget {
+  const _StandardTabSettings();
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
+    final subText = textTheme.labelMedium?.copyWith(color: colors.secondary);
+    final locals = AppLocalizations.of(context)!;
+
+    return BlocBuilder<GeneralSettingsCubit, GeneralSettingsState>(
+      builder: (context, state) {
+        final cubit = context.read<GeneralSettingsCubit>();
+        final user = state.user;
+        if (user == null) return const SizedBox.shrink();
+
+        return Card(
+          child: Padding(
+            padding: EdgeInsets.all(pu3),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(locals.standardLayoutSettings, style: textTheme.titleSmall),
+                Gap(pu2),
+                Text(locals.aiPromptLabel, style: textTheme.bodyMedium),
+                Gap(pu1),
+                BlocBuilder<AiPromptsCubit, AiPromptsState>(
+                  builder: (context, promptsState) => DropdownMenu<String?>(
+                    key: ValueKey('standard-prompt-${user.aiPromptId}'),
+                    initialSelection: user.aiPromptId,
+                    onSelected: cubit.updateAiPromptId,
+                    dropdownMenuEntries: [
+                      DropdownMenuEntry<String?>(value: null, label: locals.globalPrompt),
+                      ...promptsState.prompts
+                          .map((p) => DropdownMenuEntry<String?>(value: p.id, label: p.name)),
+                    ],
+                  ),
+                ),
+                Gap(pu2),
+                Text(locals.tabMinScore, style: textTheme.bodyMedium),
+                Text(locals.tabMinScoreExplanation, style: subText),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Slider(
+                        min: 0,
+                        max: 100,
+                        divisions: 20,
+                        label: user.minimumImportance > 0
+                            ? user.minimumImportance.toString()
+                            : 'Default',
+                        value: user.minimumImportance.toDouble(),
+                        onChanged: cubit.setAndSaveImportance,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 64,
+                      child: Text(
+                        user.minimumImportance > 0
+                            ? user.minimumImportance.toString()
+                            : 'Default',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -691,8 +818,6 @@ class _SelectedTabSettingsState extends State<_SelectedTabSettings> {
   }
 }
 
-/// A stateful title text field for a layout block section.
-/// Handles its own controller lifecycle and debounced updates.
 class _BlockTitleField extends StatefulWidget {
   final LayoutBlock block;
   final Function(LayoutBlock block) onUpdated;
@@ -738,6 +863,7 @@ class _BlockTitleFieldState extends State<_BlockTitleField> {
       controller: _controller,
       decoration: InputDecoration(
         labelText: locals.blockSectionTitle,
+        hintText: locals.blockSectionTitleHint,
         isDense: true,
         border: const OutlineInputBorder(),
       ),

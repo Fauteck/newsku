@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:app/feed/models/feed.dart';
+import 'package:app/feed/views/screens/classic_feed_screen.dart';
 import 'package:app/feed/views/screens/feed_screen.dart';
 import 'package:app/home/views/screens/home.dart';
 import 'package:app/magazine/views/screens/public_magazine_screen.dart';
@@ -56,7 +57,10 @@ class AppRouter extends RootStackRouter {
       AutoRoute.guarded(
         page: HomeRoute.page,
         initial: loggedInOnStart,
-        children: [AutoRoute(page: FeedRoute.page, initial: true)],
+        children: [
+          AutoRoute(page: FeedRoute.page, initial: true),
+          AutoRoute(page: ClassicFeedRoute.page),
+        ],
         onNavigation: loginRequired,
       ),
       AutoRoute.guarded(page: FeedErrorsRoute.page, onNavigation: loginRequired),
