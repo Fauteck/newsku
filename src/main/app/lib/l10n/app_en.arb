@@ -134,7 +134,7 @@
     "feedCategory": "Kategorie",
     "layoutBlockCategoryExplanation": "Dieser Block zeigt nur Artikel der ausgewählten Kategorie",
     "truncateText": "Textkürzung",
-    "truncateTextExplanation": "Titel und Teaser automatisch auf die optimale Zeilenanzahl je Layout-Typ begrenzen",
+    "truncateTextExplanation": "Wenn aktiviert, erzeugt die KI automatisch Titel- und Teaser-Varianten in optimaler Länge je Darstellungsform. Die Einstellung gilt global für alle Darstellungen.",
     "titleMaxLines": "Titelzeilen",
     "contentMaxLines": "Teaserze ilen",
     "savedArticles": "Gespeicherte Artikel",
@@ -158,5 +158,10 @@
     "lastBlockHint": "Der letzte Abschnitt zeigt automatisch alle verbleibenden Feeds an und hat keine Begrenzung der Artikelanzahl.",
     "blockSectionTitle": "Abschnittstitel (optional)",
     "darstellung": "Darstellung",
-    "darstellungTab": "Layout & Darstellung"
+    "darstellungTab": "Layout & Darstellung",
+    "cacheSection": "Cache",
+    "cacheExplanation": "Lokal zwischengespeicherte Beiträge und Bilder verwalten",
+    "clearImageCache": "Bilder-Cache löschen",
+    "clearArticleCache": "Beitrags-Cache löschen",
+    "cacheCleared": "Cache geleert"
 }

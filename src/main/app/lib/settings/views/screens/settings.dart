@@ -66,11 +66,14 @@ class _DarstellungTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The upper (general) section renders at its natural height so it's fully
+    // visible without a nested scrollbar. Only the layout editor keeps its own
+    // scrollable area because of drag-and-drop.
     return const Column(
       children: [
-        Expanded(child: GeneralSettingsTab()),
+        GeneralSettingsTab(),
         Divider(height: 1),
-        Expanded(flex: 2, child: LayoutSettingsTab()),
+        Expanded(child: LayoutSettingsTab()),
       ],
     );
   }

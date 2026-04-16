@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:material_loading_indicator/loading_indicator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const _validUrl = r"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)";
 
@@ -48,23 +49,28 @@ class FeedsSettingsTab extends StatelessWidget {
                       if (freshRssActive) ...[
                         Padding(
                           padding: EdgeInsets.all(pu3),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: pu4, vertical: pu3),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: colors.secondaryContainer,
-                            ),
-                            child: Row(
-                              spacing: pu3,
-                              children: [
-                                Icon(Icons.info_outline, color: colors.onSecondaryContainer),
-                                Expanded(
-                                  child: Text(
-                                    locals.freshRssManagedFeeds,
-                                    style: textTheme.bodyMedium?.copyWith(color: colors.onSecondaryContainer),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(8),
+                            onTap: () => launchUrl(Uri.parse(config!.freshRssUrl!)),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: pu4, vertical: pu3),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: colors.secondaryContainer,
+                              ),
+                              child: Row(
+                                spacing: pu3,
+                                children: [
+                                  Icon(Icons.info_outline, color: colors.onSecondaryContainer),
+                                  Expanded(
+                                    child: Text(
+                                      locals.freshRssManagedFeeds,
+                                      style: textTheme.bodyMedium?.copyWith(color: colors.onSecondaryContainer),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  Icon(Icons.open_in_new, color: colors.onSecondaryContainer),
+                                ],
+                              ),
                             ),
                           ),
                         ),

@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/utils/utils.dart';
-import 'package:app/utils/views/components/app_logo.dart';
 import 'package:flutter/material.dart';
 import 'package:motor/motor.dart';
 
@@ -30,7 +29,6 @@ class Welcome extends StatelessWidget {
           mainAxisAlignment: .center,
           spacing: pu8,
           children: [
-            AppLogo(size: 100),
             ConstrainedBox(
               constraints: BoxConstraints(maxWidth: 350),
               child: Text(locals.welcomeText, style: textTheme.bodyLarge, textAlign: .center),

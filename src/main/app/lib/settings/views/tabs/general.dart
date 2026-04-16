@@ -12,6 +12,7 @@ import 'package:auto_route/annotations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:gap/gap.dart';
 import 'package:motor/motor.dart';
 
@@ -35,8 +36,8 @@ class GeneralSettingsTab extends StatelessWidget {
           builder: (context, state) {
             final cubit = context.read<GeneralSettingsCubit>();
             return ErrorHandler<GeneralSettingsCubit, GeneralSettingsState>(
-              child: SingleChildScrollView(
-                child: Column(
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Gap(pu4),
@@ -203,10 +204,54 @@ class GeneralSettingsTab extends StatelessWidget {
                       ),
                     Gap(pu8),
                     const Divider(),
+                    Gap(pu4),
+                    Text(locals.cacheSection, style: textTheme.titleMedium),
+                    Text(locals.cacheExplanation, style: subTextTheme),
+                    Gap(pu2),
+                    Row(
+                      spacing: pu2,
+                      children: [
+                        Expanded(
+                          child: FilledButton.tonalIcon(
+                            key: const Key('clear-image-cache'),
+                            onPressed: () async {
+                              await DefaultCacheManager().emptyCache();
+                              PaintingBinding.instance.imageCache.clear();
+                              PaintingBinding.instance.imageCache.clearLiveImages();
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(SnackBar(content: Text(locals.cacheCleared)));
+                              }
+                            },
+                            label: Text(locals.clearImageCache),
+                            icon: const Icon(Icons.image_not_supported_outlined),
+                          ),
+                        ),
+                        Expanded(
+                          child: FilledButton.tonalIcon(
+                            key: const Key('clear-article-cache'),
+                            onPressed: () async {
+                              // Articles are held only in in-memory feed state
+                              // and the Flutter image cache. Dropping both
+                              // forces a fresh fetch from the server.
+                              PaintingBinding.instance.imageCache.clear();
+                              PaintingBinding.instance.imageCache.clearLiveImages();
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(SnackBar(content: Text(locals.cacheCleared)));
+                              }
+                            },
+                            label: Text(locals.clearArticleCache),
+                            icon: const Icon(Icons.article_outlined),
+                          ),
+                        ),
+                      ],
+                    ),
                     Gap(pu8),
                   ],
                 ),
-              ),
             );
           },
         ),

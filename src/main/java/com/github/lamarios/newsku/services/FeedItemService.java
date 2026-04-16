@@ -126,6 +126,8 @@ public class FeedItemService {
                                         .orElse(null));
                                 newItem.setImportance(analysis.get().importance());
                                 newItem.setReasoning(analysis.get().reasoning());
+                                newItem.setShortTitle(analysis.get().shortTitle());
+                                newItem.setShortTeaser(analysis.get().shortTeaser());
                                 newItem.setImageUrl(imageUrl);
                                 newItem.setTimeCreated(item.getPubDateAsZonedDateTime()
                                         .map(zonedDateTime -> zonedDateTime.toInstant().toEpochMilli())

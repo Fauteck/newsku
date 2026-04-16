@@ -252,6 +252,8 @@ public class FreshRssSyncService {
         feedItem.setImageUrl(imageUrl);
         feedItem.setImportance(analysis.get().importance());
         feedItem.setReasoning(analysis.get().reasoning());
+        feedItem.setShortTitle(analysis.get().shortTitle());
+        feedItem.setShortTeaser(analysis.get().shortTeaser());
         feedItem.setTimeCreated(item.getPublished() > 0
                 ? item.getPublished() * 1000L   // FreshRSS returns seconds, newsku uses ms
                 : System.currentTimeMillis());

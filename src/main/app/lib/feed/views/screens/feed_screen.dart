@@ -4,19 +4,15 @@ import 'dart:ui';
 import 'package:app/feed/models/feed_item.dart';
 import 'package:app/feed/states/main_feed.dart';
 import 'package:app/feed/views/components/date_bar.dart';
-import 'package:app/feed/views/components/insights_widget.dart';
 import 'package:app/feed/views/components/search_result.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/main.dart';
 import 'package:app/router.dart';
-import 'package:app/user/views/components/fancy_side.dart';
 import 'package:app/user/views/components/user_profile_picture.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
-import 'package:app/utils/views/components/app_logo.dart';
-import 'package:app/utils/views/components/app_name.dart';
 import 'package:app/utils/views/components/conditional_wrap.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:app/utils/views/components/main_color_provider.dart';
@@ -133,7 +129,7 @@ class FeedScreen extends StatelessWidget {
     final locals = AppLocalizations.of(context)!;
 
     return MainColorProvider(
-      builder: (context, appColor) {
+      builder: (context, _) {
         return BlocProvider(
           create: (context) => MainFeedCubit(
             MainFeedState(currentTime: DateTime.now().copyWith(hour: 23, minute: 59, second: 59, millisecond: 999)),
@@ -168,7 +164,6 @@ class FeedScreen extends StatelessWidget {
                                             snap: true,
                                             elevation: 0,
                                             scrolledUnderElevation: 0,
-                                            leadingWidth: 150,
                                             title: AnimatedSwitcher(
                                               duration: Duration(milliseconds: 250),
                                               child: state.searchMode
@@ -181,23 +176,8 @@ class FeedScreen extends StatelessWidget {
                                                         label: Text(locals.search),
                                                       ),
                                                     )
-                                                  : AppName(style: textTheme.titleLarge),
+                                                  : const SizedBox.shrink(),
                                             ),
-                                            leading: state.searchMode
-                                                ? null
-                                                : ClipPath(
-                                                    clipper: FancySide(),
-                                                    child: Container(
-                                                      decoration: BoxDecoration(color: appColor),
-                                                      child: Padding(
-                                                        padding: .only(left: pu6),
-                                                        child: Align(
-                                                          alignment: .centerLeft,
-                                                          child: AppLogo(color: colors.onSurface, size: 20),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
                                             actions: [
                                               if (state.searchMode)
                                                 IconButton(
@@ -322,14 +302,6 @@ class FeedScreen extends StatelessWidget {
                                               ],
                                             ],
                                           ),
-                                          if (!state.searchMode && !state.showSavedOnly)
-                                            SliverPadding(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: padding + pu4,
-                                                vertical: pu2,
-                                              ),
-                                              sliver: SliverToBoxAdapter(child: InsightsWidget()),
-                                            ),
                                           if (state.searchMode)
                                             SliverPadding(
                                               padding: .symmetric(horizontal: padding),

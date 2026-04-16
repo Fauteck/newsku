@@ -110,7 +110,19 @@ public class OpenaiServiceImpl implements OpenaiService {
                 also you will try to figure out if this feed item is an ad or not
 
                 You will use the name and description of the source to understand what an important news is for a user.
-                You will also tag the article with up to 4 tags
+                You will also tag the article with up to 4 tags.
+
+                Additionally, produce two shortened rewrites tailored for compact
+                card layouts. These are full, self-contained sentences/phrases —
+                NOT truncations with ellipses:
+                  - shortTitle: a concise headline variant in the article's
+                    original language, max ~60 characters, fitting on two lines
+                    in a grid card. Keep it factual and descriptive.
+                  - shortTeaser: a one-sentence teaser of the article in the
+                    article's original language, max ~140 characters. It must
+                    end as a complete sentence.
+                If the article is too short to sensibly shorten further, copy
+                the original text.
 
                 The user has the following preferences. You will refer to it to figure out how to rate a news item:
                 %s
