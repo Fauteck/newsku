@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MainFeedState {
 
- bool get hasScrolled; DateTime get currentTime; TimeBlock get timeBlock; bool get loading; Map<DateTimeRange, List<FeedItem>> get items; bool get searchMode; String get searchTerms; List<FeedItem> get searchResults; int get searchPage; List<LayoutBlock> get layout; int get errorCount; bool get showSavedOnly; dynamic get error; StackTrace? get stackTrace;
+ bool get hasScrolled; DateTime get currentTime; TimeBlock get timeBlock; bool get loading; Map<DateTimeRange, List<FeedItem>> get items; bool get searchMode; String get searchTerms; List<FeedItem> get searchResults; int get searchPage; List<LayoutBlock> get layout; int get errorCount; bool get showSavedOnly; MagazineTab? get activeTab; dynamic get error; StackTrace? get stackTrace;
 /// Create a copy of MainFeedState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $MainFeedStateCopyWith<MainFeedState> get copyWith => _$MainFeedStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MainFeedState&&(identical(other.hasScrolled, hasScrolled) || other.hasScrolled == hasScrolled)&&(identical(other.currentTime, currentTime) || other.currentTime == currentTime)&&(identical(other.timeBlock, timeBlock) || other.timeBlock == timeBlock)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.searchMode, searchMode) || other.searchMode == searchMode)&&(identical(other.searchTerms, searchTerms) || other.searchTerms == searchTerms)&&const DeepCollectionEquality().equals(other.searchResults, searchResults)&&(identical(other.searchPage, searchPage) || other.searchPage == searchPage)&&const DeepCollectionEquality().equals(other.layout, layout)&&(identical(other.errorCount, errorCount) || other.errorCount == errorCount)&&(identical(other.showSavedOnly, showSavedOnly) || other.showSavedOnly == showSavedOnly)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MainFeedState&&(identical(other.hasScrolled, hasScrolled) || other.hasScrolled == hasScrolled)&&(identical(other.currentTime, currentTime) || other.currentTime == currentTime)&&(identical(other.timeBlock, timeBlock) || other.timeBlock == timeBlock)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.searchMode, searchMode) || other.searchMode == searchMode)&&(identical(other.searchTerms, searchTerms) || other.searchTerms == searchTerms)&&const DeepCollectionEquality().equals(other.searchResults, searchResults)&&(identical(other.searchPage, searchPage) || other.searchPage == searchPage)&&const DeepCollectionEquality().equals(other.layout, layout)&&(identical(other.errorCount, errorCount) || other.errorCount == errorCount)&&(identical(other.showSavedOnly, showSavedOnly) || other.showSavedOnly == showSavedOnly)&&(identical(other.activeTab, activeTab) || other.activeTab == activeTab)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,hasScrolled,currentTime,timeBlock,loading,const DeepCollectionEquality().hash(items),searchMode,searchTerms,const DeepCollectionEquality().hash(searchResults),searchPage,const DeepCollectionEquality().hash(layout),errorCount,showSavedOnly,const DeepCollectionEquality().hash(error),stackTrace);
+int get hashCode => Object.hash(runtimeType,hasScrolled,currentTime,timeBlock,loading,const DeepCollectionEquality().hash(items),searchMode,searchTerms,const DeepCollectionEquality().hash(searchResults),searchPage,const DeepCollectionEquality().hash(layout),errorCount,showSavedOnly,activeTab,const DeepCollectionEquality().hash(error),stackTrace);
 
 @override
 String toString() {
-  return 'MainFeedState(hasScrolled: $hasScrolled, currentTime: $currentTime, timeBlock: $timeBlock, loading: $loading, items: $items, searchMode: $searchMode, searchTerms: $searchTerms, searchResults: $searchResults, searchPage: $searchPage, layout: $layout, errorCount: $errorCount, showSavedOnly: $showSavedOnly, error: $error, stackTrace: $stackTrace)';
+  return 'MainFeedState(hasScrolled: $hasScrolled, currentTime: $currentTime, timeBlock: $timeBlock, loading: $loading, items: $items, searchMode: $searchMode, searchTerms: $searchTerms, searchResults: $searchResults, searchPage: $searchPage, layout: $layout, errorCount: $errorCount, showSavedOnly: $showSavedOnly, activeTab: $activeTab, error: $error, stackTrace: $stackTrace)';
 }
 
 
@@ -45,11 +45,11 @@ abstract mixin class $MainFeedStateCopyWith<$Res>  {
   factory $MainFeedStateCopyWith(MainFeedState value, $Res Function(MainFeedState) _then) = _$MainFeedStateCopyWithImpl;
 @useResult
 $Res call({
- bool hasScrolled, DateTime currentTime, TimeBlock timeBlock, bool loading, Map<DateTimeRange, List<FeedItem>> items, bool searchMode, String searchTerms, List<FeedItem> searchResults, int searchPage, List<LayoutBlock> layout, int errorCount, bool showSavedOnly, dynamic error, StackTrace? stackTrace
+ bool hasScrolled, DateTime currentTime, TimeBlock timeBlock, bool loading, Map<DateTimeRange, List<FeedItem>> items, bool searchMode, String searchTerms, List<FeedItem> searchResults, int searchPage, List<LayoutBlock> layout, int errorCount, bool showSavedOnly, MagazineTab? activeTab, dynamic error, StackTrace? stackTrace
 });
 
 
-
+$MagazineTabCopyWith<$Res>? get activeTab;
 
 }
 /// @nodoc
@@ -62,7 +62,7 @@ class _$MainFeedStateCopyWithImpl<$Res>
 
 /// Create a copy of MainFeedState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? hasScrolled = null,Object? currentTime = null,Object? timeBlock = null,Object? loading = null,Object? items = null,Object? searchMode = null,Object? searchTerms = null,Object? searchResults = null,Object? searchPage = null,Object? layout = null,Object? errorCount = null,Object? showSavedOnly = null,Object? error = freezed,Object? stackTrace = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? hasScrolled = null,Object? currentTime = null,Object? timeBlock = null,Object? loading = null,Object? items = null,Object? searchMode = null,Object? searchTerms = null,Object? searchResults = null,Object? searchPage = null,Object? layout = null,Object? errorCount = null,Object? showSavedOnly = null,Object? activeTab = freezed,Object? error = freezed,Object? stackTrace = freezed,}) {
   return _then(_self.copyWith(
 hasScrolled: null == hasScrolled ? _self.hasScrolled : hasScrolled // ignore: cast_nullable_to_non_nullable
 as bool,currentTime: null == currentTime ? _self.currentTime : currentTime // ignore: cast_nullable_to_non_nullable
@@ -76,12 +76,26 @@ as List<FeedItem>,searchPage: null == searchPage ? _self.searchPage : searchPage
 as int,layout: null == layout ? _self.layout : layout // ignore: cast_nullable_to_non_nullable
 as List<LayoutBlock>,errorCount: null == errorCount ? _self.errorCount : errorCount // ignore: cast_nullable_to_non_nullable
 as int,showSavedOnly: null == showSavedOnly ? _self.showSavedOnly : showSavedOnly // ignore: cast_nullable_to_non_nullable
-as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as bool,activeTab: freezed == activeTab ? _self.activeTab : activeTab // ignore: cast_nullable_to_non_nullable
+as MagazineTab?,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
 as dynamic,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
 as StackTrace?,
   ));
 }
 
+/// Create a copy of MainFeedState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$MagazineTabCopyWith<$Res>? get activeTab {
+    if (_self.activeTab == null) {
+    return null;
+  }
+
+  return $MagazineTabCopyWith<$Res>(_self.activeTab!, (value) {
+    return _then(_self.copyWith(activeTab: value));
+  });
+}
 }
 
 
@@ -160,10 +174,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool hasScrolled,  DateTime currentTime,  TimeBlock timeBlock,  bool loading,  Map<DateTimeRange, List<FeedItem>> items,  bool searchMode,  String searchTerms,  List<FeedItem> searchResults,  int searchPage,  List<LayoutBlock> layout,  int errorCount,  bool showSavedOnly,  dynamic error,  StackTrace? stackTrace)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool hasScrolled,  DateTime currentTime,  TimeBlock timeBlock,  bool loading,  Map<DateTimeRange, List<FeedItem>> items,  bool searchMode,  String searchTerms,  List<FeedItem> searchResults,  int searchPage,  List<LayoutBlock> layout,  int errorCount,  bool showSavedOnly,  MagazineTab? activeTab,  dynamic error,  StackTrace? stackTrace)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MainFeedState() when $default != null:
-return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loading,_that.items,_that.searchMode,_that.searchTerms,_that.searchResults,_that.searchPage,_that.layout,_that.errorCount,_that.showSavedOnly,_that.error,_that.stackTrace);case _:
+return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loading,_that.items,_that.searchMode,_that.searchTerms,_that.searchResults,_that.searchPage,_that.layout,_that.errorCount,_that.showSavedOnly,_that.activeTab,_that.error,_that.stackTrace);case _:
   return orElse();
 
 }
@@ -181,10 +195,10 @@ return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loadin
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool hasScrolled,  DateTime currentTime,  TimeBlock timeBlock,  bool loading,  Map<DateTimeRange, List<FeedItem>> items,  bool searchMode,  String searchTerms,  List<FeedItem> searchResults,  int searchPage,  List<LayoutBlock> layout,  int errorCount,  bool showSavedOnly,  dynamic error,  StackTrace? stackTrace)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool hasScrolled,  DateTime currentTime,  TimeBlock timeBlock,  bool loading,  Map<DateTimeRange, List<FeedItem>> items,  bool searchMode,  String searchTerms,  List<FeedItem> searchResults,  int searchPage,  List<LayoutBlock> layout,  int errorCount,  bool showSavedOnly,  MagazineTab? activeTab,  dynamic error,  StackTrace? stackTrace)  $default,) {final _that = this;
 switch (_that) {
 case _MainFeedState():
-return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loading,_that.items,_that.searchMode,_that.searchTerms,_that.searchResults,_that.searchPage,_that.layout,_that.errorCount,_that.showSavedOnly,_that.error,_that.stackTrace);}
+return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loading,_that.items,_that.searchMode,_that.searchTerms,_that.searchResults,_that.searchPage,_that.layout,_that.errorCount,_that.showSavedOnly,_that.activeTab,_that.error,_that.stackTrace);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -198,10 +212,10 @@ return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loadin
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool hasScrolled,  DateTime currentTime,  TimeBlock timeBlock,  bool loading,  Map<DateTimeRange, List<FeedItem>> items,  bool searchMode,  String searchTerms,  List<FeedItem> searchResults,  int searchPage,  List<LayoutBlock> layout,  int errorCount,  bool showSavedOnly,  dynamic error,  StackTrace? stackTrace)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool hasScrolled,  DateTime currentTime,  TimeBlock timeBlock,  bool loading,  Map<DateTimeRange, List<FeedItem>> items,  bool searchMode,  String searchTerms,  List<FeedItem> searchResults,  int searchPage,  List<LayoutBlock> layout,  int errorCount,  bool showSavedOnly,  MagazineTab? activeTab,  dynamic error,  StackTrace? stackTrace)?  $default,) {final _that = this;
 switch (_that) {
 case _MainFeedState() when $default != null:
-return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loading,_that.items,_that.searchMode,_that.searchTerms,_that.searchResults,_that.searchPage,_that.layout,_that.errorCount,_that.showSavedOnly,_that.error,_that.stackTrace);case _:
+return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loading,_that.items,_that.searchMode,_that.searchTerms,_that.searchResults,_that.searchPage,_that.layout,_that.errorCount,_that.showSavedOnly,_that.activeTab,_that.error,_that.stackTrace);case _:
   return null;
 
 }
@@ -213,7 +227,7 @@ return $default(_that.hasScrolled,_that.currentTime,_that.timeBlock,_that.loadin
 
 
 class _MainFeedState implements MainFeedState, WithError {
-  const _MainFeedState({this.hasScrolled = false, required this.currentTime, this.timeBlock = TimeBlock.one_day, this.loading = true, final  Map<DateTimeRange, List<FeedItem>> items = const {}, this.searchMode = false, this.searchTerms = '', final  List<FeedItem> searchResults = const [], this.searchPage = 0, final  List<LayoutBlock> layout = const [], this.errorCount = 0, this.showSavedOnly = false, this.error, this.stackTrace}): _items = items,_searchResults = searchResults,_layout = layout;
+  const _MainFeedState({this.hasScrolled = false, required this.currentTime, this.timeBlock = TimeBlock.one_day, this.loading = true, final  Map<DateTimeRange, List<FeedItem>> items = const {}, this.searchMode = false, this.searchTerms = '', final  List<FeedItem> searchResults = const [], this.searchPage = 0, final  List<LayoutBlock> layout = const [], this.errorCount = 0, this.showSavedOnly = false, this.activeTab, this.error, this.stackTrace}): _items = items,_searchResults = searchResults,_layout = layout;
   
 
 @override@JsonKey() final  bool hasScrolled;
@@ -246,6 +260,7 @@ class _MainFeedState implements MainFeedState, WithError {
 
 @override@JsonKey() final  int errorCount;
 @override@JsonKey() final  bool showSavedOnly;
+@override final  MagazineTab? activeTab;
 @override final  dynamic error;
 @override final  StackTrace? stackTrace;
 
@@ -259,16 +274,16 @@ _$MainFeedStateCopyWith<_MainFeedState> get copyWith => __$MainFeedStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MainFeedState&&(identical(other.hasScrolled, hasScrolled) || other.hasScrolled == hasScrolled)&&(identical(other.currentTime, currentTime) || other.currentTime == currentTime)&&(identical(other.timeBlock, timeBlock) || other.timeBlock == timeBlock)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.searchMode, searchMode) || other.searchMode == searchMode)&&(identical(other.searchTerms, searchTerms) || other.searchTerms == searchTerms)&&const DeepCollectionEquality().equals(other._searchResults, _searchResults)&&(identical(other.searchPage, searchPage) || other.searchPage == searchPage)&&const DeepCollectionEquality().equals(other._layout, _layout)&&(identical(other.errorCount, errorCount) || other.errorCount == errorCount)&&(identical(other.showSavedOnly, showSavedOnly) || other.showSavedOnly == showSavedOnly)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MainFeedState&&(identical(other.hasScrolled, hasScrolled) || other.hasScrolled == hasScrolled)&&(identical(other.currentTime, currentTime) || other.currentTime == currentTime)&&(identical(other.timeBlock, timeBlock) || other.timeBlock == timeBlock)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.searchMode, searchMode) || other.searchMode == searchMode)&&(identical(other.searchTerms, searchTerms) || other.searchTerms == searchTerms)&&const DeepCollectionEquality().equals(other._searchResults, _searchResults)&&(identical(other.searchPage, searchPage) || other.searchPage == searchPage)&&const DeepCollectionEquality().equals(other._layout, _layout)&&(identical(other.errorCount, errorCount) || other.errorCount == errorCount)&&(identical(other.showSavedOnly, showSavedOnly) || other.showSavedOnly == showSavedOnly)&&(identical(other.activeTab, activeTab) || other.activeTab == activeTab)&&const DeepCollectionEquality().equals(other.error, error)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,hasScrolled,currentTime,timeBlock,loading,const DeepCollectionEquality().hash(_items),searchMode,searchTerms,const DeepCollectionEquality().hash(_searchResults),searchPage,const DeepCollectionEquality().hash(_layout),errorCount,showSavedOnly,const DeepCollectionEquality().hash(error),stackTrace);
+int get hashCode => Object.hash(runtimeType,hasScrolled,currentTime,timeBlock,loading,const DeepCollectionEquality().hash(_items),searchMode,searchTerms,const DeepCollectionEquality().hash(_searchResults),searchPage,const DeepCollectionEquality().hash(_layout),errorCount,showSavedOnly,activeTab,const DeepCollectionEquality().hash(error),stackTrace);
 
 @override
 String toString() {
-  return 'MainFeedState(hasScrolled: $hasScrolled, currentTime: $currentTime, timeBlock: $timeBlock, loading: $loading, items: $items, searchMode: $searchMode, searchTerms: $searchTerms, searchResults: $searchResults, searchPage: $searchPage, layout: $layout, errorCount: $errorCount, showSavedOnly: $showSavedOnly, error: $error, stackTrace: $stackTrace)';
+  return 'MainFeedState(hasScrolled: $hasScrolled, currentTime: $currentTime, timeBlock: $timeBlock, loading: $loading, items: $items, searchMode: $searchMode, searchTerms: $searchTerms, searchResults: $searchResults, searchPage: $searchPage, layout: $layout, errorCount: $errorCount, showSavedOnly: $showSavedOnly, activeTab: $activeTab, error: $error, stackTrace: $stackTrace)';
 }
 
 
@@ -279,11 +294,11 @@ abstract mixin class _$MainFeedStateCopyWith<$Res> implements $MainFeedStateCopy
   factory _$MainFeedStateCopyWith(_MainFeedState value, $Res Function(_MainFeedState) _then) = __$MainFeedStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool hasScrolled, DateTime currentTime, TimeBlock timeBlock, bool loading, Map<DateTimeRange, List<FeedItem>> items, bool searchMode, String searchTerms, List<FeedItem> searchResults, int searchPage, List<LayoutBlock> layout, int errorCount, bool showSavedOnly, dynamic error, StackTrace? stackTrace
+ bool hasScrolled, DateTime currentTime, TimeBlock timeBlock, bool loading, Map<DateTimeRange, List<FeedItem>> items, bool searchMode, String searchTerms, List<FeedItem> searchResults, int searchPage, List<LayoutBlock> layout, int errorCount, bool showSavedOnly, MagazineTab? activeTab, dynamic error, StackTrace? stackTrace
 });
 
 
-
+@override $MagazineTabCopyWith<$Res>? get activeTab;
 
 }
 /// @nodoc
@@ -296,7 +311,7 @@ class __$MainFeedStateCopyWithImpl<$Res>
 
 /// Create a copy of MainFeedState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? hasScrolled = null,Object? currentTime = null,Object? timeBlock = null,Object? loading = null,Object? items = null,Object? searchMode = null,Object? searchTerms = null,Object? searchResults = null,Object? searchPage = null,Object? layout = null,Object? errorCount = null,Object? showSavedOnly = null,Object? error = freezed,Object? stackTrace = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? hasScrolled = null,Object? currentTime = null,Object? timeBlock = null,Object? loading = null,Object? items = null,Object? searchMode = null,Object? searchTerms = null,Object? searchResults = null,Object? searchPage = null,Object? layout = null,Object? errorCount = null,Object? showSavedOnly = null,Object? activeTab = freezed,Object? error = freezed,Object? stackTrace = freezed,}) {
   return _then(_MainFeedState(
 hasScrolled: null == hasScrolled ? _self.hasScrolled : hasScrolled // ignore: cast_nullable_to_non_nullable
 as bool,currentTime: null == currentTime ? _self.currentTime : currentTime // ignore: cast_nullable_to_non_nullable
@@ -310,13 +325,26 @@ as List<FeedItem>,searchPage: null == searchPage ? _self.searchPage : searchPage
 as int,layout: null == layout ? _self._layout : layout // ignore: cast_nullable_to_non_nullable
 as List<LayoutBlock>,errorCount: null == errorCount ? _self.errorCount : errorCount // ignore: cast_nullable_to_non_nullable
 as int,showSavedOnly: null == showSavedOnly ? _self.showSavedOnly : showSavedOnly // ignore: cast_nullable_to_non_nullable
-as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as bool,activeTab: freezed == activeTab ? _self.activeTab : activeTab // ignore: cast_nullable_to_non_nullable
+as MagazineTab?,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
 as dynamic,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
 as StackTrace?,
   ));
 }
 
+/// Create a copy of MainFeedState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$MagazineTabCopyWith<$Res>? get activeTab {
+    if (_self.activeTab == null) {
+    return null;
+  }
 
+  return $MagazineTabCopyWith<$Res>(_self.activeTab!, (value) {
+    return _then(_self.copyWith(activeTab: value));
+  });
+}
 }
 
 // dart format on

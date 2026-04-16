@@ -40,11 +40,17 @@ public class FeedItemController {
     }
 
     @GetMapping
-    public Page<FeedItem> getItems(@RequestParam("from") Long from, @RequestParam("to") Long to, @DefaultValue("0") @RequestParam("page") int page, @DefaultValue("100") @RequestParam("pageSize") int pageSize) throws SQLException {
+    public Page<FeedItem> getItems(
+            @RequestParam("from") Long from,
+            @RequestParam("to") Long to,
+            @DefaultValue("0") @RequestParam("page") int page,
+            @DefaultValue("100") @RequestParam("pageSize") int pageSize,
+            @RequestParam(value = "minimumImportance", required = false) Integer minimumImportance
+    ) throws SQLException {
         if (from == null || to == null) {
             throw new InvalidParameterException("from and to query parameters are required");
         }
-        return feedItemService.getItems(from, to, page, pageSize);
+        return feedItemService.getItems(from, to, page, pageSize, minimumImportance);
     }
 
     @PostMapping("/read")

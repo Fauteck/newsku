@@ -8,6 +8,8 @@ import 'package:app/feed/views/components/search_result.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
+import 'package:app/magazine/models/magazine_tab.dart';
+import 'package:app/magazine/states/magazine_tabs.dart';
 import 'package:app/main.dart';
 import 'package:app/router.dart';
 import 'package:app/user/views/components/user_profile_picture.dart';
@@ -132,11 +134,17 @@ class FeedScreen extends StatelessWidget {
     return MainColorProvider(
       builder: (context, _) {
         return BlocProvider(
+          create: (context) => MagazineTabsCubit(const MagazineTabsState()),
+          child: BlocProvider(
           create: (context) => MainFeedCubit(
             MainFeedState(currentTime: DateTime.now().copyWith(hour: 23, minute: 59, second: 59, millisecond: 999)),
           ),
           child: ErrorHandler<MainFeedCubit, MainFeedState>(
-            child: BlocBuilder<MainFeedCubit, MainFeedState>(
+            child: BlocBuilder<MagazineTabsCubit, MagazineTabsState>(
+              builder: (context, tabsState) {
+                final tabsCubit = context.read<MagazineTabsCubit>();
+                final feedCubit = context.read<MainFeedCubit>();
+                return BlocBuilder<MainFeedCubit, MainFeedState>(
               builder: (context, state) {
                 var cubit = context.read<MainFeedCubit>();
                 return LayoutBuilder(
@@ -292,6 +300,18 @@ class FeedScreen extends StatelessWidget {
                                               ],
                                             ],
                                           ),
+                                          if (tabsState.tabs.isNotEmpty)
+                                            SliverToBoxAdapter(
+                                              child: _MagazineTabBar(
+                                                tabs: tabsState.tabs,
+                                                selectedTab: tabsState.selectedTab,
+                                                isMobile: isMobile,
+                                                onTabSelected: (tab) {
+                                                  tabsCubit.selectTab(tab);
+                                                  feedCubit.setActiveTab(tab);
+                                                },
+                                              ),
+                                            ),
                                           if (state.searchMode)
                                             SliverPadding(
                                               padding: .symmetric(horizontal: padding),
@@ -427,10 +447,93 @@ class FeedScreen extends StatelessWidget {
                   },
                 );
               },
+            );
+              },
             ),
           ),
-        );
+        ));
       },
+    );
+  }
+}
+
+class _MagazineTabBar extends StatelessWidget {
+  final List<MagazineTab> tabs;
+  final MagazineTab? selectedTab;
+  final bool isMobile;
+  final void Function(MagazineTab?) onTabSelected;
+
+  const _MagazineTabBar({
+    required this.tabs,
+    required this.selectedTab,
+    required this.isMobile,
+    required this.onTabSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    final allTabs = <MagazineTab?>[null, ...tabs];
+
+    if (isMobile) {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: pu3, vertical: pu2),
+        child: Row(
+          spacing: pu2,
+          children: allTabs.map((tab) {
+            final isSelected = tab?.id == selectedTab?.id;
+            return FilterChip(
+              label: Text(
+                tab?.name ?? 'Alle',
+                style: textTheme.labelMedium?.copyWith(
+                  color: isSelected ? colors.onSecondaryContainer : colors.onSurface,
+                ),
+              ),
+              selected: isSelected,
+              onSelected: (_) => onTabSelected(tab),
+              showCheckmark: false,
+            );
+          }).toList(),
+        ),
+      );
+    }
+
+    return Container(
+      color: colors.surface,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: pu4),
+        child: Row(
+          spacing: pu1,
+          children: allTabs.map((tab) {
+            final isSelected = tab?.id == selectedTab?.id;
+            return TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: isSelected ? colors.primary : colors.onSurface,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+              ),
+              onPressed: () => onTabSelected(tab),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(tab?.name ?? 'Alle', style: textTheme.labelLarge),
+                  if (isSelected)
+                    Container(
+                      height: 2,
+                      width: 24,
+                      color: colors.primary,
+                    )
+                  else
+                    SizedBox(height: 2),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 }

@@ -3,6 +3,7 @@ package com.github.lamarios.newsku.services;
 import com.github.lamarios.newsku.models.LayoutBlockSettings;
 import com.github.lamarios.newsku.models.LayoutBlockType;
 import com.github.lamarios.newsku.persistence.entities.LayoutBlock;
+import com.github.lamarios.newsku.persistence.entities.MagazineTab;
 import com.github.lamarios.newsku.persistence.repositories.LayoutRepository;
 import org.apache.tomcat.util.http.InvalidParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class LayoutService {
 
     @Transactional(readOnly = true)
     public List<LayoutBlock> getLayout() {
-        var blocks = layoutRepository.findByUserOrderByOrder(userService.getCurrentUser());
+        var blocks = layoutRepository.findByUserAndTabIsNullOrderByOrder(userService.getCurrentUser());
 
         if (blocks == null || blocks.isEmpty()) {
             return defaultLayout();
@@ -40,7 +41,7 @@ public class LayoutService {
         var user = userService.getCurrentUser();
         // we allow empty so the user will revert back to default layout
         if (layoutBlocks == null || layoutBlocks.isEmpty()) {
-            layoutRepository.deleteByUser(user);
+            layoutRepository.deleteByUserAndTabIsNull(user);
             return defaultLayout();
         }
         // we validate the blocks to make sure that the last one is not fixed
@@ -49,11 +50,12 @@ public class LayoutService {
         }
 
         // if we're good, we remove all the items from the user then we insert all the new ones.
-        layoutRepository.deleteByUser(user);
+        layoutRepository.deleteByUserAndTabIsNull(user);
 
         layoutBlocks.forEach(layoutBlock -> {
             layoutBlock.setId(UUID.randomUUID().toString());
             layoutBlock.setUser(user);
+            layoutBlock.setTab(null);
         });
 
         layoutRepository.saveAll(layoutBlocks);
@@ -62,7 +64,36 @@ public class LayoutService {
 
     }
 
-    private List<LayoutBlock> defaultLayout() {
+    @Transactional(readOnly = true)
+    public List<LayoutBlock> getTabLayout(MagazineTab tab) {
+        var blocks = layoutRepository.findByUserAndTabOrderByOrder(tab.getUser(), tab);
+        if (blocks == null || blocks.isEmpty()) {
+            return defaultLayout();
+        }
+        return blocks;
+    }
+
+    @Transactional
+    public List<LayoutBlock> setTabLayout(MagazineTab tab, List<LayoutBlock> layoutBlocks) {
+        var user = tab.getUser();
+        if (layoutBlocks == null || layoutBlocks.isEmpty()) {
+            layoutRepository.deleteByUserAndTab(user, tab);
+            return defaultLayout();
+        }
+        if (layoutBlocks.getLast().getType().isFixedSize()) {
+            throw new InvalidParameterException("layout must end by a flexible block");
+        }
+        layoutRepository.deleteByUserAndTab(user, tab);
+        layoutBlocks.forEach(layoutBlock -> {
+            layoutBlock.setId(UUID.randomUUID().toString());
+            layoutBlock.setUser(user);
+            layoutBlock.setTab(tab);
+        });
+        layoutRepository.saveAll(layoutBlocks);
+        return layoutBlocks;
+    }
+
+    List<LayoutBlock> defaultLayout() {
         // one top stories
         LayoutBlock topStories = new LayoutBlock();
         LayoutBlockSettings topStoriesSettings = new LayoutBlockSettings();

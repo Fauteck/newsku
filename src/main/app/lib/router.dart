@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:app/feed/models/feed.dart';
 import 'package:app/feed/views/screens/feed_screen.dart';
 import 'package:app/home/views/screens/home.dart';
+import 'package:app/magazine/views/screens/public_magazine_screen.dart';
 import 'package:app/reset-password/views/screens/reset_password.dart';
 import 'package:app/settings/views/screens/feed_errors.dart';
 import 'package:app/settings/views/screens/settings.dart';
@@ -79,6 +80,7 @@ class AppRouter extends RootStackRouter {
         ],
       ),
       AutoRoute(page: ResetPasswordRoute.page, path: "/reset-password"),
+      AutoRoute(page: PublicMagazineRoute.page, path: "/public/magazine/:tabId"),
       AutoRoute(
         page: LandingRoute.page,
         initial: !loggedInOnStart,

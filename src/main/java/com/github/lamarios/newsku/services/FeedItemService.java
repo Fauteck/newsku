@@ -225,12 +225,22 @@ public class FeedItemService {
     }
 
     @Transactional(readOnly = true)
-    public Page<@NotNull FeedItem> getItems(Long from, Long to, int page, int pageSize) {
+    public Page<@NotNull FeedItem> getItems(Long from, Long to, int page, int pageSize, Integer minimumImportanceOverride) {
 
         List<Feed> feeds = feedService.getFeeds();
         var user = userService.getCurrentUser();
+        int minImportance = minimumImportanceOverride != null ? minimumImportanceOverride : user.getMinimumImportance();
 
-        return feedItemRepository.findallByTimeAndFeeds(user.getMinimumImportance(), from, to, feeds, PageRequest.of(page, pageSize, Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "importance"), new Sort.Order(Sort.Direction.DESC, "timeCreated")))));
+        return feedItemRepository.findallByTimeAndFeeds(minImportance, from, to, feeds, PageRequest.of(page, pageSize, Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "importance"), new Sort.Order(Sort.Direction.DESC, "timeCreated")))));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<@NotNull FeedItem> getPublicItems(com.github.lamarios.newsku.persistence.entities.MagazineTab tab, long from, long to, int page, int pageSize) {
+        var user = tab.getUser();
+        List<Feed> feeds = feedRepository.getFeedsByUser(user);
+        int minImportance = tab.getMinimumImportance() != null ? tab.getMinimumImportance() : user.getMinimumImportance();
+
+        return feedItemRepository.findallByTimeAndFeeds(minImportance, from, to, feeds, PageRequest.of(page, pageSize, Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "importance"), new Sort.Order(Sort.Direction.DESC, "timeCreated")))));
     }
 
     @Transactional(readOnly = true)

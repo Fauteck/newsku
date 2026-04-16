@@ -4,6 +4,8 @@ import 'package:app/feed/services/feed_service.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/layouts/services/layout.dart';
+import 'package:app/magazine/models/magazine_tab.dart';
+import 'package:app/magazine/services/magazine_tab_service.dart';
 import 'package:app/main.dart';
 import 'package:app/utils/models/with_error.dart';
 import 'package:app/utils/utils.dart';
@@ -164,9 +166,16 @@ class MainFeedCubit extends Cubit<MainFeedState> {
 
       var key = DateTimeRange(start: from, end: now);
 
+      final activeTab = state.activeTab;
       var data = List<FeedItem>.from(
         await service
-            .getFeedItems(page: 0, pageSize: 999999, from: from.millisecondsSinceEpoch, to: now.millisecondsSinceEpoch)
+            .getFeedItems(
+              page: 0,
+              pageSize: 999999,
+              from: from.millisecondsSinceEpoch,
+              to: now.millisecondsSinceEpoch,
+              minimumImportance: activeTab?.minimumImportance,
+            )
             .then((value) => value.content),
       );
 
@@ -200,10 +209,19 @@ class MainFeedCubit extends Cubit<MainFeedState> {
     scrollController.animateTo(0, duration: Duration(milliseconds: 500), curve: Curves.easeOutQuart);
   }
 
+  Future<void> setActiveTab(MagazineTab? tab) async {
+    emit(state.copyWith(activeTab: tab, items: {}, currentTime: DateTime.now().copyWith(hour: 23, minute: 59, second: 59, millisecond: 999)));
+    await refresh();
+  }
+
   Future<void> refresh() async {
     try {
       emit(state.copyWith(loading: true));
-      final layout = LayoutService(serverUrl!).getLayout();
+      final activeTab = state.activeTab;
+      final Future<List<LayoutBlock>> layoutFuture = activeTab != null
+          ? MagazineTabService(serverUrl!).getTabLayout(activeTab.id!)
+          : LayoutService(serverUrl!).getLayout();
+      final layout = layoutFuture;
 
       final errorCount = FeedService(serverUrl!).countLast24Hours();
 
@@ -277,6 +295,7 @@ sealed class MainFeedState with _$MainFeedState implements WithError {
     @Default([]) List<LayoutBlock> layout,
     @Default(0) int errorCount,
     @Default(false) bool showSavedOnly,
+    MagazineTab? activeTab,
     dynamic error,
     StackTrace? stackTrace,
   }) = _MainFeedState;
