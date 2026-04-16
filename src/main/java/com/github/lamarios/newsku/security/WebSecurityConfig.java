@@ -68,8 +68,9 @@ public class WebSecurityConfig {
                 ? Arrays.stream(frontendUrl.split(","))
                         .map(String::trim)
                         .filter(s -> !s.isBlank())
+                        .map(s -> s.endsWith("/") ? s.substring(0, s.length() - 1) : s)
                         .toList()
-                : List.of(rootUrl);
+                : List.of(rootUrl.endsWith("/") ? rootUrl.substring(0, rootUrl.length() - 1) : rootUrl);
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedOrigins(allowedOrigins);
