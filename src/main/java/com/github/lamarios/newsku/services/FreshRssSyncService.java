@@ -83,18 +83,16 @@ public class FreshRssSyncService {
      * Runs a full sync for every user that has FreshRSS credentials configured.
      */
     public void syncAll() {
-        if (!freshRssApiService.isConfigured()) {
-            logger.debug("FreshRSS not configured (FRESHRSS_URL not set) – skipping sync");
+        if (!freshRssApiService.isCredentialsConfigured()) {
+            logger.debug("FreshRSS not configured (FRESHRSS_URL / FRESHRSS_USERNAME / FRESHRSS_API_PASSWORD not set) – skipping sync");
             return;
         }
         List<User> users = userRepository.findAll();
         for (User user : users) {
-            if (freshRssApiService.isUserConfigured(user)) {
-                try {
-                    syncUser(user);
-                } catch (Exception e) {
-                    logger.error("FreshRSS sync failed for user {}: {}", user.getUsername(), e.getMessage(), e);
-                }
+            try {
+                syncUser(user);
+            } catch (Exception e) {
+                logger.error("FreshRSS sync failed for user {}: {}", user.getUsername(), e.getMessage(), e);
             }
         }
     }
