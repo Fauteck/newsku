@@ -1,3 +1,5 @@
+import 'package:app/ai/models/ai_prompt.dart';
+import 'package:app/ai/states/ai_prompts.dart';
 import 'package:app/home/state/local_preferences.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/main.dart';
@@ -34,34 +36,12 @@ class AiSettingsTab extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Gap(pu4),
-                    Text(locals.articlePreference, style: textTheme.titleMedium),
-                    Gap(pu2),
-                    TextField(
-                      key: const Key('article-preferences'),
-                      controller: cubit.preferenceController,
-                      maxLines: 5,
-                      decoration: InputDecoration(
-                        helper: Text(locals.articlePreferencesExplanation, style: subTextTheme),
-                      ),
-                    ),
-                    Gap(pu2),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: FilledButton.tonalIcon(
-                        onPressed: state.loading
-                            ? null
-                            : () async {
-                                await cubit.setAiPreferences();
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(
-                                    context,
-                                  ).showSnackBar(SnackBar(content: Text(locals.preferenceUpdated)));
-                                }
-                              },
-                        label: Text(locals.update),
-                        icon: const Icon(Icons.save),
-                      ),
-                    ),
+                    // Named prompts section
+                    Text(locals.namedPrompts, style: textTheme.titleMedium),
+                    Gap(pu1),
+                    Text(locals.namedPromptsExplanation, style: subTextTheme),
+                    Gap(pu3),
+                    const _NamedPromptsList(),
                     Gap(pu8),
                     const Divider(),
                     Gap(pu8),
@@ -144,5 +124,248 @@ class AiSettingsTab extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _NamedPromptsList extends StatelessWidget {
+  const _NamedPromptsList();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final locals = AppLocalizations.of(context)!;
+
+    return BlocBuilder<AiPromptsCubit, AiPromptsState>(
+      builder: (context, state) {
+        final cubit = context.read<AiPromptsCubit>();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (state.loading && state.prompts.isEmpty)
+              const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator())),
+            if (!state.loading && state.prompts.isEmpty)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: pu2),
+                child: Text(locals.noPrompts, style: TextStyle(color: colors.onSurfaceVariant)),
+              ),
+            ...state.prompts.map(
+              (prompt) => _PromptCard(
+                key: ValueKey(prompt.id),
+                prompt: prompt,
+                cubit: cubit,
+              ),
+            ),
+            Gap(pu2),
+            OutlinedButton.icon(
+              icon: const Icon(Icons.add),
+              label: Text(locals.newPrompt),
+              onPressed: () => _showCreateDialog(context, cubit),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showCreateDialog(BuildContext context, AiPromptsCubit cubit) async {
+    final locals = AppLocalizations.of(context)!;
+    final nameController = TextEditingController();
+    final contentController = TextEditingController();
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(locals.newPrompt),
+        content: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  labelText: locals.promptName,
+                  hintText: locals.promptNameHint,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+              Gap(pu3),
+              TextField(
+                controller: contentController,
+                maxLines: 5,
+                decoration: InputDecoration(
+                  labelText: locals.promptContent,
+                  hintText: locals.promptContentHint,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(locals.cancel)),
+          FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(locals.ok)),
+        ],
+      ),
+    );
+
+    if (result == true && nameController.text.trim().isNotEmpty) {
+      await cubit.createPrompt(nameController.text.trim(), contentController.text.trim());
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(locals.promptCreated)));
+      }
+    }
+
+    nameController.dispose();
+    contentController.dispose();
+  }
+}
+
+class _PromptCard extends StatefulWidget {
+  final AiPrompt prompt;
+  final AiPromptsCubit cubit;
+
+  const _PromptCard({super.key, required this.prompt, required this.cubit});
+
+  @override
+  State<_PromptCard> createState() => _PromptCardState();
+}
+
+class _PromptCardState extends State<_PromptCard> {
+  bool _editing = false;
+  late TextEditingController _nameController;
+  late TextEditingController _contentController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.prompt.name);
+    _contentController = TextEditingController(text: widget.prompt.content);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _contentController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final locals = AppLocalizations.of(context)!;
+
+    if (_editing) {
+      return Card(
+        margin: EdgeInsets.only(bottom: pu2),
+        child: Padding(
+          padding: EdgeInsets.all(pu3),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: locals.promptName,
+                  isDense: true,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+              Gap(pu2),
+              TextField(
+                controller: _contentController,
+                maxLines: 4,
+                decoration: InputDecoration(
+                  labelText: locals.promptContent,
+                  isDense: true,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+              Gap(pu2),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                spacing: pu2,
+                children: [
+                  TextButton(
+                    onPressed: () => setState(() => _editing = false),
+                    child: Text(locals.cancel),
+                  ),
+                  FilledButton.tonalIcon(
+                    icon: const Icon(Icons.save, size: 18),
+                    label: Text(locals.save),
+                    onPressed: () async {
+                      await widget.cubit.updatePrompt(
+                        widget.prompt.copyWith(
+                          name: _nameController.text.trim(),
+                          content: _contentController.text.trim(),
+                        ),
+                      );
+                      if (mounted) {
+                        setState(() => _editing = false);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(locals.promptSaved)),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Card(
+      margin: EdgeInsets.only(bottom: pu2),
+      child: ListTile(
+        title: Text(widget.prompt.name, style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+        subtitle: Text(
+          widget.prompt.content,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit_outlined, size: 20),
+              onPressed: () => setState(() => _editing = true),
+            ),
+            IconButton(
+              icon: Icon(Icons.delete_outline, size: 20, color: colors.error),
+              onPressed: () => _confirmDelete(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final locals = AppLocalizations.of(context)!;
+    final colors = Theme.of(context).colorScheme;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(locals.deletePrompt),
+        content: Text(locals.deletePromptMessage),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(locals.cancel)),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: colors.error),
+            child: Text(locals.delete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      widget.cubit.deletePrompt(widget.prompt);
+    }
   }
 }

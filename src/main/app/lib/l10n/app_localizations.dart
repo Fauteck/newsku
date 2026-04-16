@@ -923,6 +923,37 @@ abstract class AppLocalizations {
   String get openAiModel;
   String get openAiUrl;
   String get openAiSaved;
+  String get namedPrompts;
+  String get namedPromptsExplanation;
+  String get newPrompt;
+  String get promptName;
+  String get promptContent;
+  String get promptNameHint;
+  String get promptContentHint;
+  String get deletePrompt;
+  String get deletePromptMessage;
+  String get promptSaved;
+  String get promptCreated;
+  String get noPrompts;
+  String get selectPrompt;
+  String get globalPrompt;
+  String get magazineTabs;
+  String get magazineTabsExplanation;
+  String get newTab;
+  String get tabName;
+  String get tabNameHint;
+  String get deleteTab;
+  String get deleteTabMessage;
+  String get noTabs;
+  String get tabPublic;
+  String get tabPublicExplanation;
+  String get tabKiSettings;
+  String get tabKiSettingsExplanation;
+  String get tabMinScore;
+  String get tabMinScoreExplanation;
+  String layoutForTab(String tabName);
+  String get standardLayout;
+  String get aiPromptLabel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

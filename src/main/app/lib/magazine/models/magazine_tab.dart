@@ -11,6 +11,7 @@ sealed class MagazineTab with _$MagazineTab {
     required int displayOrder,
     @Default(false) bool isPublic,
     String? aiPreference,
+    String? aiPromptId,
     int? minimumImportance,
   }) = _MagazineTab;
 

@@ -12,6 +12,7 @@ _MagazineTab _$MagazineTabFromJson(Map<String, dynamic> json) => _MagazineTab(
   displayOrder: (json['displayOrder'] as num).toInt(),
   isPublic: json['isPublic'] as bool? ?? false,
   aiPreference: json['aiPreference'] as String?,
+  aiPromptId: json['aiPromptId'] as String?,
   minimumImportance: (json['minimumImportance'] as num?)?.toInt(),
 );
 
@@ -21,5 +22,6 @@ Map<String, dynamic> _$MagazineTabToJson(_MagazineTab instance) => <String, dyna
   'displayOrder': instance.displayOrder,
   'isPublic': instance.isPublic,
   'aiPreference': instance.aiPreference,
+  'aiPromptId': instance.aiPromptId,
   'minimumImportance': instance.minimumImportance,
 };

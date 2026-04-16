@@ -567,4 +567,99 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openAiSaved => 'KI-Einstellungen gespeichert';
+
+  @override
+  String get namedPrompts => 'Artikel-Präferenzen';
+
+  @override
+  String get namedPromptsExplanation => 'Benannte Prompts für die KI-Bewertung von Artikeln. Wähle einen Prompt je Magazin-Tab oder Block aus.';
+
+  @override
+  String get newPrompt => 'Neuer Prompt';
+
+  @override
+  String get promptName => 'Prompt-Name';
+
+  @override
+  String get promptContent => 'Prompt-Inhalt';
+
+  @override
+  String get promptNameHint => 'z.B. Technologie, Politik...';
+
+  @override
+  String get promptContentHint => 'Anweisung für das KI-Modell...';
+
+  @override
+  String get deletePrompt => 'Prompt löschen?';
+
+  @override
+  String get deletePromptMessage => 'Dieser Prompt wird dauerhaft gelöscht.';
+
+  @override
+  String get promptSaved => 'Prompt gespeichert';
+
+  @override
+  String get promptCreated => 'Prompt erstellt';
+
+  @override
+  String get noPrompts => 'Noch keine Prompts vorhanden';
+
+  @override
+  String get selectPrompt => 'Prompt auswählen';
+
+  @override
+  String get globalPrompt => 'Globale Einstellung';
+
+  @override
+  String get magazineTabs => 'Magazin-Tabs';
+
+  @override
+  String get magazineTabsExplanation => 'Erstelle individuelle Tabs mit eigenem Layout und eigener KI-Einstellung';
+
+  @override
+  String get newTab => 'Neuer Tab';
+
+  @override
+  String get tabName => 'Tab-Name';
+
+  @override
+  String get tabNameHint => 'z.B. Politik, Technologie...';
+
+  @override
+  String get deleteTab => 'Tab löschen?';
+
+  @override
+  String get deleteTabMessage => 'Dieser Tab und sein Layout werden dauerhaft gelöscht.';
+
+  @override
+  String get noTabs => 'Noch keine Tabs vorhanden';
+
+  @override
+  String get tabPublic => 'Öffentlich zugänglich';
+
+  @override
+  String get tabPublicExplanation => 'Dieser Tab ist ohne Anmeldung über einen direkten Link abrufbar';
+
+  @override
+  String get tabKiSettings => 'KI-Einstellungen';
+
+  @override
+  String get tabKiSettingsExplanation => 'Überschreibt die globalen KI-Einstellungen für diesen Tab';
+
+  @override
+  String get tabMinScore => 'Minimaler Nachrichten-Score';
+
+  @override
+  String get tabMinScoreExplanation => 'Leer = globale Einstellung verwenden';
+
+  @override
+  String layoutForTab(String tabName) {
+    return 'Layout: $tabName';
+  }
+
+  @override
+  String get standardLayout => 'Standard';
+
+  @override
+  String get aiPromptLabel => 'Artikel-Präferenz-Prompt';
 }

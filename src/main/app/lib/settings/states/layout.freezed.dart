@@ -20,6 +20,10 @@ mixin _$LayoutState {
 
   List<FeedCategory> get categories;
 
+  List<MagazineTab> get magazineTabs;
+
+  MagazineTab? get selectedTab;
+
   bool get loading;
 
   dynamic get error;
@@ -37,7 +41,7 @@ $LayoutStateCopyWith<LayoutState> get copyWith => _$LayoutStateCopyWithImpl<Layo
 bool operator ==(Object other) {
   return identical(this, other) ||
       (other.runtimeType == runtimeType && other is LayoutState && (identical(other.dragging, dragging) || other.dragging == dragging) && const DeepCollectionEquality().equals(other.blocks, blocks) &&
-          const DeepCollectionEquality().equals(other.categories, categories) && (identical(other.loading, loading) || other.loading == loading) &&
+          const DeepCollectionEquality().equals(other.categories, categories) && const DeepCollectionEquality().equals(other.magazineTabs, magazineTabs) && (identical(other.selectedTab, selectedTab) || other.selectedTab == selectedTab) && (identical(other.loading, loading) || other.loading == loading) &&
           const DeepCollectionEquality().equals(other.error, error) && (identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
 }
 
@@ -49,13 +53,15 @@ int get hashCode =>
         dragging,
         const DeepCollectionEquality().hash(blocks),
         const DeepCollectionEquality().hash(categories),
+        const DeepCollectionEquality().hash(magazineTabs),
+        selectedTab,
         loading,
         const DeepCollectionEquality().hash(error),
         stackTrace);
 
 @override
 String toString() {
-  return 'LayoutState(dragging: $dragging, blocks: $blocks, categories: $categories, loading: $loading, error: $error, stackTrace: $stackTrace)';
+  return 'LayoutState(dragging: $dragging, blocks: $blocks, categories: $categories, magazineTabs: $magazineTabs, selectedTab: $selectedTab, loading: $loading, error: $error, stackTrace: $stackTrace)';
 }
 
 
@@ -66,11 +72,11 @@ abstract mixin class $LayoutStateCopyWith<$Res>  {
   factory $LayoutStateCopyWith(LayoutState value, $Res Function(LayoutState) _then) = _$LayoutStateCopyWithImpl;
 @useResult
 $Res call({
-  bool dragging, List<LayoutBlock> blocks, List<FeedCategory> categories, bool loading, dynamic error, StackTrace? stackTrace
+  bool dragging, List<LayoutBlock> blocks, List<FeedCategory> categories, List<MagazineTab> magazineTabs, MagazineTab? selectedTab, bool loading, dynamic error, StackTrace? stackTrace
 });
 
 
-
+$MagazineTabCopyWith<$Res>? get selectedTab;
 
 }
 /// @nodoc
@@ -85,13 +91,17 @@ class _$LayoutStateCopyWithImpl<$Res>
 /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? dragging = null, Object? blocks = null, Object? categories = null, Object? loading = null, Object? error = freezed, Object? stackTrace = freezed,}) {
+  $Res call({Object? dragging = null, Object? blocks = null, Object? categories = null, Object? magazineTabs = null, Object? selectedTab = freezed, Object? loading = null, Object? error = freezed, Object? stackTrace = freezed,}) {
   return _then(_self.copyWith(
 dragging: null == dragging ? _self.dragging : dragging // ignore: cast_nullable_to_non_nullable
 as bool,blocks: null == blocks ? _self.blocks : blocks // ignore: cast_nullable_to_non_nullable
   as List<LayoutBlock>,
     categories: null == categories ? _self.categories : categories // ignore: cast_nullable_to_non_nullable
     as List<FeedCategory>,
+    magazineTabs: null == magazineTabs ? _self.magazineTabs : magazineTabs // ignore: cast_nullable_to_non_nullable
+    as List<MagazineTab>,
+    selectedTab: freezed == selectedTab ? _self.selectedTab : selectedTab // ignore: cast_nullable_to_non_nullable
+    as MagazineTab?,
     loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
 as dynamic,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
@@ -99,23 +109,24 @@ as StackTrace?,
   ));
 }
 
+/// Create a copy of LayoutState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$MagazineTabCopyWith<$Res>? get selectedTab {
+    if (_self.selectedTab == null) {
+    return null;
+  }
+
+  return $MagazineTabCopyWith<$Res>(_self.selectedTab!, (value) {
+    return _then(_self.copyWith(selectedTab: value));
+  });
+}
 }
 
 
 /// Adds pattern-matching-related methods to [LayoutState].
 extension LayoutStatePatterns on LayoutState {
-/// A variant of `map` that fallback to returning `orElse`.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case _:
-///     return orElse();
-/// }
-/// ```
-
 @optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _LayoutState value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
@@ -125,18 +136,6 @@ return $default(_that);case _:
 
 }
 }
-/// A `switch`-like method, using callbacks.
-///
-/// Callbacks receives the raw object, upcasted.
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case final Subclass2 value:
-///     return ...;
-/// }
-/// ```
 
 @optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _LayoutState value)  $default,){
 final _that = this;
@@ -144,17 +143,6 @@ switch (_that) {
 case _LayoutState():
 return $default(_that);}
 }
-/// A variant of `map` that fallback to returning `null`.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case _:
-///     return null;
-/// }
-/// ```
 
 @optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _LayoutState value)?  $default,){
 final _that = this;
@@ -165,60 +153,26 @@ return $default(_that);case _:
 
 }
 }
-/// A variant of `when` that fallback to an `orElse` callback.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case _:
-///     return orElse();
-/// }
-/// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool dragging, List<LayoutBlock> blocks, List<FeedCategory> categories, bool loading, dynamic error, StackTrace? stackTrace)? $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool dragging, List<LayoutBlock> blocks, List<FeedCategory> categories, List<MagazineTab> magazineTabs, MagazineTab? selectedTab, bool loading, dynamic error, StackTrace? stackTrace)? $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LayoutState() when $default != null:
-return $default(_that.dragging,_that.blocks,_that.categories,_that.loading,_that.error,_that.stackTrace);case _:
+return $default(_that.dragging,_that.blocks,_that.categories,_that.magazineTabs,_that.selectedTab,_that.loading,_that.error,_that.stackTrace);case _:
   return orElse();
 
 }
 }
-/// A `switch`-like method, using callbacks.
-///
-/// As opposed to `map`, this offers destructuring.
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case Subclass2(:final field2):
-///     return ...;
-/// }
-/// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool dragging, List<LayoutBlock> blocks, List<FeedCategory> categories, bool loading, dynamic error, StackTrace? stackTrace) $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool dragging, List<LayoutBlock> blocks, List<FeedCategory> categories, List<MagazineTab> magazineTabs, MagazineTab? selectedTab, bool loading, dynamic error, StackTrace? stackTrace) $default,) {final _that = this;
 switch (_that) {
 case _LayoutState():
-return $default(_that.dragging,_that.blocks,_that.categories,_that.loading,_that.error,_that.stackTrace);}
+return $default(_that.dragging,_that.blocks,_that.categories,_that.magazineTabs,_that.selectedTab,_that.loading,_that.error,_that.stackTrace);}
 }
-/// A variant of `when` that fallback to returning `null`
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case _:
-///     return null;
-/// }
-/// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool dragging, List<LayoutBlock> blocks, List<FeedCategory> categories, bool loading, dynamic error, StackTrace? stackTrace)? $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool dragging, List<LayoutBlock> blocks, List<FeedCategory> categories, List<MagazineTab> magazineTabs, MagazineTab? selectedTab, bool loading, dynamic error, StackTrace? stackTrace)? $default,) {final _that = this;
 switch (_that) {
 case _LayoutState() when $default != null:
-return $default(_that.dragging,_that.blocks,_that.categories,_that.loading,_that.error,_that.stackTrace);case _:
+return $default(_that.dragging,_that.blocks,_that.categories,_that.magazineTabs,_that.selectedTab,_that.loading,_that.error,_that.stackTrace);case _:
   return null;
 
 }
@@ -230,9 +184,10 @@ return $default(_that.dragging,_that.blocks,_that.categories,_that.loading,_that
 
 
 class _LayoutState extends LayoutState implements WithError {
-  const _LayoutState({this.dragging = false, final List<LayoutBlock> blocks = const [], final List<FeedCategory> categories = const [], this.loading = true, this.error, this.stackTrace})
+  const _LayoutState({this.dragging = false, final List<LayoutBlock> blocks = const [], final List<FeedCategory> categories = const [], final List<MagazineTab> magazineTabs = const [], this.selectedTab, this.loading = true, this.error, this.stackTrace})
       : _blocks = blocks,
         _categories = categories,
+        _magazineTabs = magazineTabs,
         super._();
 
 
@@ -254,6 +209,17 @@ class _LayoutState extends LayoutState implements WithError {
     return EqualUnmodifiableListView(_categories);
   }
 
+  final List<MagazineTab> _magazineTabs;
+
+  @override
+  @JsonKey()
+  List<MagazineTab> get magazineTabs {
+    if (_magazineTabs is EqualUnmodifiableListView) return _magazineTabs;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_magazineTabs);
+  }
+
+@override final  MagazineTab? selectedTab;
 @override@JsonKey() final  bool loading;
 @override final  dynamic error;
 @override final  StackTrace? stackTrace;
@@ -270,6 +236,7 @@ _$LayoutStateCopyWith<_LayoutState> get copyWith => __$LayoutStateCopyWithImpl<_
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType && other is _LayoutState && (identical(other.dragging, dragging) || other.dragging == dragging) &&
       const DeepCollectionEquality().equals(other._blocks, _blocks) && const DeepCollectionEquality().equals(other._categories, _categories) &&
+      const DeepCollectionEquality().equals(other._magazineTabs, _magazineTabs) && (identical(other.selectedTab, selectedTab) || other.selectedTab == selectedTab) &&
       (identical(other.loading, loading) || other.loading == loading) && const DeepCollectionEquality().equals(other.error, error) &&
       (identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
 }
@@ -282,13 +249,15 @@ int get hashCode =>
         dragging,
         const DeepCollectionEquality().hash(_blocks),
         const DeepCollectionEquality().hash(_categories),
+        const DeepCollectionEquality().hash(_magazineTabs),
+        selectedTab,
         loading,
         const DeepCollectionEquality().hash(error),
         stackTrace);
 
 @override
 String toString() {
-  return 'LayoutState(dragging: $dragging, blocks: $blocks, categories: $categories, loading: $loading, error: $error, stackTrace: $stackTrace)';
+  return 'LayoutState(dragging: $dragging, blocks: $blocks, categories: $categories, magazineTabs: $magazineTabs, selectedTab: $selectedTab, loading: $loading, error: $error, stackTrace: $stackTrace)';
 }
 
 
@@ -299,11 +268,11 @@ abstract mixin class _$LayoutStateCopyWith<$Res> implements $LayoutStateCopyWith
   factory _$LayoutStateCopyWith(_LayoutState value, $Res Function(_LayoutState) _then) = __$LayoutStateCopyWithImpl;
 @override @useResult
 $Res call({
-  bool dragging, List<LayoutBlock> blocks, List<FeedCategory> categories, bool loading, dynamic error, StackTrace? stackTrace
+  bool dragging, List<LayoutBlock> blocks, List<FeedCategory> categories, List<MagazineTab> magazineTabs, MagazineTab? selectedTab, bool loading, dynamic error, StackTrace? stackTrace
 });
 
 
-
+@override $MagazineTabCopyWith<$Res>? get selectedTab;
 
 }
 /// @nodoc
@@ -318,13 +287,17 @@ class __$LayoutStateCopyWithImpl<$Res>
 /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $Res call({Object? dragging = null, Object? blocks = null, Object? categories = null, Object? loading = null, Object? error = freezed, Object? stackTrace = freezed,}) {
+  $Res call({Object? dragging = null, Object? blocks = null, Object? categories = null, Object? magazineTabs = null, Object? selectedTab = freezed, Object? loading = null, Object? error = freezed, Object? stackTrace = freezed,}) {
   return _then(_LayoutState(
 dragging: null == dragging ? _self.dragging : dragging // ignore: cast_nullable_to_non_nullable
 as bool,blocks: null == blocks ? _self._blocks : blocks // ignore: cast_nullable_to_non_nullable
   as List<LayoutBlock>,
     categories: null == categories ? _self._categories : categories // ignore: cast_nullable_to_non_nullable
     as List<FeedCategory>,
+    magazineTabs: null == magazineTabs ? _self._magazineTabs : magazineTabs // ignore: cast_nullable_to_non_nullable
+    as List<MagazineTab>,
+    selectedTab: freezed == selectedTab ? _self.selectedTab : selectedTab // ignore: cast_nullable_to_non_nullable
+    as MagazineTab?,
     loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
 as dynamic,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
@@ -332,7 +305,19 @@ as StackTrace?,
   ));
 }
 
+/// Create a copy of LayoutState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$MagazineTabCopyWith<$Res>? get selectedTab {
+    if (_self.selectedTab == null) {
+    return null;
+  }
 
+  return $MagazineTabCopyWith<$Res>(_self.selectedTab!, (value) {
+    return _then(_self.copyWith(selectedTab: value));
+  });
+}
 }
 
 // dart format on

@@ -66,12 +66,13 @@ class MagazineSettingsCubit extends Cubit<MagazineSettingsState> {
     }
   }
 
-  void updateSelectedTabField({String? name, bool? isPublic, String? aiPreference, bool clearAiPreference = false, int? minimumImportance, bool clearMinimumImportance = false}) {
+  void updateSelectedTabField({String? name, bool? isPublic, String? aiPreference, bool clearAiPreference = false, String? aiPromptId, bool clearAiPromptId = false, int? minimumImportance, bool clearMinimumImportance = false}) {
     if (state.selectedTab == null) return;
     final updated = state.selectedTab!.copyWith(
       name: name ?? state.selectedTab!.name,
       isPublic: isPublic ?? state.selectedTab!.isPublic,
       aiPreference: clearAiPreference ? null : (aiPreference ?? state.selectedTab!.aiPreference),
+      aiPromptId: clearAiPromptId ? null : (aiPromptId ?? state.selectedTab!.aiPromptId),
       minimumImportance: clearMinimumImportance ? null : (minimumImportance ?? state.selectedTab!.minimumImportance),
     );
     emit(state.copyWith(selectedTab: updated));
