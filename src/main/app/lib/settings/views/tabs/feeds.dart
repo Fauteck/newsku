@@ -8,6 +8,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:material_loading_indicator/loading_indicator.dart';
 
 const _validUrl = r"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)";
@@ -30,8 +31,10 @@ class FeedsSettingsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-
+    final colors = Theme.of(context).colorScheme;
     final locals = AppLocalizations.of(context)!;
+    final freshRssActive = config?.freshRssUrl != null;
+
     return BlocProvider(
       create: (context) => FeedsSettingsCubit(FeedsSettingsState()),
       child: ErrorHandler<FeedsSettingsCubit, FeedsSettingsState>(
@@ -39,21 +42,45 @@ class FeedsSettingsTab extends StatelessWidget {
           builder: (context, state) {
             var cubit = context.read<FeedsSettingsCubit>();
             return state.loading
-                ? Center(child: SizedBox(width: 50, height: 50, child: LoadingIndicator()))
+                ? const Center(child: SizedBox(width: 50, height: 50, child: LoadingIndicator()))
                 : Column(
                     children: [
+                      if (freshRssActive) ...[
+                        Padding(
+                          padding: EdgeInsets.all(pu3),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: pu4, vertical: pu3),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: colors.secondaryContainer,
+                            ),
+                            child: Row(
+                              spacing: pu3,
+                              children: [
+                                Icon(Icons.info_outline, color: colors.onSecondaryContainer),
+                                Expanded(
+                                  child: Text(
+                                    locals.freshRssManagedFeeds,
+                                    style: textTheme.bodyMedium?.copyWith(color: colors.onSecondaryContainer),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                       Padding(
                         padding: EdgeInsets.all(pu2),
                         child: Form(
                           key: _formKey,
                           child: Row(
-                            crossAxisAlignment: .center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             spacing: pu2,
                             children: [
                               Expanded(
                                 child: TextFormField(
                                   controller: cubit.newFeedController,
-                                  autofillHints: [AutofillHints.url],
+                                  autofillHints: const [AutofillHints.url],
                                   decoration: InputDecoration(label: Text(locals.newFeedUrl)),
                                   validator: (value) {
                                     if (!RegExp(_validUrl).hasMatch(value ?? '')) {
@@ -70,56 +97,58 @@ class FeedsSettingsTab extends StatelessWidget {
                                   }
                                 },
                                 label: Text(locals.addFeed),
-                                icon: Icon(Icons.add),
+                                icon: const Icon(Icons.add),
                               ),
                             ],
                           ),
                         ),
                       ),
                       Row(
-                        mainAxisAlignment: .start,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         spacing: pu2,
                         children: [
-                          TextButton.icon(
-                            onPressed: () => addCategory(context),
-                            label: Text(locals.addCategory),
-                            icon: Icon(Icons.add),
-                          ),
+                          if (!freshRssActive)
+                            TextButton.icon(
+                              onPressed: () => addCategory(context),
+                              label: Text(locals.addCategory),
+                              icon: const Icon(Icons.add),
+                            ),
                           TextButton.icon(
                             onPressed: () => cubit.exportFeed(),
                             label: Text(locals.export),
-                            icon: Icon(Icons.download),
+                            icon: const Icon(Icons.download),
                           ),
-                          TextButton.icon(
-                            onPressed: () async {
-                              FilePickerResult? result = await FilePicker.platform.pickFiles(
-                                allowedExtensions: ['opml'],
-                                allowMultiple: false,
-                                type: FileType.custom,
-                              );
+                          if (!freshRssActive)
+                            TextButton.icon(
+                              onPressed: () async {
+                                FilePickerResult? result = await FilePicker.platform.pickFiles(
+                                  allowedExtensions: ['opml'],
+                                  allowMultiple: false,
+                                  type: FileType.custom,
+                                );
 
-                              if (result != null && result.files.isNotEmpty) {
-                                final feeds = await cubit.importFeeds(result.files.first.bytes);
-                                if (context.mounted && feeds.isNotEmpty) {
-                                  ScaffoldMessenger.of(
-                                    context,
-                                  ).showSnackBar(SnackBar(content: Text(locals.importedNFeeds(feeds.length))));
+                                if (result != null && result.files.isNotEmpty) {
+                                  final feeds = await cubit.importFeeds(result.files.first.bytes);
+                                  if (context.mounted && feeds.isNotEmpty) {
+                                    ScaffoldMessenger.of(
+                                      context,
+                                    ).showSnackBar(SnackBar(content: Text(locals.importedNFeeds(feeds.length))));
+                                  }
                                 }
-                              }
-                            },
-                            label: Text(locals.import),
-                            icon: Icon(Icons.upload),
-                          ),
+                              },
+                              label: Text(locals.import),
+                              icon: const Icon(Icons.upload),
+                            ),
                         ],
                       ),
                       state.feeds.isEmpty
                           ? Expanded(
                               child: Column(
-                                crossAxisAlignment: .center,
-                                mainAxisAlignment: .center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 spacing: pu6,
                                 children: [
-                                  Icon(Icons.sentiment_neutral_outlined, size: 50),
+                                  const Icon(Icons.sentiment_neutral_outlined, size: 50),
                                   Text(locals.noFeeds, style: textTheme.bodyLarge),
                                 ],
                               ),

@@ -22,8 +22,8 @@ class BigGridItem extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
     final prefs = context.watch<LocalPreferencesCubit>().state;
-    final titleMaxLines = prefs.truncateText ? prefs.titleMaxLines : null;
-    final contentMaxLines = prefs.truncateText ? prefs.contentMaxLines : null;
+    final titleMaxLines = prefs.truncateText ? 2 : null;
+    final contentMaxLines = prefs.truncateText ? 2 : null;
 
     return ClickableFeedItem(
       item: item,

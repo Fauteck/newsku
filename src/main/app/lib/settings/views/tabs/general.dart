@@ -28,7 +28,7 @@ class GeneralSettingsTab extends StatelessWidget {
     final subTextTheme = textTheme.labelMedium?.copyWith(color: colors.secondary);
 
     return Padding(
-      padding: .symmetric(horizontal: pu2),
+      padding: EdgeInsets.symmetric(horizontal: pu2),
       child: BlocProvider(
         create: (context) => GeneralSettingsCubit(GeneralSettingsState()),
         child: BlocBuilder<GeneralSettingsCubit, GeneralSettingsState>(
@@ -37,12 +37,12 @@ class GeneralSettingsTab extends StatelessWidget {
             return ErrorHandler<GeneralSettingsCubit, GeneralSettingsState>(
               child: SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: .start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Gap(pu4),
                     Text(locals.articlePreference),
                     TextField(
-                      key: Key('article-preferences'),
+                      key: const Key('article-preferences'),
                       controller: cubit.preferenceController,
                       maxLines: 5,
                       decoration: InputDecoration(
@@ -51,7 +51,7 @@ class GeneralSettingsTab extends StatelessWidget {
                     ),
                     Gap(pu2),
                     Align(
-                      alignment: .centerRight,
+                      alignment: Alignment.centerRight,
                       child: FilledButton.tonalIcon(
                         onPressed: state.loading
                             ? null
@@ -64,11 +64,11 @@ class GeneralSettingsTab extends StatelessWidget {
                                 }
                               },
                         label: Text(locals.update),
-                        icon: Icon(Icons.save),
+                        icon: const Icon(Icons.save),
                       ),
                     ),
                     Gap(pu8),
-                    Divider(),
+                    const Divider(),
                     Gap(pu8),
                     Text(locals.minimumNewsScore),
                     Text(locals.minimumNewsScoreExplanation, style: subTextTheme),
@@ -86,7 +86,7 @@ class GeneralSettingsTab extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Column(
-                            crossAxisAlignment: .stretch,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Text(locals.readItemHandling),
                               Text(locals.readItemHandlingExplanation, style: subTextTheme),
@@ -94,7 +94,7 @@ class GeneralSettingsTab extends StatelessWidget {
                           ),
                         ),
                         DropdownMenu<ReadItemHandling>(
-                          key: Key('read-item-handling'),
+                          key: const Key('read-item-handling'),
                           initialSelection: state.user?.readItemHandling ?? ReadItemHandling.none,
                           onSelected: cubit.setReadItemPreference,
                           dropdownMenuEntries: ReadItemHandling.values
@@ -104,72 +104,28 @@ class GeneralSettingsTab extends StatelessWidget {
                       ],
                     ),
                     Gap(pu8),
-                    Divider(),
+                    const Divider(),
                     Gap(pu8),
                     Container(
-                      padding: .symmetric(horizontal: pu4, vertical: pu2),
-                      decoration: BoxDecoration(borderRadius: .circular(5), color: colors.tertiaryContainer),
-                      child: Row(spacing: pu, children: [Icon(Icons.info_outline), Text(locals.deviceOnlySettings)]),
+                      padding: EdgeInsets.symmetric(horizontal: pu4, vertical: pu2),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: colors.tertiaryContainer),
+                      child: Row(spacing: pu, children: [const Icon(Icons.info_outline), Text(locals.deviceOnlySettings)]),
                     ),
                     Gap(pu4),
-                    // ---- Text truncation settings ----
+                    // ---- Text truncation toggle (automatic per layout type) ----
                     BlocBuilder<LocalPreferencesCubit, LocalPreferencesState>(
                       bloc: getIt.get<LocalPreferencesCubit>(),
-                      builder: (context, prefsState) => Column(
-                        crossAxisAlignment: .start,
-                        children: [
-                          SwitchListTile(
-                            contentPadding: .zero,
-                            title: Text(locals.truncateText),
-                            subtitle: Text(locals.truncateTextExplanation, style: subTextTheme),
-                            value: prefsState.truncateText,
-                            onChanged: (value) => getIt.get<LocalPreferencesCubit>().setTruncateText(value),
-                          ),
-                          if (prefsState.truncateText) ...[
-                            Gap(pu2),
-                            Text(locals.titleMaxLines),
-                            Row(
-                              children: [
-                                Text('1', style: textTheme.labelSmall),
-                                Expanded(
-                                  child: Slider(
-                                    min: 1,
-                                    max: 6,
-                                    divisions: 5,
-                                    label: prefsState.titleMaxLines.toString(),
-                                    value: prefsState.titleMaxLines.toDouble(),
-                                    onChanged: (v) =>
-                                        getIt.get<LocalPreferencesCubit>().setTitleMaxLines(v.round()),
-                                  ),
-                                ),
-                                Text('6', style: textTheme.labelSmall),
-                              ],
-                            ),
-                            Text(locals.contentMaxLines),
-                            Row(
-                              children: [
-                                Text('1', style: textTheme.labelSmall),
-                                Expanded(
-                                  child: Slider(
-                                    min: 1,
-                                    max: 8,
-                                    divisions: 7,
-                                    label: prefsState.contentMaxLines.toString(),
-                                    value: prefsState.contentMaxLines.toDouble(),
-                                    onChanged: (v) =>
-                                        getIt.get<LocalPreferencesCubit>().setContentMaxLines(v.round()),
-                                  ),
-                                ),
-                                Text('8', style: textTheme.labelSmall),
-                              ],
-                            ),
-                          ],
-                        ],
+                      builder: (context, prefsState) => SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(locals.truncateText),
+                        subtitle: Text(locals.truncateTextExplanation, style: subTextTheme),
+                        value: prefsState.truncateText,
+                        onChanged: (value) => getIt.get<LocalPreferencesCubit>().setTruncateText(value),
                       ),
                     ),
                     Gap(pu4),
                     SwitchListTile(
-                      contentPadding: .zero,
+                      contentPadding: EdgeInsets.zero,
                       title: Text(locals.blackBackground),
                       subtitle: Text(locals.blackBackgroundExplanation, style: subTextTheme),
                       value: context.select((LocalPreferencesCubit p) => p.state.blackBackground),
@@ -179,7 +135,7 @@ class GeneralSettingsTab extends StatelessWidget {
                     Gap(pu2),
                     if (!kIsWeb && Platform.isAndroid) ...[
                       SwitchListTile(
-                        contentPadding: .zero,
+                        contentPadding: EdgeInsets.zero,
                         title: Text(locals.dynamicColor),
                         subtitle: Text(locals.blackBackgroundExplanation, style: subTextTheme),
                         value: context.select((LocalPreferencesCubit p) => p.state.dynamicColor),
@@ -205,70 +161,48 @@ class GeneralSettingsTab extends StatelessWidget {
                       Wrap(
                         spacing: pu4,
                         runSpacing: pu4,
-                        children:
-                            [
-                              Colors.deepOrange,
-                              Colors.deepPurple,
-                              Colors.amber,
-                              Colors.green,
-                              Colors.pink,
-                              Colors.blue,
-                              Colors.grey,
-                              Colors.red,
-                              Colors.teal,
-                            ].map((c) {
-                              return InkWell(
-                                onTap: () => getIt.get<LocalPreferencesCubit>().setColor(c),
-                                child: SingleMotionBuilder(
-                                  from: 0,
-                                  value:
-                                      context.select((LocalPreferencesCubit p) => p.state.themeColor).toARGB32() ==
-                                          c.toARGB32()
-                                      ? 1
-                                      : 0,
-                                  motion: MaterialSpringMotion.expressiveSpatialSlow(),
-                                  builder: (context, value, child) => Transform.scale(
-                                    scale: lerpDouble(1, 1.3, value),
-                                    child: Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                        color: c,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          width: 2,
-                                          color: Color.lerp(colors.surface, colors.tertiary, value)!,
-                                        ),
-                                      ),
+                        children: [
+                          Colors.deepOrange,
+                          Colors.deepPurple,
+                          Colors.amber,
+                          Colors.green,
+                          Colors.pink,
+                          Colors.blue,
+                          Colors.grey,
+                          Colors.red,
+                          Colors.teal,
+                        ].map((c) {
+                          return InkWell(
+                            onTap: () => getIt.get<LocalPreferencesCubit>().setColor(c),
+                            child: SingleMotionBuilder(
+                              from: 0,
+                              value:
+                                  context.select((LocalPreferencesCubit p) => p.state.themeColor).toARGB32() ==
+                                      c.toARGB32()
+                                  ? 1
+                                  : 0,
+                              motion: MaterialSpringMotion.expressiveSpatialSlow(),
+                              builder: (context, value, child) => Transform.scale(
+                                scale: lerpDouble(1, 1.3, value),
+                                child: Container(
+                                  width: 30,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                    color: c,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      width: 2,
+                                      color: Color.lerp(colors.surface, colors.tertiary, value)!,
                                     ),
                                   ),
                                 ),
-                              );
-                            }).toList(),
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
-
-                    /*
                     Gap(pu8),
-                    Text(locals.density),
-                    Row(
-                      children: [
-                        Text(locals.dense, style: textTheme.labelSmall),
-                        Expanded(
-                          child: Slider(
-                            min: 1,
-                            max: 8,
-                            divisions: 8,
-                            value: pu,
-                            onChanged: (double value) => getIt.get<LocalPreferencesCubit>().setDensity(value),
-                          ),
-                        ),
-
-                        Text(locals.spacious, style: textTheme.labelSmall),
-                      ],
-                    ),
-*/
-                    Gap(pu8),
-                    Divider(),
+                    const Divider(),
                     Gap(pu8),
                   ],
                 ),

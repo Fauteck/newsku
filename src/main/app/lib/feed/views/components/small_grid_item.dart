@@ -21,7 +21,7 @@ class SmallGridItem extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
     final prefs = context.watch<LocalPreferencesCubit>().state;
-    final titleMaxLines = prefs.truncateText ? (prefs.titleMaxLines > 1 ? 2 : 1) : null;
+    final titleMaxLines = prefs.truncateText ? 2 : null;
     final contentMaxLines = prefs.truncateText ? 1 : null;
 
     return ClickableFeedItem(
