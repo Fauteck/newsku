@@ -42,7 +42,7 @@ class FeedsSettingsTab extends StatelessWidget {
           builder: (context, state) {
             var cubit = context.read<FeedsSettingsCubit>();
             return state.loading
-                ? const Center(child: SizedBox(width: 50, height: 50, child: LoadingIndicator()))
+                ? Center(child: SizedBox(width: 50, height: 50, child: LoadingIndicator()))
                 : Column(
                     children: [
                       if (freshRssActive) ...[
