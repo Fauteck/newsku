@@ -48,6 +48,7 @@ public class MagazineTabService {
         existing.setDisplayOrder(updated.getDisplayOrder());
         existing.setPublic(updated.isPublic());
         existing.setAiPreference(updated.getAiPreference());
+        existing.setAiPromptId(updated.getAiPromptId());
         existing.setMinimumImportance(updated.getMinimumImportance());
         return magazineTabRepository.save(existing);
     }

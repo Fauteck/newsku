@@ -1,10 +1,13 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:app/ai/models/ai_prompt.dart';
+import 'package:app/ai/states/ai_prompts.dart';
 import 'package:app/home/state/local_preferences.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/layouts/models/layout_block_types.dart';
+import 'package:app/magazine/models/magazine_tab.dart';
 import 'package:app/main.dart';
 import 'package:app/settings/states/general.dart';
 import 'package:app/settings/states/layout.dart';
@@ -51,7 +54,10 @@ class LayoutSettingsTab extends StatelessWidget {
               create: (context) => LayoutCubit(LayoutState()),
               child: BlocConsumer<LayoutCubit, LayoutState>(
                 listener: (context, state) => context.read<LayoutCubit>().save(),
-                listenWhen: (previous, current) => current.blocks.isNotEmpty && previous.blocks != current.blocks,
+                listenWhen: (previous, current) =>
+                    current.blocks.isNotEmpty &&
+                    previous.blocks != current.blocks &&
+                    previous.selectedTab == current.selectedTab,
                 builder: (context, state) {
                   final cubit = context.read<LayoutCubit>();
                   return ErrorHandler<LayoutCubit, LayoutState>(
@@ -177,6 +183,11 @@ class LayoutSettingsTab extends StatelessWidget {
                         Gap(pu4),
                         const Divider(),
                         Gap(pu2),
+                        // Magazine tabs section
+                        _MagazineTabsSection(cubit: cubit, state: state),
+                        Gap(pu2),
+                        const Divider(),
+                        Gap(pu2),
                         // Two-column blocks section
                         Expanded(
                           child: Flex(
@@ -256,7 +267,14 @@ class LayoutSettingsTab extends StatelessWidget {
                                     Gap(pu2),
                                     Row(
                                       children: [
-                                        Expanded(child: Text(locals.currentLayout, style: textTheme.titleLarge)),
+                                        Expanded(
+                                          child: Text(
+                                            state.selectedTab != null
+                                                ? locals.layoutForTab(state.selectedTab!.name)
+                                                : locals.currentLayout,
+                                            style: textTheme.titleLarge,
+                                          ),
+                                        ),
                                         if (device == BreakPoint.mobile)
                                           TextButton(
                                             onPressed: () async {
@@ -278,139 +296,142 @@ class LayoutSettingsTab extends StatelessWidget {
                                           ),
                                       ],
                                     ),
-                                    Expanded(
-                                      child: ReorderableListView.builder(
-                                        scrollController: cubit.scrollController,
-                                        proxyDecorator: (child, index, animation) =>
-                                            Center(child: DraggedLayoutBlock(type: state.blocks[index].type)),
-                                        itemCount: state.blocks.length,
-                                        onReorder: (int oldIndex, int newIndex) =>
-                                            cubit.onReorder(oldIndex, newIndex),
-                                        buildDefaultDragHandles: false,
-                                        itemBuilder: (context, index) {
-                                          var block = state.blocks[index];
-                                          var isLast = index == state.blocks.length - 1;
+                                    if (state.loading)
+                                      const Expanded(child: Center(child: CircularProgressIndicator()))
+                                    else
+                                      Expanded(
+                                        child: ReorderableListView.builder(
+                                          scrollController: cubit.scrollController,
+                                          proxyDecorator: (child, index, animation) =>
+                                              Center(child: DraggedLayoutBlock(type: state.blocks[index].type)),
+                                          itemCount: state.blocks.length,
+                                          onReorder: (int oldIndex, int newIndex) =>
+                                              cubit.onReorder(oldIndex, newIndex),
+                                          buildDefaultDragHandles: false,
+                                          itemBuilder: (context, index) {
+                                            var block = state.blocks[index];
+                                            var isLast = index == state.blocks.length - 1;
 
-                                          return Padding(
-                                            key: ValueKey(block),
-                                            padding: EdgeInsets.only(bottom: pu2),
-                                            child: ConditionalWrap(
-                                              wrapIf: index == 0,
-                                              wrapper: (child) => Column(
-                                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                children: [
-                                                  LayoutSeparator(index: -1, dragging: state.dragging),
-                                                  child,
-                                                ],
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                children: [
-                                                  _BlockTitleField(
-                                                    block: block,
-                                                    onUpdated: (newBlock) => cubit.updateBlock(block, newBlock),
-                                                  ),
-                                                  Gap(pu2),
-                                                  Row(
-                                                    spacing: pu4,
-                                                    children: [
-                                                      ReorderableDragStartListener(
-                                                        index: index,
-                                                        child: MouseRegion(
-                                                          cursor: SystemMouseCursors.move,
-                                                          child: const Icon(Icons.drag_handle, size: 40),
+                                            return Padding(
+                                              key: ValueKey(block),
+                                              padding: EdgeInsets.only(bottom: pu2),
+                                              child: ConditionalWrap(
+                                                wrapIf: index == 0,
+                                                wrapper: (child) => Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                  children: [
+                                                    LayoutSeparator(index: -1, dragging: state.dragging),
+                                                    child,
+                                                  ],
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                  children: [
+                                                    _BlockTitleField(
+                                                      block: block,
+                                                      onUpdated: (newBlock) => cubit.updateBlock(block, newBlock),
+                                                    ),
+                                                    Gap(pu2),
+                                                    Row(
+                                                      spacing: pu4,
+                                                      children: [
+                                                        ReorderableDragStartListener(
+                                                          index: index,
+                                                          child: MouseRegion(
+                                                            cursor: SystemMouseCursors.move,
+                                                            child: const Icon(Icons.drag_handle, size: 40),
+                                                          ),
                                                         ),
-                                                      ),
-                                                      Expanded(
-                                                        child: ConditionalWrap(
-                                                          wrapIf: isLast && !block.type.fixedSize,
-                                                          wrapper: (child) => Stack(
-                                                            children: [
-                                                              child,
-                                                              Positioned(
-                                                                left: 0,
-                                                                right: 0,
-                                                                bottom: 0,
-                                                                child: Container(
-                                                                  height: 150,
-                                                                  decoration: BoxDecoration(
-                                                                    gradient: LinearGradient(
-                                                                      colors: [
-                                                                        (fadeColor ?? colors.surface)
-                                                                            .withValues(alpha: 0),
-                                                                        (fadeColor ?? colors.surface),
-                                                                      ],
-                                                                      stops: const [0, 0.90],
-                                                                      begin: Alignment.topCenter,
-                                                                      end: Alignment.bottomCenter,
+                                                        Expanded(
+                                                          child: ConditionalWrap(
+                                                            wrapIf: isLast && !block.type.fixedSize,
+                                                            wrapper: (child) => Stack(
+                                                              children: [
+                                                                child,
+                                                                Positioned(
+                                                                  left: 0,
+                                                                  right: 0,
+                                                                  bottom: 0,
+                                                                  child: Container(
+                                                                    height: 150,
+                                                                    decoration: BoxDecoration(
+                                                                      gradient: LinearGradient(
+                                                                        colors: [
+                                                                          (fadeColor ?? colors.surface)
+                                                                              .withValues(alpha: 0),
+                                                                          (fadeColor ?? colors.surface),
+                                                                        ],
+                                                                        stops: const [0, 0.90],
+                                                                        begin: Alignment.topCenter,
+                                                                        end: Alignment.bottomCenter,
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          child: block.type.getBigPreview(
-                                                            context,
-                                                            block: block,
-                                                            onUpdated: (newBlock) =>
-                                                                cubit.updateBlock(block, newBlock),
-                                                            last: isLast,
-                                                            categories: state.categories,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      if (state.blocks.length > 1)
-                                                        IconButton(
-                                                          onPressed: () => cubit.removeBlock(block),
-                                                          icon: const Icon(Icons.delete),
-                                                          color: colors.error,
-                                                        ),
-                                                    ],
-                                                  ),
-                                                  if (isLast && !block.type.fixedSize) ...[
-                                                    Gap(pu2),
-                                                    Container(
-                                                      padding:
-                                                          EdgeInsets.symmetric(horizontal: pu3, vertical: pu2),
-                                                      decoration: BoxDecoration(
-                                                        borderRadius: BorderRadius.circular(6),
-                                                        color: colors.tertiaryContainer.withValues(alpha: 0.6),
-                                                      ),
-                                                      child: Row(
-                                                        spacing: pu2,
-                                                        children: [
-                                                          Icon(Icons.auto_awesome,
-                                                              size: 16, color: colors.onTertiaryContainer),
-                                                          Expanded(
-                                                            child: Text(
-                                                              locals.lastBlockHint,
-                                                              style: textTheme.bodySmall?.copyWith(
-                                                                color: colors.onTertiaryContainer,
-                                                              ),
+                                                              ],
+                                                            ),
+                                                            child: block.type.getBigPreview(
+                                                              context,
+                                                              block: block,
+                                                              onUpdated: (newBlock) =>
+                                                                  cubit.updateBlock(block, newBlock),
+                                                              last: isLast,
+                                                              categories: state.categories,
                                                             ),
                                                           ),
-                                                        ],
-                                                      ),
+                                                        ),
+                                                        if (state.blocks.length > 1)
+                                                          IconButton(
+                                                            onPressed: () => cubit.removeBlock(block),
+                                                            icon: const Icon(Icons.delete),
+                                                            color: colors.error,
+                                                          ),
+                                                      ],
                                                     ),
+                                                    if (isLast && !block.type.fixedSize) ...[
+                                                      Gap(pu2),
+                                                      Container(
+                                                        padding:
+                                                            EdgeInsets.symmetric(horizontal: pu3, vertical: pu2),
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(6),
+                                                          color: colors.tertiaryContainer.withValues(alpha: 0.6),
+                                                        ),
+                                                        child: Row(
+                                                          spacing: pu2,
+                                                          children: [
+                                                            Icon(Icons.auto_awesome,
+                                                                size: 16, color: colors.onTertiaryContainer),
+                                                            Expanded(
+                                                              child: Text(
+                                                                locals.lastBlockHint,
+                                                                style: textTheme.bodySmall?.copyWith(
+                                                                  color: colors.onTertiaryContainer,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                    Gap(pu4),
+                                                    const Divider(),
+                                                    LayoutSeparator(index: index, dragging: state.dragging),
+                                                    if (state.dragging) const Divider(),
                                                   ],
-                                                  Gap(pu4),
-                                                  const Divider(),
-                                                  LayoutSeparator(index: index, dragging: state.dragging),
-                                                  if (state.dragging) const Divider(),
-                                                ],
+                                                ),
                                               ),
-                                            ),
-                                          );
-                                        },
+                                            );
+                                          },
+                                        ),
                                       ),
-                                    ),
                                   ],
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        if (!state.valid)
+                        if (!state.valid && state.selectedTab == null)
                           Text(locals.layoutMustFinishWithDynamicBlock, style: TextStyle(color: colors.error)),
                       ],
                     ),
@@ -421,6 +442,251 @@ class LayoutSettingsTab extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _MagazineTabsSection extends StatelessWidget {
+  final LayoutCubit cubit;
+  final LayoutState state;
+
+  const _MagazineTabsSection({required this.cubit, required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
+    final locals = AppLocalizations.of(context)!;
+    final subTextTheme = textTheme.labelMedium?.copyWith(color: colors.secondary);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(locals.magazineTabs, style: textTheme.titleMedium),
+                  Text(locals.magazineTabsExplanation, style: subTextTheme),
+                ],
+              ),
+            ),
+            TextButton.icon(
+              icon: const Icon(Icons.add, size: 18),
+              label: Text(locals.newTab),
+              onPressed: () => _showCreateDialog(context),
+            ),
+          ],
+        ),
+        Gap(pu2),
+        Wrap(
+          spacing: pu2,
+          runSpacing: pu1,
+          children: [
+            FilterChip(
+              label: Text(locals.standardLayout),
+              selected: state.selectedTab == null,
+              onSelected: (_) => cubit.selectTab(null),
+            ),
+            ...state.magazineTabs.map((tab) => FilterChip(
+                  label: Text(tab.name),
+                  selected: state.selectedTab?.id == tab.id,
+                  onSelected: (_) => cubit.selectTab(tab),
+                  deleteIcon: Icon(Icons.close, size: 16, color: colors.error),
+                  onDeleted: () => _confirmDelete(context, tab),
+                )),
+          ],
+        ),
+        if (state.selectedTab != null) ...[
+          Gap(pu3),
+          _SelectedTabSettings(
+            key: ValueKey(state.selectedTab!.id),
+            tab: state.selectedTab!,
+            cubit: cubit,
+          ),
+        ],
+      ],
+    );
+  }
+
+  Future<void> _showCreateDialog(BuildContext context) async {
+    final locals = AppLocalizations.of(context)!;
+    final controller = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(locals.newTab),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(
+            labelText: locals.tabName,
+            hintText: locals.tabNameHint,
+          ),
+          onSubmitted: (value) => Navigator.of(context).pop(value.trim()),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(null), child: Text(locals.cancel)),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
+            child: Text(locals.ok),
+          ),
+        ],
+      ),
+    );
+    if (name != null && name.isNotEmpty) {
+      cubit.createMagazineTab(name);
+    }
+    controller.dispose();
+  }
+
+  Future<void> _confirmDelete(BuildContext context, MagazineTab tab) async {
+    final locals = AppLocalizations.of(context)!;
+    final colors = Theme.of(context).colorScheme;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(locals.deleteTab),
+        content: Text(locals.deleteTabMessage),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(locals.cancel)),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: colors.error),
+            child: Text(locals.delete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      cubit.deleteMagazineTab(tab);
+    }
+  }
+}
+
+class _SelectedTabSettings extends StatefulWidget {
+  final MagazineTab tab;
+  final LayoutCubit cubit;
+
+  const _SelectedTabSettings({super.key, required this.tab, required this.cubit});
+
+  @override
+  State<_SelectedTabSettings> createState() => _SelectedTabSettingsState();
+}
+
+class _SelectedTabSettingsState extends State<_SelectedTabSettings> {
+  late final TextEditingController _nameController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.tab.name);
+    _nameController.addListener(() {
+      widget.cubit.updateSelectedTabField(name: _nameController.text);
+    });
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
+    final subText = textTheme.labelMedium?.copyWith(color: colors.secondary);
+    final locals = AppLocalizations.of(context)!;
+
+    return BlocBuilder<LayoutCubit, LayoutState>(
+      builder: (context, state) {
+        final tab = state.selectedTab ?? widget.tab;
+        final cubit = widget.cubit;
+
+        return Card(
+          child: Padding(
+            padding: EdgeInsets.all(pu3),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: locals.tabName,
+                    isDense: true,
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+                Gap(pu2),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  title: Text(locals.tabPublic),
+                  subtitle: Text(locals.tabPublicExplanation, style: subText),
+                  value: tab.isPublic,
+                  onChanged: (value) => cubit.updateSelectedTabField(isPublic: value),
+                ),
+                Gap(pu1),
+                Text(locals.aiPromptLabel, style: textTheme.bodyMedium),
+                Gap(pu1),
+                BlocBuilder<AiPromptsCubit, AiPromptsState>(
+                  builder: (context, promptsState) {
+                    final prompts = promptsState.prompts;
+                    return DropdownMenu<String?>(
+                      key: ValueKey('prompt-${tab.id}-${tab.aiPromptId}'),
+                      initialSelection: tab.aiPromptId,
+                      onSelected: (value) {
+                        if (value == null) {
+                          cubit.updateSelectedTabField(clearAiPromptId: true);
+                        } else {
+                          cubit.updateSelectedTabField(aiPromptId: value);
+                        }
+                      },
+                      dropdownMenuEntries: [
+                        DropdownMenuEntry<String?>(value: null, label: locals.globalPrompt),
+                        ...prompts.map((p) => DropdownMenuEntry<String?>(value: p.id, label: p.name)),
+                      ],
+                    );
+                  },
+                ),
+                Gap(pu2),
+                Text(locals.tabMinScore, style: textTheme.bodyMedium),
+                Text(locals.tabMinScoreExplanation, style: subText),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Slider(
+                        min: 0,
+                        max: 100,
+                        divisions: 20,
+                        label: tab.minimumImportance?.toString() ?? 'Global',
+                        value: (tab.minimumImportance ?? 0).toDouble(),
+                        onChanged: (value) {
+                          final rounded = value.round();
+                          cubit.updateSelectedTabField(
+                            minimumImportance: rounded == 0 ? null : rounded,
+                            clearMinimumImportance: rounded == 0,
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      width: 64,
+                      child: Text(
+                        tab.minimumImportance?.toString() ?? 'Global',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

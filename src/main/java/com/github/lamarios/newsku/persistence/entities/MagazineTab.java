@@ -22,6 +22,9 @@ public class MagazineTab {
     @Column(name = "ai_preference")
     private String aiPreference;
 
+    @Column(name = "ai_prompt_id")
+    private String aiPromptId;
+
     @Column(name = "minimum_importance")
     private Integer minimumImportance;
 
@@ -70,6 +73,14 @@ public class MagazineTab {
 
     public void setAiPreference(String aiPreference) {
         this.aiPreference = aiPreference;
+    }
+
+    public String getAiPromptId() {
+        return aiPromptId;
+    }
+
+    public void setAiPromptId(String aiPromptId) {
+        this.aiPromptId = aiPromptId;
     }
 
     public Integer getMinimumImportance() {
