@@ -94,23 +94,18 @@ public class JwtAuthenticationController {
     }
 
     public UserDetails loadUserByUsername(String username, String accessToken) throws UsernameNotFoundException {
-        try {
-            Optional<User> user;
-            if (username != null) {
-                user = userService.getUser(username);
-            } else {
-                throw new Exception();
-            }
-
-            return user
-                    .map(u -> {
-                        List<GrantedAuthority> authorityList = new ArrayList<>();
-                        return new org.springframework.security.core.userdetails.User(u.getUsername(), u.getPassword(), authorityList);
-                    })
-                    .orElseThrow(() -> new UsernameNotFoundException("No user with username " + username));
-        } catch (Exception e) {
-            throw new UsernameNotFoundException("No user with email " + username);
+        if (username == null) {
+            throw new UsernameNotFoundException("Username must not be null");
         }
+
+        Optional<User> user = userService.getUser(username);
+
+        return user
+                .map(u -> {
+                    List<GrantedAuthority> authorityList = new ArrayList<>();
+                    return new org.springframework.security.core.userdetails.User(u.getUsername(), u.getPassword(), authorityList);
+                })
+                .orElseThrow(() -> new UsernameNotFoundException("No user with username " + username));
     }
 
 }
