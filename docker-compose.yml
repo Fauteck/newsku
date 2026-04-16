@@ -23,6 +23,8 @@ services:
       DB_USER: "${POSTGRES_USER}"
       DB_PASSWORD: "${POSTGRES_PASSWORD}"
       FRESHRSS_URL: "${FRESHRSS_URL}"
+      ROOT_URL: "${ROOT_URL:-http://localhost:8080}"
+      FRONTEND_URL: "${FRONTEND_URL}"
     expose:
       - "8080"
 
