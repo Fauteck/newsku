@@ -24,7 +24,7 @@ public class ScheduleService {
         this.gReaderSyncService = gReaderSyncService;
     }
 
-    @Scheduled(fixedRate = 1000 * 60 * 60)
+    @Scheduled(fixedRateString = "${FEED_SYNC_INTERVAL_MS:3600000}")
     public void refreshFeeds() {
         // Legacy direct-RSS refresh (runs for feeds not managed via GReader)
         var feeds = feedRepository.findAll();
