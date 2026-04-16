@@ -31,13 +31,13 @@ class MobileBottomNav extends StatelessWidget {
                 router.push(const SettingsRoute());
               },
             ),
-            if (config?.freshRssUrl != null && config!.freshRssUrl!.isNotEmpty)
+            if (config?.gReaderUrl != null && config!.gReaderUrl!.isNotEmpty)
               ListTile(
                 leading: const Icon(Icons.open_in_new),
-                title: Text(locals.openInFreshRss),
+                title: Text(locals.openInGreader),
                 onTap: () {
                   Navigator.pop(sheetContext);
-                  launchUrl(Uri.parse(config!.freshRssUrl!));
+                  launchUrl(Uri.parse(config!.gReaderUrl!));
                 },
               ),
             const Divider(height: 1),

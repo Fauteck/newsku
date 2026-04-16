@@ -39,11 +39,11 @@ public class User {
     private List<EmailDigestFrequency> emailDigest;
 
     @Column(name = "freshrss_username")
-    private String freshRssUsername;
+    private String gReaderUsername;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "freshrss_api_password")
-    private String freshRssApiPassword;
+    private String gReaderApiPassword;
 
     public String getId() {
         return id;
@@ -126,19 +126,19 @@ public class User {
         this.emailDigest = emailDigest;
     }
 
-    public String getFreshRssUsername() {
-        return freshRssUsername;
+    public String getGReaderUsername() {
+        return gReaderUsername;
     }
 
-    public void setFreshRssUsername(String freshRssUsername) {
-        this.freshRssUsername = freshRssUsername;
+    public void setGReaderUsername(String gReaderUsername) {
+        this.gReaderUsername = gReaderUsername;
     }
 
-    public String getFreshRssApiPassword() {
-        return freshRssApiPassword;
+    public String getGReaderApiPassword() {
+        return gReaderApiPassword;
     }
 
-    public void setFreshRssApiPassword(String freshRssApiPassword) {
-        this.freshRssApiPassword = freshRssApiPassword;
+    public void setGReaderApiPassword(String gReaderApiPassword) {
+        this.gReaderApiPassword = gReaderApiPassword;
     }
 }

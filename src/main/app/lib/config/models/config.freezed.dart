@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Config {
 
- bool get demoMode; String get backendVersion; bool get allowSignup; bool get canResetPassword; OidcConfig? get oidcConfig; String get announcement; String? get freshRssUrl;
+ bool get demoMode; String get backendVersion; bool get allowSignup; bool get canResetPassword; OidcConfig? get oidcConfig; String get announcement; String? get gReaderUrl;
 /// Create a copy of Config
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $ConfigCopyWith<Config> get copyWith => _$ConfigCopyWithImpl<Config>(this as Con
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Config&&(identical(other.demoMode, demoMode) || other.demoMode == demoMode)&&(identical(other.backendVersion, backendVersion) || other.backendVersion == backendVersion)&&(identical(other.allowSignup, allowSignup) || other.allowSignup == allowSignup)&&(identical(other.canResetPassword, canResetPassword) || other.canResetPassword == canResetPassword)&&(identical(other.oidcConfig, oidcConfig) || other.oidcConfig == oidcConfig)&&(identical(other.announcement, announcement) || other.announcement == announcement)&&(identical(other.freshRssUrl, freshRssUrl) || other.freshRssUrl == freshRssUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Config&&(identical(other.demoMode, demoMode) || other.demoMode == demoMode)&&(identical(other.backendVersion, backendVersion) || other.backendVersion == backendVersion)&&(identical(other.allowSignup, allowSignup) || other.allowSignup == allowSignup)&&(identical(other.canResetPassword, canResetPassword) || other.canResetPassword == canResetPassword)&&(identical(other.oidcConfig, oidcConfig) || other.oidcConfig == oidcConfig)&&(identical(other.announcement, announcement) || other.announcement == announcement)&&(identical(other.gReaderUrl, gReaderUrl) || other.gReaderUrl == gReaderUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,demoMode,backendVersion,allowSignup,canResetPassword,oidcConfig,announcement,freshRssUrl);
+int get hashCode => Object.hash(runtimeType,demoMode,backendVersion,allowSignup,canResetPassword,oidcConfig,announcement,gReaderUrl);
 
 @override
 String toString() {
-  return 'Config(demoMode: $demoMode, backendVersion: $backendVersion, allowSignup: $allowSignup, canResetPassword: $canResetPassword, oidcConfig: $oidcConfig, announcement: $announcement, freshRssUrl: $freshRssUrl)';
+  return 'Config(demoMode: $demoMode, backendVersion: $backendVersion, allowSignup: $allowSignup, canResetPassword: $canResetPassword, oidcConfig: $oidcConfig, announcement: $announcement, gReaderUrl: $gReaderUrl)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $ConfigCopyWith<$Res>  {
   factory $ConfigCopyWith(Config value, $Res Function(Config) _then) = _$ConfigCopyWithImpl;
 @useResult
 $Res call({
- bool demoMode, String backendVersion, bool allowSignup, bool canResetPassword, OidcConfig? oidcConfig, String announcement, String? freshRssUrl
+ bool demoMode, String backendVersion, bool allowSignup, bool canResetPassword, OidcConfig? oidcConfig, String announcement, String? gReaderUrl
 });
 
 
@@ -65,7 +65,7 @@ class _$ConfigCopyWithImpl<$Res>
 
 /// Create a copy of Config
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? demoMode = null,Object? backendVersion = null,Object? allowSignup = null,Object? canResetPassword = null,Object? oidcConfig = freezed,Object? announcement = null,Object? freshRssUrl = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? demoMode = null,Object? backendVersion = null,Object? allowSignup = null,Object? canResetPassword = null,Object? oidcConfig = freezed,Object? announcement = null,Object? gReaderUrl = freezed,}) {
   return _then(_self.copyWith(
 demoMode: null == demoMode ? _self.demoMode : demoMode // ignore: cast_nullable_to_non_nullable
 as bool,backendVersion: null == backendVersion ? _self.backendVersion : backendVersion // ignore: cast_nullable_to_non_nullable
@@ -73,7 +73,7 @@ as String,allowSignup: null == allowSignup ? _self.allowSignup : allowSignup // 
 as bool,canResetPassword: null == canResetPassword ? _self.canResetPassword : canResetPassword // ignore: cast_nullable_to_non_nullable
 as bool,oidcConfig: freezed == oidcConfig ? _self.oidcConfig : oidcConfig // ignore: cast_nullable_to_non_nullable
 as OidcConfig?,announcement: null == announcement ? _self.announcement : announcement // ignore: cast_nullable_to_non_nullable
-as String,freshRssUrl: freezed == freshRssUrl ? _self.freshRssUrl : freshRssUrl // ignore: cast_nullable_to_non_nullable
+as String,gReaderUrl: freezed == gReaderUrl ? _self.gReaderUrl : gReaderUrl // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -168,10 +168,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool demoMode,  String backendVersion,  bool allowSignup,  bool canResetPassword,  OidcConfig? oidcConfig,  String announcement,  String? freshRssUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool demoMode,  String backendVersion,  bool allowSignup,  bool canResetPassword,  OidcConfig? oidcConfig,  String announcement,  String? gReaderUrl)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Config() when $default != null:
-return $default(_that.demoMode,_that.backendVersion,_that.allowSignup,_that.canResetPassword,_that.oidcConfig,_that.announcement,_that.freshRssUrl);case _:
+return $default(_that.demoMode,_that.backendVersion,_that.allowSignup,_that.canResetPassword,_that.oidcConfig,_that.announcement,_that.gReaderUrl);case _:
   return orElse();
 
 }
@@ -189,10 +189,10 @@ return $default(_that.demoMode,_that.backendVersion,_that.allowSignup,_that.canR
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool demoMode,  String backendVersion,  bool allowSignup,  bool canResetPassword,  OidcConfig? oidcConfig,  String announcement,  String? freshRssUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool demoMode,  String backendVersion,  bool allowSignup,  bool canResetPassword,  OidcConfig? oidcConfig,  String announcement,  String? gReaderUrl)  $default,) {final _that = this;
 switch (_that) {
 case _Config():
-return $default(_that.demoMode,_that.backendVersion,_that.allowSignup,_that.canResetPassword,_that.oidcConfig,_that.announcement,_that.freshRssUrl);}
+return $default(_that.demoMode,_that.backendVersion,_that.allowSignup,_that.canResetPassword,_that.oidcConfig,_that.announcement,_that.gReaderUrl);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -206,10 +206,10 @@ return $default(_that.demoMode,_that.backendVersion,_that.allowSignup,_that.canR
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool demoMode,  String backendVersion,  bool allowSignup,  bool canResetPassword,  OidcConfig? oidcConfig,  String announcement,  String? freshRssUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool demoMode,  String backendVersion,  bool allowSignup,  bool canResetPassword,  OidcConfig? oidcConfig,  String announcement,  String? gReaderUrl)?  $default,) {final _that = this;
 switch (_that) {
 case _Config() when $default != null:
-return $default(_that.demoMode,_that.backendVersion,_that.allowSignup,_that.canResetPassword,_that.oidcConfig,_that.announcement,_that.freshRssUrl);case _:
+return $default(_that.demoMode,_that.backendVersion,_that.allowSignup,_that.canResetPassword,_that.oidcConfig,_that.announcement,_that.gReaderUrl);case _:
   return null;
 
 }
@@ -221,7 +221,7 @@ return $default(_that.demoMode,_that.backendVersion,_that.allowSignup,_that.canR
 @JsonSerializable()
 
 class _Config implements Config {
-  const _Config({this.demoMode = false, required this.backendVersion, required this.allowSignup, this.canResetPassword = false, this.oidcConfig, this.announcement = "", this.freshRssUrl});
+  const _Config({this.demoMode = false, required this.backendVersion, required this.allowSignup, this.canResetPassword = false, this.oidcConfig, this.announcement = "", this.gReaderUrl});
   factory _Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
 
 @override@JsonKey() final  bool demoMode;
@@ -230,7 +230,7 @@ class _Config implements Config {
 @override@JsonKey() final  bool canResetPassword;
 @override final  OidcConfig? oidcConfig;
 @override@JsonKey() final  String announcement;
-@override final  String? freshRssUrl;
+@override final  String? gReaderUrl;
 
 /// Create a copy of Config
 /// with the given fields replaced by the non-null parameter values.
@@ -250,11 +250,11 @@ bool operator ==(Object other) {
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,demoMode,backendVersion,allowSignup,canResetPassword,oidcConfig,announcement,freshRssUrl);
+int get hashCode => Object.hash(runtimeType,demoMode,backendVersion,allowSignup,canResetPassword,oidcConfig,announcement,gReaderUrl);
 
 @override
 String toString() {
-  return 'Config(demoMode: $demoMode, backendVersion: $backendVersion, allowSignup: $allowSignup, canResetPassword: $canResetPassword, oidcConfig: $oidcConfig, announcement: $announcement, freshRssUrl: $freshRssUrl)';
+  return 'Config(demoMode: $demoMode, backendVersion: $backendVersion, allowSignup: $allowSignup, canResetPassword: $canResetPassword, oidcConfig: $oidcConfig, announcement: $announcement, gReaderUrl: $gReaderUrl)';
 }
 
 
@@ -265,7 +265,7 @@ abstract mixin class _$ConfigCopyWith<$Res> implements $ConfigCopyWith<$Res> {
   factory _$ConfigCopyWith(_Config value, $Res Function(_Config) _then) = __$ConfigCopyWithImpl;
 @override @useResult
 $Res call({
- bool demoMode, String backendVersion, bool allowSignup, bool canResetPassword, OidcConfig? oidcConfig, String announcement, String? freshRssUrl
+ bool demoMode, String backendVersion, bool allowSignup, bool canResetPassword, OidcConfig? oidcConfig, String announcement, String? gReaderUrl
 });
 
 
@@ -282,7 +282,7 @@ class __$ConfigCopyWithImpl<$Res>
 
 /// Create a copy of Config
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? demoMode = null,Object? backendVersion = null,Object? allowSignup = null,Object? canResetPassword = null,Object? oidcConfig = freezed,Object? announcement = null,Object? freshRssUrl = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? demoMode = null,Object? backendVersion = null,Object? allowSignup = null,Object? canResetPassword = null,Object? oidcConfig = freezed,Object? announcement = null,Object? gReaderUrl = freezed,}) {
   return _then(_Config(
 demoMode: null == demoMode ? _self.demoMode : demoMode // ignore: cast_nullable_to_non_nullable
 as bool,backendVersion: null == backendVersion ? _self.backendVersion : backendVersion // ignore: cast_nullable_to_non_nullable
@@ -290,7 +290,7 @@ as String,allowSignup: null == allowSignup ? _self.allowSignup : allowSignup // 
 as bool,canResetPassword: null == canResetPassword ? _self.canResetPassword : canResetPassword // ignore: cast_nullable_to_non_nullable
 as bool,oidcConfig: freezed == oidcConfig ? _self.oidcConfig : oidcConfig // ignore: cast_nullable_to_non_nullable
 as OidcConfig?,announcement: null == announcement ? _self.announcement : announcement // ignore: cast_nullable_to_non_nullable
-as String,freshRssUrl: freezed == freshRssUrl ? _self.freshRssUrl : freshRssUrl // ignore: cast_nullable_to_non_nullable
+as String,gReaderUrl: freezed == gReaderUrl ? _self.gReaderUrl : gReaderUrl // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

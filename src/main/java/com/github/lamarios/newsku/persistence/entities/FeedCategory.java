@@ -13,7 +13,7 @@ public class FeedCategory {
     private String name;
 
     @Column(name = "freshrss_category_id")
-    private String freshRssCategoryId;
+    private String gReaderCategoryId;
 
 
     @ManyToOne
@@ -45,11 +45,11 @@ public class FeedCategory {
         this.user = user;
     }
 
-    public String getFreshRssCategoryId() {
-        return freshRssCategoryId;
+    public String getGReaderCategoryId() {
+        return gReaderCategoryId;
     }
 
-    public void setFreshRssCategoryId(String freshRssCategoryId) {
-        this.freshRssCategoryId = freshRssCategoryId;
+    public void setGReaderCategoryId(String gReaderCategoryId) {
+        this.gReaderCategoryId = gReaderCategoryId;
     }
 }

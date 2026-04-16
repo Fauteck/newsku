@@ -48,10 +48,10 @@ public class FeedItemService {
     private final FeedClicksRepository feedClicksRepository;
     private final TagClicksRepository tagClicksRepository;
     private final ClickService clickService;
-    private final FreshRssApiService freshRssApiService;
+    private final GReaderApiService gReaderApiService;
 
     @Autowired
-    public FeedItemService(FeedItemRepository feedItemRepository, PlatformTransactionManager transactionManager, OpenaiService openaiService, FeedService feedService, UserService userService, EntityManager entityManager, FeedRepository feedRepository, FeedErrorRepository feedErrorRepository, FeedClicksRepository feedClicksRepository, TagClicksRepository tagClicksRepository, ClickService clickService, FreshRssApiService freshRssApiService) {
+    public FeedItemService(FeedItemRepository feedItemRepository, PlatformTransactionManager transactionManager, OpenaiService openaiService, FeedService feedService, UserService userService, EntityManager entityManager, FeedRepository feedRepository, FeedErrorRepository feedErrorRepository, FeedClicksRepository feedClicksRepository, TagClicksRepository tagClicksRepository, ClickService clickService, GReaderApiService gReaderApiService) {
         this.feedItemRepository = feedItemRepository;
         this.transactionManager = transactionManager;
         this.openaiService = openaiService;
@@ -63,7 +63,7 @@ public class FeedItemService {
         this.feedClicksRepository = feedClicksRepository;
         this.tagClicksRepository = tagClicksRepository;
         this.clickService = clickService;
-        this.freshRssApiService = freshRssApiService;
+        this.gReaderApiService = gReaderApiService;
     }
 
     public void refreshFeed(Feed feed) {
@@ -271,16 +271,16 @@ public class FeedItemService {
         items.forEach(feedItem -> feedItem.setRead(true));
         feedItemRepository.saveAll(items);
 
-        // Sync read-status back to FreshRSS (best-effort, non-blocking)
-        List<String> freshRssIds = items.stream()
-                .map(FeedItem::getFreshRssItemId)
+        // Sync read-status back to GReader (best-effort, non-blocking)
+        List<String> gReaderIds = items.stream()
+                .map(FeedItem::getGReaderItemId)
                 .filter(fid -> fid != null && !fid.isBlank())
                 .toList();
-        if (!freshRssIds.isEmpty()) {
+        if (!gReaderIds.isEmpty()) {
             try {
-                freshRssApiService.markAsRead(user, freshRssIds);
+                gReaderApiService.markAsRead(user, gReaderIds);
             } catch (Exception e) {
-                logger.warn("Could not sync read-status to FreshRSS for user {}: {}", user.getUsername(), e.getMessage());
+                logger.warn("Could not sync read-status to GReader for user {}: {}", user.getUsername(), e.getMessage());
             }
         }
 
@@ -289,7 +289,8 @@ public class FeedItemService {
 
     @Transactional
     public FeedItem toggleSaved(String id) {
-        var feeds = feedRepository.getFeedsByUser(userService.getCurrentUser());
+        User user = userService.getCurrentUser();
+        var feeds = feedRepository.getFeedsByUser(user);
         var item = feedItemRepository.getFirstByIdAndFeedIn(id, feeds);
 
         if (item == null) {
@@ -297,7 +298,19 @@ public class FeedItemService {
         }
 
         item.setSaved(!item.isSaved());
-        return feedItemRepository.save(item);
+        feedItemRepository.save(item);
+
+        // Sync starred status back to GReader (best-effort)
+        String gReaderItemId = item.getGReaderItemId();
+        if (gReaderItemId != null && !gReaderItemId.isBlank()) {
+            try {
+                gReaderApiService.markAsStarred(user, List.of(gReaderItemId), item.isSaved());
+            } catch (Exception e) {
+                logger.warn("Could not sync starred status to GReader for user {}: {}", user.getUsername(), e.getMessage());
+            }
+        }
+
+        return item;
     }
 
     @Transactional(readOnly = true)

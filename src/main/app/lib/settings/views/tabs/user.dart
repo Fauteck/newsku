@@ -25,7 +25,7 @@ class UserSettingsTab extends StatelessWidget {
         UserSettingsState(
           email: identityCubit.currentUser?.email ?? '',
           digest: identityCubit.currentUser?.emailDigest ?? [],
-          freshRssUsername: identityCubit.currentUser?.freshRssUsername ?? '',
+          gReaderUsername: identityCubit.currentUser?.gReaderUsername ?? '',
         ),
       ),
       child: BlocBuilder<UserSettingsCubit, UserSettingsState>(
@@ -125,45 +125,45 @@ class UserSettingsTab extends StatelessWidget {
                   Gap(pu8),
                   const Divider(),
                   Gap(pu4),
-                  // FreshRSS section — always shown, users set their own credentials
-                  Text(locals.freshRssTitle, style: textTheme.titleMedium),
+                  // GReader section — always shown, users set their own credentials
+                  Text(locals.greaderTitle, style: textTheme.titleMedium),
                   Gap(pu2),
-                  Text(locals.freshRssExplanation, style: subTextTheme),
+                  Text(locals.greaderExplanation, style: subTextTheme),
                   Gap(pu4),
-                  Text(locals.freshRssUrlLabel),
+                  Text(locals.greaderUrlLabel),
                   TextField(
-                    key: const Key('freshrss-url'),
-                    controller: cubit.freshRssUrl,
+                    key: const Key('greader-url'),
+                    controller: cubit.gReaderUrl,
                     keyboardType: TextInputType.url,
-                    decoration: InputDecoration(hintText: 'https://freshrss.example.com'),
+                    decoration: InputDecoration(hintText: 'https://greader.example.com'),
                   ),
                   Gap(pu2),
-                  Text(locals.freshRssUsername),
+                  Text(locals.greaderUsername),
                   TextField(
-                    key: const Key('freshrss-username'),
-                    controller: cubit.freshRssUsername,
+                    key: const Key('greader-username'),
+                    controller: cubit.gReaderUsername,
                   ),
                   Gap(pu2),
-                  Text(locals.freshRssApiPassword),
+                  Text(locals.greaderApiPassword),
                   TextField(
-                    key: const Key('freshrss-api-password'),
-                    controller: cubit.freshRssApiPassword,
+                    key: const Key('greader-api-password'),
+                    controller: cubit.gReaderApiPassword,
                     obscureText: true,
-                    decoration: InputDecoration(hintText: locals.freshRssApiPasswordHint),
+                    decoration: InputDecoration(hintText: locals.greaderApiPasswordHint),
                   ),
                   Gap(pu2),
                   Align(
                     alignment: Alignment.centerRight,
                     child: FilledButton.tonalIcon(
-                      key: const Key('freshrss-save-button'),
+                      key: const Key('greader-save-button'),
                       onPressed: state.loading
                           ? null
                           : () async {
-                              await cubit.updateFreshRssCredentials();
+                              await cubit.updateGReaderCredentials();
                               if (context.mounted) {
                                 ScaffoldMessenger.of(
                                   context,
-                                ).showSnackBar(SnackBar(content: Text(locals.freshRssSaved)));
+                                ).showSnackBar(SnackBar(content: Text(locals.greaderSaved)));
                               }
                             },
                       label: Text(locals.update),

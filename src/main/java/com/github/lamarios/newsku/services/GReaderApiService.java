@@ -1,10 +1,10 @@
 package com.github.lamarios.newsku.services;
 
-import com.github.lamarios.newsku.models.freshrss.FreshRssStreamContents;
-import com.github.lamarios.newsku.models.freshrss.FreshRssSubscription;
-import com.github.lamarios.newsku.models.freshrss.FreshRssSubscriptionList;
-import com.github.lamarios.newsku.models.freshrss.FreshRssTag;
-import com.github.lamarios.newsku.models.freshrss.FreshRssTagList;
+import com.github.lamarios.newsku.models.greader.GReaderStreamContents;
+import com.github.lamarios.newsku.models.greader.GReaderSubscription;
+import com.github.lamarios.newsku.models.greader.GReaderSubscriptionList;
+import com.github.lamarios.newsku.models.greader.GReaderTag;
+import com.github.lamarios.newsku.models.greader.GReaderTagList;
 import com.github.lamarios.newsku.persistence.entities.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,21 +22,23 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Low-level Google Reader API client for FreshRSS.
+ * Low-level Google Reader API client.
+ *
+ * Compatible with any GReader-API implementation (FreshRSS, Miniflux, Miniflux, etc.).
  *
  * Authentication:
  *   POST /accounts/ClientLogin  →  Auth token (cached 23 h, shared across all users)
  *   GET  /reader/api/0/token    →  Modification token (fetched per write operation)
  *
  * Credentials are read from environment variables:
- *   FRESHRSS_URL       – base URL of the FreshRSS instance  (required to enable integration)
- *   FRESHRSS_USERNAME  – FreshRSS username / e-mail
- *   FRESHRSS_API_PASSWORD – FreshRSS API password (Google Reader password, not the login password)
+ *   GREADER_URL           – base URL of the GReader instance  (required to enable integration)
+ *   GREADER_USERNAME      – GReader username / e-mail
+ *   GREADER_API_PASSWORD  – GReader API password
  *
- * All methods are no-ops / return empty when FreshRSS is not fully configured.
+ * All methods are no-ops / return empty when GReader is not fully configured.
  */
 @Service
-public class FreshRssApiService {
+public class GReaderApiService {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -53,8 +55,8 @@ public class FreshRssApiService {
     /** Auth token TTL: 23 hours */
     private static final long TOKEN_TTL_MS = 23L * 60 * 60 * 1000;
 
-    /** Batch size for mark-as-read POST requests */
-    private static final int MARK_READ_BATCH = 50;
+    /** Batch size for edit-tag POST requests */
+    private static final int EDIT_TAG_BATCH = 50;
 
     private final String baseUrl;
     private final String username;
@@ -64,10 +66,10 @@ public class FreshRssApiService {
     /** Single shared token (credentials are global, not per-user). */
     private final AtomicReference<CachedToken> cachedToken = new AtomicReference<>();
 
-    public FreshRssApiService(
-            @Value("${FRESHRSS_URL:}") String baseUrl,
-            @Value("${FRESHRSS_USERNAME:}") String username,
-            @Value("${FRESHRSS_API_PASSWORD:}") String password) {
+    public GReaderApiService(
+            @Value("${GREADER_URL:}") String baseUrl,
+            @Value("${GREADER_USERNAME:}") String username,
+            @Value("${GREADER_API_PASSWORD:}") String password) {
         this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
         this.username = username;
         this.password = password;
@@ -80,69 +82,53 @@ public class FreshRssApiService {
     // Configuration checks
     // -----------------------------------------------------------------------
 
-    /** Returns true when FRESHRSS_URL is set. */
+    /** Returns true when GREADER_URL is set. */
     public boolean isConfigured() {
         return !baseUrl.isBlank();
     }
 
-    /**
-     * Returns true when URL, username and password are all set via environment variables.
-     * The {@code user} parameter is kept for API compatibility but is no longer used for auth.
-     */
+    /** Returns true when URL, username and password are all set via environment variables. */
     public boolean isCredentialsConfigured() {
         return isConfigured()
                 && username != null && !username.isBlank()
                 && password != null && !password.isBlank();
     }
 
-    /**
-     * @deprecated Use {@link #isCredentialsConfigured()} instead.
-     *             Credentials are now global (env vars), not per-user.
-     */
-    @Deprecated
-    public boolean isUserConfigured(User user) {
-        return isCredentialsConfigured();
-    }
-
     // -----------------------------------------------------------------------
-    // Public API  (User parameter kept for API compatibility only)
+    // Public API
     // -----------------------------------------------------------------------
 
-    /**
-     * Returns all subscriptions (feeds), or an empty list if not configured.
-     */
-    public List<FreshRssSubscription> getSubscriptions(User user) {
+    /** Returns all subscriptions (feeds), or an empty list if not configured. */
+    public List<GReaderSubscription> getSubscriptions(User user) {
         if (!isCredentialsConfigured()) return Collections.emptyList();
         try {
             var result = restClient.get()
                     .uri("/api/greader.php/reader/api/0/subscription/list?output=json")
                     .header("Authorization", authHeader())
                     .retrieve()
-                    .body(FreshRssSubscriptionList.class);
+                    .body(GReaderSubscriptionList.class);
             return result != null && result.getSubscriptions() != null
                     ? result.getSubscriptions()
                     : Collections.emptyList();
         } catch (RestClientException e) {
-            logger.error("Failed to fetch FreshRSS subscriptions: {}", e.getMessage());
+            logger.error("Failed to fetch GReader subscriptions: {}", e.getMessage());
             return Collections.emptyList();
         }
     }
 
-    /**
-     * Returns all user-defined labels/categories, or an empty list if not configured.
-     */
-    public List<FreshRssTag> getTags(User user) {
+    /** Returns all user-defined labels/categories, or an empty list if not configured. */
+    public List<GReaderTag> getTags(User user) {
         if (!isCredentialsConfigured()) return Collections.emptyList();
         try {
             var result = restClient.get()
                     .uri("/api/greader.php/reader/api/0/tag/list?output=json")
                     .header("Authorization", authHeader())
                     .retrieve()
-                    .body(FreshRssTagList.class);
+                    .body(GReaderTagList.class);
             if (result == null || result.getTags() == null) return Collections.emptyList();
-            return result.getTags().stream().filter(FreshRssTag::isUserLabel).toList();
+            return result.getTags().stream().filter(GReaderTag::isUserLabel).toList();
         } catch (RestClientException e) {
-            logger.error("Failed to fetch FreshRSS tags: {}", e.getMessage());
+            logger.error("Failed to fetch GReader tags: {}", e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -150,10 +136,10 @@ public class FreshRssApiService {
     /**
      * Fetches one page of unread stream items.
      *
-     * @param user         kept for API compatibility; not used for auth
+     * @param user         kept for API compatibility
      * @param continuation pagination cursor from a previous response, or null for the first page
      */
-    public FreshRssStreamContents getUnreadItems(User user, String continuation) {
+    public GReaderStreamContents getUnreadItems(User user, String continuation) {
         if (!isCredentialsConfigured()) return emptyStream();
         try {
             String uri = "/api/greader.php/reader/api/0/stream/contents/user/-/state/com.google/reading-list"
@@ -166,29 +152,71 @@ public class FreshRssApiService {
                     .uri(uri)
                     .header("Authorization", authHeader())
                     .retrieve()
-                    .body(FreshRssStreamContents.class);
+                    .body(GReaderStreamContents.class);
             return result != null ? result : emptyStream();
         } catch (RestClientException e) {
-            logger.error("Failed to fetch FreshRSS stream: {}", e.getMessage());
+            logger.error("Failed to fetch GReader unread stream: {}", e.getMessage());
             return emptyStream();
         }
     }
 
     /**
-     * Marks the given FreshRSS item IDs as read.
+     * Fetches one page of starred items.
      *
-     * @param user            kept for API compatibility; not used for auth
-     * @param freshRssItemIds list of full tag URIs, e.g. "tag:google.com,2005:reader/item/..."
+     * @param continuation pagination cursor from a previous response, or null for the first page
      */
-    public void markAsRead(User user, List<String> freshRssItemIds) {
-        if (!isCredentialsConfigured() || freshRssItemIds.isEmpty()) return;
+    public GReaderStreamContents getStarredItems(User user, String continuation) {
+        if (!isCredentialsConfigured()) return emptyStream();
+        try {
+            String uri = "/api/greader.php/reader/api/0/stream/contents/user/-/state/com.google/starred"
+                    + "?output=json"
+                    + "&n=" + PAGE_SIZE
+                    + (continuation != null ? "&c=" + continuation : "");
+
+            var result = restClient.get()
+                    .uri(uri)
+                    .header("Authorization", authHeader())
+                    .retrieve()
+                    .body(GReaderStreamContents.class);
+            return result != null ? result : emptyStream();
+        } catch (RestClientException e) {
+            logger.error("Failed to fetch GReader starred items: {}", e.getMessage());
+            return emptyStream();
+        }
+    }
+
+    /**
+     * Marks the given GReader item IDs as read.
+     *
+     * @param gReaderItemIds list of full tag URIs, e.g. "tag:google.com,2005:reader/item/..."
+     */
+    public void markAsRead(User user, List<String> gReaderItemIds) {
+        editTag(gReaderItemIds, "user/-/state/com.google/read", true);
+    }
+
+    /**
+     * Sets or clears the starred state for the given GReader item IDs.
+     *
+     * @param gReaderItemIds list of full tag URIs
+     * @param starred        true to star, false to unstar
+     */
+    public void markAsStarred(User user, List<String> gReaderItemIds, boolean starred) {
+        editTag(gReaderItemIds, "user/-/state/com.google/starred", starred);
+    }
+
+    // -----------------------------------------------------------------------
+    // Internal helpers
+    // -----------------------------------------------------------------------
+
+    private void editTag(List<String> itemIds, String tag, boolean add) {
+        if (!isCredentialsConfigured() || itemIds.isEmpty()) return;
         try {
             String modToken = fetchModificationToken();
-            for (int i = 0; i < freshRssItemIds.size(); i += MARK_READ_BATCH) {
-                List<String> batch = freshRssItemIds.subList(i, Math.min(i + MARK_READ_BATCH, freshRssItemIds.size()));
+            for (int i = 0; i < itemIds.size(); i += EDIT_TAG_BATCH) {
+                List<String> batch = itemIds.subList(i, Math.min(i + EDIT_TAG_BATCH, itemIds.size()));
                 MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
                 form.add("T", modToken);
-                form.add("a", "user/-/state/com.google/read");
+                form.add(add ? "a" : "r", tag);
                 batch.forEach(id -> form.add("i", id));
 
                 restClient.post()
@@ -200,28 +228,21 @@ public class FreshRssApiService {
                         .toBodilessEntity();
             }
         } catch (RestClientException e) {
-            logger.error("Failed to mark items as read in FreshRSS: {}", e.getMessage());
+            logger.error("Failed to edit tag '{}' (add={}) in GReader: {}", tag, add, e.getMessage());
         }
     }
-
-    // -----------------------------------------------------------------------
-    // Internal helpers
-    // -----------------------------------------------------------------------
 
     private String authHeader() {
         return "GoogleLogin auth=" + getAuthToken();
     }
 
-    /**
-     * Returns a valid auth token, re-authenticating if the cached token is expired.
-     */
     private String getAuthToken() {
         CachedToken cached = cachedToken.get();
         if (cached != null && !cached.isExpired()) {
             return cached.token();
         }
 
-        logger.info("Authenticating against FreshRSS as '{}'", username);
+        logger.info("Authenticating against GReader as '{}'", username);
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
         form.add("Email", username);
         form.add("Passwd", password);
@@ -235,7 +256,7 @@ public class FreshRssApiService {
 
         String token = parseKeyValue(body, "Auth");
         if (token == null || token.isBlank()) {
-            throw new IllegalStateException("FreshRSS auth failed for user '" + username + "': no Auth token in response");
+            throw new IllegalStateException("GReader auth failed for user '" + username + "': no Auth token in response");
         }
 
         CachedToken newToken = new CachedToken(token, System.currentTimeMillis() + TOKEN_TTL_MS);
@@ -243,9 +264,6 @@ public class FreshRssApiService {
         return token;
     }
 
-    /**
-     * Fetches a short-lived modification token required for POST write operations.
-     */
     private String fetchModificationToken() {
         return restClient.get()
                 .uri("/api/greader.php/reader/api/0/token")
@@ -254,7 +272,6 @@ public class FreshRssApiService {
                 .body(String.class);
     }
 
-    /** Parses a plain-text "key=value\n..." response as returned by ClientLogin. */
     private static String parseKeyValue(String body, String key) {
         if (body == null) return null;
         for (String line : body.split("\n")) {
@@ -266,22 +283,13 @@ public class FreshRssApiService {
         return null;
     }
 
-    private static FreshRssStreamContents emptyStream() {
-        FreshRssStreamContents empty = new FreshRssStreamContents();
+    private static GReaderStreamContents emptyStream() {
+        GReaderStreamContents empty = new GReaderStreamContents();
         empty.setItems(new ArrayList<>());
         return empty;
     }
 
-    /**
-     * Invalidates the cached auth token (e.g. after a credential change via env var reload).
-     */
     public void invalidateToken() {
         cachedToken.set(null);
-    }
-
-    /** @deprecated Use {@link #invalidateToken()} instead. */
-    @Deprecated
-    public void invalidateToken(String userId) {
-        invalidateToken();
     }
 }

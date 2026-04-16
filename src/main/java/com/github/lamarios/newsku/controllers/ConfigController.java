@@ -23,17 +23,17 @@ public class ConfigController {
     private final boolean demoMode;
     private final BuildProperties buildProperties;
     private final Optional<Mailer> mailer;
-    private final String freshRssUrl;
+    private final String gReaderUrl;
 
     @Autowired
-    public ConfigController(OidcService oidcService, @Value("${ALLOW_SIGNUP:0}") boolean allowSignUp, @Value("${ANNOUNCEMENT:}") String announcement, @Value("${DEMO_MODE:0}") boolean demoMode, BuildProperties buildProperties, Optional<Mailer> mailer, @Value("${FRESHRSS_URL:}") String freshRssUrl) {
+    public ConfigController(OidcService oidcService, @Value("${ALLOW_SIGNUP:0}") boolean allowSignUp, @Value("${ANNOUNCEMENT:}") String announcement, @Value("${DEMO_MODE:0}") boolean demoMode, BuildProperties buildProperties, Optional<Mailer> mailer, @Value("${GREADER_URL:}") String gReaderUrl) {
         this.oidcService = oidcService;
         this.allowSignUp = allowSignUp;
         this.announcement = announcement;
         this.demoMode = demoMode;
         this.buildProperties = buildProperties;
         this.mailer = mailer;
-        this.freshRssUrl = freshRssUrl;
+        this.gReaderUrl = gReaderUrl;
     }
 
     @GetMapping
@@ -45,8 +45,8 @@ public class ConfigController {
         config.setCanResetPassword(mailer.isPresent());
         config.setBackendVersion(buildProperties.getVersion());
 
-        if (!freshRssUrl.isBlank()) {
-            config.setFreshRssUrl(freshRssUrl);
+        if (!gReaderUrl.isBlank()) {
+            config.setGReaderUrl(gReaderUrl);
         }
 
         if (oidcService.getOidcDiscoveryUrl() != null) {

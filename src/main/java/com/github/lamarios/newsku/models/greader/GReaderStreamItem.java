@@ -1,4 +1,4 @@
-package com.github.lamarios.newsku.models.freshrss;
+package com.github.lamarios.newsku.models.greader;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -8,7 +8,7 @@ import java.util.List;
  * A single article as returned inside the stream contents response.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class FreshRssStreamItem {
+public class GReaderStreamItem {
 
     /** Full tag URI, e.g. "tag:google.com,2005:reader/item/00000000ab1234ef" */
     private String id;

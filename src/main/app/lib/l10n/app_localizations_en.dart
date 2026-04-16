@@ -541,10 +541,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiTab => 'KI';
 
   @override
-  String get freshRssUrlLabel => 'FreshRSS-URL';
+  String get greaderTitle => 'GReader-Integration';
 
   @override
-  String get freshRssSaved => 'FreshRSS-Einstellungen gespeichert';
+  String get greaderExplanation => 'Ein GReader-kompatibler Server ist verbunden. Feeds und Kategorien werden über die GReader-API verwaltet.';
+
+  @override
+  String get greaderUsername => 'GReader-Benutzername';
+
+  @override
+  String get greaderApiPassword => 'GReader-API-Passwort';
+
+  @override
+  String get greaderApiPasswordHint => 'Leer lassen, um das bestehende Passwort beizubehalten';
+
+  @override
+  String get greaderUpdated => 'GReader-Zugangsdaten gespeichert';
+
+  @override
+  String get openInGreader => 'In GReader öffnen';
+
+  @override
+  String get greaderManagedFeeds => 'GReader-Modus ist aktiv. Feeds und Kategorien werden direkt in der GReader-Oberfläche verwaltet. Um neue Feeds hinzuzufügen oder Kategorien zu erstellen, nutze die GReader-Oberfläche.';
+
+  @override
+  String get greaderCredentialsEnvHint => 'Die GReader-Zugangsdaten werden vom Administrator über Umgebungsvariablen konfiguriert und sind hier nicht änderbar.';
+
+  @override
+  String get greaderUrlLabel => 'GReader-URL';
+
+  @override
+  String get greaderSaved => 'GReader-Einstellungen gespeichert';
 
   @override
   String get aiSection => 'KI-Integration';

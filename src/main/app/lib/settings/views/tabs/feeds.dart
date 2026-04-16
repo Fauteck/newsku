@@ -34,8 +34,8 @@ class FeedsSettingsTab extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
     final locals = AppLocalizations.of(context)!;
-    final freshRssActive = config?.freshRssUrl != null ||
-        (identityCubit.currentUser?.freshRssUrl?.isNotEmpty ?? false);
+    final gReaderActive = config?.gReaderUrl != null ||
+        (identityCubit.currentUser?.gReaderUrl?.isNotEmpty ?? false);
 
     return BlocProvider(
       create: (context) => FeedsSettingsCubit(FeedsSettingsState()),
@@ -47,12 +47,12 @@ class FeedsSettingsTab extends StatelessWidget {
                 ? Center(child: SizedBox(width: 50, height: 50, child: LoadingIndicator()))
                 : Column(
                     children: [
-                      if (freshRssActive) ...[
+                      if (gReaderActive) ...[
                         Padding(
                           padding: EdgeInsets.all(pu3),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(8),
-                            onTap: () => launchUrl(Uri.parse(config!.freshRssUrl!)),
+                            onTap: () => launchUrl(Uri.parse(config!.gReaderUrl!)),
                             child: Container(
                               padding: EdgeInsets.symmetric(horizontal: pu4, vertical: pu3),
                               decoration: BoxDecoration(
@@ -65,7 +65,7 @@ class FeedsSettingsTab extends StatelessWidget {
                                   Icon(Icons.info_outline, color: colors.onSecondaryContainer),
                                   Expanded(
                                     child: Text(
-                                      locals.freshRssManagedFeeds,
+                                      locals.greaderManagedFeeds,
                                       style: textTheme.bodyMedium?.copyWith(color: colors.onSecondaryContainer),
                                     ),
                                   ),
@@ -76,7 +76,7 @@ class FeedsSettingsTab extends StatelessWidget {
                           ),
                         ),
                       ],
-                      if (!freshRssActive) ...[
+                      if (!gReaderActive) ...[
                         Padding(
                           padding: EdgeInsets.all(pu2),
                           child: Form(
@@ -163,11 +163,11 @@ class FeedsSettingsTab extends StatelessWidget {
                           : Expanded(
                               child: ListView.builder(
                                 itemCount: state.categories
-                                    .where((c) => !freshRssActive || c.id != null)
+                                    .where((c) => !gReaderActive || c.id != null)
                                     .length,
                                 itemBuilder: (context, index) {
                                   final visibleCategories = state.categories
-                                      .where((c) => !freshRssActive || c.id != null)
+                                      .where((c) => !gReaderActive || c.id != null)
                                       .toList();
                                   final c = visibleCategories[index];
                                   return FeedCategoryView(
