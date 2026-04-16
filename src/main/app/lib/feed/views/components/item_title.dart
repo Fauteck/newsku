@@ -1,5 +1,7 @@
 import 'package:app/feed/models/feed_item.dart';
+import 'package:app/home/state/local_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motor/motor.dart';
 
 class ItemTitle extends StatelessWidget {
@@ -22,12 +24,19 @@ class ItemTitle extends StatelessWidget {
         final colors = Theme.of(context).colorScheme;
         var textStyle = style ?? textTheme.bodyMedium;
 
+        // When the global "Textkürzung" preference is enabled and the backend
+        // provided an AI-rewritten shortTitle, render that as a full string
+        // (no clamp/ellipsis). Otherwise render the original title.
+        final shorten = context.select((LocalPreferencesCubit p) => p.state.truncateText);
+        final hasShort = (item.shortTitle ?? '').isNotEmpty;
+        final text = (shorten && hasShort) ? item.shortTitle! : (item.title ?? '');
+
         return Text(
           key: Key('item-title'),
-          item.title ?? '',
+          text,
           style: (textStyle)?.copyWith(color: Color.lerp(textStyle.color, colors.primary, value)),
-          maxLines: maxLines,
-          overflow: overflow,
+          maxLines: (shorten && hasShort) ? null : maxLines,
+          overflow: (shorten && hasShort) ? null : overflow,
         );
       },
     );

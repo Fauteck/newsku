@@ -908,6 +908,11 @@ abstract class AppLocalizations {
   String get insightsTitle;
   String get insightsTopTags;
   String get insightsTopSources;
+  String get cacheSection;
+  String get cacheExplanation;
+  String get clearImageCache;
+  String get clearArticleCache;
+  String get cacheCleared;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

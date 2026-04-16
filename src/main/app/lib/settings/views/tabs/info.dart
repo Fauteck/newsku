@@ -5,8 +5,6 @@ import 'package:app/l10n/app_localizations.dart';
 import 'package:app/utils/models/imgur_error.dart';
 import 'package:app/utils/service/imgur_service.dart';
 import 'package:app/utils/utils.dart';
-import 'package:app/utils/views/components/app_logo.dart';
-import 'package:app/utils/views/components/app_name.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:feedback/feedback.dart';
@@ -90,11 +88,7 @@ class InfoTab extends StatelessWidget {
                 crossAxisAlignment: .center,
 
                 children: [
-                  Gap(pu4),
-                  AppLogo(size: 75),
-                  Gap(pu6),
-                  AppName(style: textTheme.displaySmall, alignment: .center),
-                  Gap(pu6),
+                  Gap(pu8),
                   Text(locals.version, style: titlesTheme),
                   Text(snapshot.data?.version ?? '-'),
                   Gap(pu2),
@@ -110,7 +104,7 @@ class InfoTab extends StatelessWidget {
                   FilledButton.tonalIcon(
                     icon: Icon(Icons.info_outline),
                     onPressed: () {
-                      showLicensePage(context: context, applicationIcon: AppLogo(size: 20));
+                      showLicensePage(context: context);
                     },
                     label: Text(locals.licenses),
                   ),

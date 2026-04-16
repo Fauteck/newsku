@@ -1,5 +1,7 @@
 import 'package:app/feed/models/feed_item.dart';
+import 'package:app/home/state/local_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 class ItemContent extends StatelessWidget {
@@ -58,11 +60,21 @@ class ItemContent extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    // When the global "Textkürzung" preference is enabled and the backend
+    // provided an AI-rewritten shortTeaser, render it in full (no clamp).
+    // Otherwise render the original description/content with the configured
+    // max-lines behavior for backward compatibility.
+    final shorten = context.select((LocalPreferencesCubit p) => p.state.truncateText);
+    final hasShort = (item.shortTeaser ?? '').isNotEmpty;
+    final text = (shorten && hasShort)
+        ? item.shortTeaser!
+        : stripHtmlTags(item.description ?? item.content ?? '');
+
     return Text(
-      stripHtmlTags(item.description ?? item.content ?? ''),
-      maxLines: maxLines,
+      text,
+      maxLines: (shorten && hasShort) ? null : maxLines,
       style: (style ?? textTheme.bodyMedium)?.copyWith(color: colors.secondary, height: 1.3),
-      overflow: overflow,
+      overflow: (shorten && hasShort) ? null : overflow,
     )
     /* return ClipRect(
       child: HtmlWidget(

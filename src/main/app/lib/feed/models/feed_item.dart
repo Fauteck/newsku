@@ -22,6 +22,12 @@ sealed class FeedItem with _$FeedItem {
     @Default(0) int timeCreated,
     @Default([]) List<String> tags,
     Feed? feed,
+    /// AI-generated length-adapted title variant, used when the global
+    /// "text shortening" preference is enabled.
+    String? shortTitle,
+    /// AI-generated length-adapted teaser variant, used when the global
+    /// "text shortening" preference is enabled.
+    String? shortTeaser,
   }) = _FeedItem;
 
   factory FeedItem.fromJson(Map<String, Object?> json) => _$FeedItemFromJson(json);

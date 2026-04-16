@@ -4,6 +4,7 @@ import 'package:app/feed/models/feed.dart';
 import 'package:app/feed/models/feed_category.dart';
 import 'package:app/feed/views/components/feed_image.dart';
 import 'package:app/l10n/app_localizations.dart';
+import 'package:app/main.dart';
 import 'package:app/router.dart';
 import 'package:app/settings/states/feeds.dart';
 import 'package:app/settings/views/components/dragged_feed.dart';
@@ -37,9 +38,11 @@ class FeedCategoryView extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final locals = AppLocalizations.of(context)!;
     final colors = Theme.of(context).colorScheme;
+    final freshRssActive = (config?.freshRssUrl ?? '').isNotEmpty;
     var cubit = context.read<FeedsSettingsCubit>();
 
     return DragTarget<Feed>(
+      onWillAcceptWithDetails: (_) => !freshRssActive,
       onAcceptWithDetails: (details) => cubit.setFeedCategory(category, details),
       builder: (context, List<Feed?> candidates, List<dynamic> rejected) {
         return SingleMotionBuilder(
@@ -86,7 +89,7 @@ class FeedCategoryView extends StatelessWidget {
                     ),
                   ),
                   if (expanded) ...[
-                    if (category.id != null)
+                    if (category.id != null && !freshRssActive)
                       Row(
                         children: [
                           TextButton.icon(
@@ -110,18 +113,24 @@ class FeedCategoryView extends StatelessWidget {
                     if (feeds.isNotEmpty)
                       ...feeds.map((f) {
                         return ListTile(
-                          leading: Draggable<Feed>(
-                            feedback: DraggedFeed(feed: f),
-                            data: f,
-                            child: Icon(Icons.drag_handle),
-                          ),
+                          leading: freshRssActive
+                              ? ClipRRect(
+                                  borderRadius: .circular(20),
+                                  child: FeedImage(item: f, width: 20, height: 20),
+                                )
+                              : Draggable<Feed>(
+                                  feedback: DraggedFeed(feed: f),
+                                  data: f,
+                                  child: Icon(Icons.drag_handle),
+                                ),
                           title: Row(
                             spacing: pu,
                             children: [
-                              ClipRRect(
-                                borderRadius: .circular(20),
-                                child: FeedImage(item: f, width: 20, height: 20),
-                              ),
+                              if (!freshRssActive)
+                                ClipRRect(
+                                  borderRadius: .circular(20),
+                                  child: FeedImage(item: f, width: 20, height: 20),
+                                ),
                               Expanded(child: Text(f.name ?? '')),
                             ],
                           ),
@@ -132,22 +141,23 @@ class FeedCategoryView extends StatelessWidget {
                             mainAxisSize: .min,
                             children: [
                               _ErrorButton(feed: f),
-                              IconButton(
-                                onPressed: () {
-                                  okCancelDialog(
-                                    context,
-                                    title: locals.deleteFeed,
-                                    content: Text(locals.deleteFeedMessage),
-                                    onOk: () => cubit.deleteFeed(f),
-                                  );
-                                },
-                                icon: Icon(Icons.delete),
-                              ),
+                              if (!freshRssActive)
+                                IconButton(
+                                  onPressed: () {
+                                    okCancelDialog(
+                                      context,
+                                      title: locals.deleteFeed,
+                                      content: Text(locals.deleteFeedMessage),
+                                      onOk: () => cubit.deleteFeed(f),
+                                    );
+                                  },
+                                  icon: Icon(Icons.delete),
+                                ),
                             ],
                           ),
                         );
                       })
-                    else
+                    else if (!freshRssActive)
                       Text(locals.noFeedInCategory, style: textTheme.labelSmall),
                   ],
                 ],

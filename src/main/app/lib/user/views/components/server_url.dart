@@ -1,17 +1,12 @@
-import 'dart:ui';
-
 import 'package:app/identity/states/identity.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/router.dart';
 import 'package:app/user/states/server_url.dart';
 import 'package:app/utils/utils.dart';
-import 'package:app/utils/views/components/app_logo.dart';
-import 'package:app/utils/views/components/app_name.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:motor/motor.dart';
 
 @RoutePage()
 class ServerUrlScreen extends StatelessWidget {
@@ -19,7 +14,6 @@ class ServerUrlScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     final locals = AppLocalizations.of(context)!;
 
     return BlocProvider(
@@ -31,25 +25,6 @@ class ServerUrlScreen extends StatelessWidget {
             mainAxisAlignment: .center,
             crossAxisAlignment: .center,
             children: [
-              SingleMotionBuilder(
-                motion: Motion.smoothSpring(duration: Duration(seconds: 1)),
-                from: 0,
-                value: 1,
-                builder: (context, value, child) => Opacity(
-                  opacity: value.clamp(0, 1),
-                  child: Transform.translate(offset: Offset(0, lerpDouble(25, 0, value)!), child: child),
-                ),
-                child: Row(
-                  crossAxisAlignment: .center,
-                  mainAxisAlignment: .center,
-                  spacing: pu4,
-                  children: [
-                    AppLogo(size: 40),
-                    AppName(style: textTheme.displayMedium, alignment: .center),
-                  ],
-                ),
-              ),
-              Gap(pu8),
               Align(alignment: .centerLeft, child: Text(locals.server)),
               TextField(
                 onChanged: (value) => cubit.setUrl(value),

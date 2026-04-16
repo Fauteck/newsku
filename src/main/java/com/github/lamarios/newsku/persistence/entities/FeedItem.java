@@ -20,6 +20,14 @@ public class FeedItem {
     private String imageUrl;
     private int importance;
     private String url;
+
+    /** AI-generated short-form title tailored for compact grid cards. */
+    @Column(name = "short_title")
+    private String shortTitle;
+
+    /** AI-generated short-form teaser tailored for compact grid cards. */
+    @Column(name = "short_teaser")
+    private String shortTeaser;
     @Column(name = "timecreated")
     private long timeCreated;
     private boolean read;
@@ -153,5 +161,21 @@ public class FeedItem {
 
     public void setFreshRssItemId(String freshRssItemId) {
         this.freshRssItemId = freshRssItemId;
+    }
+
+    public String getShortTitle() {
+        return shortTitle;
+    }
+
+    public void setShortTitle(String shortTitle) {
+        this.shortTitle = shortTitle;
+    }
+
+    public String getShortTeaser() {
+        return shortTeaser;
+    }
+
+    public void setShortTeaser(String shortTeaser) {
+        this.shortTeaser = shortTeaser;
     }
 }

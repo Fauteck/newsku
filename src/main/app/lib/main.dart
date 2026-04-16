@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
           return MainColorProvider(
             builder: (context, appColor) {
               return MaterialApp.router(
-                title: 'Feedteck',
+                title: 'Newsku',
                 localizationsDelegates: AppLocalizations.localizationsDelegates,
                 supportedLocales: AppLocalizations.supportedLocales,
                 routerConfig: appRouter.config(),

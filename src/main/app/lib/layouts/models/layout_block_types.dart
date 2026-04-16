@@ -116,15 +116,25 @@ enum LayoutBlockTypes {
       ),
     };
 
-    final title = (block.settings ?? defaultSettings).title;
-    if (title == null || title.isEmpty) return contentSliver;
+    // Section heading: derive from the block's category if one is set,
+    // otherwise fall back to the block's configured title (if any).
+    final settings = block.settings ?? defaultSettings;
+    String? heading;
+    if (settings.categoryId != null) {
+      heading = items
+          .map((i) => i.feed?.category)
+          .firstWhere((c) => c?.id == settings.categoryId, orElse: () => null)
+          ?.name;
+    }
+    heading ??= settings.title;
+    if (heading == null || heading.isEmpty) return contentSliver;
 
     return SliverMainAxisGroup(
       slivers: [
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
-            child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+            child: Text(heading, style: Theme.of(context).textTheme.titleLarge),
           ),
         ),
         contentSliver,

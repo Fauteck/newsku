@@ -21,6 +21,8 @@ _FeedItem _$FeedItemFromJson(Map<String, dynamic> json) => _FeedItem(
   timeCreated: (json['timeCreated'] as num?)?.toInt() ?? 0,
   tags: (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ?? const [],
   feed: json['feed'] == null ? null : Feed.fromJson(json['feed'] as Map<String, dynamic>),
+  shortTitle: json['shortTitle'] as String?,
+  shortTeaser: json['shortTeaser'] as String?,
 );
 
 Map<String, dynamic> _$FeedItemToJson(_FeedItem instance) => <String, dynamic>{
@@ -38,4 +40,6 @@ Map<String, dynamic> _$FeedItemToJson(_FeedItem instance) => <String, dynamic>{
   'timeCreated': instance.timeCreated,
   'tags': instance.tags,
   'feed': instance.feed,
+  'shortTitle': instance.shortTitle,
+  'shortTeaser': instance.shortTeaser,
 };

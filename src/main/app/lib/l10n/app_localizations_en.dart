@@ -486,7 +486,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get truncateText => 'Truncate article text';
 
   @override
-  String get truncateTextExplanation => 'Clamp article titles and teasers to a fixed number of lines in the feed view';
+  String get truncateTextExplanation =>
+      'When enabled, AI automatically generates title and teaser variants at the ideal length per layout type. The setting applies globally across all views.';
 
   @override
   String get titleMaxLines => 'Title lines';
@@ -520,4 +521,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get insightsTopSources => 'Top sources';
+
+  @override
+  String get cacheSection => 'Cache';
+
+  @override
+  String get cacheExplanation => 'Manage locally cached articles and images';
+
+  @override
+  String get clearImageCache => 'Clear image cache';
+
+  @override
+  String get clearArticleCache => 'Clear article cache';
+
+  @override
+  String get cacheCleared => 'Cache cleared';
 }
