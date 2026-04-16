@@ -15,6 +15,7 @@ class UserSettingsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
     final locals = AppLocalizations.of(context)!;
     return BlocProvider(
       create: (context) => UserSettingsCubit(
@@ -28,10 +29,10 @@ class UserSettingsTab extends StatelessWidget {
           final cubit = context.read<UserSettingsCubit>();
           final serverConfig = config;
           return Padding(
-            padding: .symmetric(horizontal: pu2),
+            padding: EdgeInsets.symmetric(horizontal: pu2),
             child: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: .stretch,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Gap(pu4),
                   if (serverConfig?.canResetPassword ?? false) ...[
@@ -49,7 +50,7 @@ class UserSettingsTab extends StatelessWidget {
                               value: e,
                               enabled: serverConfig?.canResetPassword ?? false,
                               label: Text(locals.emailDigest(e.name)),
-                              icon: Icon(Icons.close),
+                              icon: const Icon(Icons.close),
                             ),
                           )
                           .toList(),
@@ -61,13 +62,13 @@ class UserSettingsTab extends StatelessWidget {
                   Gap(pu4),
                   Text(locals.newEmail),
                   TextField(
-                    key: Key('email'),
+                    key: const Key('email'),
                     controller: cubit.email,
                     decoration: InputDecoration(error: state.validEmail ? null : Text(locals.invalidEmail)),
                   ),
                   Gap(pu2),
                   Align(
-                    alignment: .centerRight,
+                    alignment: Alignment.centerRight,
                     child: FilledButton.tonalIcon(
                       onPressed: state.loading || !state.validEmail
                           ? null
@@ -80,18 +81,18 @@ class UserSettingsTab extends StatelessWidget {
                               }
                             },
                       label: Text(locals.update),
-                      icon: Icon(Icons.save),
+                      icon: const Icon(Icons.save),
                     ),
                   ),
                   Gap(pu8),
                   Text(locals.changePassword, style: textTheme.titleMedium),
                   Gap(pu4),
                   Text(locals.newPassword),
-                  TextField(key: Key('new-password'), controller: cubit.password, obscureText: true),
+                  TextField(key: const Key('new-password'), controller: cubit.password, obscureText: true),
                   Gap(pu2),
                   Text(locals.confirmPassword),
                   TextField(
-                    key: Key('repeat-password'),
+                    key: const Key('repeat-password'),
                     controller: cubit.repeatPassword,
                     obscureText: true,
                     decoration: InputDecoration(
@@ -100,9 +101,9 @@ class UserSettingsTab extends StatelessWidget {
                   ),
                   Gap(pu2),
                   Align(
-                    alignment: .centerRight,
+                    alignment: Alignment.centerRight,
                     child: FilledButton.tonalIcon(
-                      key: Key('password-update-button'),
+                      key: const Key('password-update-button'),
                       onPressed: state.loading || state.password != state.repeatPassword || state.password.isEmpty
                           ? null
                           : () async {
@@ -114,59 +115,45 @@ class UserSettingsTab extends StatelessWidget {
                               }
                             },
                       label: Text(locals.update),
-                      icon: Icon(Icons.save),
+                      icon: const Icon(Icons.save),
                     ),
                   ),
                   Gap(pu8),
-                  Row(
-                    children: [
-                      Text(locals.freshRssTitle, style: textTheme.titleMedium),
-                      if (serverConfig?.freshRssUrl != null) ...[
+                  // FreshRSS section — credentials are configured via environment variables
+                  if (serverConfig?.freshRssUrl != null) ...[
+                    Row(
+                      children: [
+                        Text(locals.freshRssTitle, style: textTheme.titleMedium),
                         Gap(pu2),
                         IconButton.outlined(
-                          icon: Icon(Icons.open_in_new, size: 16),
+                          icon: const Icon(Icons.open_in_new, size: 16),
                           tooltip: locals.openInFreshRss,
                           onPressed: () => launchUrl(Uri.parse(serverConfig!.freshRssUrl!)),
                         ),
                       ],
-                    ],
-                  ),
-                  Gap(pu2),
-                  Text(locals.freshRssExplanation),
-                  Gap(pu4),
-                  Text(locals.freshRssUsername),
-                  TextField(
-                    key: Key('freshrss-username'),
-                    controller: cubit.freshRssUsername,
-                    autocorrect: false,
-                  ),
-                  Gap(pu2),
-                  Text(locals.freshRssApiPassword),
-                  TextField(
-                    key: Key('freshrss-api-password'),
-                    controller: cubit.freshRssApiPassword,
-                    obscureText: true,
-                    decoration: InputDecoration(hintText: locals.freshRssApiPasswordHint),
-                  ),
-                  Gap(pu2),
-                  Align(
-                    alignment: .centerRight,
-                    child: FilledButton.tonalIcon(
-                      key: Key('freshrss-save-button'),
-                      onPressed: state.loading
-                          ? null
-                          : () async {
-                              await cubit.updateFreshRssCredentials();
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(
-                                  context,
-                                ).showSnackBar(SnackBar(content: Text(locals.freshRssUpdated)));
-                              }
-                            },
-                      label: Text(locals.save),
-                      icon: Icon(Icons.save),
                     ),
-                  ),
+                    Gap(pu2),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: pu4, vertical: pu3),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: colors.secondaryContainer,
+                      ),
+                      child: Row(
+                        spacing: pu3,
+                        children: [
+                          Icon(Icons.info_outline, color: colors.onSecondaryContainer),
+                          Expanded(
+                            child: Text(
+                              locals.freshRssCredentialsEnvHint,
+                              style: textTheme.bodyMedium?.copyWith(color: colors.onSecondaryContainer),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Gap(pu8),
+                  ],
                 ],
               ),
             ),

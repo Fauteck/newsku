@@ -1,4 +1,5 @@
 import 'package:app/l10n/app_localizations.dart';
+import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/layouts/models/layout_block_types.dart';
 import 'package:app/settings/states/layout.dart';
 import 'package:app/settings/views/components/draggable_layout_block.dart';
@@ -12,6 +13,7 @@ import 'package:app/utils/views/components/conditional_wrap.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:app/utils/views/components/simple_cubit_view.dart';
 import 'package:auto_route/annotations.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -31,7 +33,7 @@ class LayoutSettingsTab extends StatelessWidget {
     final device = BreakPoint.get(context);
 
     return Padding(
-      padding: .only(bottom: pu8, left: pu2, right: pu2, top: pu2),
+      padding: EdgeInsets.only(bottom: pu8, left: pu2, right: pu2, top: pu2),
       child: BlocProvider(
         create: (context) => LayoutCubit(LayoutState()),
         child: BlocConsumer<LayoutCubit, LayoutState>(
@@ -44,39 +46,39 @@ class LayoutSettingsTab extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Flex(
-                      direction: device == .mobile ? .vertical : .horizontal,
+                      direction: device == BreakPoint.mobile ? Axis.vertical : Axis.horizontal,
                       spacing: pu2,
                       children: [
-                        if (device == .mobile)
+                        if (device == BreakPoint.mobile)
                           SimpleCubitView<bool>(
                             initialValue: false,
                             builder: (context, expanded) => Row(
-                              crossAxisAlignment: .start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Expanded(
                                   child: Text(
                                     locals.layoutExplanation,
-                                    overflow: .ellipsis,
+                                    overflow: TextOverflow.ellipsis,
                                     maxLines: expanded ? 10 : 2,
                                   ),
                                 ),
                                 IconButton(
-                                  visualDensity: .compact,
+                                  visualDensity: VisualDensity.compact,
                                   onPressed: () => context.read<SimpleCubit<bool>>().setValue(!expanded),
                                   icon: Icon(expanded ? Icons.expand_less : Icons.expand_more),
                                 ),
                               ],
                             ),
                           ),
-                        if (device != .mobile)
+                        if (device != BreakPoint.mobile)
                           Expanded(
                             flex: 1,
                             child: Column(
-                              crossAxisAlignment: .start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Gap(pu2),
                                 Text(locals.layoutExplanation),
-                                Divider(),
+                                const Divider(),
                                 Text(locals.availableBlocks, style: textTheme.titleLarge),
                                 Text(locals.dragAndDropInstructions),
                                 Gap(pu8),
@@ -122,7 +124,6 @@ class LayoutSettingsTab extends StatelessWidget {
                                           type: LayoutBlockTypes.smallGrid,
                                         ),
                                       ),
-
                                       Center(
                                         child: DraggableLayoutBlock(
                                           setDragging: cubit.setDragging,
@@ -135,29 +136,29 @@ class LayoutSettingsTab extends StatelessWidget {
                               ],
                             ),
                           ),
-                        VerticalDivider(),
+                        const VerticalDivider(),
                         Expanded(
                           flex: 2,
                           child: Column(
-                            crossAxisAlignment: .stretch,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Gap(pu2),
                               Row(
                                 children: [
                                   Expanded(child: Text(locals.currentLayout, style: textTheme.titleLarge)),
-                                  if (device == .mobile)
+                                  if (device == BreakPoint.mobile)
                                     TextButton(
                                       onPressed: () async {
                                         final newBlock = await NewBlockDialog.show(context);
                                         if (newBlock != null) {
                                           cubit.acceptDrag(
                                             state.blocks.length - 1,
-                                            DragTargetDetails(data: newBlock, offset: .zero),
+                                            DragTargetDetails(data: newBlock, offset: Offset.zero),
                                           );
                                           cubit.scrollController.animateTo(
                                             cubit.scrollController.position.maxScrollExtent +
                                                 cubit.scrollController.position.viewportDimension,
-                                            duration: Duration(seconds: 1),
+                                            duration: const Duration(seconds: 1),
                                             curve: Curves.easeInOutQuart,
                                           );
                                         }
@@ -173,27 +174,32 @@ class LayoutSettingsTab extends StatelessWidget {
                                       Center(child: DraggedLayoutBlock(type: state.blocks[index].type)),
                                   itemCount: state.blocks.length,
                                   onReorder: (int oldIndex, int newIndex) => cubit.onReorder(oldIndex, newIndex),
-
                                   buildDefaultDragHandles: false,
                                   itemBuilder: (context, index) {
                                     var block = state.blocks[index];
-
                                     var isLast = index == state.blocks.length - 1;
+
                                     return Padding(
                                       key: ValueKey(block),
-                                      padding: .only(bottom: pu2),
+                                      padding: EdgeInsets.only(bottom: pu2),
                                       child: ConditionalWrap(
                                         wrapIf: index == 0,
                                         wrapper: (child) => Column(
-                                          crossAxisAlignment: .stretch,
+                                          crossAxisAlignment: CrossAxisAlignment.stretch,
                                           children: [
                                             LayoutSeparator(index: -1, dragging: state.dragging),
                                             child,
                                           ],
                                         ),
                                         child: Column(
-                                          crossAxisAlignment: .stretch,
+                                          crossAxisAlignment: CrossAxisAlignment.stretch,
                                           children: [
+                                            // Common section title field for all blocks
+                                            _BlockTitleField(
+                                              block: block,
+                                              onUpdated: (newBlock) => cubit.updateBlock(block, newBlock),
+                                            ),
+                                            Gap(pu2),
                                             Row(
                                               spacing: pu4,
                                               children: [
@@ -201,7 +207,7 @@ class LayoutSettingsTab extends StatelessWidget {
                                                   index: index,
                                                   child: MouseRegion(
                                                     cursor: SystemMouseCursors.move,
-                                                    child: Icon(Icons.drag_handle, size: 40),
+                                                    child: const Icon(Icons.drag_handle, size: 40),
                                                   ),
                                                 ),
                                                 Expanded(
@@ -222,9 +228,9 @@ class LayoutSettingsTab extends StatelessWidget {
                                                                   (fadeColor ?? colors.surface).withValues(alpha: 0),
                                                                   (fadeColor ?? colors.surface),
                                                                 ],
-                                                                stops: [0, 0.90],
-                                                                begin: .topCenter,
-                                                                end: .bottomCenter,
+                                                                stops: const [0, 0.90],
+                                                                begin: Alignment.topCenter,
+                                                                end: Alignment.bottomCenter,
                                                               ),
                                                             ),
                                                           ),
@@ -243,15 +249,39 @@ class LayoutSettingsTab extends StatelessWidget {
                                                 if (state.blocks.length > 1)
                                                   IconButton(
                                                     onPressed: () => cubit.removeBlock(block),
-                                                    icon: Icon(Icons.delete),
+                                                    icon: const Icon(Icons.delete),
                                                     color: colors.error,
                                                   ),
                                               ],
                                             ),
+                                            if (isLast && !block.type.fixedSize) ...[
+                                              Gap(pu2),
+                                              Container(
+                                                padding: EdgeInsets.symmetric(horizontal: pu3, vertical: pu2),
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(6),
+                                                  color: colors.tertiaryContainer.withValues(alpha: 0.6),
+                                                ),
+                                                child: Row(
+                                                  spacing: pu2,
+                                                  children: [
+                                                    Icon(Icons.auto_awesome, size: 16, color: colors.onTertiaryContainer),
+                                                    Expanded(
+                                                      child: Text(
+                                                        locals.lastBlockHint,
+                                                        style: textTheme.bodySmall?.copyWith(
+                                                          color: colors.onTertiaryContainer,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
                                             Gap(pu4),
-                                            Divider(),
+                                            const Divider(),
                                             LayoutSeparator(index: index, dragging: state.dragging),
-                                            if (state.dragging) Divider(),
+                                            if (state.dragging) const Divider(),
                                           ],
                                         ),
                                       ),
@@ -272,6 +302,60 @@ class LayoutSettingsTab extends StatelessWidget {
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+/// A stateful title text field for a layout block section.
+/// Handles its own controller lifecycle and debounced updates.
+class _BlockTitleField extends StatefulWidget {
+  final LayoutBlock block;
+  final Function(LayoutBlock block) onUpdated;
+
+  const _BlockTitleField({required this.block, required this.onUpdated});
+
+  @override
+  State<_BlockTitleField> createState() => _BlockTitleFieldState();
+}
+
+class _BlockTitleFieldState extends State<_BlockTitleField> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(
+      text: (widget.block.settings ?? widget.block.type.defaultSettings).title ?? '',
+    );
+    _controller.addListener(_onChanged);
+  }
+
+  void _onChanged() {
+    EasyDebounce.debounce('block-title-${widget.block.id}', const Duration(milliseconds: 800), () {
+      if (!mounted) return;
+      final settings = widget.block.settings ?? widget.block.type.defaultSettings;
+      widget.onUpdated(widget.block.copyWith(settings: settings.copyWith(title: _controller.value.text)));
+    });
+  }
+
+  @override
+  void dispose() {
+    EasyDebounce.cancel('block-title-${widget.block.id}');
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final locals = AppLocalizations.of(context)!;
+    return TextFormField(
+      key: ValueKey('title-${widget.block.id}'),
+      controller: _controller,
+      decoration: InputDecoration(
+        labelText: locals.blockSectionTitle,
+        isDense: true,
+        border: const OutlineInputBorder(),
       ),
     );
   }

@@ -1,7 +1,11 @@
 import 'package:app/identity/states/identity.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/main.dart';
-import 'package:app/router.dart';
+import 'package:app/settings/views/tabs/feeds.dart';
+import 'package:app/settings/views/tabs/general.dart';
+import 'package:app/settings/views/tabs/info.dart';
+import 'package:app/settings/views/tabs/layout.dart';
+import 'package:app/settings/views/tabs/user.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -13,40 +17,73 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final locals = AppLocalizations.of(context)!;
-    return AutoTabsRouter.tabBar(
-      routes: [FeedsSettingsRoute(), LayoutSettingsRoute(), GeneralSettingsRoute(), UserSettingsRoute(), InfoRoute()],
-      builder: (context, child, tabController) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(locals.settings),
-            actions: [
-              TextButton.icon(
-                onPressed: () => getIt.get<IdentityCubit>().logout(),
-                label: Text(locals.logout),
-                icon: Icon(Icons.logout),
-              ),
+    return DefaultTabController(
+      length: 4,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(locals.settings),
+          actions: [
+            TextButton.icon(
+              onPressed: () => getIt.get<IdentityCubit>().logout(),
+              label: Text(locals.logout),
+              icon: const Icon(Icons.logout),
+            ),
+          ],
+          bottom: TabBar(
+            tabs: [
+              Tab(text: locals.feeds, icon: const Icon(Icons.rss_feed)),
+              Tab(text: locals.darstellungTab, icon: const Icon(Icons.grid_view_sharp)),
+              Tab(text: locals.user, icon: const Icon(Icons.person)),
+              Tab(text: locals.about, icon: const Icon(Icons.info_outline)),
             ],
-            bottom: TabBar(
-              controller: tabController,
-              tabs: [
-                Tab(text: locals.feeds, icon: Icon(Icons.rss_feed)),
-                Tab(text: locals.layout, icon: Icon(Icons.grid_view_sharp)),
-                Tab(text: locals.general, icon: Icon(Icons.settings)),
-                Tab(text: locals.user, icon: Icon(Icons.person)),
-                Tab(text: locals.about, icon: Icon(Icons.info_outline)),
+          ),
+        ),
+        body: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: BreakPoint.tablet.maxWidth),
+              child: TabBarView(
+                children: [
+                  const FeedsSettingsTab(),
+                  const _LayoutAndAppearanceTab(),
+                  const UserSettingsTab(),
+                  const InfoTab(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LayoutAndAppearanceTab extends StatelessWidget {
+  const _LayoutAndAppearanceTab();
+
+  @override
+  Widget build(BuildContext context) {
+    final locals = AppLocalizations.of(context)!;
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          TabBar(
+            tabs: [
+              Tab(text: locals.layout),
+              Tab(text: locals.darstellung),
+            ],
+          ),
+          const Expanded(
+            child: TabBarView(
+              children: [
+                LayoutSettingsTab(),
+                GeneralSettingsTab(),
               ],
             ),
           ),
-          body: SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: BreakPoint.tablet.maxWidth),
-                child: child,
-              ),
-            ),
-          ),
-        );
-      },
+        ],
+      ),
     );
   }
 }
