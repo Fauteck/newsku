@@ -93,6 +93,7 @@ public class WebSecurityConfig {
                         .requireExplicitSave(false))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(request -> request.getMethod().equalsIgnoreCase("OPTIONS")).permitAll()
+                        .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
                 )

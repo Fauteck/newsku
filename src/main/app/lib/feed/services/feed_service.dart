@@ -91,8 +91,11 @@ class FeedService extends BaseService {
     required int pageSize,
     required int from,
     required int to,
+    int? minimumImportance,
   }) async {
-    var uri = await formatUrl('/api/feeds/items', query: {'page': page, 'pageSize': pageSize, 'from': from, 'to': to});
+    final query = {'page': page, 'pageSize': pageSize, 'from': from, 'to': to};
+    if (minimumImportance != null) query['minimumImportance'] = minimumImportance;
+    var uri = await formatUrl('/api/feeds/items', query: query);
 
     var response = await http.get(uri, headers: await headers);
 

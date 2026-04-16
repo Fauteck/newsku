@@ -5,6 +5,7 @@ import 'package:app/settings/views/tabs/ai.dart';
 import 'package:app/settings/views/tabs/feeds.dart';
 import 'package:app/settings/views/tabs/info.dart';
 import 'package:app/settings/views/tabs/layout.dart';
+import 'package:app/settings/views/tabs/magazine.dart';
 import 'package:app/settings/views/tabs/user.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/views/components/mobile_bottom_nav.dart';
@@ -20,7 +21,7 @@ class SettingsScreen extends StatelessWidget {
     final locals = AppLocalizations.of(context)!;
     final isMobile = BreakPoint.get(context) == BreakPoint.mobile;
     return DefaultTabController(
-      length: 5,
+      length: 6,
       child: Scaffold(
         appBar: AppBar(
           title: Text(locals.settings),
@@ -44,6 +45,7 @@ class SettingsScreen extends StatelessWidget {
               Tab(text: locals.feeds, icon: const Icon(Icons.rss_feed)),
               Tab(text: locals.aiTab, icon: const Icon(Icons.auto_awesome)),
               Tab(text: locals.about, icon: const Icon(Icons.info_outline)),
+              Tab(text: 'Magazin', icon: const Icon(Icons.newspaper_outlined)),
             ],
           ),
         ),
@@ -61,6 +63,7 @@ class SettingsScreen extends StatelessWidget {
                   const FeedsSettingsTab(),
                   const AiSettingsTab(),
                   const InfoTab(),
+                  const MagazineSettingsTab(),
                 ],
               ),
             ),

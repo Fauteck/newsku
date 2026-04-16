@@ -412,3 +412,43 @@ class UserSettingsRoute extends PageRouteInfo<void> {
     },
   );
 }
+
+/// generated route for
+/// [PublicMagazineScreen]
+class PublicMagazineRoute extends PageRouteInfo<PublicMagazineRouteArgs> {
+  PublicMagazineRoute({Key? key, required String tabId, List<PageRouteInfo>? children})
+    : super(
+        PublicMagazineRoute.name,
+        args: PublicMagazineRouteArgs(key: key, tabId: tabId),
+        rawPathParams: {'tabId': tabId},
+        initialChildren: children,
+        argsEquality: false,
+      );
+
+  static const String name = 'PublicMagazineRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final pathParams = data.pathParams;
+      final args = data.argsAs<PublicMagazineRouteArgs>(
+        orElse: () =>
+            PublicMagazineRouteArgs(tabId: pathParams.getString('tabId')),
+      );
+      return PublicMagazineScreen(key: args.key, tabId: args.tabId);
+    },
+  );
+}
+
+class PublicMagazineRouteArgs {
+  const PublicMagazineRouteArgs({this.key, required this.tabId});
+
+  final Key? key;
+
+  final String tabId;
+
+  @override
+  String toString() {
+    return 'PublicMagazineRouteArgs{key: $key, tabId: $tabId}';
+  }
+}

@@ -28,6 +28,11 @@ public class LayoutBlock {
     @JsonIgnore
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "tab_id")
+    @JsonIgnore
+    private MagazineTab tab;
+
     public String getId() {
         return id;
     }
@@ -66,5 +71,13 @@ public class LayoutBlock {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public MagazineTab getTab() {
+        return tab;
+    }
+
+    public void setTab(MagazineTab tab) {
+        this.tab = tab;
     }
 }
