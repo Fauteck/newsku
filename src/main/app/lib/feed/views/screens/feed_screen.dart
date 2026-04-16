@@ -13,6 +13,7 @@ import 'package:app/router.dart';
 import 'package:app/user/views/components/user_profile_picture.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
+import 'package:app/utils/views/components/app_name.dart';
 import 'package:app/utils/views/components/conditional_wrap.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:app/utils/views/components/main_color_provider.dart';
@@ -164,6 +165,25 @@ class FeedScreen extends StatelessWidget {
                                             snap: true,
                                             elevation: 0,
                                             scrolledUnderElevation: 0,
+                                            centerTitle: isMobile,
+                                            leading: isMobile
+                                                ? IconButton(
+                                                    onPressed: () => AutoRouter.of(
+                                                      context,
+                                                    ).push(SettingsRoute()).then((_) => cubit.refresh()),
+                                                    icon: ConditionalWrap(
+                                                      wrapIf: state.errorCount > 0,
+                                                      wrapper: (child) => Badge(
+                                                        offset: const Offset(5, 0),
+                                                        backgroundColor: colors.errorContainer,
+                                                        textColor: colors.error,
+                                                        label: Text('${state.errorCount}'),
+                                                        child: child,
+                                                      ),
+                                                      child: const Icon(Icons.settings_outlined),
+                                                    ),
+                                                  )
+                                                : null,
                                             title: AnimatedSwitcher(
                                               duration: Duration(milliseconds: 250),
                                               child: state.searchMode
@@ -176,6 +196,8 @@ class FeedScreen extends StatelessWidget {
                                                         label: Text(locals.search),
                                                       ),
                                                     )
+                                                  : isMobile
+                                                  ? AppName(style: textTheme.titleMedium)
                                                   : const SizedBox.shrink(),
                                             ),
                                             actions: [
@@ -186,49 +208,17 @@ class FeedScreen extends StatelessWidget {
                                                 )
                                               else if (isMobile) ...[
                                                 IconButton(
-                                                  onPressed: () => cubit.refresh(),
-                                                  icon: Icon(Icons.refresh),
-                                                ),
-                                                MenuAnchor(
-                                                  key: Key('mobile-more-menu'),
-                                                  builder: (context, controller, child) => IconButton(
-                                                    onPressed: () =>
-                                                        controller.isOpen ? controller.close() : controller.open(),
-                                                    icon: Icon(Icons.menu),
+                                                  key: Key('saved-filter-button'),
+                                                  onPressed: () => cubit.setSavedFilter(!state.showSavedOnly),
+                                                  icon: Icon(
+                                                    state.showSavedOnly ? Icons.bookmarks : Icons.bookmarks_outlined,
+                                                    color: state.showSavedOnly ? colors.primary : null,
                                                   ),
-                                                  menuChildren: [
-                                                    MenuItemButton(
-                                                      leadingIcon: Icon(Icons.search),
-                                                      onPressed: () => cubit.setSearch(true),
-                                                      child: Text(locals.search),
-                                                    ),
-                                                    MenuItemButton(
-                                                      key: Key('saved-filter-button'),
-                                                      leadingIcon: Icon(
-                                                        state.showSavedOnly
-                                                            ? Icons.bookmarks
-                                                            : Icons.bookmarks_outlined,
-                                                        color: state.showSavedOnly ? colors.primary : null,
-                                                      ),
-                                                      onPressed: () => cubit.setSavedFilter(!state.showSavedOnly),
-                                                      child: Text(locals.savedArticles),
-                                                    ),
-                                                    if (config?.freshRssUrl != null &&
-                                                        config!.freshRssUrl!.isNotEmpty) ...[
-                                                      Divider(),
-                                                      MenuItemButton(
-                                                        leadingIcon: Icon(Icons.open_in_new),
-                                                        onPressed: () => launchUrl(Uri.parse(config!.freshRssUrl!)),
-                                                        child: Text(locals.openInFreshRss),
-                                                      ),
-                                                    ],
-                                                    Divider(),
-                                                    MenuItemButton(
-                                                      leadingIcon: Icon(Icons.logout),
-                                                      onPressed: () => getIt.get<IdentityCubit>().logout(),
-                                                      child: Text(locals.logout),
-                                                    ),
-                                                  ],
+                                                  tooltip: locals.savedArticles,
+                                                ),
+                                                IconButton(
+                                                  onPressed: () => cubit.setSearch(true),
+                                                  icon: const Icon(Icons.search),
                                                 ),
                                               ] else ...[
                                                 IconButton(
