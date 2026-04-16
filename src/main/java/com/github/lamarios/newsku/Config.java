@@ -16,9 +16,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 import javax.sql.DataSource;
 import java.io.IOException;
 
@@ -47,35 +44,9 @@ public class Config {
     @Value("${ROOT_URL:http://localhost:8080}")
     private String rootUrl;
 
-    @Value("${FRONTEND_URL:}")
-    private String frontendUrl;
-
     @Bean
     public String rootUrl() {
         return rootUrl;
-    }
-
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        // Determine allowed origins: use FRONTEND_URL if set, otherwise fall back to ROOT_URL.
-        // Multiple URLs can be provided in FRONTEND_URL as a comma-separated list.
-        String[] allowedOrigins = (frontendUrl != null && !frontendUrl.isBlank())
-                ? java.util.Arrays.stream(frontendUrl.split(","))
-                        .map(String::trim)
-                        .filter(s -> !s.isBlank())
-                        .toArray(String[]::new)
-                : new String[]{rootUrl};
-
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins(allowedOrigins)
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
-            }
-        };
     }
 
     @Bean
