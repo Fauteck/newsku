@@ -3,6 +3,7 @@ import 'package:app/feed/views/components/search_result.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/magazine/services/magazine_tab_service.dart';
 import 'package:app/main.dart';
+import 'package:app/router.dart';
 import 'package:app/utils/utils.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +79,7 @@ class _PublicMagazineScreenState extends State<PublicMagazineScreen> {
             builder: (context, state) {
               if (state.isLoggedIn) return const SizedBox.shrink();
               return TextButton(
-                onPressed: () => AutoRouter.of(context).navigateNamed('/'),
+                onPressed: () => AutoRouter.of(context).replaceAll([LandingRoute()]),
                 child: const Text('Anmelden'),
               );
             },
