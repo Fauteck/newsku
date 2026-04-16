@@ -34,6 +34,9 @@ class MainFeedCubit extends Cubit<MainFeedState> {
   bool _handleKeyEvent(KeyEvent event) {
     if (event is! KeyDownEvent) return false;
 
+    // Don't steal keys from text inputs
+    if (FocusManager.instance.primaryFocus?.context?.widget is EditableText) return false;
+
     // When search is active, only handle Escape
     if (state.searchMode) {
       if (event.logicalKey == LogicalKeyboardKey.escape) {

@@ -46,6 +46,14 @@ public class FeedService {
                 enclosure.setType("image");
                 enclosure.setUrl(s);
                 item.addEnclosure(enclosure);
+            })
+            .addItemExtension("media:content", "url", (item, s) -> {
+                if (item.getEnclosure().isEmpty()) {
+                    Enclosure enclosure = new Enclosure();
+                    enclosure.setType("image");
+                    enclosure.setUrl(s);
+                    item.addEnclosure(enclosure);
+                }
             });
 
     @Autowired
