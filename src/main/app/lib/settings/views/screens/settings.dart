@@ -1,8 +1,8 @@
 import 'package:app/identity/states/identity.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/main.dart';
+import 'package:app/settings/views/tabs/ai.dart';
 import 'package:app/settings/views/tabs/feeds.dart';
-import 'package:app/settings/views/tabs/general.dart';
 import 'package:app/settings/views/tabs/info.dart';
 import 'package:app/settings/views/tabs/layout.dart';
 import 'package:app/settings/views/tabs/user.dart';
@@ -39,10 +39,10 @@ class SettingsScreen extends StatelessWidget {
             isScrollable: true,
             tabAlignment: TabAlignment.start,
             tabs: [
-              Tab(text: locals.feeds, icon: const Icon(Icons.rss_feed)),
-              Tab(text: locals.darstellung, icon: const Icon(Icons.grid_view_sharp)),
-              Tab(text: locals.layout, icon: const Icon(Icons.view_module_outlined)),
               Tab(text: locals.user, icon: const Icon(Icons.person)),
+              Tab(text: locals.layout, icon: const Icon(Icons.view_module_outlined)),
+              Tab(text: locals.feeds, icon: const Icon(Icons.rss_feed)),
+              Tab(text: locals.aiTab, icon: const Icon(Icons.auto_awesome)),
               Tab(text: locals.about, icon: const Icon(Icons.info_outline)),
             ],
           ),
@@ -56,10 +56,10 @@ class SettingsScreen extends StatelessWidget {
                 // Wischen zwischen Tabs deaktivieren
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  const FeedsSettingsTab(),
-                  const SingleChildScrollView(child: GeneralSettingsTab()),
-                  const LayoutSettingsTab(),
                   const UserSettingsTab(),
+                  const LayoutSettingsTab(),
+                  const FeedsSettingsTab(),
+                  const AiSettingsTab(),
                   const InfoTab(),
                 ],
               ),

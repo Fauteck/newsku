@@ -16,11 +16,13 @@ class UserSettingsCubit extends Cubit<UserSettingsState> {
   late final TextEditingController email;
   late final TextEditingController freshRssUsername;
   late final TextEditingController freshRssApiPassword;
+  late final TextEditingController freshRssUrl;
 
   UserSettingsCubit(super.initialState) {
     email = TextEditingController(text: state.email);
     freshRssUsername = TextEditingController(text: state.freshRssUsername);
     freshRssApiPassword = TextEditingController(text: '');
+    freshRssUrl = TextEditingController(text: identityCubit.currentUser?.freshRssUrl ?? '');
 
     password.addListener(() => emit(state.copyWith(password: password.value.text.trim())));
     repeatPassword.addListener(() => emit(state.copyWith(repeatPassword: repeatPassword.value.text.trim())));
@@ -35,6 +37,7 @@ class UserSettingsCubit extends Cubit<UserSettingsState> {
     email.dispose();
     freshRssUsername.dispose();
     freshRssApiPassword.dispose();
+    freshRssUrl.dispose();
     return super.close();
   }
 
@@ -81,9 +84,11 @@ class UserSettingsCubit extends Cubit<UserSettingsState> {
     var user = identityCubit.currentUser;
     if (user != null) {
       final apiPassword = freshRssApiPassword.value.text;
+      final url = freshRssUrl.value.text.trim();
       user = user.copyWith(
         freshRssUsername: freshRssUsername.value.text.trim(),
         freshRssApiPassword: apiPassword.isNotEmpty ? apiPassword : null,
+        freshRssUrl: url.isNotEmpty ? url : null,
       );
       await updateUser(user);
       freshRssApiPassword.text = '';

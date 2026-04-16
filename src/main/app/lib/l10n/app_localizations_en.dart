@@ -536,4 +536,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cacheCleared => 'Cache cleared';
+
+  @override
+  String get aiTab => 'KI';
+
+  @override
+  String get freshRssUrlLabel => 'FreshRSS-URL';
+
+  @override
+  String get freshRssSaved => 'FreshRSS-Einstellungen gespeichert';
+
+  @override
+  String get aiSection => 'KI-Integration';
+
+  @override
+  String get aiSectionExplanation =>
+      'Verbinde deinen eigenen KI-Dienst. Die Zugangsdaten werden sicher auf dem Server gespeichert.';
+
+  @override
+  String get openAiApiKey => 'API-Schlüssel';
+
+  @override
+  String get openAiApiKeyHint => 'Leer lassen, um den bestehenden Schlüssel beizubehalten';
+
+  @override
+  String get openAiModel => 'Modell';
+
+  @override
+  String get openAiUrl => 'API-URL';
+
+  @override
+  String get openAiSaved => 'KI-Einstellungen gespeichert';
 }
