@@ -62,6 +62,8 @@ class MobileBottomNav extends StatelessWidget {
 
     final int selected;
     if (router.isRouteActive(StatsRoute.name)) {
+      selected = 2;
+    } else if (router.isRouteActive(ClassicFeedRoute.name)) {
       selected = 1;
     } else {
       selected = 0;
@@ -70,29 +72,36 @@ class MobileBottomNav extends StatelessWidget {
     return NavigationBar(
       selectedIndex: selected,
       onDestinationSelected: (i) {
-        if (i == 2) {
+        if (i == 3) {
           _showMoreSheet(context);
           return;
         }
         if (i == selected) return;
         router.popUntilRouteWithName(HomeRoute.name);
         if (i == 1) {
+          router.push(const ClassicFeedRoute());
+        } else if (i == 2) {
           router.push(const StatsRoute());
         }
       },
-      destinations: const [
+      destinations: [
         NavigationDestination(
-          icon: Icon(Icons.article_outlined),
-          selectedIcon: Icon(Icons.article),
+          icon: const Icon(Icons.article_outlined),
+          selectedIcon: const Icon(Icons.article),
           label: 'Magazin',
         ),
         NavigationDestination(
-          icon: Icon(Icons.insights_outlined),
-          selectedIcon: Icon(Icons.insights),
+          icon: const Icon(Icons.rss_feed_outlined),
+          selectedIcon: const Icon(Icons.rss_feed),
+          label: 'Feeds',
+        ),
+        NavigationDestination(
+          icon: const Icon(Icons.insights_outlined),
+          selectedIcon: const Icon(Icons.insights),
           label: 'Stats',
         ),
         NavigationDestination(
-          icon: Icon(Icons.more_horiz),
+          icon: const Icon(Icons.more_horiz),
           label: 'Mehr',
         ),
       ],

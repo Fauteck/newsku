@@ -63,15 +63,22 @@ class FeedScreen extends StatelessWidget {
       }
 
       List<FeedItem> blockItems = [];
+      final settings = block.settings ?? block.type.defaultSettings;
       if (index == blocks.length - 1) {
-        // if we're in the last block, we take all items
-        blockItems = List.from(items);
+        if (block.type.fixedSize || settings.lastBlockShowAll) {
+          blockItems = List.from(items);
+        } else {
+          final blockSize = settings.items ?? 0;
+          blockItems = items
+              .where((i) => settings.categoryId == null || i.feed?.category?.id == settings.categoryId)
+              .take(blockSize > 0 ? blockSize : items.length)
+              .toList();
+        }
       } else {
-        int blockSize = block.type.fixedItemSize ?? block.settings?.items ?? 0;
+        int blockSize = block.type.fixedItemSize ?? settings.items ?? 0;
         _log.fine('${block.type}: Block Size: $blockSize');
-        // we take the items the block is expecting
         var list = items
-            .where((i) => block.settings?.categoryId == null || i.feed?.category?.id == block.settings?.categoryId)
+            .where((i) => settings.categoryId == null || i.feed?.category?.id == settings.categoryId)
             .take(blockSize)
             .toList();
 
@@ -254,6 +261,11 @@ class FeedScreen extends StatelessWidget {
                                                     icon: UserProfilePicture(),
                                                   ),
                                                   menuChildren: [
+                                                    MenuItemButton(
+                                                      leadingIcon: Icon(Icons.rss_feed),
+                                                      onPressed: () => AutoRouter.of(context).push(const ClassicFeedRoute()),
+                                                      child: Text(locals.classicFeedsTitle),
+                                                    ),
                                                     MenuItemButton(
                                                       leadingIcon: Icon(Icons.show_chart),
                                                       onPressed: () => AutoRouter.of(context).push(StatsRoute()),

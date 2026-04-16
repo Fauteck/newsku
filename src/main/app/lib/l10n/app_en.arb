@@ -204,5 +204,13 @@
     "tabMinScoreExplanation": "Leer = globale Einstellung verwenden",
     "layoutForTab": "Layout: {tabName}",
     "standardLayout": "Standard",
-    "aiPromptLabel": "Artikel-Präferenz-Prompt"
+    "aiPromptLabel": "Artikel-Präferenz-Prompt",
+    "standardLayoutSettings": "Standard-Einstellungen",
+    "blockSectionTitleHint": "Abschnittstitel (leer = Kategoriename)",
+    "lastBlockShowAllArticles": "Alle verbleibenden Artikel anzeigen",
+    "lastBlockLimitArticles": "Auf X Artikel begrenzen",
+    "blockAiPromptLabel": "Block-Prompt (optional)",
+    "classicFeedsTitle": "Feeds",
+    "classicFeedsNoItems": "Keine Artikel vorhanden",
+    "classicFeedsLoadMore": "Mehr laden"
 }

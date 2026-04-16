@@ -25,6 +25,7 @@ sealed class User with _$User {
     String? openAiApiKey,
     String? openAiModel,
     String? openAiUrl,
+    String? aiPromptId,
   }) = _User;
 
   factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);

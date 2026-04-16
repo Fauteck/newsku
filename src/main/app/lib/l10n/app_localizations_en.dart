@@ -689,4 +689,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiPromptLabel => 'Artikel-Präferenz-Prompt';
+
+  @override
+  String get standardLayoutSettings => 'Standard-Einstellungen';
+
+  @override
+  String get blockSectionTitleHint => 'Abschnittstitel (leer = Kategoriename)';
+
+  @override
+  String get lastBlockShowAllArticles => 'Alle verbleibenden Artikel anzeigen';
+
+  @override
+  String get lastBlockLimitArticles => 'Auf X Artikel begrenzen';
+
+  @override
+  String get blockAiPromptLabel => 'Block-Prompt (optional)';
+
+  @override
+  String get classicFeedsTitle => 'Feeds';
+
+  @override
+  String get classicFeedsNoItems => 'Keine Artikel vorhanden';
+
+  @override
+  String get classicFeedsLoadMore => 'Mehr laden';
 }

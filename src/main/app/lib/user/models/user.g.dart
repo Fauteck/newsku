@@ -25,6 +25,7 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
   openAiApiKey: json['openAiApiKey'] as String?,
   openAiModel: json['openAiModel'] as String?,
   openAiUrl: json['openAiUrl'] as String?,
+  aiPromptId: json['aiPromptId'] as String?,
 );
 
 Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
@@ -44,6 +45,7 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'openAiApiKey': instance.openAiApiKey,
   'openAiModel': instance.openAiModel,
   'openAiUrl': instance.openAiUrl,
+  'aiPromptId': instance.aiPromptId,
 };
 
 const _$ReadItemHandlingEnumMap = {

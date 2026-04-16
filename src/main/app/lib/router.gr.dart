@@ -46,6 +46,22 @@ class FeedErrorsRouteArgs {
 }
 
 /// generated route for
+/// [ClassicFeedScreen]
+class ClassicFeedRoute extends PageRouteInfo<void> {
+  const ClassicFeedRoute({List<PageRouteInfo>? children})
+    : super(ClassicFeedRoute.name, initialChildren: children, argsEquality: false);
+
+  static const String name = 'ClassicFeedRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ClassicFeedScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [FeedScreen]
 class FeedRoute extends PageRouteInfo<void> {
   const FeedRoute({List<PageRouteInfo>? children})

@@ -963,6 +963,14 @@ abstract class AppLocalizations {
   String layoutForTab(String tabName);
   String get standardLayout;
   String get aiPromptLabel;
+  String get standardLayoutSettings;
+  String get blockSectionTitleHint;
+  String get lastBlockShowAllArticles;
+  String get lastBlockLimitArticles;
+  String get blockAiPromptLabel;
+  String get classicFeedsTitle;
+  String get classicFeedsNoItems;
+  String get classicFeedsLoadMore;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

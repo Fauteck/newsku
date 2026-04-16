@@ -1,64 +1,22 @@
-import 'dart:math';
-
-import 'package:app/feed/models/feed_category.dart';
-import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
-import 'package:app/layouts/views/components/layout_category_selector.dart';
 import 'package:app/layouts/views/components/previews/preview_container.dart';
 import 'package:app/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class SearchResultBig extends StatelessWidget {
   final LayoutBlock block;
-  final Function(LayoutBlock block) onUpdated;
   final bool last;
-  final List<FeedCategory> categories;
 
-  const SearchResultBig({
-    super.key,
-    required this.block,
-    required this.onUpdated,
-    required this.last,
-    required this.categories,
-  });
+  const SearchResultBig({super.key, required this.block, required this.last});
 
   @override
   Widget build(BuildContext context) {
-    final locals = AppLocalizations.of(context)!;
-    return Column(
-      children: [
-        ListView(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          children: List.generate(
-            last ? 3 : (block.settings ?? block.type.defaultSettings).items ?? 0,
-            (index) => _GridItem(),
-          ),
-        ),
-        if (!last) ...[
-          Row(
-            mainAxisAlignment: .center,
-            children: [
-              IconButton(
-                onPressed: () {
-                  var settings = block.settings ?? block.type.defaultSettings;
-                  onUpdated(block.copyWith(settings: settings.copyWith(items: max(1, (settings.items ?? 0) - 1))));
-                },
-                icon: Icon(Icons.remove),
-              ),
-              Text(locals.nItems((block.settings ?? block.type.defaultSettings).items ?? 0)),
-              IconButton(
-                onPressed: () {
-                  var settings = block.settings ?? block.type.defaultSettings;
-                  onUpdated(block.copyWith(settings: settings.copyWith(items: (settings.items ?? 0) + 1)));
-                },
-                icon: Icon(Icons.remove),
-              ),
-            ],
-          ),
-          LayoutCategorySelector(block: block, onUpdated: onUpdated, categories: categories),
-        ],
-      ],
+    final itemCount = last ? 3 : (block.settings ?? block.type.defaultSettings).items ?? 0;
+
+    return ListView(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      children: List.generate(itemCount, (index) => _GridItem()),
     );
   }
 }

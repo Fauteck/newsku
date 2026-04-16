@@ -58,21 +58,15 @@ enum LayoutBlockTypes {
     };
   }
 
-  Widget getBigPreview(
-    BuildContext context, {
-    required LayoutBlock block,
-    required Function(LayoutBlock block) onUpdated,
-    required bool last,
-    required List<FeedCategory> categories,
-  }) {
+  Widget getBigPreview(BuildContext context, {required LayoutBlock block, required bool last}) {
     return switch (this) {
-      bigGrid => BigGridBig(block: block, onUpdated: onUpdated, last: last, categories: categories),
-      topStories => TopStoriesBig(block: block, onUpdated: onUpdated, categories: categories),
-      smallGrid => SmallGridBig(block: block, onUpdated: onUpdated, last: last, categories: categories),
-      bigHeadline => HeadlineBig(block: block, onUpdated: onUpdated, categories: categories),
-      bigHeadlinePicture => HeadlinePictureBig(block: block, onUpdated: onUpdated, categories: categories),
-      searchResult => SearchResultBig(block: block, onUpdated: onUpdated, last: last, categories: categories),
-      bigGridPicture => BigGridPictureBig(block: block, onUpdated: onUpdated, last: last, categories: categories),
+      bigGrid => BigGridBig(block: block, last: last),
+      topStories => TopStoriesBig(block: block),
+      smallGrid => SmallGridBig(block: block, last: last),
+      bigHeadline => HeadlineBig(block: block),
+      bigHeadlinePicture => HeadlinePictureBig(block: block),
+      searchResult => SearchResultBig(block: block, last: last),
+      bigGridPicture => BigGridPictureBig(block: block, last: last),
     };
   }
 

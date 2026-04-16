@@ -93,6 +93,12 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
       await updateUser();
     }
   }
+
+  Future<void> updateAiPromptId(String? promptId) async {
+    if (state.user == null) return;
+    emit(state.copyWith(user: state.user!.copyWith(aiPromptId: promptId)));
+    EasyDebounce.debounce('ai-prompt-id-update', Duration(milliseconds: 500), updateUser);
+  }
 }
 
 @freezed
