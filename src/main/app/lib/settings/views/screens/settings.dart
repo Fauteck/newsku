@@ -7,6 +7,7 @@ import 'package:app/settings/views/tabs/info.dart';
 import 'package:app/settings/views/tabs/layout.dart';
 import 'package:app/settings/views/tabs/user.dart';
 import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/utils/views/components/mobile_bottom_nav.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +18,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final locals = AppLocalizations.of(context)!;
+    final isMobile = BreakPoint.get(context) == BreakPoint.mobile;
     return DefaultTabController(
       length: 4,
       child: Scaffold(
@@ -38,6 +40,7 @@ class SettingsScreen extends StatelessWidget {
             ],
           ),
         ),
+        bottomNavigationBar: isMobile ? const MobileBottomNav() : null,
         body: SafeArea(
           child: Center(
             child: ConstrainedBox(

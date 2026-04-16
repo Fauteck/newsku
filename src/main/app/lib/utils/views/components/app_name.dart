@@ -16,8 +16,8 @@ class AppName extends StatelessWidget {
         return Row(
           mainAxisAlignment: alignment ?? .start,
           children: [
-            Text('news', style: (style ?? textTheme.bodyMedium)?.copyWith(color: textTheme.bodyMedium?.color)),
-            Text('ku', style: (style ?? textTheme.bodyMedium)?.copyWith(color: mainColor)),
+            Text('Feed', style: (style ?? textTheme.bodyMedium)?.copyWith(color: textTheme.bodyMedium?.color)),
+            Text('teck', style: (style ?? textTheme.bodyMedium)?.copyWith(color: mainColor)),
           ],
         );
       },
