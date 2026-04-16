@@ -38,11 +38,11 @@ class FeedCategoryView extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final locals = AppLocalizations.of(context)!;
     final colors = Theme.of(context).colorScheme;
-    final freshRssActive = (config?.freshRssUrl ?? '').isNotEmpty;
+    final gReaderActive = (config?.gReaderUrl ?? '').isNotEmpty;
     var cubit = context.read<FeedsSettingsCubit>();
 
     return DragTarget<Feed>(
-      onWillAcceptWithDetails: (_) => !freshRssActive,
+      onWillAcceptWithDetails: (_) => !gReaderActive,
       onAcceptWithDetails: (details) => cubit.setFeedCategory(category, details),
       builder: (context, List<Feed?> candidates, List<dynamic> rejected) {
         return SingleMotionBuilder(
@@ -89,7 +89,7 @@ class FeedCategoryView extends StatelessWidget {
                     ),
                   ),
                   if (expanded) ...[
-                    if (category.id != null && !freshRssActive)
+                    if (category.id != null && !gReaderActive)
                       Row(
                         children: [
                           TextButton.icon(
@@ -113,7 +113,7 @@ class FeedCategoryView extends StatelessWidget {
                     if (feeds.isNotEmpty)
                       ...feeds.map((f) {
                         return ListTile(
-                          leading: freshRssActive
+                          leading: gReaderActive
                               ? ClipRRect(
                                   borderRadius: .circular(20),
                                   child: FeedImage(item: f, width: 20, height: 20),
@@ -126,7 +126,7 @@ class FeedCategoryView extends StatelessWidget {
                           title: Row(
                             spacing: pu,
                             children: [
-                              if (!freshRssActive)
+                              if (!gReaderActive)
                                 ClipRRect(
                                   borderRadius: .circular(20),
                                   child: FeedImage(item: f, width: 20, height: 20),
@@ -141,7 +141,7 @@ class FeedCategoryView extends StatelessWidget {
                             mainAxisSize: .min,
                             children: [
                               _ErrorButton(feed: f),
-                              if (!freshRssActive)
+                              if (!gReaderActive)
                                 IconButton(
                                   onPressed: () {
                                     okCancelDialog(
@@ -157,7 +157,7 @@ class FeedCategoryView extends StatelessWidget {
                           ),
                         );
                       })
-                    else if (!freshRssActive)
+                    else if (!gReaderActive)
                       Text(locals.noFeedInCategory, style: textTheme.labelSmall),
                   ],
                 ],

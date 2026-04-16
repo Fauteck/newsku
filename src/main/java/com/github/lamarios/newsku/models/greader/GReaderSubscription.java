@@ -1,4 +1,4 @@
-package com.github.lamarios.newsku.models.freshrss;
+package com.github.lamarios.newsku.models.greader;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -9,7 +9,7 @@ import java.util.List;
  * endpoint /reader/api/0/subscription/list
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class FreshRssSubscription {
+public class GReaderSubscription {
 
     /** e.g. "feed/https://example.com/rss" */
     private String id;
@@ -17,7 +17,7 @@ public class FreshRssSubscription {
     private String url;
     private String htmlUrl;
     private String iconUrl;
-    private List<FreshRssLabel> categories;
+    private List<GReaderLabel> categories;
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -34,11 +34,11 @@ public class FreshRssSubscription {
     public String getIconUrl() { return iconUrl; }
     public void setIconUrl(String iconUrl) { this.iconUrl = iconUrl; }
 
-    public List<FreshRssLabel> getCategories() { return categories; }
-    public void setCategories(List<FreshRssLabel> categories) { this.categories = categories; }
+    public List<GReaderLabel> getCategories() { return categories; }
+    public void setCategories(List<GReaderLabel> categories) { this.categories = categories; }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class FreshRssLabel {
+    public static class GReaderLabel {
         /** e.g. "user/-/label/Tech" */
         private String id;
         private String label;

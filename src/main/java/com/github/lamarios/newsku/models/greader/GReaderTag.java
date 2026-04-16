@@ -1,4 +1,4 @@
-package com.github.lamarios.newsku.models.freshrss;
+package com.github.lamarios.newsku.models.greader;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * Only entries with type "folder" or no type are user-defined categories.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class FreshRssTag {
+public class GReaderTag {
     /** e.g. "user/-/label/Tech" */
     private String id;
     private String sortid;

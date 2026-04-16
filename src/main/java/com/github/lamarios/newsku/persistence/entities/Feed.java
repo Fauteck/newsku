@@ -21,7 +21,7 @@ public class Feed {
     private int lastRefreshErrors;
 
     @Column(name = "freshrss_feed_id")
-    private String freshRssFeedId;
+    private String gReaderFeedId;
 
     public String getImage() {
         return image;
@@ -105,11 +105,11 @@ public class Feed {
         this.category = category;
     }
 
-    public String getFreshRssFeedId() {
-        return freshRssFeedId;
+    public String getGReaderFeedId() {
+        return gReaderFeedId;
     }
 
-    public void setFreshRssFeedId(String freshRssFeedId) {
-        this.freshRssFeedId = freshRssFeedId;
+    public void setGReaderFeedId(String gReaderFeedId) {
+        this.gReaderFeedId = gReaderFeedId;
     }
 }

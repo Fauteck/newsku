@@ -13,7 +13,7 @@ _Config _$ConfigFromJson(Map<String, dynamic> json) => _Config(
   canResetPassword: json['canResetPassword'] as bool? ?? false,
   oidcConfig: json['oidcConfig'] == null ? null : OidcConfig.fromJson(json['oidcConfig'] as Map<String, dynamic>),
   announcement: json['announcement'] as String? ?? "",
-  freshRssUrl: json['freshRssUrl'] as String?,
+  gReaderUrl: json['gReaderUrl'] as String?,
 );
 
 Map<String, dynamic> _$ConfigToJson(_Config instance) => <String, dynamic>{
@@ -23,5 +23,5 @@ Map<String, dynamic> _$ConfigToJson(_Config instance) => <String, dynamic>{
   'canResetPassword': instance.canResetPassword,
   'oidcConfig': instance.oidcConfig,
   'announcement': instance.announcement,
-  'freshRssUrl': instance.freshRssUrl,
+  'gReaderUrl': instance.gReaderUrl,
 };

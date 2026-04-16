@@ -15,30 +15,30 @@ public class ScheduleService {
 
     private final FeedRepository feedRepository;
     private final FeedItemService feedItemService;
-    private final FreshRssSyncService freshRssSyncService;
+    private final GReaderSyncService gReaderSyncService;
 
     @Autowired
-    public ScheduleService(FeedRepository feedRepository, FeedItemService feedItemService, FreshRssSyncService freshRssSyncService) {
+    public ScheduleService(FeedRepository feedRepository, FeedItemService feedItemService, GReaderSyncService gReaderSyncService) {
         this.feedRepository = feedRepository;
         this.feedItemService = feedItemService;
-        this.freshRssSyncService = freshRssSyncService;
+        this.gReaderSyncService = gReaderSyncService;
     }
 
     @Scheduled(fixedRate = 1000 * 60 * 60)
     public void refreshFeeds() {
-        // Legacy direct-RSS refresh (runs for feeds not managed via FreshRSS)
+        // Legacy direct-RSS refresh (runs for feeds not managed via GReader)
         var feeds = feedRepository.findAll();
         for (Feed feed : feeds) {
-            if (feed.getFreshRssFeedId() == null || feed.getFreshRssFeedId().isBlank()) {
+            if (feed.getGReaderFeedId() == null || feed.getGReaderFeedId().isBlank()) {
                 feedItemService.refreshFeed(feed);
             }
         }
 
-        // FreshRSS-backed refresh for all configured users
+        // GReader-backed refresh for all configured users
         try {
-            freshRssSyncService.syncAll();
+            gReaderSyncService.syncAll();
         } catch (Exception e) {
-            logger.error("FreshRSS syncAll failed: {}", e.getMessage(), e);
+            logger.error("GReader syncAll failed: {}", e.getMessage(), e);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.github.lamarios.newsku.models.freshrss;
+package com.github.lamarios.newsku.models.greader;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -9,10 +9,10 @@ import java.util.List;
  * The "continuation" token is present when more items are available (pagination).
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class FreshRssStreamContents {
+public class GReaderStreamContents {
     private String id;
     private String title;
-    private List<FreshRssStreamItem> items;
+    private List<GReaderStreamItem> items;
 
     /** Pagination cursor – null/absent when no more pages */
     private String continuation;
@@ -23,8 +23,8 @@ public class FreshRssStreamContents {
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
-    public List<FreshRssStreamItem> getItems() { return items; }
-    public void setItems(List<FreshRssStreamItem> items) { this.items = items; }
+    public List<GReaderStreamItem> getItems() { return items; }
+    public void setItems(List<GReaderStreamItem> items) { this.items = items; }
 
     public String getContinuation() { return continuation; }
     public void setContinuation(String continuation) { this.continuation = continuation; }

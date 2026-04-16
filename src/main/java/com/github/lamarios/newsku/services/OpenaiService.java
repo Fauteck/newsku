@@ -12,7 +12,7 @@ public interface OpenaiService {
     Optional<OpenAiFeedResponse> processFeedItem(Item item, User user, List<TagClickStat> clickStats);
 
     /**
-     * Overload for callers that already have plain strings (e.g. FreshRSS sync).
+     * Overload for callers that already have plain strings (e.g. GReader sync).
      *
      * @param guid    unique identifier used for logging
      * @param title   article title

@@ -6,7 +6,7 @@
 
 > **Fork von [lamarios/newsku](https://github.com/lamarios/newsku)**  
 > Dieses Repository ist ein Fork des ursprünglichen Projekts von [@lamarios](https://github.com/lamarios).
-> Fauteck hat newsku eigenständig weiterentwickelt und um FreshRSS-Integration, App-Verbesserungen
+> Fauteck hat newsku eigenständig weiterentwickelt und um GReader-Integration, App-Verbesserungen
 > sowie Docker-Setup-Anpassungen ergänzt.
 
 ---
@@ -26,8 +26,8 @@
 ---
 
 Selbst-gehosteter RSS-Reader, der LLMs (OpenAI) nutzt, um Feed-Beiträge nach persönlicher
-Relevanz zu sortieren und zu priorisieren. Optionale FreshRSS-Integration macht newsku zu einer
-reinen Darstellungs- und KI-Scoring-Schicht über FreshRSS.
+Relevanz zu sortieren und zu priorisieren. Optionale GReader-Integration macht newsku zu einer
+reinen Darstellungs- und KI-Scoring-Schicht über die GReader-API.
 
 ---
 
@@ -35,9 +35,9 @@ reinen Darstellungs- und KI-Scoring-Schicht über FreshRSS.
 
 | Erweiterung | Beschreibung |
 |-------------|-------------|
-| **FreshRSS-Integration** | newsku als Präsentationsschicht über FreshRSS: Feeds, Kategorien und Artikel werden über die Google Reader API aus FreshRSS synchronisiert. Lesestatus wird zurück an FreshRSS gemeldet. |
-| **"Open in FreshRSS"-Button** | Direktlink zur FreshRSS-Oberfläche aus der App heraus (konfigurierbar via `FRESHRSS_URL`) |
-| **FreshRSS-Zugangsdaten in den Einstellungen** | Benutzer können FreshRSS-Benutzernamen und API-Passwort direkt in der App hinterlegen |
+| **GReader-Integration** | newsku als Präsentationsschicht über die GReader-API: Feeds, Kategorien und Artikel werden über die Google Reader API aus GReader synchronisiert. Lesestatus wird zurück an GReader gemeldet. |
+| **"In GReader öffnen"-Button** | Direktlink zur GReader-Oberfläche aus der App heraus (konfigurierbar via `GREADER_URL`) |
+| **GReader-Zugangsdaten in den Einstellungen** | Benutzer können GReader-Benutzernamen und API-Passwort direkt in der App hinterlegen |
 | **Gespeicherte Artikel** | Artikel können für später gespeichert/gemerkt werden |
 | **App-Verbesserungen** | Wischgesten, Tastaturkürzel, Textkürzel-Einstellungen, Insights-Widget, Zurück-Button in Desktop-Einstellungen, scrollbare Darstellungsseite |
 | **App-Branding** | Browser-Tab-Titel, PWA-Name und Manifest auf „Feedteck" umgestellt |
@@ -49,7 +49,7 @@ reinen Darstellungs- und KI-Scoring-Schicht über FreshRSS.
 
 | Feature | Beschreibung |
 |---------|-------------|
-| FreshRSS-Integration | newsku als KI-Scoring-Schicht über FreshRSS (Google Reader API) |
+| GReader-Integration | newsku als KI-Scoring-Schicht über die GReader-API (Google Reader API) |
 | RSS/Atom Feed-Verwaltung | Feeds hinzufügen, kategorisieren, automatisch aktualisieren |
 | KI-gesteuertes Ranking | OpenAI bewertet Beiträge nach Benutzerpräferenzen (`importanceScore`) |
 | Feed-Kategorien | Benutzerdefinierte Gruppierung von Feeds |
@@ -84,15 +84,15 @@ reinen Darstellungs- und KI-Scoring-Schicht über FreshRSS.
                                +-------------------+
                                          │
                                +---------▼---------+
-                               |   FreshRSS         |
+                               |   GReader-API      |
                                |  (Google Reader    |
                                |   API, optional)   |
                                +-------------------+
 ```
 
-**FreshRSS-Modus:** Wenn `FRESHRSS_URL` gesetzt ist, übernimmt FreshRSS das RSS-Fetching,
+**GReader-Modus:** Wenn `GREADER_URL` gesetzt ist, übernimmt GReader das RSS-Fetching,
 die Feed- und Kategorienverwaltung sowie die Lesestatus-Verwaltung. newsku fügt KI-Scoring
-und E-Mail-Digest hinzu. Feeds ohne FreshRSS-Verknüpfung werden weiterhin direkt via RSS
+und E-Mail-Digest hinzu. Feeds ohne GReader-Verknüpfung werden weiterhin direkt via RSS
 abgerufen (Rückwärtskompatibilität).
 
 **Tech Stack:**
@@ -104,7 +104,7 @@ abgerufen (Rückwärtskompatibilität).
 | Frontend | Flutter ^3.10.0, Material Design 3, BLoC |
 | LLM | OpenAI Java SDK 4.13.0 |
 | RSS Parsing | Apptastic RSS Reader 3.12.0 |
-| FreshRSS | Google Reader API (optional) |
+| GReader-API | Google Reader API (optional) |
 | Auth | JWT (JJWT 0.13.0) + optionales OIDC |
 | E-Mail | Simple Java Mail 6.6.1, Freemarker Templates |
 | Container | Docker, GHCR Registry |
@@ -118,7 +118,7 @@ abgerufen (Rückwärtskompatibilität).
 | Docker + Docker Compose | 24+ |
 | PostgreSQL | 18 (oder via Docker) |
 | OpenAI API Key | — |
-| FreshRSS | optional, beliebige Version mit Google Reader API |
+| GReader-komp. Backend | optional, jeder GReader-API-Server (z. B. GReader, Miniflux) |
 
 Für lokale Entwicklung zusätzlich:
 
@@ -144,7 +144,7 @@ cd newsku
 ```bash
 cp .env.example .env
 # .env bearbeiten: DB-Zugangsdaten, OpenAI API-Key und SALT eintragen
-# Optional: FRESHRSS_URL setzen wenn FreshRSS genutzt werden soll
+# Optional: GREADER_URL setzen wenn GReader genutzt werden soll
 ```
 
 ### 3. Docker-Stack starten
@@ -176,19 +176,19 @@ Die Anwendung ist erreichbar unter: `http://localhost:8080`
 | `OPENAI_URL` | Nein | OpenAI Standard | Eigener API-Endpunkt (Ollama, Azure, etc.) |
 | `SALT` | Ja | — | Passwort-Hashing Salt (min. 32 Zeichen) |
 | `ALLOW_SIGNUP` | Nein | `0` | `1` = Registrierung erlaubt |
-| `FRESHRSS_URL` | Nein | — | URL zur FreshRSS-Instanz (aktiviert FreshRSS-Modus) |
+| `GREADER_URL` | Nein | — | URL zur GReader-kompatibler Instanz (aktiviert GReader-Modus) |
 | `TZ` | Nein | `Europe/Berlin` | Zeitzone |
 
-### FreshRSS-Konfiguration
+### GReader-Konfiguration
 
-Wenn `FRESHRSS_URL` gesetzt ist, wird der FreshRSS-Modus aktiviert:
+Wenn `GREADER_URL` gesetzt ist, wird der GReader-Modus aktiviert:
 
-1. `FRESHRSS_URL` auf die URL der FreshRSS-Instanz setzen (z. B. `https://freshrss.example.com`)
-2. In den Benutzereinstellungen der App: FreshRSS-Benutzername und API-Passwort hinterlegen
-3. newsku synchronisiert automatisch Feeds, Kategorien und Artikel aus FreshRSS
+1. `GREADER_URL` auf die URL der GReader-kompatibler Instanz setzen (z. B. `https://greader.example.com`)
+2. In den Benutzereinstellungen der App: GReader-Benutzername und API-Passwort hinterlegen
+3. newsku synchronisiert automatisch Feeds, Kategorien und Artikel aus GReader
 
-> Das FreshRSS API-Passwort findet sich in FreshRSS unter:
-> Einstellungen → Profil → API-Passwort
+> Das GReader API-Passwort findet sich in GReader unter:
+> Einstellungen → Profil → API-Passwort (bei FreshRSS) bzw. der jeweiligen GReader-Oberfläche
 
 ### PostgreSQL-Variablen (docker-compose)
 
@@ -218,7 +218,7 @@ Swagger UI erreichbar unter: `http://localhost:8080/swagger-ui.html`
 | `GET` | `/api/feed-categories` | Feed-Kategorien |
 | `GET` | `/api/layouts` | Layout-Blöcke |
 | `GET` | `/api/search?q=...` | Volltextsuche |
-| `GET` | `/api/config` | Anwendungskonfiguration (inkl. `freshRssUrl`) |
+| `GET` | `/api/config` | Anwendungskonfiguration (inkl. `gReaderUrl`) |
 | `GET` | `/actuator/health` | Health Check |
 
 Alle Endpunkte außer `/api/users/login`, `/api/signup`, `/api/config` und `/actuator/health`
@@ -231,7 +231,7 @@ erfordern einen gültigen JWT-Token: `Authorization: Bearer <token>`
 - **Keine Secrets im Code:** Alle sensiblen Werte über Umgebungsvariablen
 - **`.env` nicht committen:** Nur `.env.example` versioniert
 - **Passwort-Hashing:** BCrypt mit konfiguriertem SALT
-- **FreshRSS API-Passwort:** Wird verschlüsselt gespeichert, nie in API-Antworten zurückgegeben
+- **GReader API-Passwort:** Wird verschlüsselt gespeichert, nie in API-Antworten zurückgegeben
 - **JWT-Authentifizierung:** Kurzlebige Tokens, validiert bei jedem Request
 - **OWASP Top 10:** Implementierung berücksichtigt Injection, Auth, Security Misconfiguration etc.
 - **Registrierung deaktivierbar:** Standard `ALLOW_SIGNUP=0` verhindert öffentliche Anmeldung
@@ -254,7 +254,7 @@ erfordern einen gültigen JWT-Token: `Authorization: Bearer <token>`
 | State Management | flutter_bloc | — |
 | LLM | OpenAI Java SDK | 4.13.0 |
 | RSS Parsing | Apptastic RSS Reader | 3.12.0 |
-| FreshRSS | Google Reader API | optional |
+| GReader-API | Google Reader API | optional |
 | Auth | JJWT | 0.13.0 |
 | E-Mail | Simple Java Mail | 6.6.1 |
 | Container | Docker (Amazon Corretto 25) | — |

@@ -280,13 +280,13 @@ class FeedScreen extends StatelessWidget {
                                                           context,
                                                         ).push(SettingsRoute()).then((value) => cubit.refresh()),
                                                       ),
-                                                    if (config?.freshRssUrl != null &&
-                                                        config!.freshRssUrl!.isNotEmpty) ...[
+                                                    if (config?.gReaderUrl != null &&
+                                                        config!.gReaderUrl!.isNotEmpty) ...[
                                                       Divider(),
                                                       MenuItemButton(
                                                         leadingIcon: Icon(Icons.open_in_new),
-                                                        onPressed: () => launchUrl(Uri.parse(config!.freshRssUrl!)),
-                                                        child: Text(locals.openInFreshRss),
+                                                        onPressed: () => launchUrl(Uri.parse(config!.gReaderUrl!)),
+                                                        child: Text(locals.openInGreader),
                                                       ),
                                                     ],
                                                     Divider(),

@@ -56,13 +56,13 @@ public class AppConfig {
         this.canResetPassword = canResetPassword;
     }
 
-    private String freshRssUrl;
+    private String gReaderUrl;
 
-    public String getFreshRssUrl() {
-        return freshRssUrl;
+    public String getGReaderUrl() {
+        return gReaderUrl;
     }
 
-    public void setFreshRssUrl(String freshRssUrl) {
-        this.freshRssUrl = freshRssUrl;
+    public void setGReaderUrl(String gReaderUrl) {
+        this.gReaderUrl = gReaderUrl;
     }
 }

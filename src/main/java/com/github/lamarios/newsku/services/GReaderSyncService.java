@@ -1,10 +1,10 @@
 package com.github.lamarios.newsku.services;
 
 import com.github.lamarios.newsku.Constants;
-import com.github.lamarios.newsku.models.freshrss.FreshRssStreamContents;
-import com.github.lamarios.newsku.models.freshrss.FreshRssStreamItem;
-import com.github.lamarios.newsku.models.freshrss.FreshRssSubscription;
-import com.github.lamarios.newsku.models.freshrss.FreshRssTag;
+import com.github.lamarios.newsku.models.greader.GReaderStreamContents;
+import com.github.lamarios.newsku.models.greader.GReaderStreamItem;
+import com.github.lamarios.newsku.models.greader.GReaderSubscription;
+import com.github.lamarios.newsku.models.greader.GReaderTag;
 import com.github.lamarios.newsku.persistence.entities.Feed;
 import com.github.lamarios.newsku.persistence.entities.FeedCategory;
 import com.github.lamarios.newsku.persistence.entities.FeedError;
@@ -30,21 +30,21 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Synchronises data from FreshRSS into newsku for all users that have
- * FreshRSS credentials configured.
+ * Synchronises data from a GReader-compatible backend into newsku.
  *
  * Sync order per user:
- *  1. Categories  (labels in FreshRSS → FeedCategory in newsku)
- *  2. Feeds       (subscriptions in FreshRSS → Feed in newsku)
+ *  1. Categories  (labels in GReader → FeedCategory in newsku)
+ *  2. Feeds       (subscriptions in GReader → Feed in newsku)
  *  3. Articles    (unread stream → FeedItem + OpenAI scoring)
+ *  4. Starred     (starred stream → mark matching FeedItems as saved)
  */
 @Service
-public class FreshRssSyncService {
+public class GReaderSyncService {
 
     private static final Logger logger = LogManager.getLogger();
     private static final long PROMPT_TAG_TIME_FRAME = 30L * 24 * 60 * 60 * 1000;
 
-    private final FreshRssApiService freshRssApiService;
+    private final GReaderApiService gReaderApiService;
     private final UserRepository userRepository;
     private final FeedRepository feedRepository;
     private final FeedCategoryRepository feedCategoryRepository;
@@ -55,8 +55,8 @@ public class FreshRssSyncService {
     private final PlatformTransactionManager transactionManager;
 
     @Autowired
-    public FreshRssSyncService(
-            FreshRssApiService freshRssApiService,
+    public GReaderSyncService(
+            GReaderApiService gReaderApiService,
             UserRepository userRepository,
             FeedRepository feedRepository,
             FeedCategoryRepository feedCategoryRepository,
@@ -65,7 +65,7 @@ public class FreshRssSyncService {
             OpenaiService openaiService,
             ClickService clickService,
             PlatformTransactionManager transactionManager) {
-        this.freshRssApiService = freshRssApiService;
+        this.gReaderApiService = gReaderApiService;
         this.userRepository = userRepository;
         this.feedRepository = feedRepository;
         this.feedCategoryRepository = feedCategoryRepository;
@@ -80,12 +80,10 @@ public class FreshRssSyncService {
     // Entry point (called by ScheduleService)
     // -----------------------------------------------------------------------
 
-    /**
-     * Runs a full sync for every user that has FreshRSS credentials configured.
-     */
+    /** Runs a full sync for every user when GReader credentials are configured. */
     public void syncAll() {
-        if (!freshRssApiService.isCredentialsConfigured()) {
-            logger.debug("FreshRSS not configured (FRESHRSS_URL / FRESHRSS_USERNAME / FRESHRSS_API_PASSWORD not set) – skipping sync");
+        if (!gReaderApiService.isCredentialsConfigured()) {
+            logger.debug("GReader not configured (GREADER_URL / GREADER_USERNAME / GREADER_API_PASSWORD not set) – skipping sync");
             return;
         }
         List<User> users = userRepository.findAll();
@@ -93,7 +91,7 @@ public class FreshRssSyncService {
             try {
                 syncUser(user);
             } catch (Exception e) {
-                logger.error("FreshRSS sync failed for user {}: {}", user.getUsername(), e.getMessage(), e);
+                logger.error("GReader sync failed for user {}: {}", user.getUsername(), e.getMessage(), e);
             }
         }
     }
@@ -103,11 +101,12 @@ public class FreshRssSyncService {
     // -----------------------------------------------------------------------
 
     public void syncUser(User user) {
-        logger.info("Starting FreshRSS sync for user {}", user.getUsername());
+        logger.info("Starting GReader sync for user {}", user.getUsername());
         syncCategories(user);
         syncFeeds(user);
         syncArticles(user);
-        logger.info("FreshRSS sync complete for user {}", user.getUsername());
+        syncStarredItems(user);
+        logger.info("GReader sync complete for user {}", user.getUsername());
     }
 
     // -----------------------------------------------------------------------
@@ -116,14 +115,14 @@ public class FreshRssSyncService {
 
     @Transactional
     public void syncCategories(User user) {
-        List<FreshRssTag> tags = freshRssApiService.getTags(user);
-        for (FreshRssTag tag : tags) {
-            FeedCategory existing = feedCategoryRepository.findByFreshRssCategoryIdAndUser(tag.getId(), user);
+        List<GReaderTag> tags = gReaderApiService.getTags(user);
+        for (GReaderTag tag : tags) {
+            FeedCategory existing = feedCategoryRepository.findByGReaderCategoryIdAndUser(tag.getId(), user);
             if (existing == null) {
                 FeedCategory cat = new FeedCategory();
                 cat.setId(UUID.randomUUID().toString());
                 cat.setName(tag.getLabel());
-                cat.setFreshRssCategoryId(tag.getId());
+                cat.setGReaderCategoryId(tag.getId());
                 cat.setUser(user);
                 feedCategoryRepository.save(cat);
                 logger.debug("Created category '{}' for user {}", tag.getLabel(), user.getUsername());
@@ -140,25 +139,23 @@ public class FreshRssSyncService {
 
     @Transactional
     public void syncFeeds(User user) {
-        List<FreshRssSubscription> subscriptions = freshRssApiService.getSubscriptions(user);
-        for (FreshRssSubscription sub : subscriptions) {
-            Feed feed = feedRepository.findByFreshRssFeedIdAndUser(sub.getId(), user);
+        List<GReaderSubscription> subscriptions = gReaderApiService.getSubscriptions(user);
+        for (GReaderSubscription sub : subscriptions) {
+            Feed feed = feedRepository.findByGReaderFeedIdAndUser(sub.getId(), user);
             if (feed == null) {
                 feed = new Feed();
                 feed.setId(UUID.randomUUID().toString());
-                feed.setFreshRssFeedId(sub.getId());
+                feed.setGReaderFeedId(sub.getId());
                 feed.setUser(user);
                 logger.debug("Created feed '{}' for user {}", sub.getTitle(), user.getUsername());
             }
-            // Always refresh metadata from FreshRSS
             feed.setName(sub.getTitle() != null ? sub.getTitle() : sub.getUrl());
             feed.setUrl(sub.getUrl() != null ? sub.getUrl() : stripFeedPrefix(sub.getId()));
             feed.setImage(sub.getIconUrl());
 
-            // Assign category if present
             if (sub.getCategories() != null && !sub.getCategories().isEmpty()) {
                 String labelId = sub.getCategories().get(0).getId();
-                FeedCategory cat = feedCategoryRepository.findByFreshRssCategoryIdAndUser(labelId, user);
+                FeedCategory cat = feedCategoryRepository.findByGReaderCategoryIdAndUser(labelId, user);
                 feed.setCategory(cat);
             }
 
@@ -171,8 +168,8 @@ public class FreshRssSyncService {
     // -----------------------------------------------------------------------
 
     /**
-     * Fetches all unread items from FreshRSS for the given user and processes them
-     * through OpenAI scoring.  Pagination via the GReader continuation token.
+     * Fetches all unread items from GReader and processes them through OpenAI scoring.
+     * Pagination via the GReader continuation token.
      */
     public void syncArticles(User user) {
         var clicks = clickService.tagClicks(
@@ -184,16 +181,16 @@ public class FreshRssSyncService {
         int totalNew = 0;
 
         do {
-            FreshRssStreamContents page = freshRssApiService.getUnreadItems(user, continuation);
-            List<FreshRssStreamItem> items = page.getItems();
+            GReaderStreamContents page = gReaderApiService.getUnreadItems(user, continuation);
+            List<GReaderStreamItem> items = page.getItems();
             if (items == null || items.isEmpty()) break;
 
-            for (FreshRssStreamItem item : items) {
+            for (GReaderStreamItem item : items) {
                 try {
                     processArticle(item, user, clicks);
                     totalNew++;
                 } catch (Exception e) {
-                    logger.error("Failed to process FreshRSS item {} for user {}: {}",
+                    logger.error("Failed to process GReader item {} for user {}: {}",
                             item.getId(), user.getUsername(), e.getMessage(), e);
                     saveFeedError(item, user, e);
                 }
@@ -202,24 +199,55 @@ public class FreshRssSyncService {
             continuation = page.getContinuation();
         } while (continuation != null && !continuation.isBlank());
 
-        logger.info("Processed {} new articles from FreshRSS for user {}", totalNew, user.getUsername());
+        logger.info("Processed {} new articles from GReader for user {}", totalNew, user.getUsername());
+    }
+
+    /**
+     * Fetches all starred items from GReader and marks the corresponding local
+     * FeedItems as saved (best-effort, does not unmark items no longer starred).
+     */
+    public void syncStarredItems(User user) {
+        if (!gReaderApiService.isCredentialsConfigured()) return;
+
+        List<Feed> feeds = feedRepository.getFeedsByUser(user);
+        String continuation = null;
+        int markedSaved = 0;
+
+        do {
+            GReaderStreamContents page = gReaderApiService.getStarredItems(user, continuation);
+            List<GReaderStreamItem> items = page.getItems();
+            if (items == null || items.isEmpty()) break;
+
+            List<String> gReaderIds = items.stream().map(GReaderStreamItem::getId).toList();
+            List<FeedItem> feedItems = feedItemRepository.findByGReaderItemIdInAndFeedIn(gReaderIds, feeds);
+            for (FeedItem feedItem : feedItems) {
+                if (!feedItem.isSaved()) {
+                    feedItem.setSaved(true);
+                    feedItemRepository.save(feedItem);
+                    markedSaved++;
+                }
+            }
+
+            continuation = page.getContinuation();
+        } while (continuation != null && !continuation.isBlank());
+
+        if (markedSaved > 0) {
+            logger.info("Marked {} items as saved from GReader starred stream for user {}", markedSaved, user.getUsername());
+        }
     }
 
     @Transactional
-    protected void processArticle(FreshRssStreamItem item, User user, List<com.github.lamarios.newsku.models.TagClickStat> clicks) {
-        // Skip if already stored
-        if (feedItemRepository.findByFreshRssItemId(item.getId()) != null) {
+    protected void processArticle(GReaderStreamItem item, User user, List<com.github.lamarios.newsku.models.TagClickStat> clicks) {
+        if (feedItemRepository.findByGReaderItemId(item.getId()) != null) {
             return;
         }
 
-        // Find the feed this article belongs to
         String originStreamId = item.getOrigin() != null ? item.getOrigin().getStreamId() : null;
         Feed feed = originStreamId != null
-                ? feedRepository.findByFreshRssFeedIdAndUser(originStreamId, user)
+                ? feedRepository.findByGReaderFeedIdAndUser(originStreamId, user)
                 : null;
 
         if (feed == null) {
-            // Feed not synced yet – skip; next syncFeeds() call will create it
             logger.debug("Skipping article {} – feed '{}' not yet in newsku", item.getId(), originStreamId);
             return;
         }
@@ -243,8 +271,8 @@ public class FreshRssSyncService {
 
         FeedItem feedItem = new FeedItem();
         feedItem.setId(UUID.randomUUID().toString());
-        feedItem.setFreshRssItemId(item.getId());
-        feedItem.setGuid(item.getId());  // use FreshRSS ID also as guid for deduplication
+        feedItem.setGReaderItemId(item.getId());
+        feedItem.setGuid(item.getId());
         feedItem.setFeed(feed);
         feedItem.setTitle(StringEscapeUtils.unescapeHtml4(HtmlUtils.getTextContent(title)));
         feedItem.setDescription(content);
@@ -255,7 +283,7 @@ public class FreshRssSyncService {
         feedItem.setShortTitle(analysis.get().shortTitle());
         feedItem.setShortTeaser(analysis.get().shortTeaser());
         feedItem.setTimeCreated(item.getPublished() > 0
-                ? item.getPublished() * 1000L   // FreshRSS returns seconds, newsku uses ms
+                ? item.getPublished() * 1000L   // GReader returns seconds, newsku uses ms
                 : System.currentTimeMillis());
         feedItem.setTags(analysis.get().tags().stream()
                 .map(String::toLowerCase)
@@ -270,7 +298,6 @@ public class FreshRssSyncService {
     // Helpers
     // -----------------------------------------------------------------------
 
-    /** Strips the "feed/" prefix from a GReader stream ID to get the raw URL. */
     private static String stripFeedPrefix(String streamId) {
         if (streamId != null && streamId.startsWith("feed/")) {
             return streamId.substring(5);
@@ -307,12 +334,11 @@ public class FreshRssSyncService {
         return null;
     }
 
-    private void saveFeedError(FreshRssStreamItem item, User user, Exception e) {
+    private void saveFeedError(GReaderStreamItem item, User user, Exception e) {
         try {
-            // Find the feed to attach the error to (best-effort)
             String originStreamId = item.getOrigin() != null ? item.getOrigin().getStreamId() : null;
             Feed feed = originStreamId != null
-                    ? feedRepository.findByFreshRssFeedIdAndUser(originStreamId, user)
+                    ? feedRepository.findByGReaderFeedIdAndUser(originStreamId, user)
                     : null;
             if (feed == null) return;
 
@@ -325,7 +351,6 @@ public class FreshRssSyncService {
             error.setUrl(item.resolveUrl());
             feedErrorRepository.save(error);
         } catch (Exception ignored) {
-            // error saving is best-effort
         }
     }
 }

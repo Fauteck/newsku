@@ -34,7 +34,7 @@ public class FeedItem {
     private boolean saved;
 
     @Column(name = "freshrss_item_id")
-    private String freshRssItemId;
+    private String gReaderItemId;
 
     @ManyToOne
     @JoinColumn(name = "feed_id")
@@ -155,12 +155,12 @@ public class FeedItem {
         this.tags = tags;
     }
 
-    public String getFreshRssItemId() {
-        return freshRssItemId;
+    public String getGReaderItemId() {
+        return gReaderItemId;
     }
 
-    public void setFreshRssItemId(String freshRssItemId) {
-        this.freshRssItemId = freshRssItemId;
+    public void setGReaderItemId(String gReaderItemId) {
+        this.gReaderItemId = gReaderItemId;
     }
 
     public String getShortTitle() {
