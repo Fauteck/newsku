@@ -5,6 +5,7 @@ import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/conditional_wrap.dart';
 import 'package:app/utils/views/components/error_listener.dart';
+import 'package:app/utils/views/components/mobile_bottom_nav.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,6 +19,7 @@ class StatsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final locals = AppLocalizations.of(context)!;
 
+    final isMobile = BreakPoint.get(context) == BreakPoint.mobile;
     return AutoTabsRouter.tabBar(
       routes: [TagStatsRoute(), FeedStatsRoute()],
       builder: (context, child, tabController) => Scaffold(
@@ -31,6 +33,7 @@ class StatsScreen extends StatelessWidget {
             ],
           ),
         ),
+        bottomNavigationBar: isMobile ? const MobileBottomNav() : null,
         body: SafeArea(
           child: Center(
             child: ConstrainedBox(

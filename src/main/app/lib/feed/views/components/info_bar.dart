@@ -24,17 +24,6 @@ class InfoBar extends StatelessWidget {
       crossAxisAlignment: .stretch,
       spacing: pu,
       children: [
-        if (item.tags.isNotEmpty)
-          Wrap(
-            alignment: WrapAlignment.start,
-            spacing: pu2,
-            runSpacing: pu,
-            crossAxisAlignment: .center,
-            children: [
-              Icon(Icons.sell, size: 12, color: colors.secondary),
-              ...item.tags.map((e) => Text(e, style: textTheme.labelSmall?.copyWith(color: colors.secondary))),
-            ],
-          ),
         Row(
           spacing: pu2,
           children: [

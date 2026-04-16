@@ -22,7 +22,8 @@ class SmallGridItem extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final prefs = context.watch<LocalPreferencesCubit>().state;
     final titleMaxLines = prefs.truncateText ? 2 : null;
-    final contentMaxLines = prefs.truncateText ? 1 : null;
+    final contentMaxLines = prefs.truncateText ? 3 : null;
+    final hasImage = (item.imageUrl ?? '').isNotEmpty;
 
     return ClickableFeedItem(
       item: item,
@@ -59,19 +60,21 @@ class SmallGridItem extends StatelessWidget {
                 ),
               ),
             ),
-            Align(
-              alignment: .centerLeft,
-              child: Container(width: 4, height: 50, decoration: BoxDecoration(color: colors.tertiary)),
-            ),
-            FeedItemImage(
-              item: item,
-              borderRadius: .horizontal(right: .circular(feedItemBorderRadius)),
-              width: switch (BreakPoint.get(context)) {
-                .mobile => 20,
-                .tablet => 50,
-                _ => 70,
-              },
-            ),
+            if (hasImage) ...[
+              Align(
+                alignment: .centerLeft,
+                child: Container(width: 4, height: 50, decoration: BoxDecoration(color: colors.tertiary)),
+              ),
+              FeedItemImage(
+                item: item,
+                borderRadius: .horizontal(right: .circular(feedItemBorderRadius)),
+                width: switch (BreakPoint.get(context)) {
+                  .mobile => 20,
+                  .tablet => 50,
+                  _ => 70,
+                },
+              ),
+            ],
           ],
         ),
       ),

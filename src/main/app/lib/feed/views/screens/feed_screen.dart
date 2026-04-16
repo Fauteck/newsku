@@ -145,6 +145,7 @@ class FeedScreen extends StatelessWidget {
                 return LayoutBuilder(
                   builder: (context, constraints) {
                     final double padding = max(0, (constraints.maxWidth - BreakPoint.desktop.maxWidth) / 2);
+                    final isMobile = BreakPoint.get(context) == BreakPoint.mobile;
 
                     return Center(
                       child: Stack(
@@ -198,11 +199,62 @@ class FeedScreen extends StatelessWidget {
                                                     ),
                                                   ),
                                             actions: [
-                                              IconButton(
-                                                onPressed: () => cubit.setSearch(!state.searchMode),
-                                                icon: Icon(state.searchMode ? Icons.close : Icons.search),
-                                              ),
-                                              if (!state.searchMode) ...[
+                                              if (state.searchMode)
+                                                IconButton(
+                                                  onPressed: () => cubit.setSearch(false),
+                                                  icon: Icon(Icons.close),
+                                                )
+                                              else if (isMobile) ...[
+                                                IconButton(
+                                                  onPressed: () => cubit.refresh(),
+                                                  icon: Icon(Icons.refresh),
+                                                ),
+                                                MenuAnchor(
+                                                  key: Key('mobile-more-menu'),
+                                                  builder: (context, controller, child) => IconButton(
+                                                    onPressed: () =>
+                                                        controller.isOpen ? controller.close() : controller.open(),
+                                                    icon: Icon(Icons.menu),
+                                                  ),
+                                                  menuChildren: [
+                                                    MenuItemButton(
+                                                      leadingIcon: Icon(Icons.search),
+                                                      onPressed: () => cubit.setSearch(true),
+                                                      child: Text(locals.search),
+                                                    ),
+                                                    MenuItemButton(
+                                                      key: Key('saved-filter-button'),
+                                                      leadingIcon: Icon(
+                                                        state.showSavedOnly
+                                                            ? Icons.bookmarks
+                                                            : Icons.bookmarks_outlined,
+                                                        color: state.showSavedOnly ? colors.primary : null,
+                                                      ),
+                                                      onPressed: () => cubit.setSavedFilter(!state.showSavedOnly),
+                                                      child: Text(locals.savedArticles),
+                                                    ),
+                                                    if (config?.freshRssUrl != null &&
+                                                        config!.freshRssUrl!.isNotEmpty) ...[
+                                                      Divider(),
+                                                      MenuItemButton(
+                                                        leadingIcon: Icon(Icons.open_in_new),
+                                                        onPressed: () => launchUrl(Uri.parse(config!.freshRssUrl!)),
+                                                        child: Text(locals.openInFreshRss),
+                                                      ),
+                                                    ],
+                                                    Divider(),
+                                                    MenuItemButton(
+                                                      leadingIcon: Icon(Icons.logout),
+                                                      onPressed: () => getIt.get<IdentityCubit>().logout(),
+                                                      child: Text(locals.logout),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ] else ...[
+                                                IconButton(
+                                                  onPressed: () => cubit.setSearch(true),
+                                                  icon: Icon(Icons.search),
+                                                ),
                                                 IconButton(
                                                   key: Key('saved-filter-button'),
                                                   onPressed: () => cubit.setSavedFilter(!state.showSavedOnly),
@@ -212,57 +264,62 @@ class FeedScreen extends StatelessWidget {
                                                   ),
                                                   tooltip: locals.savedArticles,
                                                 ),
-                                                IconButton(onPressed: () => cubit.refresh(), icon: Icon(Icons.refresh)),
-                                              ],
-                                              MenuAnchor(
-                                                key: Key('profile-button'),
-                                                builder: (context, controller, child) => IconButton(
-                                                  onPressed: () =>
-                                                      controller.isOpen ? controller.close() : controller.open(),
-                                                  icon: UserProfilePicture(),
+                                                IconButton(
+                                                  onPressed: () => cubit.refresh(),
+                                                  icon: Icon(Icons.refresh),
                                                 ),
-                                                menuChildren: [
-                                                  MenuItemButton(
-                                                    leadingIcon: Icon(Icons.show_chart),
-                                                    onPressed: () => AutoRouter.of(context).push(StatsRoute()),
-                                                    child: Text(locals.stats),
+                                                MenuAnchor(
+                                                  key: Key('profile-button'),
+                                                  builder: (context, controller, child) => IconButton(
+                                                    onPressed: () =>
+                                                        controller.isOpen ? controller.close() : controller.open(),
+                                                    icon: UserProfilePicture(),
                                                   ),
-                                                  if (!(context.read<IdentityCubit>().state.config?.demoMode ?? false))
+                                                  menuChildren: [
                                                     MenuItemButton(
-                                                      key: Key('settings-button'),
-                                                      leadingIcon: ConditionalWrap(
-                                                        wrapIf: state.errorCount > 0,
-                                                        wrapper: (child) => Badge(
-                                                          offset: Offset(5, 0),
-                                                          backgroundColor: colors.errorContainer,
-                                                          textColor: colors.error,
-                                                          label: Text('${state.errorCount}'),
-                                                          child: child,
-                                                        ),
-
-                                                        child: Icon(Icons.settings),
-                                                      ),
-                                                      child: Text(locals.settings),
-                                                      onPressed: () => AutoRouter.of(
-                                                        context,
-                                                      ).push(SettingsRoute()).then((value) => cubit.refresh()),
+                                                      leadingIcon: Icon(Icons.show_chart),
+                                                      onPressed: () => AutoRouter.of(context).push(StatsRoute()),
+                                                      child: Text(locals.stats),
                                                     ),
-                                                  if (config?.freshRssUrl != null && config!.freshRssUrl!.isNotEmpty) ...[
+                                                    if (!(context.read<IdentityCubit>().state.config?.demoMode ??
+                                                        false))
+                                                      MenuItemButton(
+                                                        key: Key('settings-button'),
+                                                        leadingIcon: ConditionalWrap(
+                                                          wrapIf: state.errorCount > 0,
+                                                          wrapper: (child) => Badge(
+                                                            offset: Offset(5, 0),
+                                                            backgroundColor: colors.errorContainer,
+                                                            textColor: colors.error,
+                                                            label: Text('${state.errorCount}'),
+                                                            child: child,
+                                                          ),
+
+                                                          child: Icon(Icons.settings),
+                                                        ),
+                                                        child: Text(locals.settings),
+                                                        onPressed: () => AutoRouter.of(
+                                                          context,
+                                                        ).push(SettingsRoute()).then((value) => cubit.refresh()),
+                                                      ),
+                                                    if (config?.freshRssUrl != null &&
+                                                        config!.freshRssUrl!.isNotEmpty) ...[
+                                                      Divider(),
+                                                      MenuItemButton(
+                                                        leadingIcon: Icon(Icons.open_in_new),
+                                                        onPressed: () => launchUrl(Uri.parse(config!.freshRssUrl!)),
+                                                        child: Text(locals.openInFreshRss),
+                                                      ),
+                                                    ],
                                                     Divider(),
                                                     MenuItemButton(
-                                                      leadingIcon: Icon(Icons.open_in_new),
-                                                      onPressed: () => launchUrl(Uri.parse(config!.freshRssUrl!)),
-                                                      child: Text(locals.openInFreshRss),
+                                                      leadingIcon: Icon(Icons.logout),
+                                                      onPressed: () => getIt.get<IdentityCubit>().logout(),
+                                                      child: Text(locals.logout),
                                                     ),
                                                   ],
-                                                  Divider(),
-                                                  MenuItemButton(
-                                                    leadingIcon: Icon(Icons.logout),
-                                                    onPressed: () => getIt.get<IdentityCubit>().logout(),
-                                                    child: Text(locals.logout),
-                                                  ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ],
                                           ),
                                           if (!state.searchMode && !state.showSavedOnly)
