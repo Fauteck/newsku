@@ -88,7 +88,7 @@
     "buildNumber": "Build-Nummer",
     "package": "Paket",
     "backendVersion": "Backend-Version",
-    "licenses": "Lizenzen anzeigen",
+    "licenses": "Open-Source-Lizenzen",
     "feedback": "Feedback senden",
     "backendUrl": "Backend-URL",
     "submitFeedback": "Feedback absenden",

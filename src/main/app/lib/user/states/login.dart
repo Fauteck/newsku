@@ -80,7 +80,7 @@ class LoginCubit extends Cubit<LoginState> {
           //
           // for debugging in flutter, you must run this app with --web-port 22433
           ? Uri.parse(webUrl)
-          : Uri.parse('com.github.lamarios.newsku:/oidcRedirect');
+          : Uri.parse('eu.fauteck.feedteck:/oidcRedirect');
       final manager = OidcUserManager.lazy(
         discoveryDocumentUri: OidcUtils.getOpenIdConfigWellKnownUri(Uri.parse(config.issuer)),
         clientCredentials: OidcClientAuthentication.none(clientId: config.clientId),
