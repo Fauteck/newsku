@@ -1,5 +1,6 @@
 package com.github.lamarios.newsku.services;
 
+import com.github.lamarios.newsku.Constants;
 import com.github.lamarios.newsku.models.freshrss.FreshRssStreamContents;
 import com.github.lamarios.newsku.models.freshrss.FreshRssStreamItem;
 import com.github.lamarios.newsku.models.freshrss.FreshRssSubscription;
@@ -236,6 +237,9 @@ public class FreshRssSyncService {
         if (imageUrl == null && rawContent != null) {
             imageUrl = extractImageFromHtml(rawContent);
         }
+        if (imageUrl == null) {
+            imageUrl = extractOgImageFromUrl(item.resolveUrl());
+        }
 
         FeedItem feedItem = new FeedItem();
         feedItem.setId(UUID.randomUUID().toString());
@@ -276,6 +280,29 @@ public class FreshRssSyncService {
         if (html == null) return null;
         String src = Jsoup.parse(html).getElementsByTag("img").attr("src");
         return src.isBlank() ? null : src;
+    }
+
+    private static final List<String> OG_IMAGE_SELECTORS = List.of(
+            "meta[property=og:image]",
+            "meta[name=og:image]",
+            "meta[property=twitter:image]",
+            "meta[name=twitter:image]");
+
+    private static String extractOgImageFromUrl(String url) {
+        if (url == null || url.isBlank()) return null;
+        try {
+            var doc = Jsoup.connect(url)
+                    .userAgent(Constants.USER_AGENT)
+                    .timeout(5000)
+                    .get();
+            for (String selector : OG_IMAGE_SELECTORS) {
+                String content = doc.select(selector).attr("content");
+                if (!content.isBlank()) return content;
+            }
+        } catch (Exception e) {
+            logger.debug("og:image fetch failed for {}: {}", url, e.getMessage());
+        }
+        return null;
     }
 
     private void saveFeedError(FreshRssStreamItem item, User user, Exception e) {

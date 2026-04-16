@@ -23,7 +23,8 @@ class BigGridItem extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final prefs = context.watch<LocalPreferencesCubit>().state;
     final titleMaxLines = prefs.truncateText ? 2 : null;
-    final contentMaxLines = prefs.truncateText ? 2 : null;
+    final contentMaxLines = prefs.truncateText ? 5 : null;
+    final hasImage = (item.imageUrl ?? '').isNotEmpty;
 
     return ClickableFeedItem(
       item: item,
@@ -33,11 +34,12 @@ class BigGridItem extends StatelessWidget {
           spacing: 0,
           crossAxisAlignment: .stretch,
           children: [
-            FeedItemImage(
-              item: item,
-              height: 180,
-              borderRadius: BorderRadius.vertical(top: .circular(feedItemBorderRadius)),
-            ),
+            if (hasImage)
+              FeedItemImage(
+                item: item,
+                height: 180,
+                borderRadius: BorderRadius.vertical(top: .circular(feedItemBorderRadius)),
+              ),
             Align(
               alignment: .centerLeft,
               child: Container(
