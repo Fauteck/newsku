@@ -79,13 +79,13 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.github.lamarios.newsku"
+        applicationId "eu.fauteck.feedteck"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion 36
         versionCode buildNumber
         versionName flutterVersionName
         manifestPlaceholders += [
-                'appAuthRedirectScheme': 'com.github.lamarios.newsku' // for oidc flutter dependency
+                'appAuthRedirectScheme': 'eu.fauteck.feedteck' // for oidc flutter dependency
         ]
     }
 
@@ -102,7 +102,7 @@ android {
             signingConfig signingConfigs.release
         }
     }
-    namespace 'com.github.lamarios.newsku'
+    namespace 'eu.fauteck.feedteck'
 }
 
 flutter {

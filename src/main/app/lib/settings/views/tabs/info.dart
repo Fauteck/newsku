@@ -1,130 +1,98 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:app/l10n/app_localizations.dart';
-import 'package:app/utils/models/imgur_error.dart';
-import 'package:app/utils/service/imgur_service.dart';
 import 'package:app/utils/utils.dart';
 import 'package:auto_route/annotations.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:feedback/feedback.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:logging/logging.dart';
-import 'package:material_loading_indicator/loading_indicator.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-final _log = Logger('InfoTab');
+const _githubReadmeUrl = 'https://github.com/Fauteck/newsku#readme';
 
 @RoutePage()
 class InfoTab extends StatelessWidget {
   const InfoTab({super.key});
 
-  Future<void> sendFeedBack(BuildContext context, UserFeedback feedback) async {
-    try {
-      // workaround to avoid the app to be offset after sending feedback
-      // see https://github.com/ueman/feedback/issues/322
-      await Future.delayed(const Duration(seconds: 1));
-
-      BetterFeedback.of(context).hide();
-
-      final deviceInfo = DeviceInfoPlugin();
-      final packageInfo = await PackageInfo.fromPlatform();
-
-      String deviceLine = '';
-      if (kIsWeb) {
-        WebBrowserInfo webBrowserInfo = await deviceInfo.webBrowserInfo;
-        deviceLine =
-            '**Runtime info:**\n[Device] User agent: ${webBrowserInfo.userAgent} / Browser: ${webBrowserInfo.browserName}';
-      } else if (Platform.isAndroid) {
-        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        deviceLine =
-            '**Runtime info:**\n[Device] Manufacturer: ${androidInfo.manufacturer} / Brand: ${androidInfo.brand} / Model: ${androidInfo.model} / Hardware: ${androidInfo.hardware}';
-        deviceLine +=
-            '\n[Device] Version: ${androidInfo.version.release}.${androidInfo.version.incremental} (${androidInfo.version.codename})';
-      }
-
-      _log.fine(deviceLine);
-
-      final firstLine = feedback.text.split('\n')[0];
-
-      String body = deviceLine;
-      body += '\n[Newsku] Version: ${packageInfo.version} Build: ${packageInfo.buildNumber}';
-      body += '\n[Backend] Version: ${config?.backendVersion ?? '-'}';
-
-      body += '\n\n\n**Feedback:**\n${feedback.text}\n\n\n';
-
-      String screenshotUrl = await ImgurService().uploadImageToImgur(base64Encode(feedback.screenshot));
-      body += '\n**Screenshot:**\n![app screenshot]($screenshotUrl)';
-
-      final url =
-          'https://github.com/lamarios/newsku/issues/new?title=${Uri.encodeComponent('[App Feedback] $firstLine')}&body=${Uri.encodeComponent(body)}';
-      await launchUrl(Uri.parse(url));
-    } catch (err) {
-      if (err is ImgurError) {
-        _log.severe("Issue while submitting feedback, img error: ${err.error}", err);
-      } else {
-        _log.severe("Issue while submitting feedback", err);
-      }
-      rethrow;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final locals = AppLocalizations.of(context)!;
     final colors = Theme.of(context).colorScheme;
-    var titlesTheme = textTheme.labelSmall?.copyWith(color: colors.tertiary);
+    final locals = AppLocalizations.of(context)!;
 
     return SelectionArea(
       child: FutureBuilder(
-        future: PackageInfo.fromPlatform(),
-        builder: (context, snapshot) => snapshot.data == null
-            ? Center(child: LoadingIndicator())
-            : Column(
-                crossAxisAlignment: .center,
+        future: Future.wait([
+          PackageInfo.fromPlatform(),
+          LicenseRegistry.licenses.toList(),
+        ]),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                children: [
-                  Gap(pu8),
-                  Text(locals.version, style: titlesTheme),
-                  Text(snapshot.data?.version ?? '-'),
-                  Gap(pu2),
-                  Text(locals.buildNumber, style: titlesTheme),
-                  Text(snapshot.data?.buildNumber ?? '-'),
-                  Gap(pu2),
-                  Text(locals.backendVersion, style: titlesTheme),
-                  Text(serverUrl ?? '-'),
-                  Gap(pu2),
-                  Text(locals.backendVersion, style: titlesTheme),
-                  Text(config?.backendVersion ?? '-'),
-                  Gap(pu6),
-                  FilledButton.tonalIcon(
-                    icon: Icon(Icons.info_outline),
-                    onPressed: () {
-                      showLicensePage(context: context);
-                    },
-                    label: Text(locals.licenses),
+          final packageInfo = snapshot.data![0] as PackageInfo;
+          final licenseEntries = snapshot.data![1] as List<LicenseEntry>;
+
+          final byPackage = <String, List<String>>{};
+          for (final entry in licenseEntries) {
+            final text = entry.paragraphs.map((p) => p.text).join('\n\n');
+            for (final package in entry.packages) {
+              (byPackage[package] ??= []).add(text);
+            }
+          }
+          final packageNames = byPackage.keys.toList()..sort();
+
+          return ListView.separated(
+            padding: EdgeInsets.all(pu8),
+            itemCount: packageNames.length + 1,
+            separatorBuilder: (_, __) => const Divider(),
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                return Padding(
+                  padding: EdgeInsets.only(bottom: pu6),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'v${packageInfo.version}+${packageInfo.buildNumber}',
+                        style: textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+                      ),
+                      Gap(pu4),
+                      FilledButton.tonalIcon(
+                        icon: const Icon(Icons.open_in_new),
+                        onPressed: () => launchUrl(Uri.parse(_githubReadmeUrl), mode: LaunchMode.externalApplication),
+                        label: const Text('README auf GitHub'),
+                      ),
+                      Gap(pu8),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(locals.licenses, style: textTheme.titleMedium),
+                      ),
+                    ],
                   ),
-                  /*
-                  Gap(pu6),
-                  FilledButton.tonalIcon(
-                    icon: Icon(Icons.feedback),
-                    onPressed: () {
-                      okCancelDialog(
-                        context,
-                        title: locals.submitFeedback,
-                        content: Text(locals.feedbackDisclaimer),
-                        onOk: () => BetterFeedback.of(context).show((feedback) => sendFeedBack(context, feedback)),
-                      );
-                    },
-                    label: Text(locals.feedback),
-                  ),
-*/
-                ],
-              ),
+                );
+              }
+
+              final package = packageNames[index - 1];
+              final texts = byPackage[package]!;
+
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: pu2),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(package, style: textTheme.titleSmall?.copyWith(color: colors.primary)),
+                    Gap(pu2),
+                    ...texts.map((text) => Text(
+                          text,
+                          style: textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+                        )),
+                  ],
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }
