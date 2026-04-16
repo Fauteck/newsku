@@ -24,6 +24,10 @@ class SettingsScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(locals.settings),
+          automaticallyImplyLeading: false,
+          leading: !isMobile
+              ? BackButton(onPressed: () => AutoRouter.of(context).maybePop())
+              : null,
           actions: [
             TextButton.icon(
               onPressed: () => getIt.get<IdentityCubit>().logout(),
@@ -66,14 +70,13 @@ class _DarstellungTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // The upper (general) section renders at its natural height so it's fully
-    // visible without a nested scrollbar. Only the layout editor keeps its own
-    // scrollable area because of drag-and-drop.
-    return const Column(
+    return Column(
       children: [
-        GeneralSettingsTab(),
-        Divider(height: 1),
-        Expanded(child: LayoutSettingsTab()),
+        Expanded(
+          child: SingleChildScrollView(child: const GeneralSettingsTab()),
+        ),
+        const Divider(height: 1),
+        const Expanded(child: LayoutSettingsTab()),
       ],
     );
   }
