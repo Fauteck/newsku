@@ -163,5 +163,15 @@
     "cacheExplanation": "Lokal zwischengespeicherte Beiträge und Bilder verwalten",
     "clearImageCache": "Bilder-Cache löschen",
     "clearArticleCache": "Beitrags-Cache löschen",
-    "cacheCleared": "Cache geleert"
+    "cacheCleared": "Cache geleert",
+    "aiTab": "KI",
+    "freshRssUrlLabel": "FreshRSS-URL",
+    "freshRssSaved": "FreshRSS-Einstellungen gespeichert",
+    "aiSection": "KI-Integration",
+    "aiSectionExplanation": "Verbinde deinen eigenen KI-Dienst. Die Zugangsdaten werden sicher auf dem Server gespeichert.",
+    "openAiApiKey": "API-Schlüssel",
+    "openAiApiKeyHint": "Leer lassen, um den bestehenden Schlüssel beizubehalten",
+    "openAiModel": "Modell",
+    "openAiUrl": "API-URL",
+    "openAiSaved": "KI-Einstellungen gespeichert"
 }

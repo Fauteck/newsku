@@ -21,6 +21,10 @@ sealed class User with _$User {
     @Default([]) List<EmailDigestFrequency> emailDigest,
     String? freshRssUsername,
     String? freshRssApiPassword,
+    String? freshRssUrl,
+    String? openAiApiKey,
+    String? openAiModel,
+    String? openAiUrl,
   }) = _User;
 
   factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);

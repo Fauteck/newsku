@@ -913,6 +913,16 @@ abstract class AppLocalizations {
   String get clearImageCache;
   String get clearArticleCache;
   String get cacheCleared;
+  String get aiTab;
+  String get freshRssUrlLabel;
+  String get freshRssSaved;
+  String get aiSection;
+  String get aiSectionExplanation;
+  String get openAiApiKey;
+  String get openAiApiKeyHint;
+  String get openAiModel;
+  String get openAiUrl;
+  String get openAiSaved;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

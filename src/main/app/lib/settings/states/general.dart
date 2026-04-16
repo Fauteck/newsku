@@ -14,6 +14,9 @@ part 'general.freezed.dart';
 
 class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
   final TextEditingController preferenceController = TextEditingController(text: '');
+  final TextEditingController openAiApiKeyController = TextEditingController(text: '');
+  final TextEditingController openAiModelController = TextEditingController(text: '');
+  final TextEditingController openAiUrlController = TextEditingController(text: '');
 
   GeneralSettingsCubit(super.initialState) {
     getUser();
@@ -22,6 +25,9 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
   @override
   Future<void> close() async {
     preferenceController.dispose();
+    openAiApiKeyController.dispose();
+    openAiModelController.dispose();
+    openAiUrlController.dispose();
     super.close();
   }
 
@@ -30,6 +36,9 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
       emit(state.copyWith(loading: true));
       final user = await UserService(serverUrl!).getUser();
       preferenceController.text = user.feedItemPreference ?? '';
+      openAiApiKeyController.text = user.openAiApiKey ?? '';
+      openAiModelController.text = user.openAiModel ?? 'gpt-4o-mini';
+      openAiUrlController.text = user.openAiUrl ?? 'https://api.openai.com/v1';
       emit(state.copyWith(user: user));
     } catch (e, s) {
       emit(state.copyWith(error: e, stackTrace: s));
@@ -68,6 +77,20 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
     if (state.user != null) {
       emit(state.copyWith.user!(minimumImportance: importance.toInt()));
       EasyDebounce.debounce('importance update', Duration(milliseconds: 250), updateUser);
+    }
+  }
+
+  Future<void> saveOpenAiSettings() async {
+    if (state.user != null) {
+      final apiKey = openAiApiKeyController.value.text.trim();
+      final model = openAiModelController.value.text.trim();
+      final url = openAiUrlController.value.text.trim();
+      emit(state.copyWith.user!(
+        openAiApiKey: apiKey.isNotEmpty ? apiKey : null,
+        openAiModel: model.isNotEmpty ? model : null,
+        openAiUrl: url.isNotEmpty ? url : null,
+      ));
+      await updateUser();
     }
   }
 }

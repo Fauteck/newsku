@@ -1,12 +1,14 @@
+import 'package:app/home/state/local_preferences.dart';
 import 'package:app/l10n/app_localizations.dart';
+import 'package:app/main.dart';
 import 'package:app/settings/states/user_settings.dart';
 import 'package:app/user/models/email_digest_frequency.dart';
 import 'package:app/utils/utils.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:gap/gap.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 @RoutePage()
 class UserSettingsTab extends StatelessWidget {
@@ -17,11 +19,13 @@ class UserSettingsTab extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
     final locals = AppLocalizations.of(context)!;
+    final subTextTheme = textTheme.labelMedium?.copyWith(color: colors.secondary);
     return BlocProvider(
       create: (context) => UserSettingsCubit(
         UserSettingsState(
           email: identityCubit.currentUser?.email ?? '',
           digest: identityCubit.currentUser?.emailDigest ?? [],
+          freshRssUsername: identityCubit.currentUser?.freshRssUsername ?? '',
         ),
       ),
       child: BlocBuilder<UserSettingsCubit, UserSettingsState>(
@@ -119,41 +123,99 @@ class UserSettingsTab extends StatelessWidget {
                     ),
                   ),
                   Gap(pu8),
-                  // FreshRSS section — credentials are configured via environment variables
-                  if (serverConfig?.freshRssUrl != null) ...[
-                    Row(
-                      children: [
-                        Text(locals.freshRssTitle, style: textTheme.titleMedium),
-                        Gap(pu2),
-                        IconButton.outlined(
-                          icon: const Icon(Icons.open_in_new, size: 16),
-                          tooltip: locals.openInFreshRss,
-                          onPressed: () => launchUrl(Uri.parse(serverConfig!.freshRssUrl!)),
+                  const Divider(),
+                  Gap(pu4),
+                  // FreshRSS section — always shown, users set their own credentials
+                  Text(locals.freshRssTitle, style: textTheme.titleMedium),
+                  Gap(pu2),
+                  Text(locals.freshRssExplanation, style: subTextTheme),
+                  Gap(pu4),
+                  Text(locals.freshRssUrlLabel),
+                  TextField(
+                    key: const Key('freshrss-url'),
+                    controller: cubit.freshRssUrl,
+                    keyboardType: TextInputType.url,
+                    decoration: InputDecoration(hintText: 'https://freshrss.example.com'),
+                  ),
+                  Gap(pu2),
+                  Text(locals.freshRssUsername),
+                  TextField(
+                    key: const Key('freshrss-username'),
+                    controller: cubit.freshRssUsername,
+                  ),
+                  Gap(pu2),
+                  Text(locals.freshRssApiPassword),
+                  TextField(
+                    key: const Key('freshrss-api-password'),
+                    controller: cubit.freshRssApiPassword,
+                    obscureText: true,
+                    decoration: InputDecoration(hintText: locals.freshRssApiPasswordHint),
+                  ),
+                  Gap(pu2),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: FilledButton.tonalIcon(
+                      key: const Key('freshrss-save-button'),
+                      onPressed: state.loading
+                          ? null
+                          : () async {
+                              await cubit.updateFreshRssCredentials();
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(SnackBar(content: Text(locals.freshRssSaved)));
+                              }
+                            },
+                      label: Text(locals.update),
+                      icon: const Icon(Icons.save),
+                    ),
+                  ),
+                  Gap(pu8),
+                  const Divider(),
+                  Gap(pu4),
+                  // Cache section
+                  Text(locals.cacheSection, style: textTheme.titleMedium),
+                  Text(locals.cacheExplanation, style: subTextTheme),
+                  Gap(pu2),
+                  Row(
+                    spacing: pu2,
+                    children: [
+                      Expanded(
+                        child: FilledButton.tonalIcon(
+                          key: const Key('clear-image-cache'),
+                          onPressed: () async {
+                            await DefaultCacheManager().emptyCache();
+                            PaintingBinding.instance.imageCache.clear();
+                            PaintingBinding.instance.imageCache.clearLiveImages();
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(SnackBar(content: Text(locals.cacheCleared)));
+                            }
+                          },
+                          label: Text(locals.clearImageCache),
+                          icon: const Icon(Icons.image_not_supported_outlined),
                         ),
-                      ],
-                    ),
-                    Gap(pu2),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: pu4, vertical: pu3),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: colors.secondaryContainer,
                       ),
-                      child: Row(
-                        spacing: pu3,
-                        children: [
-                          Icon(Icons.info_outline, color: colors.onSecondaryContainer),
-                          Expanded(
-                            child: Text(
-                              locals.freshRssCredentialsEnvHint,
-                              style: textTheme.bodyMedium?.copyWith(color: colors.onSecondaryContainer),
-                            ),
-                          ),
-                        ],
+                      Expanded(
+                        child: FilledButton.tonalIcon(
+                          key: const Key('clear-article-cache'),
+                          onPressed: () async {
+                            PaintingBinding.instance.imageCache.clear();
+                            PaintingBinding.instance.imageCache.clearLiveImages();
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(SnackBar(content: Text(locals.cacheCleared)));
+                            }
+                          },
+                          label: Text(locals.clearArticleCache),
+                          icon: const Icon(Icons.article_outlined),
+                        ),
                       ),
-                    ),
-                    Gap(pu8),
-                  ],
+                    ],
+                  ),
+                  Gap(pu8),
                 ],
               ),
             ),

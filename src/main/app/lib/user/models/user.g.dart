@@ -21,6 +21,10 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
       const [],
   freshRssUsername: json['freshRssUsername'] as String?,
   freshRssApiPassword: json['freshRssApiPassword'] as String?,
+  freshRssUrl: json['freshRssUrl'] as String?,
+  openAiApiKey: json['openAiApiKey'] as String?,
+  openAiModel: json['openAiModel'] as String?,
+  openAiUrl: json['openAiUrl'] as String?,
 );
 
 Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
@@ -36,6 +40,10 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'emailDigest': instance.emailDigest.map((e) => _$EmailDigestFrequencyEnumMap[e]!).toList(),
   'freshRssUsername': instance.freshRssUsername,
   'freshRssApiPassword': instance.freshRssApiPassword,
+  'freshRssUrl': instance.freshRssUrl,
+  'openAiApiKey': instance.openAiApiKey,
+  'openAiModel': instance.openAiModel,
+  'openAiUrl': instance.openAiUrl,
 };
 
 const _$ReadItemHandlingEnumMap = {

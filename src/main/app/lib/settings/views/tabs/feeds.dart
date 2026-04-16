@@ -34,7 +34,8 @@ class FeedsSettingsTab extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
     final locals = AppLocalizations.of(context)!;
-    final freshRssActive = config?.freshRssUrl != null;
+    final freshRssActive = config?.freshRssUrl != null ||
+        (identityCubit.currentUser?.freshRssUrl?.isNotEmpty ?? false);
 
     return BlocProvider(
       create: (context) => FeedsSettingsCubit(FeedsSettingsState()),
@@ -161,9 +162,14 @@ class FeedsSettingsTab extends StatelessWidget {
                             )
                           : Expanded(
                               child: ListView.builder(
-                                itemCount: state.categories.length,
+                                itemCount: state.categories
+                                    .where((c) => !freshRssActive || c.id != null)
+                                    .length,
                                 itemBuilder: (context, index) {
-                                  final c = state.categories[index];
+                                  final visibleCategories = state.categories
+                                      .where((c) => !freshRssActive || c.id != null)
+                                      .toList();
+                                  final c = visibleCategories[index];
                                   return FeedCategoryView(
                                     category: c,
                                     feeds: state.feeds.where((f) => f.category?.id == c.id).toList(),
