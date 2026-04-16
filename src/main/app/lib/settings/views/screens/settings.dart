@@ -20,7 +20,7 @@ class SettingsScreen extends StatelessWidget {
     final locals = AppLocalizations.of(context)!;
     final isMobile = BreakPoint.get(context) == BreakPoint.mobile;
     return DefaultTabController(
-      length: 4,
+      length: 5,
       child: Scaffold(
         appBar: AppBar(
           title: Text(locals.settings),
@@ -36,9 +36,12 @@ class SettingsScreen extends StatelessWidget {
             ),
           ],
           bottom: TabBar(
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
             tabs: [
               Tab(text: locals.feeds, icon: const Icon(Icons.rss_feed)),
               Tab(text: locals.darstellung, icon: const Icon(Icons.grid_view_sharp)),
+              Tab(text: locals.layout, icon: const Icon(Icons.view_module_outlined)),
               Tab(text: locals.user, icon: const Icon(Icons.person)),
               Tab(text: locals.about, icon: const Icon(Icons.info_outline)),
             ],
@@ -50,9 +53,12 @@ class SettingsScreen extends StatelessWidget {
             child: ConstrainedBox(
               constraints: BoxConstraints(maxWidth: BreakPoint.tablet.maxWidth),
               child: TabBarView(
+                // Wischen zwischen Tabs deaktivieren
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
                   const FeedsSettingsTab(),
-                  const _DarstellungTab(),
+                  const SingleChildScrollView(child: GeneralSettingsTab()),
+                  const LayoutSettingsTab(),
                   const UserSettingsTab(),
                   const InfoTab(),
                 ],
@@ -61,23 +67,6 @@ class SettingsScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _DarstellungTab extends StatelessWidget {
-  const _DarstellungTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: SingleChildScrollView(child: const GeneralSettingsTab()),
-        ),
-        const Divider(height: 1),
-        const Expanded(child: LayoutSettingsTab()),
-      ],
     );
   }
 }
