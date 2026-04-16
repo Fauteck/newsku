@@ -32,7 +32,7 @@ class SettingsScreen extends StatelessWidget {
           bottom: TabBar(
             tabs: [
               Tab(text: locals.feeds, icon: const Icon(Icons.rss_feed)),
-              Tab(text: locals.darstellungTab, icon: const Icon(Icons.grid_view_sharp)),
+              Tab(text: locals.darstellung, icon: const Icon(Icons.grid_view_sharp)),
               Tab(text: locals.user, icon: const Icon(Icons.person)),
               Tab(text: locals.about, icon: const Icon(Icons.info_outline)),
             ],
@@ -45,7 +45,7 @@ class SettingsScreen extends StatelessWidget {
               child: TabBarView(
                 children: [
                   const FeedsSettingsTab(),
-                  const _LayoutAndAppearanceTab(),
+                  const _DarstellungTab(),
                   const UserSettingsTab(),
                   const InfoTab(),
                 ],
@@ -58,32 +58,17 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
-class _LayoutAndAppearanceTab extends StatelessWidget {
-  const _LayoutAndAppearanceTab();
+class _DarstellungTab extends StatelessWidget {
+  const _DarstellungTab();
 
   @override
   Widget build(BuildContext context) {
-    final locals = AppLocalizations.of(context)!;
-    return DefaultTabController(
-      length: 2,
-      child: Column(
-        children: [
-          TabBar(
-            tabs: [
-              Tab(text: locals.layout),
-              Tab(text: locals.darstellung),
-            ],
-          ),
-          const Expanded(
-            child: TabBarView(
-              children: [
-                LayoutSettingsTab(),
-                GeneralSettingsTab(),
-              ],
-            ),
-          ),
-        ],
-      ),
+    return const Column(
+      children: [
+        Expanded(child: GeneralSettingsTab()),
+        Divider(height: 1),
+        Expanded(flex: 2, child: LayoutSettingsTab()),
+      ],
     );
   }
 }
