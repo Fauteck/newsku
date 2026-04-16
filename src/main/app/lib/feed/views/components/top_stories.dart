@@ -32,22 +32,6 @@ class TopStories extends StatelessWidget {
         spacing: pu6,
         crossAxisAlignment: .start,
         children: [
-          Align(
-            alignment: .topCenter,
-            child: RotatedBox(
-              quarterTurns: 1,
-              child: Container(
-                decoration: BoxDecoration(color: colors.tertiary, borderRadius: .circular(50)),
-                padding: .symmetric(horizontal: pu4),
-                child: Text(
-                  (block.settings ?? block.type.defaultSettings).title ?? '★ Top Stories',
-                  maxLines: 1,
-                  overflow: .ellipsis,
-                  style: textTheme.bodyLarge?.copyWith(fontSize: 25, color: colors.onTertiary),
-                ),
-              ),
-            ),
-          ),
           Expanded(
             child: Column(
               mainAxisSize: .min,

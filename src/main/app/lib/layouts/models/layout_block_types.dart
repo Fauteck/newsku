@@ -78,7 +78,7 @@ enum LayoutBlockTypes {
 
   Widget getSliver({required BuildContext context, required List<FeedItem> items, required LayoutBlock block}) {
     final breakPoint = BreakPoint.get(context);
-    return switch (this) {
+    final contentSliver = switch (this) {
       bigHeadline =>
         breakPoint == .mobile
             ? _bigGridSliver(breakPoint: breakPoint, items: items, block: block)
@@ -115,6 +115,21 @@ enum LayoutBlockTypes {
         },
       ),
     };
+
+    final title = (block.settings ?? defaultSettings).title;
+    if (title == null || title.isEmpty) return contentSliver;
+
+    return SliverMainAxisGroup(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+          ),
+        ),
+        contentSliver,
+      ],
+    );
   }
 
   Widget _bigGridSliver({required BreakPoint breakPoint, required List<FeedItem> items, required LayoutBlock block}) {
