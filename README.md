@@ -39,7 +39,8 @@ reinen Darstellungs- und KI-Scoring-Schicht über FreshRSS.
 | **"Open in FreshRSS"-Button** | Direktlink zur FreshRSS-Oberfläche aus der App heraus (konfigurierbar via `FRESHRSS_URL`) |
 | **FreshRSS-Zugangsdaten in den Einstellungen** | Benutzer können FreshRSS-Benutzernamen und API-Passwort direkt in der App hinterlegen |
 | **Gespeicherte Artikel** | Artikel können für später gespeichert/gemerkt werden |
-| **App-Verbesserungen** | Wischgesten, Tastaturkürzel, Textkürzel-Einstellungen, Insights-Widget |
+| **App-Verbesserungen** | Wischgesten, Tastaturkürzel, Textkürzel-Einstellungen, Insights-Widget, Zurück-Button in Desktop-Einstellungen, scrollbare Darstellungsseite |
+| **App-Branding** | Browser-Tab-Titel, PWA-Name und Manifest auf „Feedteck" umgestellt |
 | **Docker-Setup** | Angepasste Docker-Konfiguration und Deployment-Einrichtung |
 
 ---
