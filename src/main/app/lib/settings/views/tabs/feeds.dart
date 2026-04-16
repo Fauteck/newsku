@@ -69,56 +69,55 @@ class FeedsSettingsTab extends StatelessWidget {
                           ),
                         ),
                       ],
-                      Padding(
-                        padding: EdgeInsets.all(pu2),
-                        child: Form(
-                          key: _formKey,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            spacing: pu2,
-                            children: [
-                              Expanded(
-                                child: TextFormField(
-                                  controller: cubit.newFeedController,
-                                  autofillHints: const [AutofillHints.url],
-                                  decoration: InputDecoration(label: Text(locals.newFeedUrl)),
-                                  validator: (value) {
-                                    if (!RegExp(_validUrl).hasMatch(value ?? '')) {
-                                      return locals.invalidUrl;
-                                    }
-                                    return null;
-                                  },
+                      if (!freshRssActive) ...[
+                        Padding(
+                          padding: EdgeInsets.all(pu2),
+                          child: Form(
+                            key: _formKey,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              spacing: pu2,
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: cubit.newFeedController,
+                                    autofillHints: const [AutofillHints.url],
+                                    decoration: InputDecoration(label: Text(locals.newFeedUrl)),
+                                    validator: (value) {
+                                      if (!RegExp(_validUrl).hasMatch(value ?? '')) {
+                                        return locals.invalidUrl;
+                                      }
+                                      return null;
+                                    },
+                                  ),
                                 ),
-                              ),
-                              FilledButton.tonalIcon(
-                                onPressed: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    cubit.addFeed();
-                                  }
-                                },
-                                label: Text(locals.addFeed),
-                                icon: const Icon(Icons.add),
-                              ),
-                            ],
+                                FilledButton.tonalIcon(
+                                  onPressed: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      cubit.addFeed();
+                                    }
+                                  },
+                                  label: Text(locals.addFeed),
+                                  icon: const Icon(Icons.add),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        spacing: pu2,
-                        children: [
-                          if (!freshRssActive)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          spacing: pu2,
+                          children: [
                             TextButton.icon(
                               onPressed: () => addCategory(context),
                               label: Text(locals.addCategory),
                               icon: const Icon(Icons.add),
                             ),
-                          TextButton.icon(
-                            onPressed: () => cubit.exportFeed(),
-                            label: Text(locals.export),
-                            icon: const Icon(Icons.download),
-                          ),
-                          if (!freshRssActive)
+                            TextButton.icon(
+                              onPressed: () => cubit.exportFeed(),
+                              label: Text(locals.export),
+                              icon: const Icon(Icons.download),
+                            ),
                             TextButton.icon(
                               onPressed: () async {
                                 FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -139,8 +138,9 @@ class FeedsSettingsTab extends StatelessWidget {
                               label: Text(locals.import),
                               icon: const Icon(Icons.upload),
                             ),
-                        ],
-                      ),
+                          ],
+                        ),
+                      ],
                       state.feeds.isEmpty
                           ? Expanded(
                               child: Column(
