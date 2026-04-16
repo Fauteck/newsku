@@ -2,6 +2,7 @@ import 'package:app/home/state/local_preferences.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/main.dart';
 import 'package:app/settings/states/general.dart';
+import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
