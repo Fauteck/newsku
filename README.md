@@ -179,7 +179,7 @@ Die Anwendung ist erreichbar unter: `http://localhost:8080`
 | `ALLOW_SIGNUP` | Nein | `0` | `1` = Registrierung erlaubt |
 | `GREADER_URL` | Nein | — | URL zur GReader-kompatibler Instanz (aktiviert GReader-Modus) |
 | `TZ` | Nein | `Europe/Berlin` | Zeitzone |
-| `FEED_SYNC_INTERVAL_MS` | Nein | `900000` | Intervall in Millisekunden, in dem alle Feeds (direkte RSS + GReader) synchronisiert werden (Standard: 15 min) |
+| `FEED_SYNC_CRON` | Nein | `0 15,35,55 * * * *` | Spring-Cron-Expression für den Feed-Sync (direkte RSS + GReader). Default: 3×/Stunde zu Minute :15/:35/:55, abgestimmt auf die empfohlene FreshRSS-Kadenz `CRON_MIN=10,30,50` (Sync jeweils 5 Min nach FreshRSS-Fetch). Syntax: 6 Felder `sec min hour day month weekday`. |
 
 ¹ Ein Benutzer kann im KI-Tab einen eigenen API-Key hinterlegen; dieser hat Vorrang vor `OPENAI_API_KEY`.
 

@@ -12,12 +12,12 @@
 | [README.md](README.md) | Feature-Übersicht, Architektur-Diagramm, API-Referenz |
 | [docs/architektur.md](docs/architektur.md) | Tech Stack, Datenmodelle, Request-Flow, Auth |
 | [docs/verzeichnisstruktur.md](docs/verzeichnisstruktur.md) | Kompletter Dateibaum mit absoluten Pfaden |
-| [docs/api-patterns.md](docs/api-patterns.md) | Fastify-Routen, Services, Plugins, Validierung |
-| [docs/frontend-patterns.md](docs/frontend-patterns.md) | React-Patterns, Zustand, Seiten, Komponenten |
-| [docs/datenbank.md](docs/datenbank.md) | Drizzle-Schema, Migrationen, Beziehungen |
+| [docs/api-patterns.md](docs/api-patterns.md) | Spring-Controller, Services, Repositories, Validierung |
+| [docs/frontend-patterns.md](docs/frontend-patterns.md) | Flutter/BLoC-Patterns, Routing, Widgets |
+| [docs/datenbank.md](docs/datenbank.md) | JPA/Hibernate-Schema, Flyway-Migrationen, Beziehungen |
 | [docs/entwicklung.md](docs/entwicklung.md) | Setup, Dev-Server, Feature-Walkthrough |
-| [docs/code-konventionen.md](docs/code-konventionen.md) | Stil-Guide, Naming, TypeScript-Patterns |
-| [docs/testing.md](docs/testing.md) | Vitest, Testorganisation, Mocking |
+| [docs/code-konventionen.md](docs/code-konventionen.md) | Stil-Guide, Naming, Java- und Dart-Patterns |
+| [docs/testing.md](docs/testing.md) | JUnit, TestContainers, Flutter-Tests, Mocking |
 | [docs/haeufige-aufgaben.md](docs/haeufige-aufgaben.md) | How-To-Guides für typische Aufgaben |
 | [docs/design-system.md](docs/design-system.md) | Fauteck Design System (Tokens, Komponenten) |
 
@@ -35,6 +35,7 @@
 8. [robots.txt](#8-robotstxt)
 9. [Datenbank & Migrationen](#9-datenbank--migrationen)
 10. [Logging & Health](#10-logging--health)
+10a. [Sync-Kadenz zu externen Diensten](#10a-sync-kadenz-zu-externen-diensten)
 11. [Build & Deployment](#11-build--deployment)
 12. [Definition of Done](#12-definition-of-done)
 13. [Dokumentationspflicht](#13-dokumentationspflicht)
@@ -180,6 +181,18 @@ Sitemap: https://example.com/sitemap.xml
 - Log-Level konsistent (`ERROR/WARN/INFO/DEBUG`), Produktion standardmäßig `INFO`
 - Healthcheck-Endpunkt vorhanden (`/health` oder `/healthz`)
 - Healthcheck ist schnell und ohne schwere Queries
+
+---
+
+## 10a. Sync-Kadenz zu externen Diensten
+
+> Gilt, wenn dieses Repo Daten von einem externen Dienst pollt (z. B. FreshRSS via GReader-API).
+
+- **Poll-Intervall an die Quelle angleichen:** Sync-Intervall darf nicht kürzer sein als die Update-Kadenz des upstream-Dienstes. Kürzere Intervalle erzeugen nur Leerlauf + unnötige API-Last.
+- **Zeitlich versetzen:** Wenn der upstream-Dienst zu festen Zeiten arbeitet (z. B. FreshRSS-Cron), den eigenen Sync per Cron-Expression so legen, dass er wenige Minuten nach dem upstream-Fetch läuft.
+- **Konfiguration via ENV:** Sync-Zeitpläne sind per ENV-Variable konfigurierbar (nicht hartcodiert), damit Abweichungen ohne Rebuild möglich sind.
+- **Dokumentationspflicht:** Jede Sync-Kadenz wird in `README.md` (ENV-Tabelle) begründet dokumentiert — inkl. Hinweis auf die upstream-Kadenz, auf die sie abgestimmt ist.
+- **Aktuell relevant:** FreshRSS `CRON_MIN=10,30,50` (3×/Stunde) → newsku-Default `FEED_SYNC_CRON=0 15,35,55 * * * *` (Sync 5 Min nach jedem FreshRSS-Fetch).
 
 ---
 
