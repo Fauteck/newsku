@@ -120,6 +120,12 @@ public class UserService {
 
             }
 
+            // Keep existing GReader API password when the frontend sends a blank value
+            // (the UI intentionally clears the password field after a save).
+            if (user.getGReaderApiPassword() == null || user.getGReaderApiPassword().isBlank()) {
+                user.setGReaderApiPassword(currentUser.getGReaderApiPassword());
+            }
+
             return updateUser(user);
         } else {
             throw new AccessDeniedException("You can only edit yourself");
