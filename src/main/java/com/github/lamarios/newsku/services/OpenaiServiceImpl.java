@@ -86,6 +86,13 @@ public class OpenaiServiceImpl implements OpenaiService {
 
     @Override
     public Optional<OpenAiFeedResponse> processFeedItem(String guid, String title, String content, User user, List<TagClickStat> clickStats) {
+        if (!user.isAiEnabled()) {
+            return Optional.empty();
+        }
+        if (!hasApiKey(user)) {
+            logger.debug("Skipping AI analysis for user {} – no API key configured", user.getUsername());
+            return Optional.empty();
+        }
         Optional<OpenAiRelevanceResponse> relevance = scoreRelevance(guid, title, content, user, clickStats);
         if (relevance.isEmpty()) {
             return Optional.empty();
@@ -329,6 +336,11 @@ public class OpenaiServiceImpl implements OpenaiService {
         Boolean flag = user.getEnableTextShortening();
         // Default: enabled (backwards compatible with prior behaviour).
         return flag == null || flag;
+    }
+
+    private boolean hasApiKey(User user) {
+        String apiKey = first(user.getOpenAiApiKey(), defaultApiKey);
+        return apiKey != null && !apiKey.isBlank();
     }
 
     private static String first(String primary, String fallback) {

@@ -171,6 +171,8 @@
     "greaderSaved": "GReader-Einstellungen gespeichert",
     "aiSection": "KI-Integration",
     "aiSectionExplanation": "Verbinde deinen eigenen KI-Dienst. Die Zugangsdaten werden sicher auf dem Server gespeichert.",
+    "enableAi": "KI-Analyse aktiv",
+    "enableAiExplanation": "Wenn deaktiviert, werden Artikel weiterhin synchronisiert, aber ohne Wichtigkeitsbewertung, Tags und KI-Kurzfassungen. Nützlich bei Token-Limit oder API-Ausfall.",
     "openAiApiKey": "API-Schlüssel",
     "openAiApiKeyHint": "Leer lassen, um den bestehenden Schlüssel beizubehalten",
     "openAiModel": "Modell",

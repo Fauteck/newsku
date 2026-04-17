@@ -118,6 +118,13 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
     }
   }
 
+  Future<void> setEnableAi(bool value) async {
+    if (state.user != null) {
+      emit(state.copyWith.user!(enableAi: value));
+      await updateUser();
+    }
+  }
+
   Future<void> setMonthlyTokenLimit({int? relevance, int? shortening}) async {
     if (state.user != null) {
       emit(state.copyWith.user!(

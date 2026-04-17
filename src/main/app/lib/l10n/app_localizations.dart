@@ -929,6 +929,8 @@ abstract class AppLocalizations {
   String get greaderSaved;
   String get aiSection;
   String get aiSectionExplanation;
+  String get enableAi;
+  String get enableAiExplanation;
   String get openAiApiKey;
   String get openAiApiKeyHint;
   String get openAiModel;

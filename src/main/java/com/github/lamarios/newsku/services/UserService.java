@@ -132,6 +132,13 @@ public class UserService {
                 user.setOpenAiApiKey(currentUser.getOpenAiApiKey());
             }
 
+            // enableAi is a NOT NULL column — if an older client omits it we
+            // preserve the current setting instead of letting Hibernate reject
+            // the update.
+            if (user.getEnableAi() == null) {
+                user.setEnableAi(currentUser.getEnableAi());
+            }
+
             return updateUser(user);
         } else {
             throw new AccessDeniedException("You can only edit yourself");

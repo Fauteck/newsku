@@ -29,6 +29,7 @@ sealed class User with _$User {
     int? openAiMonthlyTokenLimitRelevance,
     int? openAiMonthlyTokenLimitShortening,
     String? aiPromptId,
+    @Default(true) bool enableAi,
   }) = _User;
 
   factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);

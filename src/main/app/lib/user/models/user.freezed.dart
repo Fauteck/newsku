@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$User {
 
- String? get id; String? get username; String? get password; String? get email; String? get feedItemPreference; String? get oidcSub; int get minimumImportance; bool get firstTimeSetupDone; ReadItemHandling get readItemHandling; List<EmailDigestFrequency> get emailDigest; String? get gReaderUsername; String? get gReaderApiPassword; String? get gReaderUrl; String? get openAiApiKey; String? get openAiModel; String? get openAiUrl; bool? get enableTextShortening; int? get openAiMonthlyTokenLimitRelevance; int? get openAiMonthlyTokenLimitShortening; String? get aiPromptId;
+ String? get id; String? get username; String? get password; String? get email; String? get feedItemPreference; String? get oidcSub; int get minimumImportance; bool get firstTimeSetupDone; ReadItemHandling get readItemHandling; List<EmailDigestFrequency> get emailDigest; String? get gReaderUsername; String? get gReaderApiPassword; String? get gReaderUrl; String? get openAiApiKey; String? get openAiModel; String? get openAiUrl; bool? get enableTextShortening; int? get openAiMonthlyTokenLimitRelevance; int? get openAiMonthlyTokenLimitShortening; String? get aiPromptId; bool get enableAi;
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $UserCopyWith<User> get copyWith => _$UserCopyWithImpl<User>(this as User, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&(identical(other.email, email) || other.email == email)&&(identical(other.feedItemPreference, feedItemPreference) || other.feedItemPreference == feedItemPreference)&&(identical(other.oidcSub, oidcSub) || other.oidcSub == oidcSub)&&(identical(other.minimumImportance, minimumImportance) || other.minimumImportance == minimumImportance)&&(identical(other.firstTimeSetupDone, firstTimeSetupDone) || other.firstTimeSetupDone == firstTimeSetupDone)&&(identical(other.readItemHandling, readItemHandling) || other.readItemHandling == readItemHandling)&&const DeepCollectionEquality().equals(other.emailDigest, emailDigest)&&(identical(other.gReaderUsername, gReaderUsername) || other.gReaderUsername == gReaderUsername)&&(identical(other.gReaderApiPassword, gReaderApiPassword) || other.gReaderApiPassword == gReaderApiPassword)&&(identical(other.gReaderUrl, gReaderUrl) || other.gReaderUrl == gReaderUrl)&&(identical(other.openAiApiKey, openAiApiKey) || other.openAiApiKey == openAiApiKey)&&(identical(other.openAiModel, openAiModel) || other.openAiModel == openAiModel)&&(identical(other.openAiUrl, openAiUrl) || other.openAiUrl == openAiUrl)&&(identical(other.enableTextShortening, enableTextShortening) || other.enableTextShortening == enableTextShortening)&&(identical(other.openAiMonthlyTokenLimitRelevance, openAiMonthlyTokenLimitRelevance) || other.openAiMonthlyTokenLimitRelevance == openAiMonthlyTokenLimitRelevance)&&(identical(other.openAiMonthlyTokenLimitShortening, openAiMonthlyTokenLimitShortening) || other.openAiMonthlyTokenLimitShortening == openAiMonthlyTokenLimitShortening)&&(identical(other.aiPromptId, aiPromptId) || other.aiPromptId == aiPromptId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&(identical(other.email, email) || other.email == email)&&(identical(other.feedItemPreference, feedItemPreference) || other.feedItemPreference == feedItemPreference)&&(identical(other.oidcSub, oidcSub) || other.oidcSub == oidcSub)&&(identical(other.minimumImportance, minimumImportance) || other.minimumImportance == minimumImportance)&&(identical(other.firstTimeSetupDone, firstTimeSetupDone) || other.firstTimeSetupDone == firstTimeSetupDone)&&(identical(other.readItemHandling, readItemHandling) || other.readItemHandling == readItemHandling)&&const DeepCollectionEquality().equals(other.emailDigest, emailDigest)&&(identical(other.gReaderUsername, gReaderUsername) || other.gReaderUsername == gReaderUsername)&&(identical(other.gReaderApiPassword, gReaderApiPassword) || other.gReaderApiPassword == gReaderApiPassword)&&(identical(other.gReaderUrl, gReaderUrl) || other.gReaderUrl == gReaderUrl)&&(identical(other.openAiApiKey, openAiApiKey) || other.openAiApiKey == openAiApiKey)&&(identical(other.openAiModel, openAiModel) || other.openAiModel == openAiModel)&&(identical(other.openAiUrl, openAiUrl) || other.openAiUrl == openAiUrl)&&(identical(other.enableTextShortening, enableTextShortening) || other.enableTextShortening == enableTextShortening)&&(identical(other.openAiMonthlyTokenLimitRelevance, openAiMonthlyTokenLimitRelevance) || other.openAiMonthlyTokenLimitRelevance == openAiMonthlyTokenLimitRelevance)&&(identical(other.openAiMonthlyTokenLimitShortening, openAiMonthlyTokenLimitShortening) || other.openAiMonthlyTokenLimitShortening == openAiMonthlyTokenLimitShortening)&&(identical(other.aiPromptId, aiPromptId) || other.aiPromptId == aiPromptId)&&(identical(other.enableAi, enableAi) || other.enableAi == enableAi));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,username,password,email,feedItemPreference,oidcSub,minimumImportance,firstTimeSetupDone,readItemHandling,const DeepCollectionEquality().hash(emailDigest),gReaderUsername,gReaderApiPassword,gReaderUrl,openAiApiKey,openAiModel,openAiUrl,enableTextShortening,openAiMonthlyTokenLimitRelevance,openAiMonthlyTokenLimitShortening,aiPromptId]);
+int get hashCode => Object.hashAll([runtimeType,id,username,password,email,feedItemPreference,oidcSub,minimumImportance,firstTimeSetupDone,readItemHandling,const DeepCollectionEquality().hash(emailDigest),gReaderUsername,gReaderApiPassword,gReaderUrl,openAiApiKey,openAiModel,openAiUrl,enableTextShortening,openAiMonthlyTokenLimitRelevance,openAiMonthlyTokenLimitShortening,aiPromptId,enableAi]);
 
 @override
 String toString() {
-  return 'User(id: $id, username: $username, password: $password, email: $email, feedItemPreference: $feedItemPreference, oidcSub: $oidcSub, minimumImportance: $minimumImportance, firstTimeSetupDone: $firstTimeSetupDone, readItemHandling: $readItemHandling, emailDigest: $emailDigest, gReaderUsername: $gReaderUsername, gReaderApiPassword: $gReaderApiPassword, gReaderUrl: $gReaderUrl, openAiApiKey: $openAiApiKey, openAiModel: $openAiModel, openAiUrl: $openAiUrl, enableTextShortening: $enableTextShortening, openAiMonthlyTokenLimitRelevance: $openAiMonthlyTokenLimitRelevance, openAiMonthlyTokenLimitShortening: $openAiMonthlyTokenLimitShortening, aiPromptId: $aiPromptId)';
+  return 'User(id: $id, username: $username, password: $password, email: $email, feedItemPreference: $feedItemPreference, oidcSub: $oidcSub, minimumImportance: $minimumImportance, firstTimeSetupDone: $firstTimeSetupDone, readItemHandling: $readItemHandling, emailDigest: $emailDigest, gReaderUsername: $gReaderUsername, gReaderApiPassword: $gReaderApiPassword, gReaderUrl: $gReaderUrl, openAiApiKey: $openAiApiKey, openAiModel: $openAiModel, openAiUrl: $openAiUrl, enableTextShortening: $enableTextShortening, openAiMonthlyTokenLimitRelevance: $openAiMonthlyTokenLimitRelevance, openAiMonthlyTokenLimitShortening: $openAiMonthlyTokenLimitShortening, aiPromptId: $aiPromptId, enableAi: $enableAi)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $UserCopyWith<$Res>  {
   factory $UserCopyWith(User value, $Res Function(User) _then) = _$UserCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? username, String? password, String? email, String? feedItemPreference, String? oidcSub, int minimumImportance, bool firstTimeSetupDone, ReadItemHandling readItemHandling, List<EmailDigestFrequency> emailDigest, String? gReaderUsername, String? gReaderApiPassword, String? gReaderUrl, String? openAiApiKey, String? openAiModel, String? openAiUrl, bool? enableTextShortening, int? openAiMonthlyTokenLimitRelevance, int? openAiMonthlyTokenLimitShortening, String? aiPromptId
+ String? id, String? username, String? password, String? email, String? feedItemPreference, String? oidcSub, int minimumImportance, bool firstTimeSetupDone, ReadItemHandling readItemHandling, List<EmailDigestFrequency> emailDigest, String? gReaderUsername, String? gReaderApiPassword, String? gReaderUrl, String? openAiApiKey, String? openAiModel, String? openAiUrl, bool? enableTextShortening, int? openAiMonthlyTokenLimitRelevance, int? openAiMonthlyTokenLimitShortening, String? aiPromptId, bool enableAi
 });
 
 
@@ -65,7 +65,7 @@ class _$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? username = freezed,Object? password = freezed,Object? email = freezed,Object? feedItemPreference = freezed,Object? oidcSub = freezed,Object? minimumImportance = null,Object? firstTimeSetupDone = null,Object? readItemHandling = null,Object? emailDigest = null,Object? gReaderUsername = freezed,Object? gReaderApiPassword = freezed,Object? gReaderUrl = freezed,Object? openAiApiKey = freezed,Object? openAiModel = freezed,Object? openAiUrl = freezed,Object? enableTextShortening = freezed,Object? openAiMonthlyTokenLimitRelevance = freezed,Object? openAiMonthlyTokenLimitShortening = freezed,Object? aiPromptId = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? username = freezed,Object? password = freezed,Object? email = freezed,Object? feedItemPreference = freezed,Object? oidcSub = freezed,Object? minimumImportance = null,Object? firstTimeSetupDone = null,Object? readItemHandling = null,Object? emailDigest = null,Object? gReaderUsername = freezed,Object? gReaderApiPassword = freezed,Object? gReaderUrl = freezed,Object? openAiApiKey = freezed,Object? openAiModel = freezed,Object? openAiUrl = freezed,Object? enableTextShortening = freezed,Object? openAiMonthlyTokenLimitRelevance = freezed,Object? openAiMonthlyTokenLimitShortening = freezed,Object? aiPromptId = freezed,Object? enableAi = null,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,username: freezed == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
@@ -87,7 +87,8 @@ as String?,enableTextShortening: freezed == enableTextShortening ? _self.enableT
 as bool?,openAiMonthlyTokenLimitRelevance: freezed == openAiMonthlyTokenLimitRelevance ? _self.openAiMonthlyTokenLimitRelevance : openAiMonthlyTokenLimitRelevance // ignore: cast_nullable_to_non_nullable
 as int?,openAiMonthlyTokenLimitShortening: freezed == openAiMonthlyTokenLimitShortening ? _self.openAiMonthlyTokenLimitShortening : openAiMonthlyTokenLimitShortening // ignore: cast_nullable_to_non_nullable
 as int?,aiPromptId: freezed == aiPromptId ? _self.aiPromptId : aiPromptId // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,enableAi: null == enableAi ? _self.enableAi : enableAi // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -154,7 +155,7 @@ return $default(_that.id,_that.username,_that.password,_that.email,_that.feedIte
 @JsonSerializable()
 
 class _User implements User {
-  const _User({this.id, this.username, this.password, this.email, this.feedItemPreference, this.oidcSub, this.minimumImportance = 0, this.firstTimeSetupDone = false, this.readItemHandling = ReadItemHandling.none, final  List<EmailDigestFrequency> emailDigest = const [], this.gReaderUsername, this.gReaderApiPassword, this.gReaderUrl, this.openAiApiKey, this.openAiModel, this.openAiUrl, this.enableTextShortening, this.openAiMonthlyTokenLimitRelevance, this.openAiMonthlyTokenLimitShortening, this.aiPromptId}): _emailDigest = emailDigest;
+  const _User({this.id, this.username, this.password, this.email, this.feedItemPreference, this.oidcSub, this.minimumImportance = 0, this.firstTimeSetupDone = false, this.readItemHandling = ReadItemHandling.none, final  List<EmailDigestFrequency> emailDigest = const [], this.gReaderUsername, this.gReaderApiPassword, this.gReaderUrl, this.openAiApiKey, this.openAiModel, this.openAiUrl, this.enableTextShortening, this.openAiMonthlyTokenLimitRelevance, this.openAiMonthlyTokenLimitShortening, this.aiPromptId, this.enableAi = true}): _emailDigest = emailDigest;
   factory _User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
 @override final  String? id;
@@ -183,6 +184,7 @@ class _User implements User {
 @override final  int? openAiMonthlyTokenLimitRelevance;
 @override final  int? openAiMonthlyTokenLimitShortening;
 @override final  String? aiPromptId;
+@override@JsonKey() final  bool enableAi;
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
@@ -197,16 +199,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&(identical(other.email, email) || other.email == email)&&(identical(other.feedItemPreference, feedItemPreference) || other.feedItemPreference == feedItemPreference)&&(identical(other.oidcSub, oidcSub) || other.oidcSub == oidcSub)&&(identical(other.minimumImportance, minimumImportance) || other.minimumImportance == minimumImportance)&&(identical(other.firstTimeSetupDone, firstTimeSetupDone) || other.firstTimeSetupDone == firstTimeSetupDone)&&(identical(other.readItemHandling, readItemHandling) || other.readItemHandling == readItemHandling)&&const DeepCollectionEquality().equals(other._emailDigest, _emailDigest)&&(identical(other.aiPromptId, aiPromptId) || other.aiPromptId == aiPromptId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password)&&(identical(other.email, email) || other.email == email)&&(identical(other.feedItemPreference, feedItemPreference) || other.feedItemPreference == feedItemPreference)&&(identical(other.oidcSub, oidcSub) || other.oidcSub == oidcSub)&&(identical(other.minimumImportance, minimumImportance) || other.minimumImportance == minimumImportance)&&(identical(other.firstTimeSetupDone, firstTimeSetupDone) || other.firstTimeSetupDone == firstTimeSetupDone)&&(identical(other.readItemHandling, readItemHandling) || other.readItemHandling == readItemHandling)&&const DeepCollectionEquality().equals(other._emailDigest, _emailDigest)&&(identical(other.aiPromptId, aiPromptId) || other.aiPromptId == aiPromptId)&&(identical(other.enableAi, enableAi) || other.enableAi == enableAi));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,username,password,email,feedItemPreference,oidcSub,minimumImportance,firstTimeSetupDone,readItemHandling,const DeepCollectionEquality().hash(_emailDigest),aiPromptId);
+int get hashCode => Object.hash(runtimeType,id,username,password,email,feedItemPreference,oidcSub,minimumImportance,firstTimeSetupDone,readItemHandling,const DeepCollectionEquality().hash(_emailDigest),aiPromptId,enableAi);
 
 @override
 String toString() {
-  return 'User(id: $id, username: $username, password: $password, email: $email, feedItemPreference: $feedItemPreference, oidcSub: $oidcSub, minimumImportance: $minimumImportance, firstTimeSetupDone: $firstTimeSetupDone, readItemHandling: $readItemHandling, emailDigest: $emailDigest, gReaderUsername: $gReaderUsername, gReaderApiPassword: $gReaderApiPassword, gReaderUrl: $gReaderUrl, openAiApiKey: $openAiApiKey, openAiModel: $openAiModel, openAiUrl: $openAiUrl, enableTextShortening: $enableTextShortening, openAiMonthlyTokenLimitRelevance: $openAiMonthlyTokenLimitRelevance, openAiMonthlyTokenLimitShortening: $openAiMonthlyTokenLimitShortening, aiPromptId: $aiPromptId)';
+  return 'User(id: $id, username: $username, password: $password, email: $email, feedItemPreference: $feedItemPreference, oidcSub: $oidcSub, minimumImportance: $minimumImportance, firstTimeSetupDone: $firstTimeSetupDone, readItemHandling: $readItemHandling, emailDigest: $emailDigest, gReaderUsername: $gReaderUsername, gReaderApiPassword: $gReaderApiPassword, gReaderUrl: $gReaderUrl, openAiApiKey: $openAiApiKey, openAiModel: $openAiModel, openAiUrl: $openAiUrl, enableTextShortening: $enableTextShortening, openAiMonthlyTokenLimitRelevance: $openAiMonthlyTokenLimitRelevance, openAiMonthlyTokenLimitShortening: $openAiMonthlyTokenLimitShortening, aiPromptId: $aiPromptId, enableAi: $enableAi)';
 }
 
 
@@ -217,7 +219,7 @@ abstract mixin class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
   factory _$UserCopyWith(_User value, $Res Function(_User) _then) = __$UserCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? username, String? password, String? email, String? feedItemPreference, String? oidcSub, int minimumImportance, bool firstTimeSetupDone, ReadItemHandling readItemHandling, List<EmailDigestFrequency> emailDigest, String? gReaderUsername, String? gReaderApiPassword, String? gReaderUrl, String? openAiApiKey, String? openAiModel, String? openAiUrl, bool? enableTextShortening, int? openAiMonthlyTokenLimitRelevance, int? openAiMonthlyTokenLimitShortening, String? aiPromptId
+ String? id, String? username, String? password, String? email, String? feedItemPreference, String? oidcSub, int minimumImportance, bool firstTimeSetupDone, ReadItemHandling readItemHandling, List<EmailDigestFrequency> emailDigest, String? gReaderUsername, String? gReaderApiPassword, String? gReaderUrl, String? openAiApiKey, String? openAiModel, String? openAiUrl, bool? enableTextShortening, int? openAiMonthlyTokenLimitRelevance, int? openAiMonthlyTokenLimitShortening, String? aiPromptId, bool enableAi
 });
 
 
@@ -234,7 +236,7 @@ class __$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? username = freezed,Object? password = freezed,Object? email = freezed,Object? feedItemPreference = freezed,Object? oidcSub = freezed,Object? minimumImportance = null,Object? firstTimeSetupDone = null,Object? readItemHandling = null,Object? emailDigest = null,Object? gReaderUsername = freezed,Object? gReaderApiPassword = freezed,Object? gReaderUrl = freezed,Object? openAiApiKey = freezed,Object? openAiModel = freezed,Object? openAiUrl = freezed,Object? enableTextShortening = freezed,Object? openAiMonthlyTokenLimitRelevance = freezed,Object? openAiMonthlyTokenLimitShortening = freezed,Object? aiPromptId = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? username = freezed,Object? password = freezed,Object? email = freezed,Object? feedItemPreference = freezed,Object? oidcSub = freezed,Object? minimumImportance = null,Object? firstTimeSetupDone = null,Object? readItemHandling = null,Object? emailDigest = null,Object? gReaderUsername = freezed,Object? gReaderApiPassword = freezed,Object? gReaderUrl = freezed,Object? openAiApiKey = freezed,Object? openAiModel = freezed,Object? openAiUrl = freezed,Object? enableTextShortening = freezed,Object? openAiMonthlyTokenLimitRelevance = freezed,Object? openAiMonthlyTokenLimitShortening = freezed,Object? aiPromptId = freezed,Object? enableAi = null,}) {
   return _then(_User(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,username: freezed == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
@@ -256,7 +258,8 @@ as String?,enableTextShortening: freezed == enableTextShortening ? _self.enableT
 as bool?,openAiMonthlyTokenLimitRelevance: freezed == openAiMonthlyTokenLimitRelevance ? _self.openAiMonthlyTokenLimitRelevance : openAiMonthlyTokenLimitRelevance // ignore: cast_nullable_to_non_nullable
 as int?,openAiMonthlyTokenLimitShortening: freezed == openAiMonthlyTokenLimitShortening ? _self.openAiMonthlyTokenLimitShortening : openAiMonthlyTokenLimitShortening // ignore: cast_nullable_to_non_nullable
 as int?,aiPromptId: freezed == aiPromptId ? _self.aiPromptId : aiPromptId // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,enableAi: null == enableAi ? _self.enableAi : enableAi // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
