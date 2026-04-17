@@ -565,6 +565,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get greaderManagedFeeds => 'GReader-Modus ist aktiv. Feeds und Kategorien werden direkt in der GReader-Oberfläche verwaltet. Um neue Feeds hinzuzufügen oder Kategorien zu erstellen, nutze die GReader-Oberfläche.';
 
   @override
+  String get syncNow => 'Jetzt synchronisieren';
+
+  @override
+  String get greaderSyncFailed => 'GReader-Synchronisation fehlgeschlagen';
+
+  @override
   String get greaderCredentialsEnvHint => 'Die GReader-Zugangsdaten werden vom Administrator über Umgebungsvariablen konfiguriert und sind hier nicht änderbar.';
 
   @override

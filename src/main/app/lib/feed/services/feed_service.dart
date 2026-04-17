@@ -78,6 +78,18 @@ class FeedService extends BaseService {
     return Feed.fromJson(feed);
   }
 
+  Future<List<Feed>> syncGreader() async {
+    var uri = await formatUrl('/api/feeds/sync-greader');
+
+    var response = await http.post(uri, headers: await headers);
+
+    processResponse(response);
+
+    Iterable i = jsonDecode(response.body);
+
+    return i.map((e) => Feed.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
   Future<void> click(String id) async {
     var uri = await formatUrl('/api/feeds/items/$id/click');
 
