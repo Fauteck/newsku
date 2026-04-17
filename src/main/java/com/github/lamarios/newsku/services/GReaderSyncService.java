@@ -2,6 +2,7 @@ package com.github.lamarios.newsku.services;
 
 import com.github.lamarios.newsku.Constants;
 import com.github.lamarios.newsku.errors.NewskuException;
+import com.github.lamarios.newsku.errors.OpenAiQuotaExceededException;
 import com.github.lamarios.newsku.models.greader.GReaderStreamContents;
 import com.github.lamarios.newsku.models.greader.GReaderStreamItem;
 import com.github.lamarios.newsku.models.greader.GReaderSubscription;
@@ -238,6 +239,10 @@ public class GReaderSyncService {
                 try {
                     processArticle(item, user, clicks);
                     totalNew++;
+                } catch (OpenAiQuotaExceededException quota) {
+                    logger.warn("Aborting article sync for user {} — OpenAI quota exhausted; next scheduled run will retry",
+                            user.getUsername());
+                    return;
                 } catch (Exception e) {
                     logger.error("Failed to process GReader item {} for user {}: {}",
                             item.getId(), user.getUsername(), e.getMessage(), e);

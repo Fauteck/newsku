@@ -1,6 +1,7 @@
 package com.github.lamarios.newsku.services;
 
 import com.apptasticsoftware.rssreader.Item;
+import com.github.lamarios.newsku.errors.OpenAiQuotaExceededException;
 import com.github.lamarios.newsku.models.OpenAiFeedResponse;
 import com.github.lamarios.newsku.models.OpenAiRelevanceResponse;
 import com.github.lamarios.newsku.models.OpenAiShorteningResponse;
@@ -209,6 +210,12 @@ public class OpenaiServiceImpl implements OpenaiService {
             try {
                 return singleCall(client, model, user, useCase, guid, prompt, responseClass);
             } catch (Exception e) {
+                if (isQuotaOrRateLimit(e)) {
+                    logger.error("OpenAI {} quota exceeded for user {} — aborting sync: {}",
+                            useCase, user.getUsername(), e.getMessage());
+                    throw new OpenAiQuotaExceededException(
+                            "OpenAI quota/rate limit hit for user " + user.getUsername() + ": " + e.getMessage());
+                }
                 if (attempt >= maxRetries) {
                     logger.error("OpenAI {} call failed after {} attempts for item {}: {}",
                             useCase, maxRetries, guid, e.getMessage());
@@ -226,6 +233,29 @@ public class OpenaiServiceImpl implements OpenaiService {
             }
         }
         return Optional.empty();
+    }
+
+    /**
+     * Detects whether an OpenAI SDK exception represents a 429 quota/rate-limit
+     * response. Checks the exception class name (to tolerate SDK version skew
+     * without a hard compile-time dependency) and falls back to the message
+     * body, since the SDK's {@code toString()} format ({@code "429: ..."}) is
+     * what we actually observe in logs.
+     */
+    static boolean isQuotaOrRateLimit(Throwable e) {
+        for (Throwable t = e; t != null; t = t.getCause()) {
+            String cn = t.getClass().getName();
+            if (cn.equals("com.openai.errors.RateLimitException")) return true;
+            String msg = t.getMessage();
+            if (msg == null) continue;
+            String m = msg.toLowerCase();
+            if (m.startsWith("429")
+                    || m.contains("insufficient_quota")
+                    || m.contains("exceeded your current quota")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private <T> Optional<T> singleCall(OpenAIClient client, String model, User user,
