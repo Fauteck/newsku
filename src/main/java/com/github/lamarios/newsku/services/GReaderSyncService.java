@@ -308,7 +308,6 @@ public class GReaderSyncService {
                 : "no content";
 
         var analysis = openaiService.processFeedItem(item.getId(), title, content, user, clicks);
-        if (analysis.isEmpty()) return;
 
         String imageUrl = item.resolveImageUrl();
         if (imageUrl == null && rawContent != null) {
@@ -327,16 +326,28 @@ public class GReaderSyncService {
         feedItem.setDescription(content);
         feedItem.setUrl(item.resolveUrl());
         feedItem.setImageUrl(imageUrl);
-        feedItem.setImportance(analysis.get().importance());
-        feedItem.setReasoning(analysis.get().reasoning());
-        feedItem.setShortTitle(analysis.get().shortTitle());
-        feedItem.setShortTeaser(analysis.get().shortTeaser());
         feedItem.setTimeCreated(item.resolveTimestampMs());
-        feedItem.setTags(analysis.get().tags().stream()
-                .map(String::toLowerCase)
-                .map(s -> s.replaceAll("[^a-zA-Z0-9 ]", ""))
-                .filter(s -> !s.isEmpty())
-                .toList());
+
+        if (analysis.isPresent()) {
+            feedItem.setImportance(analysis.get().importance());
+            feedItem.setReasoning(analysis.get().reasoning());
+            feedItem.setShortTitle(analysis.get().shortTitle());
+            feedItem.setShortTeaser(analysis.get().shortTeaser());
+            feedItem.setTags(analysis.get().tags().stream()
+                    .map(String::toLowerCase)
+                    .map(s -> s.replaceAll("[^a-zA-Z0-9 ]", ""))
+                    .filter(s -> !s.isEmpty())
+                    .toList());
+        } else {
+            // Persist the item even when AI analysis is unavailable (disabled,
+            // quota exhausted, API down) so it still shows up in the feed.
+            // importance defaults to 0; the ranking query filters by
+            // user.minimumImportance, so items remain visible for users who
+            // have not raised that threshold.
+            logger.warn("AI analysis unavailable for GReader item {} (feed {}); persisting without score/tags",
+                    item.getId(), feed.getId());
+            feedItem.setTags(List.of());
+        }
 
         feedItemRepository.save(feedItem);
     }

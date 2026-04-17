@@ -74,6 +74,15 @@ class AiSettingsTab extends StatelessWidget {
                     Text(locals.aiSection, style: textTheme.titleMedium),
                     Gap(pu2),
                     Text(locals.aiSectionExplanation, style: subTextTheme),
+                    Gap(pu2),
+                    SwitchListTile(
+                      key: const Key('enable-ai-toggle'),
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(locals.enableAi),
+                      subtitle: Text(locals.enableAiExplanation, style: subTextTheme),
+                      value: state.user?.enableAi ?? true,
+                      onChanged: state.loading ? null : (value) => cubit.setEnableAi(value),
+                    ),
                     Gap(pu4),
                     Text(locals.openAiApiKey),
                     TextField(

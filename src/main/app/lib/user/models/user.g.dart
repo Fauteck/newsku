@@ -29,6 +29,7 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
   openAiMonthlyTokenLimitRelevance: (json['openAiMonthlyTokenLimitRelevance'] as num?)?.toInt(),
   openAiMonthlyTokenLimitShortening: (json['openAiMonthlyTokenLimitShortening'] as num?)?.toInt(),
   aiPromptId: json['aiPromptId'] as String?,
+  enableAi: json['enableAi'] as bool? ?? true,
 );
 
 Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
@@ -52,6 +53,7 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'openAiMonthlyTokenLimitRelevance': instance.openAiMonthlyTokenLimitRelevance,
   'openAiMonthlyTokenLimitShortening': instance.openAiMonthlyTokenLimitShortening,
   'aiPromptId': instance.aiPromptId,
+  'enableAi': instance.enableAi,
 };
 
 const _$ReadItemHandlingEnumMap = {

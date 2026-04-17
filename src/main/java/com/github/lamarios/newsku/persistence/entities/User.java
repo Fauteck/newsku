@@ -75,6 +75,9 @@ public class User {
     @Column(name = "openai_monthly_token_limit_shortening")
     private Integer openAiMonthlyTokenLimitShortening;
 
+    @Column(name = "enable_ai", nullable = false)
+    private Boolean enableAi = Boolean.TRUE;
+
     public String getId() {
         return id;
     }
@@ -234,5 +237,17 @@ public class User {
 
     public void setOpenAiMonthlyTokenLimitShortening(Integer openAiMonthlyTokenLimitShortening) {
         this.openAiMonthlyTokenLimitShortening = openAiMonthlyTokenLimitShortening;
+    }
+
+    public Boolean getEnableAi() {
+        return enableAi;
+    }
+
+    public void setEnableAi(Boolean enableAi) {
+        this.enableAi = enableAi;
+    }
+
+    public boolean isAiEnabled() {
+        return enableAi == null || enableAi;
     }
 }

@@ -587,6 +587,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Verbinde deinen eigenen KI-Dienst. Die Zugangsdaten werden sicher auf dem Server gespeichert.';
 
   @override
+  String get enableAi => 'KI-Analyse aktiv';
+
+  @override
+  String get enableAiExplanation =>
+      'Wenn deaktiviert, werden Artikel weiterhin synchronisiert, aber ohne Wichtigkeitsbewertung, Tags und KI-Kurzfassungen. Nützlich bei Token-Limit oder API-Ausfall.';
+
+  @override
   String get openAiApiKey => 'API-Schlüssel';
 
   @override
