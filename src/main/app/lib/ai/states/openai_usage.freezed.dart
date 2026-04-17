@@ -81,7 +81,7 @@ $OpenAiUsageStatsCopyWith<$Res>? get relevance {
   }
 
   return $OpenAiUsageStatsCopyWith<$Res>(_self.relevance!, (value) {
-    _then(_self.copyWith(relevance: value));
+    return _then(_self.copyWith(relevance: value));
   });
 }/// Create a copy of OpenaiUsageState
 /// with the given fields replaced by the non-null parameter values.
@@ -93,7 +93,7 @@ $OpenAiUsageStatsCopyWith<$Res>? get shortening {
   }
 
   return $OpenAiUsageStatsCopyWith<$Res>(_self.shortening!, (value) {
-    _then(_self.copyWith(shortening: value));
+    return _then(_self.copyWith(shortening: value));
   });
 }
 }
@@ -234,7 +234,7 @@ $OpenAiUsageStatsCopyWith<$Res>? get relevance {
   }
 
   return $OpenAiUsageStatsCopyWith<$Res>(_self.relevance!, (value) {
-    _then(_self.copyWith(relevance: value));
+    return _then(_self.copyWith(relevance: value));
   });
 }/// Create a copy of OpenaiUsageState
 /// with the given fields replaced by the non-null parameter values.
@@ -246,7 +246,7 @@ $OpenAiUsageStatsCopyWith<$Res>? get shortening {
   }
 
   return $OpenAiUsageStatsCopyWith<$Res>(_self.shortening!, (value) {
-    _then(_self.copyWith(shortening: value));
+    return _then(_self.copyWith(shortening: value));
   });
 }
 }
