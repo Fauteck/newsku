@@ -88,7 +88,7 @@ class ClassicFeedScreen extends StatelessWidget {
                       child: Center(
                         child: Padding(
                           padding: EdgeInsets.all(pu4),
-                          child: const SizedBox(width: 50, height: 50, child: LoadingIndicator()),
+                          child: SizedBox(width: 50, height: 50, child: LoadingIndicator()),
                         ),
                       ),
                     )
