@@ -3,6 +3,7 @@ package com.github.lamarios.newsku.persistence.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.lamarios.newsku.models.EmailDigestFrequency;
 import com.github.lamarios.newsku.models.ReadItemHandling;
+import com.github.lamarios.newsku.persistence.converters.StringCryptoConverter;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -43,6 +44,7 @@ public class User {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "freshrss_api_password")
+    @Convert(converter = StringCryptoConverter.class)
     private String gReaderApiPassword;
 
     @Column(name = "freshrss_url")
@@ -50,6 +52,26 @@ public class User {
 
     @Column(name = "ai_prompt_id")
     private String aiPromptId;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(name = "openai_api_key")
+    @Convert(converter = StringCryptoConverter.class)
+    private String openAiApiKey;
+
+    @Column(name = "openai_model")
+    private String openAiModel;
+
+    @Column(name = "openai_url")
+    private String openAiUrl;
+
+    @Column(name = "enable_text_shortening")
+    private Boolean enableTextShortening;
+
+    @Column(name = "openai_monthly_token_limit_relevance")
+    private Integer openAiMonthlyTokenLimitRelevance;
+
+    @Column(name = "openai_monthly_token_limit_shortening")
+    private Integer openAiMonthlyTokenLimitShortening;
 
     public String getId() {
         return id;
@@ -162,5 +184,53 @@ public class User {
 
     public void setAiPromptId(String aiPromptId) {
         this.aiPromptId = aiPromptId;
+    }
+
+    public String getOpenAiApiKey() {
+        return openAiApiKey;
+    }
+
+    public void setOpenAiApiKey(String openAiApiKey) {
+        this.openAiApiKey = openAiApiKey;
+    }
+
+    public String getOpenAiModel() {
+        return openAiModel;
+    }
+
+    public void setOpenAiModel(String openAiModel) {
+        this.openAiModel = openAiModel;
+    }
+
+    public String getOpenAiUrl() {
+        return openAiUrl;
+    }
+
+    public void setOpenAiUrl(String openAiUrl) {
+        this.openAiUrl = openAiUrl;
+    }
+
+    public Boolean getEnableTextShortening() {
+        return enableTextShortening;
+    }
+
+    public void setEnableTextShortening(Boolean enableTextShortening) {
+        this.enableTextShortening = enableTextShortening;
+    }
+
+    public Integer getOpenAiMonthlyTokenLimitRelevance() {
+        return openAiMonthlyTokenLimitRelevance;
+    }
+
+    public void setOpenAiMonthlyTokenLimitRelevance(Integer openAiMonthlyTokenLimitRelevance) {
+        this.openAiMonthlyTokenLimitRelevance = openAiMonthlyTokenLimitRelevance;
+    }
+
+    public Integer getOpenAiMonthlyTokenLimitShortening() {
+        return openAiMonthlyTokenLimitShortening;
+    }
+
+    public void setOpenAiMonthlyTokenLimitShortening(Integer openAiMonthlyTokenLimitShortening) {
+        this.openAiMonthlyTokenLimitShortening = openAiMonthlyTokenLimitShortening;
     }
 }

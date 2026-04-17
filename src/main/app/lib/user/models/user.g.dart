@@ -25,6 +25,9 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
   openAiApiKey: json['openAiApiKey'] as String?,
   openAiModel: json['openAiModel'] as String?,
   openAiUrl: json['openAiUrl'] as String?,
+  enableTextShortening: json['enableTextShortening'] as bool?,
+  openAiMonthlyTokenLimitRelevance: (json['openAiMonthlyTokenLimitRelevance'] as num?)?.toInt(),
+  openAiMonthlyTokenLimitShortening: (json['openAiMonthlyTokenLimitShortening'] as num?)?.toInt(),
   aiPromptId: json['aiPromptId'] as String?,
 );
 
@@ -45,6 +48,9 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'openAiApiKey': instance.openAiApiKey,
   'openAiModel': instance.openAiModel,
   'openAiUrl': instance.openAiUrl,
+  'enableTextShortening': instance.enableTextShortening,
+  'openAiMonthlyTokenLimitRelevance': instance.openAiMonthlyTokenLimitRelevance,
+  'openAiMonthlyTokenLimitShortening': instance.openAiMonthlyTokenLimitShortening,
   'aiPromptId': instance.aiPromptId,
 };
 

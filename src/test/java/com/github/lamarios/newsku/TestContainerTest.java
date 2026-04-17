@@ -20,7 +20,12 @@ import java.nio.file.AccessDeniedException;
 
 
 @SuppressWarnings("SpringBootApplicationProperties")
-@SpringBootTest(classes = Application.class, properties = {"spring.main.allow-bean-definition-overriding=true", "ALLOW_SIGNUP=1"}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = Application.class, properties = {
+        "spring.main.allow-bean-definition-overriding=true",
+        "ALLOW_SIGNUP=1",
+        // Deterministic AES-256 key for tests (32 bytes → 44 Base64 chars).
+        "APP_ENCRYPTION_KEY=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 abstract public class TestContainerTest {
 

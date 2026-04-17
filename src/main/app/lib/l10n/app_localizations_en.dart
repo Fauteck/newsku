@@ -734,4 +734,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get classicFeedsAllFeeds => 'Alle Feeds';
+
+  @override
+  String get openAiUsageTitle => 'OpenAI-Verbrauch';
+
+  @override
+  String get openAiUsageExplanation =>
+      'Token-Verbrauch im aktuellen Monat, aufgeschlüsselt nach Relevanz-Bewertung und Text-Kürzung.';
+
+  @override
+  String get openAiUseCaseRelevance => 'Relevanz-Bewertung';
+
+  @override
+  String get openAiUseCaseShortening => 'Text-Kürzung';
+
+  @override
+  String openAiUsageTokens(Object tokens) => '$tokens Tokens';
+
+  @override
+  String openAiUsageCalls(Object calls) => '$calls Aufrufe';
+
+  @override
+  String get openAiUsageLimit => 'Monats-Limit';
+
+  @override
+  String get openAiUsageLimitUnset => 'Kein Limit gesetzt';
+
+  @override
+  String openAiUsageRemaining(Object remaining) => '$remaining verbleibend';
+
+  @override
+  String get openAiUsageLimitReached => 'Limit erreicht';
+
+  @override
+  String get openAiLimitsTitle => 'Monatliche Token-Limits';
+
+  @override
+  String get openAiLimitsExplanation =>
+      'Sobald ein Limit erreicht ist, werden weitere Aufrufe dieses Typs im aktuellen Monat übersprungen.';
+
+  @override
+  String get openAiLimitRelevance => 'Limit Relevanz-Bewertung';
+
+  @override
+  String get openAiLimitShortening => 'Limit Text-Kürzung';
+
+  @override
+  String get openAiLimitHint => 'Leer lassen für unbegrenzt';
 }

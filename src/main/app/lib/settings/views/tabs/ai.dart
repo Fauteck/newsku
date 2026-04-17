@@ -1,5 +1,7 @@
 import 'package:app/ai/models/ai_prompt.dart';
+import 'package:app/ai/models/openai_usage.dart';
 import 'package:app/ai/states/ai_prompts.dart';
+import 'package:app/ai/states/openai_usage.dart';
 import 'package:app/home/state/local_preferences.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/main.dart';
@@ -8,6 +10,7 @@ import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
@@ -24,8 +27,11 @@ class AiSettingsTab extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: pu2),
-      child: BlocProvider(
-        create: (context) => GeneralSettingsCubit(GeneralSettingsState()),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => GeneralSettingsCubit(GeneralSettingsState())),
+          BlocProvider(create: (context) => OpenaiUsageCubit(const OpenaiUsageState())),
+        ],
         child: BlocBuilder<GeneralSettingsCubit, GeneralSettingsState>(
           builder: (context, state) {
             final cubit = context.read<GeneralSettingsCubit>();
@@ -109,6 +115,8 @@ class AiSettingsTab extends StatelessWidget {
                                   ScaffoldMessenger.of(
                                     context,
                                   ).showSnackBar(SnackBar(content: Text(locals.openAiSaved)));
+                                  // refresh usage numbers so any changed limit is reflected
+                                  await context.read<OpenaiUsageCubit>().refresh();
                                 }
                               },
                         label: Text(locals.update),
@@ -116,11 +124,227 @@ class AiSettingsTab extends StatelessWidget {
                       ),
                     ),
                     Gap(pu8),
+                    const Divider(),
+                    Gap(pu4),
+                    _OpenAiLimitsSection(cubit: cubit),
+                    Gap(pu8),
+                    const Divider(),
+                    Gap(pu4),
+                    const _OpenAiUsageSection(),
+                    Gap(pu8),
                   ],
                 ),
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+class _OpenAiLimitsSection extends StatefulWidget {
+  final GeneralSettingsCubit cubit;
+
+  const _OpenAiLimitsSection({required this.cubit});
+
+  @override
+  State<_OpenAiLimitsSection> createState() => _OpenAiLimitsSectionState();
+}
+
+class _OpenAiLimitsSectionState extends State<_OpenAiLimitsSection> {
+  late final TextEditingController _relevance;
+  late final TextEditingController _shortening;
+
+  @override
+  void initState() {
+    super.initState();
+    final user = widget.cubit.state.user;
+    _relevance = TextEditingController(
+      text: user?.openAiMonthlyTokenLimitRelevance?.toString() ?? '',
+    );
+    _shortening = TextEditingController(
+      text: user?.openAiMonthlyTokenLimitShortening?.toString() ?? '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _relevance.dispose();
+    _shortening.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
+    final locals = AppLocalizations.of(context)!;
+    final subTextTheme = textTheme.labelMedium?.copyWith(color: colors.secondary);
+
+    return BlocListener<GeneralSettingsCubit, GeneralSettingsState>(
+      listenWhen: (prev, curr) =>
+          prev.user?.openAiMonthlyTokenLimitRelevance != curr.user?.openAiMonthlyTokenLimitRelevance ||
+          prev.user?.openAiMonthlyTokenLimitShortening != curr.user?.openAiMonthlyTokenLimitShortening,
+      listener: (context, state) {
+        final user = state.user;
+        final r = user?.openAiMonthlyTokenLimitRelevance?.toString() ?? '';
+        final s = user?.openAiMonthlyTokenLimitShortening?.toString() ?? '';
+        if (_relevance.text != r) _relevance.text = r;
+        if (_shortening.text != s) _shortening.text = s;
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(locals.openAiLimitsTitle, style: textTheme.titleMedium),
+          Gap(pu1),
+          Text(locals.openAiLimitsExplanation, style: subTextTheme),
+          Gap(pu3),
+          Text(locals.openAiLimitRelevance),
+          TextField(
+            key: const Key('openai-limit-relevance'),
+            controller: _relevance,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: InputDecoration(hintText: locals.openAiLimitHint),
+            onSubmitted: (_) => _save(),
+            onEditingComplete: _save,
+          ),
+          Gap(pu2),
+          Text(locals.openAiLimitShortening),
+          TextField(
+            key: const Key('openai-limit-shortening'),
+            controller: _shortening,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: InputDecoration(hintText: locals.openAiLimitHint),
+            onSubmitted: (_) => _save(),
+            onEditingComplete: _save,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _save() {
+    final relevance = int.tryParse(_relevance.text.trim());
+    final shortening = int.tryParse(_shortening.text.trim());
+    widget.cubit.setMonthlyTokenLimit(relevance: relevance, shortening: shortening);
+  }
+}
+
+class _OpenAiUsageSection extends StatelessWidget {
+  const _OpenAiUsageSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
+    final locals = AppLocalizations.of(context)!;
+    final subTextTheme = textTheme.labelMedium?.copyWith(color: colors.secondary);
+
+    return BlocBuilder<OpenaiUsageCubit, OpenaiUsageState>(
+      builder: (context, state) {
+        final usageCubit = context.read<OpenaiUsageCubit>();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(child: Text(locals.openAiUsageTitle, style: textTheme.titleMedium)),
+                IconButton(
+                  icon: const Icon(Icons.refresh, size: 20),
+                  onPressed: state.loading ? null : usageCubit.refresh,
+                ),
+              ],
+            ),
+            Gap(pu1),
+            Text(locals.openAiUsageExplanation, style: subTextTheme),
+            Gap(pu3),
+            if (state.loading && state.relevance == null && state.shortening == null)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else ...[
+              _UsageRow(label: locals.openAiUseCaseRelevance, stats: state.relevance),
+              Gap(pu2),
+              _UsageRow(label: locals.openAiUseCaseShortening, stats: state.shortening),
+            ],
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _UsageRow extends StatelessWidget {
+  final String label;
+  final OpenAiUsageStats? stats;
+
+  const _UsageRow({required this.label, required this.stats});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
+    final locals = AppLocalizations.of(context)!;
+
+    final total = stats?.totalTokens ?? 0;
+    final calls = stats?.callCount ?? 0;
+    final limit = stats?.monthlyLimit;
+    final remaining = (limit == null) ? null : (limit - total).clamp(0, limit);
+    final limitReached = limit != null && total >= limit;
+
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: EdgeInsets.all(pu3),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(label, style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+                ),
+                if (limitReached)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: colors.errorContainer,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      locals.openAiUsageLimitReached,
+                      style: textTheme.labelSmall?.copyWith(color: colors.onErrorContainer),
+                    ),
+                  ),
+              ],
+            ),
+            Gap(pu1),
+            Text(locals.openAiUsageTokens(total), style: textTheme.bodyLarge),
+            Text(
+              locals.openAiUsageCalls(calls),
+              style: textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+            ),
+            Gap(pu1),
+            if (limit == null)
+              Text(locals.openAiUsageLimitUnset, style: textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant))
+            else ...[
+              LinearProgressIndicator(
+                value: (total / limit).clamp(0, 1).toDouble(),
+                color: limitReached ? colors.error : colors.primary,
+                backgroundColor: colors.surfaceContainerHighest,
+              ),
+              Gap(pu1),
+              Text(
+                '${locals.openAiUsageLimit}: $limit — ${locals.openAiUsageRemaining(remaining ?? 0)}',
+                style: textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+              ),
+            ],
+          ],
         ),
       ),
     );

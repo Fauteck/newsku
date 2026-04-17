@@ -19,10 +19,17 @@ class UserSettingsCubit extends Cubit<UserSettingsState> {
   late final TextEditingController gReaderUrl;
 
   UserSettingsCubit(super.initialState) {
+    final currentUser = identityCubit.currentUser;
     email = TextEditingController(text: state.email);
-    gReaderUsername = TextEditingController(text: state.gReaderUsername);
+    gReaderUsername = TextEditingController(
+      text: currentUser?.gReaderUsername ?? state.gReaderUsername,
+    );
     gReaderApiPassword = TextEditingController(text: '');
-    gReaderUrl = TextEditingController(text: identityCubit.currentUser?.gReaderUrl ?? '');
+    gReaderUrl = TextEditingController(text: currentUser?.gReaderUrl ?? '');
+
+    if (currentUser?.gReaderUsername != null && state.gReaderUsername.isEmpty) {
+      emit(state.copyWith(gReaderUsername: currentUser!.gReaderUsername!));
+    }
 
     password.addListener(() => emit(state.copyWith(password: password.value.text.trim())));
     repeatPassword.addListener(() => emit(state.copyWith(repeatPassword: repeatPassword.value.text.trim())));
@@ -91,6 +98,17 @@ class UserSettingsCubit extends Cubit<UserSettingsState> {
         gReaderUrl: url.isNotEmpty ? url : null,
       );
       await updateUser(user);
+      // Refresh IdentityCubit so the rest of the app sees the new values and
+      // reload our form controllers from the fresh server state. Without this,
+      // returning to the tab shows empty fields because the cubit was
+      // initialised from stale data.
+      await identityCubit.getUser();
+      final fresh = identityCubit.currentUser;
+      if (fresh != null) {
+        gReaderUsername.text = fresh.gReaderUsername ?? '';
+        gReaderUrl.text = fresh.gReaderUrl ?? '';
+        emit(state.copyWith(gReaderUsername: fresh.gReaderUsername ?? ''));
+      }
       gReaderApiPassword.text = '';
     }
   }
