@@ -106,32 +106,33 @@ public class FeedItemService {
                             var clicks = clickService.tagClicks(System.currentTimeMillis() - PROMPT_TAG_TIME_FRAME, System.currentTimeMillis(), feed.getUser());
 
                             var analysis = openaiService.processFeedItem(item, feed.getUser(), clicks);
-                            if (analysis.isPresent()) {
 
-                                FeedItem newItem = new FeedItem();
-                                newItem.setId(UUID.randomUUID().toString());
-                                newItem.setFeed(feed);
-                                newItem.setUrl(item.getLink().orElse(null));
-                                newItem.setGuid(item.getGuid().get());
-                                newItem.setDescription(item.getDescription()
-                                        .map(StringEscapeUtils::unescapeHtml4)
-                                        .map(HtmlUtils::getTextContent)
-                                        .orElse(null));
-                                newItem.setTitle(item.getTitle().map(StringEscapeUtils::unescapeHtml4)
-                                        .map(HtmlUtils::getTextContent)
-                                        .orElse(null));
-                                newItem.setContent(item.getContent()
-                                        .map(StringEscapeUtils::unescapeHtml4)
-                                        .map(HtmlUtils::getTextContent)
-                                        .orElse(null));
+                            FeedItem newItem = new FeedItem();
+                            newItem.setId(UUID.randomUUID().toString());
+                            newItem.setFeed(feed);
+                            newItem.setUrl(item.getLink().orElse(null));
+                            newItem.setGuid(item.getGuid().get());
+                            newItem.setDescription(item.getDescription()
+                                    .map(StringEscapeUtils::unescapeHtml4)
+                                    .map(HtmlUtils::getTextContent)
+                                    .orElse(null));
+                            newItem.setTitle(item.getTitle().map(StringEscapeUtils::unescapeHtml4)
+                                    .map(HtmlUtils::getTextContent)
+                                    .orElse(null));
+                            newItem.setContent(item.getContent()
+                                    .map(StringEscapeUtils::unescapeHtml4)
+                                    .map(HtmlUtils::getTextContent)
+                                    .orElse(null));
+                            newItem.setImageUrl(imageUrl);
+                            newItem.setTimeCreated(item.getPubDateAsZonedDateTime()
+                                    .map(zonedDateTime -> zonedDateTime.toInstant().toEpochMilli())
+                                    .orElse(System.currentTimeMillis()));
+
+                            if (analysis.isPresent()) {
                                 newItem.setImportance(analysis.get().importance());
                                 newItem.setReasoning(analysis.get().reasoning());
                                 newItem.setShortTitle(analysis.get().shortTitle());
                                 newItem.setShortTeaser(analysis.get().shortTeaser());
-                                newItem.setImageUrl(imageUrl);
-                                newItem.setTimeCreated(item.getPubDateAsZonedDateTime()
-                                        .map(zonedDateTime -> zonedDateTime.toInstant().toEpochMilli())
-                                        .orElse(System.currentTimeMillis()));
                                 newItem.setTags(analysis.get()
                                         .tags()
                                         .stream()
@@ -139,9 +140,17 @@ public class FeedItemService {
                                         .map(s -> s.replaceAll("[^a-zA-Z0-9 ]", ""))
                                         .filter(s -> !s.isEmpty())
                                         .toList());
-
-                                feedItemRepository.save(newItem);
+                            } else {
+                                // Persist the item even when AI analysis is unavailable so it still
+                                // shows up chronologically. importance defaults to 0; the ranking
+                                // query filters by user.minimumImportance, so items remain visible
+                                // for users who have not raised that threshold.
+                                logger.warn("AI analysis unavailable for item {} (feed {}); persisting without score/tags",
+                                        item.getGuid().orElse("unknown"), feed.getId());
+                                newItem.setTags(List.of());
                             }
+
+                            feedItemRepository.save(newItem);
                         } catch (Exception e) {
                             logger.error("Couldn't parse feed item: {}", item.getGuid(), e);
                             throw e;
