@@ -331,9 +331,7 @@ public class GReaderSyncService {
         feedItem.setReasoning(analysis.get().reasoning());
         feedItem.setShortTitle(analysis.get().shortTitle());
         feedItem.setShortTeaser(analysis.get().shortTeaser());
-        feedItem.setTimeCreated(item.getPublished() > 0
-                ? item.getPublished() * 1000L   // GReader returns seconds, newsku uses ms
-                : System.currentTimeMillis());
+        feedItem.setTimeCreated(item.resolveTimestampMs());
         feedItem.setTags(analysis.get().tags().stream()
                 .map(String::toLowerCase)
                 .map(s -> s.replaceAll("[^a-zA-Z0-9 ]", ""))

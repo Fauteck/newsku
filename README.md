@@ -179,7 +179,7 @@ Die Anwendung ist erreichbar unter: `http://localhost:8080`
 | `ALLOW_SIGNUP` | Nein | `0` | `1` = Registrierung erlaubt |
 | `GREADER_URL` | Nein | — | URL zur GReader-kompatibler Instanz (aktiviert GReader-Modus) |
 | `TZ` | Nein | `Europe/Berlin` | Zeitzone |
-| `FEED_SYNC_INTERVAL_MS` | Nein | `3600000` | Intervall in Millisekunden, in dem alle Feeds (direkte RSS + GReader) synchronisiert werden (Standard: 1 h) |
+| `FEED_SYNC_INTERVAL_MS` | Nein | `900000` | Intervall in Millisekunden, in dem alle Feeds (direkte RSS + GReader) synchronisiert werden (Standard: 15 min) |
 
 ¹ Ein Benutzer kann im KI-Tab einen eigenen API-Key hinterlegen; dieser hat Vorrang vor `OPENAI_API_KEY`.
 
