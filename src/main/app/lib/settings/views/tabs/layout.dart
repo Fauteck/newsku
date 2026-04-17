@@ -71,28 +71,47 @@ class LayoutSettingsTab extends StatelessWidget {
                           Text(locals.layoutExplanation),
                           const Divider(),
                           Gap(pu2),
-                          Row(
-                            spacing: pu2,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [
-                                    Text(locals.readItemHandling),
-                                    Text(locals.readItemHandlingExplanation, style: subTextTheme),
-                                  ],
+                          if (device == BreakPoint.mobile)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(locals.readItemHandling),
+                                Text(locals.readItemHandlingExplanation, style: subTextTheme),
+                                Gap(pu1),
+                                DropdownMenu<ReadItemHandling>(
+                                  key: const Key('read-item-handling'),
+                                  expandedInsets: EdgeInsets.zero,
+                                  initialSelection: generalState.user?.readItemHandling ?? ReadItemHandling.none,
+                                  onSelected: generalCubit.setReadItemPreference,
+                                  dropdownMenuEntries: ReadItemHandling.values
+                                      .map((h) => DropdownMenuEntry(value: h, label: h.getLabel(context)))
+                                      .toList(),
                                 ),
-                              ),
-                              DropdownMenu<ReadItemHandling>(
-                                key: const Key('read-item-handling'),
-                                initialSelection: generalState.user?.readItemHandling ?? ReadItemHandling.none,
-                                onSelected: generalCubit.setReadItemPreference,
-                                dropdownMenuEntries: ReadItemHandling.values
-                                    .map((h) => DropdownMenuEntry(value: h, label: h.getLabel(context)))
-                                    .toList(),
-                              ),
-                            ],
-                          ),
+                              ],
+                            )
+                          else
+                            Row(
+                              spacing: pu2,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [
+                                      Text(locals.readItemHandling),
+                                      Text(locals.readItemHandlingExplanation, style: subTextTheme),
+                                    ],
+                                  ),
+                                ),
+                                DropdownMenu<ReadItemHandling>(
+                                  key: const Key('read-item-handling'),
+                                  initialSelection: generalState.user?.readItemHandling ?? ReadItemHandling.none,
+                                  onSelected: generalCubit.setReadItemPreference,
+                                  dropdownMenuEntries: ReadItemHandling.values
+                                      .map((h) => DropdownMenuEntry(value: h, label: h.getLabel(context)))
+                                      .toList(),
+                                ),
+                              ],
+                            ),
                           Gap(pu2),
                           BlocBuilder<LocalPreferencesCubit, LocalPreferencesState>(
                             bloc: getIt.get<LocalPreferencesCubit>(),
@@ -123,20 +142,38 @@ class LayoutSettingsTab extends StatelessWidget {
                             ),
                             Gap(pu2),
                           ],
-                          Row(
-                            spacing: pu2,
-                            children: [
-                              Expanded(child: Text(locals.theme)),
-                              DropdownMenu<ThemeMode>(
-                                initialSelection: context.select((LocalPreferencesCubit p) => p.state.theme),
-                                onSelected: (value) =>
-                                    getIt.get<LocalPreferencesCubit>().setBrightness(value ?? ThemeMode.system),
-                                dropdownMenuEntries: ThemeMode.values
-                                    .map((h) => DropdownMenuEntry(value: h, label: locals.appTheme(h.name)))
-                                    .toList(),
-                              ),
-                            ],
-                          ),
+                          if (device == BreakPoint.mobile)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(locals.theme),
+                                Gap(pu1),
+                                DropdownMenu<ThemeMode>(
+                                  expandedInsets: EdgeInsets.zero,
+                                  initialSelection: context.select((LocalPreferencesCubit p) => p.state.theme),
+                                  onSelected: (value) =>
+                                      getIt.get<LocalPreferencesCubit>().setBrightness(value ?? ThemeMode.system),
+                                  dropdownMenuEntries: ThemeMode.values
+                                      .map((h) => DropdownMenuEntry(value: h, label: locals.appTheme(h.name)))
+                                      .toList(),
+                                ),
+                              ],
+                            )
+                          else
+                            Row(
+                              spacing: pu2,
+                              children: [
+                                Expanded(child: Text(locals.theme)),
+                                DropdownMenu<ThemeMode>(
+                                  initialSelection: context.select((LocalPreferencesCubit p) => p.state.theme),
+                                  onSelected: (value) =>
+                                      getIt.get<LocalPreferencesCubit>().setBrightness(value ?? ThemeMode.system),
+                                  dropdownMenuEntries: ThemeMode.values
+                                      .map((h) => DropdownMenuEntry(value: h, label: locals.appTheme(h.name)))
+                                      .toList(),
+                                ),
+                              ],
+                            ),
                           if (!context.select((LocalPreferencesCubit p) => p.state.dynamicColor))
                             Wrap(
                               spacing: pu4,

@@ -77,11 +77,16 @@ class MobileBottomNav extends StatelessWidget {
           return;
         }
         if (i == selected) return;
-        router.popUntilRouteWithName(HomeRoute.name);
-        if (i == 1) {
-          router.push(const ClassicFeedRoute());
-        } else if (i == 2) {
-          router.push(const StatsRoute());
+        switch (i) {
+          case 0:
+            router.navigate(const HomeRoute(children: [FeedRoute()]));
+            break;
+          case 1:
+            router.navigate(const HomeRoute(children: [ClassicFeedRoute()]));
+            break;
+          case 2:
+            router.navigate(const StatsRoute());
+            break;
         }
       },
       destinations: [

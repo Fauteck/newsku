@@ -226,12 +226,38 @@ public class FeedItemService {
 
     @Transactional(readOnly = true)
     public Page<@NotNull FeedItem> getItems(Long from, Long to, int page, int pageSize, Integer minimumImportanceOverride) {
+        return getItems(from, to, page, pageSize, minimumImportanceOverride, null, null, null);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<@NotNull FeedItem> getItems(Long from, Long to, int page, int pageSize, Integer minimumImportanceOverride, String sort, String feedId, String categoryId) {
 
         List<Feed> feeds = feedService.getFeeds();
         var user = userService.getCurrentUser();
         int minImportance = minimumImportanceOverride != null ? minimumImportanceOverride : user.getMinimumImportance();
 
-        return feedItemRepository.findallByTimeAndFeeds(minImportance, from, to, feeds, PageRequest.of(page, pageSize, Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "importance"), new Sort.Order(Sort.Direction.DESC, "timeCreated")))));
+        if (feedId != null && !feedId.isBlank()) {
+            feeds = feeds.stream().filter(f -> feedId.equals(f.getId())).toList();
+        } else if (categoryId != null && !categoryId.isBlank()) {
+            feeds = feeds.stream()
+                    .filter(f -> f.getCategory() != null && categoryId.equals(f.getCategory().getId()))
+                    .toList();
+        }
+
+        if (feeds.isEmpty()) {
+            return Page.empty(PageRequest.of(page, pageSize));
+        }
+
+        Sort sortOrder;
+        if ("chronological".equalsIgnoreCase(sort)) {
+            sortOrder = Sort.by(new Sort.Order(Sort.Direction.DESC, "timeCreated"));
+        } else {
+            sortOrder = Sort.by(List.of(
+                    new Sort.Order(Sort.Direction.DESC, "importance"),
+                    new Sort.Order(Sort.Direction.DESC, "timeCreated")));
+        }
+
+        return feedItemRepository.findallByTimeAndFeeds(minImportance, from, to, feeds, PageRequest.of(page, pageSize, sortOrder));
     }
 
     @Transactional(readOnly = true)

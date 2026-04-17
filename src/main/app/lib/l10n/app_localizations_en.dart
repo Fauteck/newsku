@@ -713,4 +713,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get classicFeedsLoadMore => 'Mehr laden';
+
+  @override
+  String get classicFeedsSortLabel => 'Sortierung';
+
+  @override
+  String get classicFeedsSortChronological => 'Chronologisch';
+
+  @override
+  String get classicFeedsSortImportance => 'Relevanz';
+
+  @override
+  String get classicFeedsCategoryLabel => 'Kategorie';
+
+  @override
+  String get classicFeedsAllCategories => 'Alle Kategorien';
+
+  @override
+  String get classicFeedsFeedLabel => 'Feed';
+
+  @override
+  String get classicFeedsAllFeeds => 'Alle Feeds';
 }
