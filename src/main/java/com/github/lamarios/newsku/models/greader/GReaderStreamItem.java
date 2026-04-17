@@ -15,8 +15,14 @@ public class GReaderStreamItem {
     private String title;
     private String author;
 
-    /** Unix timestamp in seconds */
+    /** Unix timestamp in seconds (original pubDate of the source feed item) */
     private long published;
+
+    /**
+     * FreshRSS crawl time in milliseconds (string in JSON, may be null for non-FreshRSS GReader backends).
+     * This matches the timestamp that the FreshRSS web UI shows for an item.
+     */
+    private String crawlTimeMsec;
 
     /** Enclosures (images, audio, etc.) */
     private List<Enclosure> enclosure;
@@ -114,6 +120,27 @@ public class GReaderStreamItem {
 
     public long getPublished() { return published; }
     public void setPublished(long published) { this.published = published; }
+
+    public String getCrawlTimeMsec() { return crawlTimeMsec; }
+    public void setCrawlTimeMsec(String crawlTimeMsec) { this.crawlTimeMsec = crawlTimeMsec; }
+
+    /**
+     * Returns the best available timestamp in milliseconds since epoch.
+     * Priority: FreshRSS crawl time → source pubDate → current time.
+     * This aligns the timestamp shown in newsku with what FreshRSS displays.
+     */
+    public long resolveTimestampMs() {
+        if (crawlTimeMsec != null && !crawlTimeMsec.isBlank()) {
+            try {
+                long ms = Long.parseLong(crawlTimeMsec.trim());
+                if (ms > 0) return ms;
+            } catch (NumberFormatException ignored) {
+                // fall through to published
+            }
+        }
+        if (published > 0) return published * 1000L;
+        return System.currentTimeMillis();
+    }
 
     public List<Enclosure> getEnclosure() { return enclosure; }
     public void setEnclosure(List<Enclosure> enclosure) { this.enclosure = enclosure; }
