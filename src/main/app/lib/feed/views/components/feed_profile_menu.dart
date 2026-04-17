@@ -2,6 +2,7 @@ import 'package:app/identity/states/identity.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/main.dart';
 import 'package:app/router.dart';
+import 'package:app/utils/utils.dart';
 import 'package:app/user/views/components/user_profile_picture.dart';
 import 'package:app/utils/views/components/conditional_wrap.dart';
 import 'package:auto_route/auto_route.dart';
