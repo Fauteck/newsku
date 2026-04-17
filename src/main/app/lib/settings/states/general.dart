@@ -52,6 +52,14 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
       emit(state.copyWith(loading: true));
       await UserService(serverUrl!).updateUser(state.user!);
       await getIt.get<IdentityCubit>().getUser();
+      // Pull the fresh server-side user into this cubit's state so any
+      // subsequent save operates on up-to-date values (the backend strips
+      // write-only fields like the OpenAI API key, so we re-read to get
+      // the authoritative model/url/limits).
+      final refreshed = getIt.get<IdentityCubit>().currentUser;
+      if (refreshed != null) {
+        emit(state.copyWith(user: refreshed));
+      }
     } catch (e, s) {
       emit(state.copyWith(error: e, stackTrace: s));
     } finally {
@@ -91,6 +99,32 @@ class GeneralSettingsCubit extends Cubit<GeneralSettingsState> {
         openAiUrl: url.isNotEmpty ? url : null,
       ));
       await updateUser();
+      // After save: the backend never returns the API key (WRITE_ONLY), so
+      // leave the key field blank but repopulate model/url from the fresh
+      // server state so the user sees their saved configuration.
+      final fresh = state.user;
+      openAiApiKeyController.text = '';
+      if (fresh != null) {
+        openAiModelController.text = fresh.openAiModel ?? 'gpt-4o-mini';
+        openAiUrlController.text = fresh.openAiUrl ?? 'https://api.openai.com/v1';
+      }
+    }
+  }
+
+  Future<void> setEnableTextShortening(bool value) async {
+    if (state.user != null) {
+      emit(state.copyWith.user!(enableTextShortening: value));
+      await updateUser();
+    }
+  }
+
+  Future<void> setMonthlyTokenLimit({int? relevance, int? shortening}) async {
+    if (state.user != null) {
+      emit(state.copyWith.user!(
+        openAiMonthlyTokenLimitRelevance: relevance ?? state.user!.openAiMonthlyTokenLimitRelevance,
+        openAiMonthlyTokenLimitShortening: shortening ?? state.user!.openAiMonthlyTokenLimitShortening,
+      ));
+      EasyDebounce.debounce('openai-limits-update', Duration(milliseconds: 500), updateUser);
     }
   }
 

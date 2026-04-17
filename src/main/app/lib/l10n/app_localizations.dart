@@ -978,6 +978,21 @@ abstract class AppLocalizations {
   String get classicFeedsAllCategories;
   String get classicFeedsFeedLabel;
   String get classicFeedsAllFeeds;
+  String get openAiUsageTitle;
+  String get openAiUsageExplanation;
+  String get openAiUseCaseRelevance;
+  String get openAiUseCaseShortening;
+  String openAiUsageTokens(Object tokens);
+  String openAiUsageCalls(Object calls);
+  String get openAiUsageLimit;
+  String get openAiUsageLimitUnset;
+  String openAiUsageRemaining(Object remaining);
+  String get openAiUsageLimitReached;
+  String get openAiLimitsTitle;
+  String get openAiLimitsExplanation;
+  String get openAiLimitRelevance;
+  String get openAiLimitShortening;
+  String get openAiLimitHint;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -171,14 +171,25 @@ Die Anwendung ist erreichbar unter: `http://localhost:8080`
 | `DB_DATABASE` | Ja | — | Datenbankname |
 | `DB_USER` | Ja | — | Datenbankbenutzer |
 | `DB_PASSWORD` | Ja | — | Datenbankpasswort |
-| `OPENAI_API_KEY` | Ja | — | API-Key für LLM-Ranking |
-| `OPENAI_MODEL` | Ja | — | Modellname (z. B. `gpt-4o`, `gpt-4-turbo`) |
-| `OPENAI_URL` | Nein | OpenAI Standard | Eigener API-Endpunkt (Ollama, Azure, etc.) |
+| `OPENAI_API_KEY` | Nein¹ | — | Fallback-API-Key, wenn kein per-User-Key gesetzt ist |
+| `OPENAI_MODEL` | Nein | `gpt-4o-mini` | Default-Modell (per Benutzer überschreibbar) |
+| `OPENAI_URL` | Nein | `https://api.openai.com/v1` | Default-API-Endpunkt (Ollama, Azure, etc.) |
 | `SALT` | Ja | — | Passwort-Hashing Salt (min. 32 Zeichen) |
+| `APP_ENCRYPTION_KEY` | **Ja** | — | Base64-AES-Schlüssel für verschlüsselte Credential-Spalten (GReader-Passwort, OpenAI-API-Key). Generierung: `openssl rand -base64 32`. Startup bricht ohne diesen Key ab. |
 | `ALLOW_SIGNUP` | Nein | `0` | `1` = Registrierung erlaubt |
 | `GREADER_URL` | Nein | — | URL zur GReader-kompatibler Instanz (aktiviert GReader-Modus) |
 | `TZ` | Nein | `Europe/Berlin` | Zeitzone |
 | `FEED_SYNC_INTERVAL_MS` | Nein | `3600000` | Intervall in Millisekunden, in dem alle Feeds (direkte RSS + GReader) synchronisiert werden (Standard: 1 h) |
+
+¹ Ein Benutzer kann im KI-Tab einen eigenen API-Key hinterlegen; dieser hat Vorrang vor `OPENAI_API_KEY`.
+
+### Sicherheit sensibler Felder
+
+- **Login-Passwort:** BCrypt-Hash (einweg).
+- **GReader-API-Passwort & OpenAI-API-Key:** Verschlüsselt at rest mit
+  AES-GCM über `APP_ENCRYPTION_KEY`. Key ändern = bestehende Ciphertexte
+  sind nicht mehr entschlüsselbar — Key nur einmalig zu Projektstart
+  setzen und sicher verwahren.
 
 ### GReader-Konfiguration
 
@@ -220,6 +231,7 @@ Swagger UI erreichbar unter: `http://localhost:8080/swagger-ui.html`
 | `GET` | `/api/layouts` | Layout-Blöcke |
 | `GET` | `/api/search?q=...` | Volltextsuche |
 | `GET` | `/api/config` | Anwendungskonfiguration (inkl. `gReaderUrl`) |
+| `GET` | `/api/openai/usage` | OpenAI-Token-Verbrauch des aktuellen Monats (pro Use-Case) |
 | `GET` | `/actuator/health` | Health Check |
 
 Alle Endpunkte außer `/api/users/login`, `/api/signup`, `/api/config` und `/actuator/health`

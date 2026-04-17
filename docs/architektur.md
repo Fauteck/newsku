@@ -109,21 +109,41 @@ HTTP Request
 - BCrypt mit konfigurierbarem `SALT`
 - Niemals Klartextpasswoerter speichern
 
+### Credential-Verschluesselung at rest
+
+Zugangsdaten, die wir im Klartext wieder benoetigen (GReader-API-Passwort,
+per-User OpenAI-API-Key), werden mit AES-GCM transparent per
+`StringCryptoConverter` verschluesselt. Key aus `APP_ENCRYPTION_KEY` (ENV,
+Base64, 16/24/32 Byte). Startup schlaegt fehl, wenn der Key fehlt oder
+formal ungueltig ist.
+
 ---
 
 ## LLM-Integration (OpenAI)
 
+Pro Artikel werden **zwei getrennte** OpenAI-Aufrufe ausgefuehrt, damit
+Token-Verbrauch und Limits je Use-Case verwaltbar sind:
+
 ```
-FeedService (RSS abrufen + Items speichern)
+GReaderSyncService.processArticle
   │
-  └─ OpenaiService.rankItems(userId, items)
+  └─ OpenaiService.processFeedItem(user, guid, title, content, tagStats)
        │
-       ├─ Benutzer-Praeferenzen laden (UserService)
-       ├─ OpenAI API aufrufen (Chat Completion)
-       │     → Model: OPENAI_MODEL (env)
-       │     → Endpoint: OPENAI_URL (env, default: openai.com)
-       └─ importance_score pro Item speichern
+       ├─ scoreRelevance    → importance, possibleAd, tags          (use_case = RELEVANCE)
+       └─ shortenText       → shortTitle, shortTeaser               (use_case = SHORTENING)
+              (nur wenn users.enable_text_shortening != false)
+
+Pro Call:
+  1. OpenaiUsageService.isLimitExceeded(user, useCase)  → ggf. Skip
+  2. OpenAI API aufrufen (Chat Completion, strukturierte Response)
+  3. OpenaiUsageService.record(user, useCase, tokens…)  → openai_usage
 ```
+
+- Per-User-API-Key/Model/URL ueberschreibt `OPENAI_API_KEY` / `OPENAI_MODEL`
+  / `OPENAI_URL` aus der Umgebung.
+- Monats-Limits (`users.openai_monthly_token_limit_{relevance,shortening}`):
+  hart blockend, werden mit Beginn des naechsten UTC-Monats zurueckgesetzt.
+- Stats-Endpoint: `GET /api/openai/usage[?from=&to=]`.
 
 Der `ScheduleService` triggert Feed-Updates und LLM-Ranking periodisch.
 

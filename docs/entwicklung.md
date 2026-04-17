@@ -170,12 +170,15 @@ Vollstaendige Liste in `.env.example`:
 | `DB_DATABASE` | Ja | Datenbankname |
 | `DB_USER` | Ja | Datenbankbenutzer |
 | `DB_PASSWORD` | Ja | Datenbankpasswort |
-| `OPENAI_API_KEY` | Ja | API-Key fuer LLM-Ranking |
-| `OPENAI_MODEL` | Ja | Modellname (z. B. `gpt-4o`) |
-| `OPENAI_URL` | Nein | Eigener API-Endpunkt (Standard: OpenAI) |
+| `OPENAI_API_KEY` | Nein* | Globaler API-Key (Fallback, wenn kein per-User-Key gesetzt ist) |
+| `OPENAI_MODEL` | Nein | Default-Modell (z. B. `gpt-4o-mini`) |
+| `OPENAI_URL` | Nein | Default-API-Endpunkt (Standard: `https://api.openai.com/v1`) |
 | `SALT` | Ja | Passwort-Hashing Salt (min. 32 Zeichen) |
+| `APP_ENCRYPTION_KEY` | **Ja** | Base64-AES-Schluessel fuer verschluesselte Credential-Spalten. Generierung: `openssl rand -base64 32`. Startup bricht ohne diesen Key ab. Nach Inbetriebnahme nicht aendern. |
 | `ALLOW_SIGNUP` | Nein | `0` = deaktiviert (Standard), `1` = aktiv |
 | `TZ` | Nein | Zeitzone (Standard: `Europe/Berlin`) |
+
+\* Nutzer koennen eigene Keys im KI-Tab hinterlegen; diese haben Vorrang vor `OPENAI_API_KEY`.
 
 ---
 

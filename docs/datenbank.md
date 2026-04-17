@@ -239,6 +239,40 @@ public interface FeedItemRepository extends JpaRepository<FeedItem, String> {
 | `DB_DATABASE` | `postgres` | Datenbankname |
 | `DB_USER` | `postgres` | Datenbankbenutzer |
 | `DB_PASSWORD` | `postgres` | Datenbankpasswort |
+| `APP_ENCRYPTION_KEY` | — (Pflicht) | Base64-AES-Schluessel (16/24/32 Byte) fuer Feldverschluesselung at rest. Startup bricht ab, wenn nicht gesetzt. `openssl rand -base64 32`. |
+
+---
+
+## Verschluesselung sensibler Felder
+
+Felder mit Anmeldedaten werden ueber den JPA-`AttributeConverter`
+`StringCryptoConverter` transparent mit AES-GCM verschluesselt.
+
+| Spalte | Tabelle | Verschluesselt | Hinweis |
+|---|---|---|---|
+| `password` | `users` | Nein — BCrypt-Hash (Login) | Einweg-Hash, kein Entschluesseln |
+| `freshrss_api_password` | `users` | **Ja (AES-GCM)** | Klartext im Code, Ciphertext in DB |
+| `openai_api_key` | `users` | **Ja (AES-GCM)** | Per-User-Key (optional) |
+
+Jeder Ciphertext hat das Praefix `enc:v1:` gefolgt von `Base64(iv || ciphertext || tag)`.
+Bestands-Plaintext-Zeilen werden beim Lesen transparent durchgereicht und beim
+naechsten Speichern automatisch verschluesselt.
+
+---
+
+## OpenAI-Verbrauchs-Tracking (ab V25)
+
+```
+users (1) ──< (n) openai_usage
+```
+
+- `openai_usage.use_case` ∈ {`RELEVANCE`, `SHORTENING`}
+- `openai_usage.total_tokens` wird pro Monat summiert gegen
+  `users.openai_monthly_token_limit_relevance` bzw.
+  `users.openai_monthly_token_limit_shortening` geprueft.
+- Ueberschreitet die Monats-Summe das Limit, ueberspringt
+  `OpenaiServiceImpl` weitere Aufrufe fuer diesen Use-Case bis zum
+  Monatswechsel (UTC).
 
 ---
 

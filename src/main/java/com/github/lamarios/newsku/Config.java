@@ -18,6 +18,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.util.Base64;
+
+import jakarta.annotation.PostConstruct;
 
 @Configuration
 @SecurityScheme(
@@ -43,6 +46,35 @@ public class Config {
 
     @Value("${ROOT_URL:http://localhost:8080}")
     private String rootUrl;
+
+    @Value("${APP_ENCRYPTION_KEY:}")
+    private String appEncryptionKey;
+
+    /**
+     * Validates that {@code APP_ENCRYPTION_KEY} is set and well-formed.
+     * Credentials at rest (GReader password, OpenAI API key) are encrypted
+     * with this key via {@link com.github.lamarios.newsku.persistence.converters.StringCryptoConverter}.
+     */
+    @PostConstruct
+    public void validateEncryptionKey() {
+        if (appEncryptionKey == null || appEncryptionKey.isBlank()) {
+            throw new IllegalStateException(
+                    "APP_ENCRYPTION_KEY must be set. Generate one with: openssl rand -base64 32");
+        }
+        byte[] raw;
+        try {
+            raw = Base64.getDecoder().decode(appEncryptionKey.trim());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException(
+                    "APP_ENCRYPTION_KEY must be Base64. Generate with: openssl rand -base64 32", e);
+        }
+        if (raw.length != 16 && raw.length != 24 && raw.length != 32) {
+            throw new IllegalStateException(
+                    "APP_ENCRYPTION_KEY must decode to 16, 24 or 32 bytes (got " + raw.length + ").");
+        }
+        // Propagate to system property so JPA converter can read it in any context.
+        System.setProperty("APP_ENCRYPTION_KEY", appEncryptionKey.trim());
+    }
 
     @Bean
     public String rootUrl() {

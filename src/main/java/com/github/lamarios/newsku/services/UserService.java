@@ -126,6 +126,12 @@ public class UserService {
                 user.setGReaderApiPassword(currentUser.getGReaderApiPassword());
             }
 
+            // Same for the OpenAI API key — never returned to the client, so a
+            // blank value on update means "keep existing".
+            if (user.getOpenAiApiKey() == null || user.getOpenAiApiKey().isBlank()) {
+                user.setOpenAiApiKey(currentUser.getOpenAiApiKey());
+            }
+
             return updateUser(user);
         } else {
             throw new AccessDeniedException("You can only edit yourself");

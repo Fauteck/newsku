@@ -25,6 +25,9 @@ sealed class User with _$User {
     String? openAiApiKey,
     String? openAiModel,
     String? openAiUrl,
+    bool? enableTextShortening,
+    int? openAiMonthlyTokenLimitRelevance,
+    int? openAiMonthlyTokenLimitShortening,
     String? aiPromptId,
   }) = _User;
 
