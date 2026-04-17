@@ -35,7 +35,7 @@ public class FeedItemControllerTest extends TestContainerTest {
 
         feedItemService.refreshFeedWorker(feed);
 
-        var items = feedItemController.getItems(0L, System.currentTimeMillis(), 0, 9999999, null);
+        var items = feedItemController.getItems(0L, System.currentTimeMillis(), 0, 9999999, null, null, null, null);
 
         assertTrue(items.hasContent());
 
@@ -45,7 +45,7 @@ public class FeedItemControllerTest extends TestContainerTest {
         feedItemController.readArticles(items.getContent().stream().map(FeedItem::getId).toList());
 
 
-        items = feedItemController.getItems(0L, System.currentTimeMillis(), 0, 9999999, null);
+        items = feedItemController.getItems(0L, System.currentTimeMillis(), 0, 9999999, null, null, null, null);
         assertTrue(items.getContent().stream().allMatch(FeedItem::isRead));
     }
 }
