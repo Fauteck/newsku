@@ -1,6 +1,7 @@
 package com.github.lamarios.newsku.services;
 
 import com.github.lamarios.newsku.Constants;
+import com.github.lamarios.newsku.errors.NewskuException;
 import com.github.lamarios.newsku.models.greader.GReaderStreamContents;
 import com.github.lamarios.newsku.models.greader.GReaderStreamItem;
 import com.github.lamarios.newsku.models.greader.GReaderSubscription;
@@ -97,6 +98,24 @@ public class GReaderSyncService {
     }
 
     // -----------------------------------------------------------------------
+    // On-demand sync (triggered by UI)
+    // -----------------------------------------------------------------------
+
+    /**
+     * Synchronises only categories and feeds (not articles) for a single user,
+     * propagating any errors. Intended for UI-triggered syncs so the caller can
+     * surface failures to the user.
+     */
+    @Transactional
+    public void syncFeedsAndCategoriesOnDemand(User user) throws NewskuException {
+        if (!gReaderApiService.isCredentialsConfigured(user)) {
+            throw new NewskuException("GReader credentials not configured");
+        }
+        syncCategoriesStrict(user);
+        syncFeedsStrict(user);
+    }
+
+    // -----------------------------------------------------------------------
     // Per-user sync
     // -----------------------------------------------------------------------
 
@@ -116,6 +135,17 @@ public class GReaderSyncService {
     @Transactional
     public void syncCategories(User user) {
         List<GReaderTag> tags = gReaderApiService.getTags(user);
+        applyCategorySync(user, tags);
+    }
+
+    /** Error-propagating variant for on-demand syncs. */
+    @Transactional
+    public void syncCategoriesStrict(User user) throws NewskuException {
+        List<GReaderTag> tags = gReaderApiService.getTagsOrThrow(user);
+        applyCategorySync(user, tags);
+    }
+
+    private void applyCategorySync(User user, List<GReaderTag> tags) {
         for (GReaderTag tag : tags) {
             FeedCategory existing = feedCategoryRepository.findByGReaderCategoryIdAndUser(tag.getId(), user);
             if (existing == null) {
@@ -140,6 +170,17 @@ public class GReaderSyncService {
     @Transactional
     public void syncFeeds(User user) {
         List<GReaderSubscription> subscriptions = gReaderApiService.getSubscriptions(user);
+        applyFeedSync(user, subscriptions);
+    }
+
+    /** Error-propagating variant for on-demand syncs. */
+    @Transactional
+    public void syncFeedsStrict(User user) throws NewskuException {
+        List<GReaderSubscription> subscriptions = gReaderApiService.getSubscriptionsOrThrow(user);
+        applyFeedSync(user, subscriptions);
+    }
+
+    private void applyFeedSync(User user, List<GReaderSubscription> subscriptions) {
         for (GReaderSubscription sub : subscriptions) {
             Feed feed = feedRepository.findByGReaderFeedIdAndUser(sub.getId(), user);
             if (feed == null) {

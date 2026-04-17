@@ -922,6 +922,8 @@ abstract class AppLocalizations {
   String get greaderUpdated;
   String get openInGreader;
   String get greaderManagedFeeds;
+  String get syncNow;
+  String get greaderSyncFailed;
   String get greaderCredentialsEnvHint;
   String get greaderUrlLabel;
   String get greaderSaved;

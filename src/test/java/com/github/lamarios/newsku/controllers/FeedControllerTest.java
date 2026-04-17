@@ -80,6 +80,14 @@ public class FeedControllerTest extends TestContainerTest {
     }
 
     @Test
+    public void testSyncGreaderWithoutCredentialsThrows() {
+        // Current test user has no GReader fields and no env defaults are set in tests,
+        // so the sync endpoint must surface a NewskuException rather than silently return an empty list.
+        NewskuException ex = assertThrows(NewskuException.class, () -> feedController.syncGreader());
+        assertTrue(ex.getMessage().toLowerCase().contains("greader"));
+    }
+
+    @Test
     public void testImportFeeds() throws NewskuException, IOException {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         try (InputStream is = classloader.getResourceAsStream("feeds.opml")) {

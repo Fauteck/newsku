@@ -33,6 +33,19 @@ class FeedsSettingsCubit extends Cubit<FeedsSettingsState> {
     }
   }
 
+  Future<void> syncGreader() async {
+    try {
+      emit(state.copyWith(loading: true, greaderSyncAttempted: true));
+      var feedService = FeedService(serverUrl!);
+      var feeds = await feedService.syncGreader();
+      var categories = await feedService.getFeedCategories();
+      categories.insert(0, FeedCategory(name: ''));
+      emit(state.copyWith(loading: false, feeds: feeds, categories: categories));
+    } catch (e, s) {
+      emit(state.copyWith(loading: false, error: e, stackTrace: s));
+    }
+  }
+
   Future<void> addFeed() async {
     try {
       emit(state.copyWith(loading: true));
@@ -146,6 +159,7 @@ sealed class FeedsSettingsState with _$FeedsSettingsState implements WithError {
     @Default([]) List<Feed> feeds,
     @Default([]) List<FeedCategory> categories,
     @Default(true) bool loading,
+    @Default(false) bool greaderSyncAttempted,
     dynamic error,
     StackTrace? stackTrace,
   }) = _FeedsSettingsState;

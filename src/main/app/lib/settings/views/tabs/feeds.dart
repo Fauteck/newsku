@@ -43,6 +43,15 @@ class FeedsSettingsTab extends StatelessWidget {
         child: BlocBuilder<FeedsSettingsCubit, FeedsSettingsState>(
           builder: (context, state) {
             var cubit = context.read<FeedsSettingsCubit>();
+
+            // Auto-sync GReader feeds once on first open if the local cache is empty.
+            if (gReaderActive &&
+                !state.loading &&
+                !state.greaderSyncAttempted &&
+                state.feeds.isEmpty) {
+              WidgetsBinding.instance.addPostFrameCallback((_) => cubit.syncGreader());
+            }
+
             return state.loading
                 ? Center(child: SizedBox(width: 50, height: 50, child: LoadingIndicator()))
                 : Column(
@@ -50,29 +59,43 @@ class FeedsSettingsTab extends StatelessWidget {
                       if (gReaderActive) ...[
                         Padding(
                           padding: EdgeInsets.all(pu3),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(8),
-                            onTap: () => launchUrl(Uri.parse(config!.gReaderUrl!)),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: pu4, vertical: pu3),
-                              decoration: BoxDecoration(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            spacing: pu2,
+                            children: [
+                              InkWell(
                                 borderRadius: BorderRadius.circular(8),
-                                color: colors.secondaryContainer,
-                              ),
-                              child: Row(
-                                spacing: pu3,
-                                children: [
-                                  Icon(Icons.info_outline, color: colors.onSecondaryContainer),
-                                  Expanded(
-                                    child: Text(
-                                      locals.greaderManagedFeeds,
-                                      style: textTheme.bodyMedium?.copyWith(color: colors.onSecondaryContainer),
-                                    ),
+                                onTap: () => launchUrl(Uri.parse(config!.gReaderUrl!)),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: pu4, vertical: pu3),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: colors.secondaryContainer,
                                   ),
-                                  Icon(Icons.open_in_new, color: colors.onSecondaryContainer),
-                                ],
+                                  child: Row(
+                                    spacing: pu3,
+                                    children: [
+                                      Icon(Icons.info_outline, color: colors.onSecondaryContainer),
+                                      Expanded(
+                                        child: Text(
+                                          locals.greaderManagedFeeds,
+                                          style: textTheme.bodyMedium?.copyWith(color: colors.onSecondaryContainer),
+                                        ),
+                                      ),
+                                      Icon(Icons.open_in_new, color: colors.onSecondaryContainer),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: FilledButton.tonalIcon(
+                                  onPressed: state.loading ? null : () => cubit.syncGreader(),
+                                  icon: const Icon(Icons.sync),
+                                  label: Text(locals.syncNow),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -163,11 +186,17 @@ class FeedsSettingsTab extends StatelessWidget {
                           : Expanded(
                               child: ListView.builder(
                                 itemCount: state.categories
-                                    .where((c) => !gReaderActive || c.id != null)
+                                    .where((c) =>
+                                        !gReaderActive ||
+                                        c.id != null ||
+                                        state.feeds.any((f) => f.category == null))
                                     .length,
                                 itemBuilder: (context, index) {
                                   final visibleCategories = state.categories
-                                      .where((c) => !gReaderActive || c.id != null)
+                                      .where((c) =>
+                                          !gReaderActive ||
+                                          c.id != null ||
+                                          state.feeds.any((f) => f.category == null))
                                       .toList();
                                   final c = visibleCategories[index];
                                   return FeedCategoryView(

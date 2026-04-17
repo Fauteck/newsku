@@ -1,5 +1,6 @@
 package com.github.lamarios.newsku.services;
 
+import com.github.lamarios.newsku.errors.NewskuException;
 import com.github.lamarios.newsku.models.greader.GReaderStreamContents;
 import com.github.lamarios.newsku.models.greader.GReaderSubscription;
 import com.github.lamarios.newsku.models.greader.GReaderSubscriptionList;
@@ -114,6 +115,30 @@ public class GReaderApiService {
         }
     }
 
+    /**
+     * Like {@link #getSubscriptions(User)}, but propagates transport and auth errors
+     * instead of swallowing them. Intended for on-demand UI-triggered syncs so the
+     * user can see why a sync failed.
+     */
+    public List<GReaderSubscription> getSubscriptionsOrThrow(User user) throws NewskuException {
+        Credentials creds = resolve(user);
+        if (!creds.isComplete()) {
+            throw new NewskuException("GReader credentials not configured");
+        }
+        try {
+            var result = clientFor(creds).get()
+                    .uri("/api/greader.php/reader/api/0/subscription/list?output=json")
+                    .header("Authorization", authHeader(user, creds))
+                    .retrieve()
+                    .body(GReaderSubscriptionList.class);
+            return result != null && result.getSubscriptions() != null
+                    ? result.getSubscriptions()
+                    : Collections.emptyList();
+        } catch (RestClientException | IllegalStateException e) {
+            throw new NewskuException("GReader subscription fetch failed: " + e.getMessage());
+        }
+    }
+
     /** Returns all user-defined labels/categories, or an empty list if not configured. */
     public List<GReaderTag> getTags(User user) {
         Credentials creds = resolve(user);
@@ -129,6 +154,28 @@ public class GReaderApiService {
         } catch (RestClientException e) {
             logger.error("Failed to fetch GReader tags for user {}: {}", user.getUsername(), e.getMessage());
             return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Like {@link #getTags(User)}, but propagates transport and auth errors
+     * instead of swallowing them. Intended for on-demand UI-triggered syncs.
+     */
+    public List<GReaderTag> getTagsOrThrow(User user) throws NewskuException {
+        Credentials creds = resolve(user);
+        if (!creds.isComplete()) {
+            throw new NewskuException("GReader credentials not configured");
+        }
+        try {
+            var result = clientFor(creds).get()
+                    .uri("/api/greader.php/reader/api/0/tag/list?output=json")
+                    .header("Authorization", authHeader(user, creds))
+                    .retrieve()
+                    .body(GReaderTagList.class);
+            if (result == null || result.getTags() == null) return Collections.emptyList();
+            return result.getTags().stream().filter(GReaderTag::isUserLabel).toList();
+        } catch (RestClientException | IllegalStateException e) {
+            throw new NewskuException("GReader tag fetch failed: " + e.getMessage());
         }
     }
 

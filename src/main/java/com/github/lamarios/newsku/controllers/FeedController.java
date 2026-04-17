@@ -5,6 +5,8 @@ import com.github.lamarios.newsku.errors.NewskuException;
 import com.github.lamarios.newsku.persistence.entities.Feed;
 import com.github.lamarios.newsku.services.FeedItemService;
 import com.github.lamarios.newsku.services.FeedService;
+import com.github.lamarios.newsku.services.GReaderSyncService;
+import com.github.lamarios.newsku.services.UserService;
 import com.github.lamarios.newsku.utils.ImageHelper;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,20 +39,37 @@ import static com.github.lamarios.newsku.controllers.FeedItemController.serveFil
 public class FeedController {
     private final FeedService feedService;
     private final FeedItemService feedItemService;
+    private final GReaderSyncService gReaderSyncService;
+    private final UserService userService;
     private final Path tempDir;
     private final Logger log = LogManager.getLogger();
     private final boolean demoMode;
 
     @Autowired
-    public FeedController(FeedService feedService, FeedItemService feedItemService, @Value("${DEMO_MODE:0}") boolean demoMode) throws IOException {
+    public FeedController(FeedService feedService,
+                          FeedItemService feedItemService,
+                          GReaderSyncService gReaderSyncService,
+                          UserService userService,
+                          @Value("${DEMO_MODE:0}") boolean demoMode) throws IOException {
         this.feedService = feedService;
         this.feedItemService = feedItemService;
+        this.gReaderSyncService = gReaderSyncService;
+        this.userService = userService;
         this.demoMode = demoMode;
         this.tempDir = Files.createTempDirectory("newsku-feed-images");
     }
 
     @GetMapping
     public List<Feed> getFeeds() {
+        return feedService.getFeeds();
+    }
+
+    @PostMapping("/sync-greader")
+    public List<Feed> syncGreader() throws NewskuException {
+        if (demoMode) {
+            throw new AccessDeniedException("App in demoMode");
+        }
+        gReaderSyncService.syncFeedsAndCategoriesOnDemand(userService.getCurrentUser());
         return feedService.getFeeds();
     }
 
