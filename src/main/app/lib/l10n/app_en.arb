@@ -223,7 +223,7 @@
     "classicFeedsFeedLabel": "Feed",
     "classicFeedsAllFeeds": "Alle Feeds",
     "openAiUsageTitle": "OpenAI-Verbrauch",
-    "openAiUsageExplanation": "Token-Verbrauch im aktuellen Monat, aufgeschlüsselt nach Relevanz-Bewertung und Text-Kürzung.",
+    "openAiUsageExplanation": "Token-Verbrauch im gewählten Zeitraum, aufgeschlüsselt nach Relevanz-Bewertung und Text-Kürzung.",
     "openAiUseCaseRelevance": "Relevanz-Bewertung",
     "openAiUseCaseShortening": "Text-Kürzung",
     "openAiUsageTokens": "{tokens} Tokens",
@@ -236,5 +236,10 @@
     "openAiLimitsExplanation": "Sobald ein Limit erreicht ist, werden weitere Aufrufe dieses Typs im aktuellen Monat übersprungen.",
     "openAiLimitRelevance": "Limit Relevanz-Bewertung",
     "openAiLimitShortening": "Limit Text-Kürzung",
-    "openAiLimitHint": "Leer lassen für unbegrenzt"
+    "openAiLimitHint": "Leer lassen für unbegrenzt",
+    "aiUsagePeriodDay": "Tag",
+    "aiUsagePeriodWeek": "Woche",
+    "aiUsagePeriodMonth": "Monat",
+    "aiUsageCost": "Geschätzte Kosten: {cost}",
+    "aiUsageByModel": "Nach Modell"
 }

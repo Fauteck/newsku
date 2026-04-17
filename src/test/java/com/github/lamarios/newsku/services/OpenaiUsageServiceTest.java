@@ -2,6 +2,7 @@ package com.github.lamarios.newsku.services;
 
 import com.github.lamarios.newsku.TestConfig;
 import com.github.lamarios.newsku.TestContainerTest;
+import com.github.lamarios.newsku.models.OpenAiModelUsage;
 import com.github.lamarios.newsku.models.OpenAiUsageStats;
 import com.github.lamarios.newsku.models.OpenAiUseCase;
 import com.github.lamarios.newsku.persistence.entities.User;
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -80,5 +83,48 @@ public class OpenaiUsageServiceTest extends TestContainerTest {
         usageService.record(user, OpenAiUseCase.SHORTENING, "m", 1_000_000, 1_000_000, 2_000_000, null);
         assertFalse(usageService.isLimitExceeded(user, OpenAiUseCase.SHORTENING),
                 "no limit configured → never blocked");
+    }
+
+    @Test
+    void estimatesCostFromPricingTableWhenNotStored() {
+        User user = userRepository.getUserByUsername("test").getFirst();
+
+        // 1M input tokens on gpt-4o-mini → $0.15, 1M output → $0.60, sum $0.75
+        usageService.record(user, OpenAiUseCase.RELEVANCE, "gpt-4o-mini",
+                1_000_000, 1_000_000, 2_000_000, null);
+
+        OpenAiUsageStats stats = usageService.getMonthlyUsage(user).get(OpenAiUseCase.RELEVANCE);
+        assertNotNull(stats.estimatedCostUsd(), "pricing table must produce a cost");
+        assertEquals(0, new BigDecimal("0.75").compareTo(stats.estimatedCostUsd()),
+                "expected 0.75 USD, got " + stats.estimatedCostUsd());
+    }
+
+    @Test
+    void unknownModelLeavesCostNull() {
+        User user = userRepository.getUserByUsername("test").getFirst();
+        usageService.record(user, OpenAiUseCase.SHORTENING, "some-other-model",
+                100, 50, 150, null);
+
+        OpenAiUsageStats stats = usageService.getMonthlyUsage(user).get(OpenAiUseCase.SHORTENING);
+        assertEquals(150, stats.totalTokens());
+        assertNull(stats.estimatedCostUsd(), "unknown model → no cost");
+    }
+
+    @Test
+    void modelBreakdownGroupsPerModel() {
+        User user = userRepository.getUserByUsername("test").getFirst();
+        usageService.record(user, OpenAiUseCase.RELEVANCE, "gpt-4o-mini", 100, 50, 150, null);
+        usageService.record(user, OpenAiUseCase.RELEVANCE, "gpt-4o-mini", 200, 100, 300, null);
+        usageService.record(user, OpenAiUseCase.RELEVANCE, "gpt-4o", 10, 5, 15, null);
+
+        OpenAiUsageStats stats = usageService.getMonthlyUsage(user).get(OpenAiUseCase.RELEVANCE);
+        List<OpenAiModelUsage> breakdown = stats.modelBreakdown();
+        assertEquals(2, breakdown.size());
+        // sorted by totalTokens desc → gpt-4o-mini (450) first, gpt-4o (15) last
+        assertEquals("gpt-4o-mini", breakdown.get(0).model());
+        assertEquals(450, breakdown.get(0).totalTokens());
+        assertEquals(2, breakdown.get(0).callCount());
+        assertEquals("gpt-4o", breakdown.get(1).model());
+        assertEquals(15, breakdown.get(1).totalTokens());
     }
 }

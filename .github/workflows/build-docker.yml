@@ -33,6 +33,7 @@ jobs:
         working-directory: src/main/app
         run: |
           flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
           flutter build web --release
 
       - name: Copy Flutter Web build into Spring Boot static resources

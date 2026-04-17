@@ -1,5 +1,6 @@
 package com.github.lamarios.newsku.services;
 
+import com.github.lamarios.newsku.models.OpenAiModelUsage;
 import com.github.lamarios.newsku.models.OpenAiUsageStats;
 import com.github.lamarios.newsku.models.OpenAiUseCase;
 import com.github.lamarios.newsku.persistence.entities.OpenaiUsage;
@@ -14,8 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -28,6 +32,7 @@ import java.util.UUID;
 public class OpenaiUsageService {
 
     private static final Logger logger = LogManager.getLogger();
+    private static final String UNKNOWN_MODEL = "unknown";
 
     private final OpenaiUsageRepository repository;
 
@@ -102,21 +107,58 @@ public class OpenaiUsageService {
 
     private Map<OpenAiUseCase, OpenAiUsageStats> aggregate(User user, long from, long to) {
         List<OpenaiUsage> rows = repository.findByUserAndCreatedAtBetween(user, from, to);
+
         Map<OpenAiUseCase, long[]> sums = new HashMap<>();
         Map<OpenAiUseCase, BigDecimal> costs = new HashMap<>();
+        Map<OpenAiUseCase, Map<String, long[]>> perModel = new HashMap<>();
+        Map<OpenAiUseCase, Map<String, BigDecimal>> perModelCosts = new HashMap<>();
+
         for (OpenaiUsage r : rows) {
             long[] agg = sums.computeIfAbsent(r.getUseCase(), k -> new long[]{0, 0, 0, 0});
             agg[0] += r.getTotalTokens();
             agg[1] += r.getPromptTokens();
             agg[2] += r.getCompletionTokens();
             agg[3] += 1;
-            if (r.getEstimatedCostUsd() != null) {
-                costs.merge(r.getUseCase(), r.getEstimatedCostUsd(), BigDecimal::add);
+
+            BigDecimal rowCost = r.getEstimatedCostUsd();
+            if (rowCost == null) {
+                rowCost = OpenAiPricing.estimate(r.getModel(), r.getPromptTokens(), r.getCompletionTokens());
+            }
+            if (rowCost != null) {
+                costs.merge(r.getUseCase(), rowCost, BigDecimal::add);
+            }
+
+            String modelKey = (r.getModel() == null || r.getModel().isBlank()) ? UNKNOWN_MODEL : r.getModel();
+            Map<String, long[]> models = perModel.computeIfAbsent(r.getUseCase(), k -> new LinkedHashMap<>());
+            long[] modelAgg = models.computeIfAbsent(modelKey, k -> new long[]{0, 0, 0, 0});
+            modelAgg[0] += r.getTotalTokens();
+            modelAgg[1] += r.getPromptTokens();
+            modelAgg[2] += r.getCompletionTokens();
+            modelAgg[3] += 1;
+
+            if (rowCost != null) {
+                Map<String, BigDecimal> modelCosts = perModelCosts.computeIfAbsent(r.getUseCase(), k -> new HashMap<>());
+                modelCosts.merge(modelKey, rowCost, BigDecimal::add);
             }
         }
+
         Map<OpenAiUseCase, OpenAiUsageStats> result = new EnumMap<>(OpenAiUseCase.class);
         for (OpenAiUseCase useCase : OpenAiUseCase.values()) {
             long[] agg = sums.getOrDefault(useCase, new long[]{0, 0, 0, 0});
+            Map<String, long[]> models = perModel.getOrDefault(useCase, Map.of());
+            Map<String, BigDecimal> modelCosts = perModelCosts.getOrDefault(useCase, Map.of());
+
+            List<OpenAiModelUsage> breakdown = new ArrayList<>(models.size());
+            for (Map.Entry<String, long[]> e : models.entrySet()) {
+                long[] m = e.getValue();
+                breakdown.add(new OpenAiModelUsage(
+                        e.getKey(),
+                        m[0], m[1], m[2], m[3],
+                        modelCosts.get(e.getKey())
+                ));
+            }
+            breakdown.sort(Comparator.comparingLong(OpenAiModelUsage::totalTokens).reversed());
+
             result.put(useCase, new OpenAiUsageStats(
                     useCase,
                     agg[0],
@@ -124,7 +166,8 @@ public class OpenaiUsageService {
                     agg[2],
                     costs.get(useCase),
                     agg[3],
-                    monthlyLimit(user, useCase)
+                    monthlyLimit(user, useCase),
+                    breakdown
             ));
         }
         return result;

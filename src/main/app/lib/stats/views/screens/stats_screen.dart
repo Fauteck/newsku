@@ -5,7 +5,6 @@ import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/conditional_wrap.dart';
 import 'package:app/utils/views/components/error_listener.dart';
-import 'package:app/utils/views/components/mobile_bottom_nav.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,25 +14,28 @@ import 'package:material_loading_indicator/loading_indicator.dart';
 class StatsScreen extends StatelessWidget {
   const StatsScreen({super.key});
 
+  // Index of the AI tab inside `AutoTabsRouter.tabBar.routes`.
+  static const _aiTabIndex = 2;
+
   @override
   Widget build(BuildContext context) {
     final locals = AppLocalizations.of(context)!;
 
-    final isMobile = BreakPoint.get(context) == BreakPoint.mobile;
     return AutoTabsRouter.tabBar(
-      routes: [TagStatsRoute(), FeedStatsRoute()],
+      routes: [TagStatsRoute(), FeedStatsRoute(), AiStatsRoute()],
       builder: (context, child, tabController) => Scaffold(
         appBar: AppBar(
           title: Text(locals.stats),
+          automaticallyImplyLeading: false,
           bottom: TabBar(
             controller: tabController,
             tabs: [
               Tab(text: locals.tags, icon: Icon(Icons.sell)),
               Tab(text: locals.feeds, icon: Icon(Icons.rss_feed)),
+              Tab(text: locals.aiTab, icon: Icon(Icons.auto_awesome)),
             ],
           ),
         ),
-        bottomNavigationBar: isMobile ? const MobileBottomNav() : null,
         body: SafeArea(
           child: Center(
             child: ConstrainedBox(
@@ -43,18 +45,24 @@ class StatsScreen extends StatelessWidget {
                 child: ErrorHandler<StatsCubit, StatsState>(
                   child: BlocBuilder<StatsCubit, StatsState>(
                     builder: (context, state) {
-                      if (state.loading) {
-                        return Center(child: LoadingIndicator());
-                      } else {
-                        return ConditionalWrap(
-                          wrapIf: BreakPoint.get(context) == .mobile,
-                          wrapper: (child) => Padding(
-                            padding: .symmetric(horizontal: pu2),
-                            child: child,
-                          ),
+                      return ConditionalWrap(
+                        wrapIf: BreakPoint.get(context) == .mobile,
+                        wrapper: (child) => Padding(
+                          padding: .symmetric(horizontal: pu2),
                           child: child,
-                        );
-                      }
+                        ),
+                        child: AnimatedBuilder(
+                          animation: tabController,
+                          builder: (context, _) {
+                            // The AI tab manages its own loading state via
+                            // OpenaiUsageCubit; don't gate it on StatsCubit.
+                            if (tabController.index != _aiTabIndex && state.loading) {
+                              return Center(child: LoadingIndicator());
+                            }
+                            return child;
+                          },
+                        ),
+                      );
                     },
                   ),
                 ),

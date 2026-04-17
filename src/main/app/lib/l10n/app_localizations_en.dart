@@ -746,7 +746,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openAiUsageExplanation =>
-      'Token-Verbrauch im aktuellen Monat, aufgeschlüsselt nach Relevanz-Bewertung und Text-Kürzung.';
+      'Token-Verbrauch im gewählten Zeitraum, aufgeschlüsselt nach Relevanz-Bewertung und Text-Kürzung.';
 
   @override
   String get openAiUseCaseRelevance => 'Relevanz-Bewertung';
@@ -787,4 +787,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openAiLimitHint => 'Leer lassen für unbegrenzt';
+
+  @override
+  String get aiUsagePeriodDay => 'Tag';
+
+  @override
+  String get aiUsagePeriodWeek => 'Woche';
+
+  @override
+  String get aiUsagePeriodMonth => 'Monat';
+
+  @override
+  String aiUsageCost(Object cost) => 'Geschätzte Kosten: $cost';
+
+  @override
+  String get aiUsageByModel => 'Nach Modell';
 }

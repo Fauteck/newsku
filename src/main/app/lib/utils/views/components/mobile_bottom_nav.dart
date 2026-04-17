@@ -115,14 +115,14 @@ class _MobileBottomNavState extends State<MobileBottomNav> {
             router.navigate(const HomeRoute(children: [ClassicFeedRoute()]));
             break;
           case 2:
-            router.navigate(const StatsRoute());
+            router.navigate(const HomeRoute(children: [StatsRoute()]));
             break;
         }
       },
       destinations: [
         NavigationDestination(
-          icon: const Icon(Icons.article_outlined),
-          selectedIcon: const Icon(Icons.article),
+          icon: const Icon(Icons.newspaper_outlined),
+          selectedIcon: const Icon(Icons.newspaper),
           label: 'Magazin',
         ),
         NavigationDestination(
