@@ -80,14 +80,14 @@ public class GReaderSyncService {
     // Entry point (called by ScheduleService)
     // -----------------------------------------------------------------------
 
-    /** Runs a full sync for every user when GReader credentials are configured. */
+    /** Runs a full sync for every user with GReader credentials configured. */
     public void syncAll() {
-        if (!gReaderApiService.isCredentialsConfigured()) {
-            logger.debug("GReader not configured (GREADER_URL / GREADER_USERNAME / GREADER_API_PASSWORD not set) – skipping sync");
-            return;
-        }
         List<User> users = userRepository.findAll();
         for (User user : users) {
+            if (!gReaderApiService.isCredentialsConfigured(user)) {
+                logger.debug("GReader not configured for user {} – skipping", user.getUsername());
+                continue;
+            }
             try {
                 syncUser(user);
             } catch (Exception e) {
@@ -207,7 +207,7 @@ public class GReaderSyncService {
      * FeedItems as saved (best-effort, does not unmark items no longer starred).
      */
     public void syncStarredItems(User user) {
-        if (!gReaderApiService.isCredentialsConfigured()) return;
+        if (!gReaderApiService.isCredentialsConfigured(user)) return;
 
         List<Feed> feeds = feedRepository.getFeedsByUser(user);
         String continuation = null;

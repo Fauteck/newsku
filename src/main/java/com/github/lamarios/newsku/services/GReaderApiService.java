@@ -19,23 +19,22 @@ import org.springframework.web.client.RestClientException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Low-level Google Reader API client.
  *
- * Compatible with any GReader-API implementation (FreshRSS, Miniflux, Miniflux, etc.).
+ * Compatible with any GReader-API implementation (FreshRSS, Miniflux, etc.).
  *
  * Authentication:
- *   POST /accounts/ClientLogin  →  Auth token (cached 23 h, shared across all users)
+ *   POST /accounts/ClientLogin  →  Auth token (cached 23 h, per user)
  *   GET  /reader/api/0/token    →  Modification token (fetched per write operation)
  *
- * Credentials are read from environment variables:
- *   GREADER_URL           – base URL of the GReader instance  (required to enable integration)
- *   GREADER_USERNAME      – GReader username / e-mail
- *   GREADER_API_PASSWORD  – GReader API password
+ * Credentials are resolved per call:
+ *   1. User-level fields on the {@link User} entity (primary)
+ *   2. Environment-variable fallbacks GREADER_URL / GREADER_USERNAME / GREADER_API_PASSWORD
  *
- * All methods are no-ops / return empty when GReader is not fully configured.
+ * All methods are no-ops / return empty when credentials aren't configured for the user.
  */
 @Service
 public class GReaderApiService {
@@ -49,6 +48,15 @@ public class GReaderApiService {
         }
     }
 
+    /** Resolved credentials for a single user (user values overriding env defaults). */
+    private record Credentials(String baseUrl, String username, String password) {
+        boolean isComplete() {
+            return baseUrl != null && !baseUrl.isBlank()
+                    && username != null && !username.isBlank()
+                    && password != null && !password.isBlank();
+        }
+    }
+
     /** Max items to fetch per GReader page */
     private static final int PAGE_SIZE = 100;
 
@@ -58,40 +66,29 @@ public class GReaderApiService {
     /** Batch size for edit-tag POST requests */
     private static final int EDIT_TAG_BATCH = 50;
 
-    private final String baseUrl;
-    private final String username;
-    private final String password;
-    private final RestClient restClient;
+    private final String defaultBaseUrl;
+    private final String defaultUsername;
+    private final String defaultPassword;
 
-    /** Single shared token (credentials are global, not per-user). */
-    private final AtomicReference<CachedToken> cachedToken = new AtomicReference<>();
+    /** Per-user auth-token cache, keyed by user id. */
+    private final ConcurrentHashMap<String, CachedToken> tokenCache = new ConcurrentHashMap<>();
 
     public GReaderApiService(
             @Value("${GREADER_URL:}") String baseUrl,
             @Value("${GREADER_USERNAME:}") String username,
             @Value("${GREADER_API_PASSWORD:}") String password) {
-        this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
-        this.username = username;
-        this.password = password;
-        this.restClient = baseUrl.isBlank() ? null : RestClient.builder()
-                .baseUrl(this.baseUrl)
-                .build();
+        this.defaultBaseUrl = stripTrailingSlash(baseUrl);
+        this.defaultUsername = username;
+        this.defaultPassword = password;
     }
 
     // -----------------------------------------------------------------------
     // Configuration checks
     // -----------------------------------------------------------------------
 
-    /** Returns true when GREADER_URL is set. */
-    public boolean isConfigured() {
-        return !baseUrl.isBlank();
-    }
-
-    /** Returns true when URL, username and password are all set via environment variables. */
-    public boolean isCredentialsConfigured() {
-        return isConfigured()
-                && username != null && !username.isBlank()
-                && password != null && !password.isBlank();
+    /** Returns true when URL, username and password are all configured for the given user. */
+    public boolean isCredentialsConfigured(User user) {
+        return resolve(user).isComplete();
     }
 
     // -----------------------------------------------------------------------
@@ -100,35 +97,37 @@ public class GReaderApiService {
 
     /** Returns all subscriptions (feeds), or an empty list if not configured. */
     public List<GReaderSubscription> getSubscriptions(User user) {
-        if (!isCredentialsConfigured()) return Collections.emptyList();
+        Credentials creds = resolve(user);
+        if (!creds.isComplete()) return Collections.emptyList();
         try {
-            var result = restClient.get()
+            var result = clientFor(creds).get()
                     .uri("/api/greader.php/reader/api/0/subscription/list?output=json")
-                    .header("Authorization", authHeader())
+                    .header("Authorization", authHeader(user, creds))
                     .retrieve()
                     .body(GReaderSubscriptionList.class);
             return result != null && result.getSubscriptions() != null
                     ? result.getSubscriptions()
                     : Collections.emptyList();
         } catch (RestClientException e) {
-            logger.error("Failed to fetch GReader subscriptions: {}", e.getMessage());
+            logger.error("Failed to fetch GReader subscriptions for user {}: {}", user.getUsername(), e.getMessage());
             return Collections.emptyList();
         }
     }
 
     /** Returns all user-defined labels/categories, or an empty list if not configured. */
     public List<GReaderTag> getTags(User user) {
-        if (!isCredentialsConfigured()) return Collections.emptyList();
+        Credentials creds = resolve(user);
+        if (!creds.isComplete()) return Collections.emptyList();
         try {
-            var result = restClient.get()
+            var result = clientFor(creds).get()
                     .uri("/api/greader.php/reader/api/0/tag/list?output=json")
-                    .header("Authorization", authHeader())
+                    .header("Authorization", authHeader(user, creds))
                     .retrieve()
                     .body(GReaderTagList.class);
             if (result == null || result.getTags() == null) return Collections.emptyList();
             return result.getTags().stream().filter(GReaderTag::isUserLabel).toList();
         } catch (RestClientException e) {
-            logger.error("Failed to fetch GReader tags: {}", e.getMessage());
+            logger.error("Failed to fetch GReader tags for user {}: {}", user.getUsername(), e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -136,11 +135,11 @@ public class GReaderApiService {
     /**
      * Fetches one page of unread stream items.
      *
-     * @param user         kept for API compatibility
      * @param continuation pagination cursor from a previous response, or null for the first page
      */
     public GReaderStreamContents getUnreadItems(User user, String continuation) {
-        if (!isCredentialsConfigured()) return emptyStream();
+        Credentials creds = resolve(user);
+        if (!creds.isComplete()) return emptyStream();
         try {
             String uri = "/api/greader.php/reader/api/0/stream/contents/user/-/state/com.google/reading-list"
                     + "?output=json"
@@ -148,14 +147,14 @@ public class GReaderApiService {
                     + "&xt=user/-/state/com.google/read"
                     + (continuation != null ? "&c=" + continuation : "");
 
-            var result = restClient.get()
+            var result = clientFor(creds).get()
                     .uri(uri)
-                    .header("Authorization", authHeader())
+                    .header("Authorization", authHeader(user, creds))
                     .retrieve()
                     .body(GReaderStreamContents.class);
             return result != null ? result : emptyStream();
         } catch (RestClientException e) {
-            logger.error("Failed to fetch GReader unread stream: {}", e.getMessage());
+            logger.error("Failed to fetch GReader unread stream for user {}: {}", user.getUsername(), e.getMessage());
             return emptyStream();
         }
     }
@@ -166,21 +165,22 @@ public class GReaderApiService {
      * @param continuation pagination cursor from a previous response, or null for the first page
      */
     public GReaderStreamContents getStarredItems(User user, String continuation) {
-        if (!isCredentialsConfigured()) return emptyStream();
+        Credentials creds = resolve(user);
+        if (!creds.isComplete()) return emptyStream();
         try {
             String uri = "/api/greader.php/reader/api/0/stream/contents/user/-/state/com.google/starred"
                     + "?output=json"
                     + "&n=" + PAGE_SIZE
                     + (continuation != null ? "&c=" + continuation : "");
 
-            var result = restClient.get()
+            var result = clientFor(creds).get()
                     .uri(uri)
-                    .header("Authorization", authHeader())
+                    .header("Authorization", authHeader(user, creds))
                     .retrieve()
                     .body(GReaderStreamContents.class);
             return result != null ? result : emptyStream();
         } catch (RestClientException e) {
-            logger.error("Failed to fetch GReader starred items: {}", e.getMessage());
+            logger.error("Failed to fetch GReader starred items for user {}: {}", user.getUsername(), e.getMessage());
             return emptyStream();
         }
     }
@@ -191,7 +191,7 @@ public class GReaderApiService {
      * @param gReaderItemIds list of full tag URIs, e.g. "tag:google.com,2005:reader/item/..."
      */
     public void markAsRead(User user, List<String> gReaderItemIds) {
-        editTag(gReaderItemIds, "user/-/state/com.google/read", true);
+        editTag(user, gReaderItemIds, "user/-/state/com.google/read", true);
     }
 
     /**
@@ -201,17 +201,20 @@ public class GReaderApiService {
      * @param starred        true to star, false to unstar
      */
     public void markAsStarred(User user, List<String> gReaderItemIds, boolean starred) {
-        editTag(gReaderItemIds, "user/-/state/com.google/starred", starred);
+        editTag(user, gReaderItemIds, "user/-/state/com.google/starred", starred);
     }
 
     // -----------------------------------------------------------------------
     // Internal helpers
     // -----------------------------------------------------------------------
 
-    private void editTag(List<String> itemIds, String tag, boolean add) {
-        if (!isCredentialsConfigured() || itemIds.isEmpty()) return;
+    private void editTag(User user, List<String> itemIds, String tag, boolean add) {
+        if (itemIds.isEmpty()) return;
+        Credentials creds = resolve(user);
+        if (!creds.isComplete()) return;
         try {
-            String modToken = fetchModificationToken();
+            RestClient client = clientFor(creds);
+            String modToken = fetchModificationToken(client, user, creds);
             for (int i = 0; i < itemIds.size(); i += EDIT_TAG_BATCH) {
                 List<String> batch = itemIds.subList(i, Math.min(i + EDIT_TAG_BATCH, itemIds.size()));
                 MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
@@ -219,35 +222,55 @@ public class GReaderApiService {
                 form.add(add ? "a" : "r", tag);
                 batch.forEach(id -> form.add("i", id));
 
-                restClient.post()
+                client.post()
                         .uri("/api/greader.php/reader/api/0/edit-tag")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .header("Authorization", authHeader())
+                        .header("Authorization", authHeader(user, creds))
                         .body(form)
                         .retrieve()
                         .toBodilessEntity();
             }
         } catch (RestClientException e) {
-            logger.error("Failed to edit tag '{}' (add={}) in GReader: {}", tag, add, e.getMessage());
+            logger.error("Failed to edit tag '{}' (add={}) in GReader for user {}: {}",
+                    tag, add, user.getUsername(), e.getMessage());
         }
     }
 
-    private String authHeader() {
-        return "GoogleLogin auth=" + getAuthToken();
+    /** Resolves credentials: user-level values take precedence over env-var defaults. */
+    private Credentials resolve(User user) {
+        String url = user != null && user.getGReaderUrl() != null && !user.getGReaderUrl().isBlank()
+                ? stripTrailingSlash(user.getGReaderUrl())
+                : defaultBaseUrl;
+        String username = user != null && user.getGReaderUsername() != null && !user.getGReaderUsername().isBlank()
+                ? user.getGReaderUsername()
+                : defaultUsername;
+        String password = user != null && user.getGReaderApiPassword() != null && !user.getGReaderApiPassword().isBlank()
+                ? user.getGReaderApiPassword()
+                : defaultPassword;
+        return new Credentials(url, username, password);
     }
 
-    private String getAuthToken() {
-        CachedToken cached = cachedToken.get();
+    private RestClient clientFor(Credentials creds) {
+        return RestClient.builder().baseUrl(creds.baseUrl()).build();
+    }
+
+    private String authHeader(User user, Credentials creds) {
+        return "GoogleLogin auth=" + getAuthToken(user, creds);
+    }
+
+    private String getAuthToken(User user, Credentials creds) {
+        String cacheKey = user.getId();
+        CachedToken cached = tokenCache.get(cacheKey);
         if (cached != null && !cached.isExpired()) {
             return cached.token();
         }
 
-        logger.info("Authenticating against GReader as '{}'", username);
+        logger.info("Authenticating against GReader as '{}' (user {})", creds.username(), user.getUsername());
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("Email", username);
-        form.add("Passwd", password);
+        form.add("Email", creds.username());
+        form.add("Passwd", creds.password());
 
-        String body = restClient.post()
+        String body = clientFor(creds).post()
                 .uri("/api/greader.php/accounts/ClientLogin")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(form)
@@ -256,18 +279,18 @@ public class GReaderApiService {
 
         String token = parseKeyValue(body, "Auth");
         if (token == null || token.isBlank()) {
-            throw new IllegalStateException("GReader auth failed for user '" + username + "': no Auth token in response");
+            throw new IllegalStateException("GReader auth failed for user '" + user.getUsername() + "': no Auth token in response");
         }
 
         CachedToken newToken = new CachedToken(token, System.currentTimeMillis() + TOKEN_TTL_MS);
-        cachedToken.set(newToken);
+        tokenCache.put(cacheKey, newToken);
         return token;
     }
 
-    private String fetchModificationToken() {
-        return restClient.get()
+    private String fetchModificationToken(RestClient client, User user, Credentials creds) {
+        return client.get()
                 .uri("/api/greader.php/reader/api/0/token")
-                .header("Authorization", authHeader())
+                .header("Authorization", authHeader(user, creds))
                 .retrieve()
                 .body(String.class);
     }
@@ -289,7 +312,14 @@ public class GReaderApiService {
         return empty;
     }
 
-    public void invalidateToken() {
-        cachedToken.set(null);
+    private static String stripTrailingSlash(String url) {
+        if (url == null) return "";
+        return url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
+    }
+
+    public void invalidateToken(User user) {
+        if (user != null && user.getId() != null) {
+            tokenCache.remove(user.getId());
+        }
     }
 }

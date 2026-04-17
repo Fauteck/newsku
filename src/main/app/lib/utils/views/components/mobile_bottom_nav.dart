@@ -8,8 +8,36 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class MobileBottomNav extends StatelessWidget {
+class MobileBottomNav extends StatefulWidget {
   const MobileBottomNav({super.key});
+
+  @override
+  State<MobileBottomNav> createState() => _MobileBottomNavState();
+}
+
+class _MobileBottomNavState extends State<MobileBottomNav> {
+  StackRouter? _router;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final router = AutoRouter.of(context);
+    if (!identical(router, _router)) {
+      _router?.removeListener(_onRouteChanged);
+      _router = router;
+      _router?.addListener(_onRouteChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    _router?.removeListener(_onRouteChanged);
+    super.dispose();
+  }
+
+  void _onRouteChanged() {
+    if (mounted) setState(() {});
+  }
 
   void _showMoreSheet(BuildContext context) {
     final router = AutoRouter.of(context);
@@ -65,12 +93,14 @@ class MobileBottomNav extends StatelessWidget {
       selected = 2;
     } else if (router.isRouteActive(ClassicFeedRoute.name)) {
       selected = 1;
-    } else {
+    } else if (router.isRouteActive(FeedRoute.name)) {
       selected = 0;
+    } else {
+      selected = -1;
     }
 
     return NavigationBar(
-      selectedIndex: selected,
+      selectedIndex: selected >= 0 ? selected : 0,
       onDestinationSelected: (i) {
         if (i == 3) {
           _showMoreSheet(context);
