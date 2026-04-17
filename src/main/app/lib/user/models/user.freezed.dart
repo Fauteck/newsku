@@ -33,7 +33,7 @@ bool operator ==(Object other) {
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,username,password,email,feedItemPreference,oidcSub,minimumImportance,firstTimeSetupDone,readItemHandling,const DeepCollectionEquality().hash(emailDigest),gReaderUsername,gReaderApiPassword,gReaderUrl,openAiApiKey,openAiModel,openAiUrl,enableTextShortening,openAiMonthlyTokenLimitRelevance,openAiMonthlyTokenLimitShortening,aiPromptId);
+int get hashCode => Object.hashAll([runtimeType,id,username,password,email,feedItemPreference,oidcSub,minimumImportance,firstTimeSetupDone,readItemHandling,const DeepCollectionEquality().hash(emailDigest),gReaderUsername,gReaderApiPassword,gReaderUrl,openAiApiKey,openAiModel,openAiUrl,enableTextShortening,openAiMonthlyTokenLimitRelevance,openAiMonthlyTokenLimitShortening,aiPromptId]);
 
 @override
 String toString() {
