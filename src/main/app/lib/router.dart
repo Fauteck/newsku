@@ -14,6 +14,7 @@ import 'package:app/settings/views/tabs/info.dart';
 import 'package:app/settings/views/tabs/layout.dart';
 import 'package:app/settings/views/tabs/user.dart';
 import 'package:app/stats/views/screens/stats_screen.dart';
+import 'package:app/stats/views/tabs/ai_stats.dart';
 import 'package:app/stats/views/tabs/feed_stats.dart';
 import 'package:app/stats/views/tabs/tag_stats.dart';
 import 'package:app/user/views/components/forgot_password.dart';
@@ -60,6 +61,14 @@ class AppRouter extends RootStackRouter {
         children: [
           AutoRoute(page: FeedRoute.page, initial: true),
           AutoRoute(page: ClassicFeedRoute.page),
+          AutoRoute(
+            page: StatsRoute.page,
+            children: [
+              AutoRoute(page: TagStatsRoute.page, initial: true),
+              AutoRoute(page: FeedStatsRoute.page),
+              AutoRoute(page: AiStatsRoute.page),
+            ],
+          ),
         ],
         onNavigation: loginRequired,
       ),
@@ -73,14 +82,6 @@ class AppRouter extends RootStackRouter {
           AutoRoute(page: GeneralSettingsRoute.page),
           AutoRoute(page: UserSettingsRoute.page),
           AutoRoute(page: InfoRoute.page),
-        ],
-      ),
-      AutoRoute.guarded(
-        page: StatsRoute.page,
-        onNavigation: loginRequired,
-        children: [
-          AutoRoute(page: TagStatsRoute.page, initial: true),
-          AutoRoute(page: FeedStatsRoute.page),
         ],
       ),
       AutoRoute(page: ResetPasswordRoute.page, path: "/reset-password"),

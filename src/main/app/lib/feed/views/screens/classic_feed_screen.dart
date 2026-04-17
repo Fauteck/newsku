@@ -56,7 +56,9 @@ class ClassicFeedScreen extends StatelessWidget {
                           ],
                   ),
                   SliverToBoxAdapter(
-                    child: _ClassicFeedFilterBar(state: state, cubit: cubit),
+                    child: isMobile
+                        ? _ClassicFeedChipFilters(state: state, cubit: cubit)
+                        : _ClassicFeedFilterBar(state: state, cubit: cubit),
                   ),
                   if (state.items.isEmpty && !state.loading)
                     SliverFillRemaining(
@@ -182,6 +184,201 @@ class _ClassicFeedFilterBar extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+/// Mobile variant: three compact [ActionChip]s in a horizontally-scrollable row.
+/// Each chip opens a bottom sheet with selectable options so the top of the
+/// feed stays dedicated to content, not filter controls.
+class _ClassicFeedChipFilters extends StatelessWidget {
+  final ClassicFeedState state;
+  final ClassicFeedCubit cubit;
+
+  const _ClassicFeedChipFilters({required this.state, required this.cubit});
+
+  @override
+  Widget build(BuildContext context) {
+    final locals = AppLocalizations.of(context)!;
+
+    final visibleFeeds = state.categoryId == null
+        ? state.feeds
+        : state.feeds.where((f) => f.category?.id == state.categoryId).toList();
+
+    final sortLabel = switch (state.sort) {
+      ClassicFeedSort.chronological => locals.classicFeedsSortChronological,
+      ClassicFeedSort.importance => locals.classicFeedsSortImportance,
+    };
+
+    final categoryLabel = state.categoryId == null
+        ? locals.classicFeedsAllCategories
+        : state.categories
+              .firstWhere(
+                (c) => c.id == state.categoryId,
+                orElse: () => FeedCategory(id: null, name: locals.classicFeedsAllCategories),
+              )
+              .name;
+
+    final feedLabel = state.feedId == null
+        ? locals.classicFeedsAllFeeds
+        : (state.feeds
+                  .firstWhere(
+                    (f) => f.id == state.feedId,
+                    orElse: () => Feed(id: null, url: null, name: locals.classicFeedsAllFeeds),
+                  )
+                  .name ??
+              locals.classicFeedsAllFeeds);
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: EdgeInsets.symmetric(horizontal: pu3, vertical: pu2),
+      child: Row(
+        spacing: pu2,
+        children: [
+          _FilterChip(
+            key: const Key('classic-feed-sort'),
+            icon: Icons.sort,
+            label: sortLabel,
+            onTap: () => _openSortSheet(context),
+          ),
+          if (state.categories.isNotEmpty)
+            _FilterChip(
+              key: const Key('classic-feed-category'),
+              icon: Icons.category_outlined,
+              label: categoryLabel,
+              onTap: () => _openCategorySheet(context),
+              active: state.categoryId != null,
+            ),
+          if (visibleFeeds.isNotEmpty || state.feedId != null)
+            _FilterChip(
+              key: const Key('classic-feed-feed'),
+              icon: Icons.rss_feed,
+              label: feedLabel,
+              onTap: () => _openFeedSheet(context, visibleFeeds),
+              active: state.feedId != null,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openSortSheet(BuildContext context) async {
+    final locals = AppLocalizations.of(context)!;
+    await _showFilterSheet<ClassicFeedSort>(
+      context: context,
+      title: locals.classicFeedsSortLabel,
+      current: state.sort,
+      options: [
+        (ClassicFeedSort.chronological, locals.classicFeedsSortChronological),
+        (ClassicFeedSort.importance, locals.classicFeedsSortImportance),
+      ],
+      onSelected: cubit.setSort,
+    );
+  }
+
+  Future<void> _openCategorySheet(BuildContext context) async {
+    final locals = AppLocalizations.of(context)!;
+    await _showFilterSheet<String?>(
+      context: context,
+      title: locals.classicFeedsCategoryLabel,
+      current: state.categoryId,
+      options: [
+        (null, locals.classicFeedsAllCategories),
+        ...state.categories.where((c) => c.id != null).map((c) => (c.id, c.name)),
+      ],
+      onSelected: cubit.setCategoryFilter,
+    );
+  }
+
+  Future<void> _openFeedSheet(BuildContext context, List<Feed> visibleFeeds) async {
+    final locals = AppLocalizations.of(context)!;
+    await _showFilterSheet<String?>(
+      context: context,
+      title: locals.classicFeedsFeedLabel,
+      current: state.feedId,
+      options: [
+        (null, locals.classicFeedsAllFeeds),
+        ...visibleFeeds.where((f) => f.id != null).map((f) => (f.id, f.name ?? f.url ?? '—')),
+      ],
+      onSelected: cubit.setFeedFilter,
+    );
+  }
+}
+
+Future<void> _showFilterSheet<T>({
+  required BuildContext context,
+  required String title,
+  required T current,
+  required List<(T, String)> options,
+  required ValueChanged<T> onSelected,
+}) async {
+  await showModalBottomSheet<void>(
+    context: context,
+    showDragHandle: true,
+    builder: (sheetContext) {
+      final textTheme = Theme.of(sheetContext).textTheme;
+      return SafeArea(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(sheetContext).size.height * 0.6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: pu4, vertical: pu2),
+                child: Text(title, style: textTheme.titleMedium),
+              ),
+              const Divider(height: 1),
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: options
+                      .map(
+                        (opt) => RadioListTile<T>(
+                          title: Text(opt.$2),
+                          value: opt.$1,
+                          groupValue: current,
+                          onChanged: (value) {
+                            Navigator.of(sheetContext).pop();
+                            onSelected(value as T);
+                          },
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+class _FilterChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool active;
+
+  const _FilterChip({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.active = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return ActionChip(
+      avatar: Icon(icon, size: 18, color: active ? colors.onSecondaryContainer : colors.primary),
+      label: Text(label, overflow: TextOverflow.ellipsis),
+      onPressed: onTap,
+      backgroundColor: active ? colors.secondaryContainer : null,
+      visualDensity: VisualDensity.compact,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }
 }

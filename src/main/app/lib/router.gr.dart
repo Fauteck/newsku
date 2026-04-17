@@ -410,6 +410,22 @@ class TagStatsRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [AiStatsTab]
+class AiStatsRoute extends PageRouteInfo<void> {
+  const AiStatsRoute({List<PageRouteInfo>? children})
+    : super(AiStatsRoute.name, initialChildren: children, argsEquality: false);
+
+  static const String name = 'AiStatsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AiStatsTab();
+    },
+  );
+}
+
+/// generated route for
 /// [UserSettingsTab]
 class UserSettingsRoute extends PageRouteInfo<void> {
   const UserSettingsRoute({List<PageRouteInfo>? children})

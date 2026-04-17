@@ -995,6 +995,11 @@ abstract class AppLocalizations {
   String get openAiLimitRelevance;
   String get openAiLimitShortening;
   String get openAiLimitHint;
+  String get aiUsagePeriodDay;
+  String get aiUsagePeriodWeek;
+  String get aiUsagePeriodMonth;
+  String aiUsageCost(Object cost);
+  String get aiUsageByModel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
