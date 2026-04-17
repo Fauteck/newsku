@@ -28,7 +28,11 @@ public interface FeedItemRepository extends JpaRepository<FeedItem, String> {
 
     List<FeedItem> findBySavedTrueAndFeedIn(Collection<Feed> feeds);
 
-    FeedItem findByGReaderItemId(String gReaderItemId);
+    // Spring Data interprets the "GR" prefix as an acronym and would look up a
+    // non-existent "GReaderItemId" property, so the JPQL is written by hand.
+    @Query("select i from FeedItem i where i.gReaderItemId = :gReaderItemId")
+    FeedItem findByGReaderItemId(@Param("gReaderItemId") String gReaderItemId);
 
-    List<FeedItem> findByGReaderItemIdInAndFeedIn(Collection<String> gReaderItemIds, Collection<Feed> feeds);
+    @Query("select i from FeedItem i where i.gReaderItemId in :gReaderItemIds and i.feed in :feeds")
+    List<FeedItem> findByGReaderItemIdInAndFeedIn(@Param("gReaderItemIds") Collection<String> gReaderItemIds, @Param("feeds") Collection<Feed> feeds);
 }

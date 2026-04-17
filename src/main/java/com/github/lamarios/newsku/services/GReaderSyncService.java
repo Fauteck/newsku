@@ -111,8 +111,16 @@ public class GReaderSyncService {
         if (!gReaderApiService.isCredentialsConfigured(user)) {
             throw new NewskuException("GReader credentials not configured");
         }
-        syncCategoriesStrict(user);
-        syncFeedsStrict(user);
+        try {
+            syncCategoriesStrict(user);
+            syncFeedsStrict(user);
+        } catch (NewskuException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("On-demand GReader sync failed for user {}: {}", user.getUsername(), e.getMessage(), e);
+            String msg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+            throw new NewskuException("GReader sync failed: " + msg);
+        }
     }
 
     // -----------------------------------------------------------------------
