@@ -36,7 +36,7 @@ public class ClickControllerTest extends TestContainerTest {
 
         feedItemService.refreshFeedWorker(feed);
 
-        var items = feedItemController.getItems(0L, System.currentTimeMillis(), 0, 9999999, null);
+        var items = feedItemController.getItems(0L, System.currentTimeMillis(), 0, 9999999, null, null, null, null);
 
         assertTrue(items.hasContent());
 
