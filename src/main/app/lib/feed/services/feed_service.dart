@@ -92,9 +92,15 @@ class FeedService extends BaseService {
     required int from,
     required int to,
     int? minimumImportance,
+    String? sort,
+    String? feedId,
+    String? categoryId,
   }) async {
-    final query = {'page': page, 'pageSize': pageSize, 'from': from, 'to': to};
+    final query = <String, dynamic>{'page': page, 'pageSize': pageSize, 'from': from, 'to': to};
     if (minimumImportance != null) query['minimumImportance'] = minimumImportance;
+    if (sort != null) query['sort'] = sort;
+    if (feedId != null) query['feedId'] = feedId;
+    if (categoryId != null) query['categoryId'] = categoryId;
     var uri = await formatUrl('/api/feeds/items', query: query);
 
     var response = await http.get(uri, headers: await headers);

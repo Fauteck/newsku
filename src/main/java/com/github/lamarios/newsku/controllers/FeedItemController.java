@@ -45,12 +45,15 @@ public class FeedItemController {
             @RequestParam("to") Long to,
             @DefaultValue("0") @RequestParam("page") int page,
             @DefaultValue("100") @RequestParam("pageSize") int pageSize,
-            @RequestParam(value = "minimumImportance", required = false) Integer minimumImportance
+            @RequestParam(value = "minimumImportance", required = false) Integer minimumImportance,
+            @RequestParam(value = "sort", required = false) String sort,
+            @RequestParam(value = "feedId", required = false) String feedId,
+            @RequestParam(value = "categoryId", required = false) String categoryId
     ) throws SQLException {
         if (from == null || to == null) {
             throw new InvalidParameterException("from and to query parameters are required");
         }
-        return feedItemService.getItems(from, to, page, pageSize, minimumImportance);
+        return feedItemService.getItems(from, to, page, pageSize, minimumImportance, sort, feedId, categoryId);
     }
 
     @PostMapping("/read")

@@ -212,5 +212,12 @@
     "blockAiPromptLabel": "Block-Prompt (optional)",
     "classicFeedsTitle": "Feeds",
     "classicFeedsNoItems": "Keine Artikel vorhanden",
-    "classicFeedsLoadMore": "Mehr laden"
+    "classicFeedsLoadMore": "Mehr laden",
+    "classicFeedsSortLabel": "Sortierung",
+    "classicFeedsSortChronological": "Chronologisch",
+    "classicFeedsSortImportance": "Relevanz",
+    "classicFeedsCategoryLabel": "Kategorie",
+    "classicFeedsAllCategories": "Alle Kategorien",
+    "classicFeedsFeedLabel": "Feed",
+    "classicFeedsAllFeeds": "Alle Feeds"
 }

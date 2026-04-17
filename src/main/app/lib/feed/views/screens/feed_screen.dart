@@ -4,15 +4,14 @@ import 'dart:ui';
 import 'package:app/feed/models/feed_item.dart';
 import 'package:app/feed/states/main_feed.dart';
 import 'package:app/feed/views/components/date_bar.dart';
+import 'package:app/feed/views/components/feed_profile_menu.dart';
 import 'package:app/feed/views/components/search_result.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/magazine/models/magazine_tab.dart';
 import 'package:app/magazine/states/magazine_tabs.dart';
-import 'package:app/main.dart';
 import 'package:app/router.dart';
-import 'package:app/user/views/components/user_profile_picture.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/app_name.dart';
@@ -21,7 +20,6 @@ import 'package:app/utils/views/components/error_listener.dart';
 import 'package:app/utils/views/components/main_color_provider.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:intl/intl.dart';
@@ -238,10 +236,17 @@ class FeedScreen extends StatelessWidget {
                                               ] else ...[
                                                 IconButton(
                                                   onPressed: () => cubit.setSearch(true),
-                                                  icon: Icon(Icons.search),
+                                                  icon: const Icon(Icons.search),
                                                 ),
                                                 IconButton(
-                                                  key: Key('saved-filter-button'),
+                                                  key: const Key('feeds-button'),
+                                                  onPressed: () =>
+                                                      AutoRouter.of(context).push(const ClassicFeedRoute()),
+                                                  icon: const Icon(Icons.rss_feed_outlined),
+                                                  tooltip: locals.classicFeedsTitle,
+                                                ),
+                                                IconButton(
+                                                  key: const Key('saved-filter-button'),
                                                   onPressed: () => cubit.setSavedFilter(!state.showSavedOnly),
                                                   icon: Icon(
                                                     state.showSavedOnly ? Icons.bookmarks : Icons.bookmarks_outlined,
@@ -251,63 +256,11 @@ class FeedScreen extends StatelessWidget {
                                                 ),
                                                 IconButton(
                                                   onPressed: () => cubit.refresh(),
-                                                  icon: Icon(Icons.refresh),
+                                                  icon: const Icon(Icons.refresh),
                                                 ),
-                                                MenuAnchor(
-                                                  key: Key('profile-button'),
-                                                  builder: (context, controller, child) => IconButton(
-                                                    onPressed: () =>
-                                                        controller.isOpen ? controller.close() : controller.open(),
-                                                    icon: UserProfilePicture(),
-                                                  ),
-                                                  menuChildren: [
-                                                    MenuItemButton(
-                                                      leadingIcon: Icon(Icons.rss_feed),
-                                                      onPressed: () => AutoRouter.of(context).push(const ClassicFeedRoute()),
-                                                      child: Text(locals.classicFeedsTitle),
-                                                    ),
-                                                    MenuItemButton(
-                                                      leadingIcon: Icon(Icons.show_chart),
-                                                      onPressed: () => AutoRouter.of(context).push(StatsRoute()),
-                                                      child: Text(locals.stats),
-                                                    ),
-                                                    if (!(context.read<IdentityCubit>().state.config?.demoMode ??
-                                                        false))
-                                                      MenuItemButton(
-                                                        key: Key('settings-button'),
-                                                        leadingIcon: ConditionalWrap(
-                                                          wrapIf: state.errorCount > 0,
-                                                          wrapper: (child) => Badge(
-                                                            offset: Offset(5, 0),
-                                                            backgroundColor: colors.errorContainer,
-                                                            textColor: colors.error,
-                                                            label: Text('${state.errorCount}'),
-                                                            child: child,
-                                                          ),
-
-                                                          child: Icon(Icons.settings),
-                                                        ),
-                                                        child: Text(locals.settings),
-                                                        onPressed: () => AutoRouter.of(
-                                                          context,
-                                                        ).push(SettingsRoute()).then((value) => cubit.refresh()),
-                                                      ),
-                                                    if (config?.gReaderUrl != null &&
-                                                        config!.gReaderUrl!.isNotEmpty) ...[
-                                                      Divider(),
-                                                      MenuItemButton(
-                                                        leadingIcon: Icon(Icons.open_in_new),
-                                                        onPressed: () => launchUrl(Uri.parse(config!.gReaderUrl!)),
-                                                        child: Text(locals.openInGreader),
-                                                      ),
-                                                    ],
-                                                    Divider(),
-                                                    MenuItemButton(
-                                                      leadingIcon: Icon(Icons.logout),
-                                                      onPressed: () => getIt.get<IdentityCubit>().logout(),
-                                                      child: Text(locals.logout),
-                                                    ),
-                                                  ],
+                                                FeedProfileMenu(
+                                                  errorCount: state.errorCount,
+                                                  onSettingsClosed: () => cubit.refresh(),
                                                 ),
                                               ],
                                             ],

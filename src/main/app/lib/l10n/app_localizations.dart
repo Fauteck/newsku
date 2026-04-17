@@ -971,6 +971,13 @@ abstract class AppLocalizations {
   String get classicFeedsTitle;
   String get classicFeedsNoItems;
   String get classicFeedsLoadMore;
+  String get classicFeedsSortLabel;
+  String get classicFeedsSortChronological;
+  String get classicFeedsSortImportance;
+  String get classicFeedsCategoryLabel;
+  String get classicFeedsAllCategories;
+  String get classicFeedsFeedLabel;
+  String get classicFeedsAllFeeds;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
