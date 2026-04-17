@@ -7,6 +7,8 @@
     ],
     "feedItemPreference": "ai preference",
     "firstTimeSetupDone": true,
+    "gReaderUrl": "https://greader.example.com",
+    "gReaderUsername": "testuser",
     "id": "10f5a36c-c82a-4d16-8085-647ab0d3fc55",
     "minimumImportance": 5,
     "oidcSub": "ff73c9e2-48be-4b07-a9bd-42c538f2171d",

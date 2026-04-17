@@ -1,5 +1,7 @@
 package com.github.lamarios.newsku.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class AppConfig {
     private boolean allowSignup;
     private OIDCConfig oidcConfig;
@@ -56,6 +58,7 @@ public class AppConfig {
         this.canResetPassword = canResetPassword;
     }
 
+    @JsonProperty("gReaderUrl")
     private String gReaderUrl;
 
     public String getGReaderUrl() {

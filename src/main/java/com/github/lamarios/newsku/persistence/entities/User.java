@@ -39,14 +39,16 @@ public class User {
     @Enumerated(EnumType.STRING)
     private List<EmailDigestFrequency> emailDigest;
 
+    @JsonProperty("gReaderUsername")
     @Column(name = "freshrss_username")
     private String gReaderUsername;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty(value = "gReaderApiPassword", access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "freshrss_api_password")
     @Convert(converter = StringCryptoConverter.class)
     private String gReaderApiPassword;
 
+    @JsonProperty("gReaderUrl")
     @Column(name = "freshrss_url")
     private String gReaderUrl;
 
