@@ -9,6 +9,7 @@ import 'package:app/reset-password/views/screens/reset_password.dart';
 import 'package:app/settings/views/screens/feed_errors.dart';
 import 'package:app/settings/views/screens/settings.dart';
 import 'package:app/settings/views/tabs/ai.dart';
+import 'package:app/settings/views/tabs/ai_activity_log.dart';
 import 'package:app/settings/views/tabs/feeds.dart';
 import 'package:app/settings/views/tabs/general.dart';
 import 'package:app/settings/views/tabs/info.dart';
