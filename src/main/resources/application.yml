@@ -1,9 +1,10 @@
 server:
- # tomcat:
- #   threads:
- #     max: 8
   port: 8080
   forward-headers-strategy: framework
+  tomcat:
+    max-http-response-headers: 200
+ #   threads:
+ #     max: 8
 spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_DATABASE:newsku}
