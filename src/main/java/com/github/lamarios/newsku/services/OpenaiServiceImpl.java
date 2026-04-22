@@ -325,6 +325,9 @@ public class OpenaiServiceImpl implements OpenaiService {
 
     private OpenAIClient buildClient(User user) {
         String url = first(user.getOpenAiUrl(), defaultUrl);
+        if (url == null || url.isBlank()) {
+            throw new IllegalStateException("No OpenAI base URL configured");
+        }
         String apiKey = first(user.getOpenAiApiKey(), defaultApiKey);
 
         // Ollama and other self-hosted OpenAI-compatible servers don't require an API

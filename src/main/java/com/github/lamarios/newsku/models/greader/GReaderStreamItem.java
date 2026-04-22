@@ -180,6 +180,7 @@ public class GReaderStreamItem {
         return enclosure.stream()
                 .filter(Enclosure::isImage)
                 .map(Enclosure::getUrl)
+                .filter(url -> url != null && !url.isBlank())
                 .findFirst()
                 .orElse(null);
     }
