@@ -12,9 +12,6 @@ services:
 
     environment:
       TZ: Europe/Berlin
-      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
-      OPENAI_MODEL: "${OPENAI_MODEL:-gpt-4o-mini}"
-      OPENAI_URL: "${OPENAI_URL:-https://api.openai.com/v1}"
       SALT: "${SALT}"
       ALLOW_SIGNUP: "${ALLOW_SIGNUP:-0}"
       DB_HOST: postgres-newsku
