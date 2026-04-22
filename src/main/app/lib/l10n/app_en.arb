@@ -246,5 +246,24 @@
     "aiUsagePeriodWeek": "Woche",
     "aiUsagePeriodMonth": "Monat",
     "aiUsageCost": "Geschätzte Kosten: {cost}",
-    "aiUsageByModel": "Nach Modell"
+    "aiUsageByModel": "Nach Modell",
+    "aiLog": "Log",
+    "aiLogEmpty": "Noch keine KI-Aktivität aufgezeichnet.",
+    "aiLogRetry": "Erneut versuchen",
+    "aiLogLoadMore": "Mehr laden",
+    "aiLogUseCaseRelevance": "Relevanz-Bewertung",
+    "aiLogUseCaseShortening": "Text-Kürzung",
+    "aiLogTokenCount": "{count} Tokens",
+    "@aiLogTokenCount": {
+        "placeholders": {
+            "count": {"type": "int"}
+        }
+    },
+    "aiLogTokenBreakdown": "{prompt} Prompt · {completion} Completion",
+    "@aiLogTokenBreakdown": {
+        "placeholders": {
+            "prompt": {"type": "int"},
+            "completion": {"type": "int"}
+        }
+    }
 }

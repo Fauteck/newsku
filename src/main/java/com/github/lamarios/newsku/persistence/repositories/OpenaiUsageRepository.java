@@ -3,6 +3,8 @@ package com.github.lamarios.newsku.persistence.repositories;
 import com.github.lamarios.newsku.models.OpenAiUseCase;
 import com.github.lamarios.newsku.persistence.entities.OpenaiUsage;
 import com.github.lamarios.newsku.persistence.entities.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,4 +26,6 @@ public interface OpenaiUsageRepository extends JpaRepository<OpenaiUsage, String
                         @Param("to") long to);
 
     List<OpenaiUsage> findByUserAndCreatedAtBetween(User user, long from, long to);
+
+    Page<OpenaiUsage> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
 }

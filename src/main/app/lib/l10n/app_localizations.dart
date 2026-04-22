@@ -1005,6 +1005,14 @@ abstract class AppLocalizations {
   String get aiUsagePeriodMonth;
   String aiUsageCost(Object cost);
   String get aiUsageByModel;
+  String get aiLog;
+  String get aiLogEmpty;
+  String get aiLogRetry;
+  String get aiLogLoadMore;
+  String get aiLogUseCaseRelevance;
+  String get aiLogUseCaseShortening;
+  String aiLogTokenCount(int count);
+  String aiLogTokenBreakdown(int prompt, int completion);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

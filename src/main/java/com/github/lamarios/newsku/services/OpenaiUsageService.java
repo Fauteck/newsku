@@ -3,12 +3,15 @@ package com.github.lamarios.newsku.services;
 import com.github.lamarios.newsku.models.OpenAiModelUsage;
 import com.github.lamarios.newsku.models.OpenAiUsageStats;
 import com.github.lamarios.newsku.models.OpenAiUseCase;
+import com.github.lamarios.newsku.models.OpenaiUsageEntryDto;
+import com.github.lamarios.newsku.models.PageResponse;
 import com.github.lamarios.newsku.persistence.entities.OpenaiUsage;
 import com.github.lamarios.newsku.persistence.entities.User;
 import com.github.lamarios.newsku.persistence.repositories.OpenaiUsageRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -178,6 +181,26 @@ public class OpenaiUsageService {
             case RELEVANCE -> user.getOpenAiMonthlyTokenLimitRelevance();
             case SHORTENING -> user.getOpenAiMonthlyTokenLimitShortening();
         };
+    }
+
+    /**
+     * Returns paginated individual AI call log entries for the current user,
+     * newest first.
+     */
+    @Transactional(readOnly = true)
+    public PageResponse<OpenaiUsageEntryDto> getLog(User user, int page, int size) {
+        var pageRequest = PageRequest.of(page, size);
+        var rows = repository.findByUserOrderByCreatedAtDesc(user, pageRequest);
+        return PageResponse.of(rows.map(r -> new OpenaiUsageEntryDto(
+                r.getId(),
+                r.getUseCase().name(),
+                r.getModel(),
+                r.getPromptTokens(),
+                r.getCompletionTokens(),
+                r.getTotalTokens(),
+                r.getEstimatedCostUsd(),
+                r.getCreatedAt()
+        )));
     }
 
     /** Returns [startOfMonthMs, startOfNextMonthMs] in UTC. */

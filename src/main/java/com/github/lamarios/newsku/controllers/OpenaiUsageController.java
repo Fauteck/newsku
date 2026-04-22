@@ -2,6 +2,8 @@ package com.github.lamarios.newsku.controllers;
 
 import com.github.lamarios.newsku.models.OpenAiUsageStats;
 import com.github.lamarios.newsku.models.OpenAiUseCase;
+import com.github.lamarios.newsku.models.OpenaiUsageEntryDto;
+import com.github.lamarios.newsku.models.PageResponse;
 import com.github.lamarios.newsku.services.OpenaiUsageService;
 import com.github.lamarios.newsku.services.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -44,5 +46,17 @@ public class OpenaiUsageController {
             return usageService.getMonthlyUsage(user);
         }
         return usageService.getUsage(user, from, to);
+    }
+
+    /**
+     * Returns paginated individual AI call log entries for the current user,
+     * newest first.
+     */
+    @GetMapping("/log")
+    public PageResponse<OpenaiUsageEntryDto> getLog(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "50") int size) {
+        var user = userService.getCurrentUser();
+        return usageService.getLog(user, page, Math.min(size, 100));
     }
 }
