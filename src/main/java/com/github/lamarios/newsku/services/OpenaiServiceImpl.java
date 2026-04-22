@@ -280,6 +280,12 @@ public class OpenaiServiceImpl implements OpenaiService {
         if (msg == null || msg.isBlank()) {
             msg = t.toString();
         }
+        // Some providers (e.g. Google Gemini OpenAI-compat endpoint) return HTTP 429
+        // with no response body, causing the SDK to report "429: null". Strip the
+        // trailing ": null" so the UI shows just the status code.
+        if (msg != null && msg.endsWith(": null")) {
+            msg = msg.substring(0, msg.length() - 6);
+        }
         return msg;
     }
 

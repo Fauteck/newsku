@@ -57,16 +57,20 @@ class AiSettingsTab extends StatelessWidget {
                       onChanged: (double value) => cubit.setAndSaveImportance(value),
                     ),
                     Gap(pu4),
-                    // Textkürzung toggle
-                    BlocBuilder<LocalPreferencesCubit, LocalPreferencesState>(
-                      bloc: getIt.get<LocalPreferencesCubit>(),
-                      builder: (context, prefsState) => SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(locals.truncateText),
-                        subtitle: Text(locals.truncateTextExplanation, style: subTextTheme),
-                        value: prefsState.truncateText,
-                        onChanged: (value) => getIt.get<LocalPreferencesCubit>().setTruncateText(value),
-                      ),
+                    // Textkürzung toggle — drives both the server-side AI generation
+                    // flag (enableTextShortening) and the local display preference
+                    // (truncateText) so they stay in sync.
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(locals.truncateText),
+                      subtitle: Text(locals.truncateTextExplanation, style: subTextTheme),
+                      value: state.user?.enableTextShortening ?? true,
+                      onChanged: state.loading
+                          ? null
+                          : (value) {
+                              cubit.setEnableTextShortening(value);
+                              getIt.get<LocalPreferencesCubit>().setTruncateText(value);
+                            },
                     ),
                     Gap(pu8),
                     const Divider(),
