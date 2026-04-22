@@ -1,7 +1,6 @@
 import 'package:app/ai/states/ai_prompts.dart';
-import 'package:app/identity/states/identity.dart';
+import 'package:app/feed/views/components/feed_profile_menu.dart';
 import 'package:app/l10n/app_localizations.dart';
-import 'package:app/main.dart';
 import 'package:app/settings/views/tabs/ai.dart';
 import 'package:app/settings/views/tabs/ai_activity_log.dart';
 import 'package:app/settings/views/tabs/feeds.dart';
@@ -30,16 +29,10 @@ class SettingsScreen extends StatelessWidget {
           appBar: AppBar(
             title: Text(locals.settings),
             automaticallyImplyLeading: false,
-            leading: !isMobile
-                ? BackButton(onPressed: () => AutoRouter.of(context).maybePop())
-                : null,
-            actions: [
-              TextButton.icon(
-                onPressed: () => getIt.get<IdentityCubit>().logout(),
-                label: Text(locals.logout),
-                icon: const Icon(Icons.logout),
-              ),
-            ],
+            leading: BackButton(
+              onPressed: () => AutoRouter.of(context).maybePop(),
+            ),
+            actions: const [FeedProfileMenu()],
             bottom: TabBar(
               isScrollable: true,
               tabAlignment: TabAlignment.start,
