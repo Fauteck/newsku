@@ -1,5 +1,6 @@
 package com.github.lamarios.newsku.controllers;
 
+import com.github.lamarios.newsku.models.PageResponse;
 import com.github.lamarios.newsku.persistence.entities.FeedItem;
 import com.github.lamarios.newsku.persistence.entities.LayoutBlock;
 import com.github.lamarios.newsku.persistence.entities.MagazineTab;
@@ -8,7 +9,6 @@ import com.github.lamarios.newsku.services.LayoutService;
 import com.github.lamarios.newsku.services.MagazineTabService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class PublicMagazineController {
     }
 
     @GetMapping("/{tabId}/items")
-    public Page<FeedItem> getPublicTabItems(
+    public PageResponse<FeedItem> getPublicTabItems(
             @PathVariable String tabId,
             @RequestParam("from") long from,
             @RequestParam("to") long to,
@@ -44,6 +44,6 @@ public class PublicMagazineController {
             @RequestParam(value = "pageSize", defaultValue = "100") int pageSize
     ) {
         MagazineTab tab = magazineTabService.getPublicTab(tabId);
-        return feedItemService.getPublicItems(tab, from, to, page, pageSize);
+        return PageResponse.of(feedItemService.getPublicItems(tab, from, to, page, pageSize));
     }
 }

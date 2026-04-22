@@ -147,6 +147,7 @@ class ClassicFeedCubit extends Cubit<ClassicFeedState> {
         pageSize: _pageSize,
         from: from,
         to: now,
+        minimumImportance: 0,
         sort: state.sort == ClassicFeedSort.chronological ? 'chronological' : 'importance',
         feedId: state.feedId,
         categoryId: state.categoryId,

@@ -1,5 +1,6 @@
 package com.github.lamarios.newsku.controllers;
 
+import com.github.lamarios.newsku.models.PageResponse;
 import com.github.lamarios.newsku.persistence.entities.FeedItem;
 import com.github.lamarios.newsku.services.FeedItemService;
 import com.github.lamarios.newsku.services.ImageCacheService;
@@ -9,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.bind.DefaultValue;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +40,7 @@ public class FeedItemController {
     }
 
     @GetMapping
-    public Page<FeedItem> getItems(
+    public PageResponse<FeedItem> getItems(
             @RequestParam("from") Long from,
             @RequestParam("to") Long to,
             @DefaultValue("0") @RequestParam("page") int page,
@@ -53,7 +53,7 @@ public class FeedItemController {
         if (from == null || to == null) {
             throw new InvalidParameterException("from and to query parameters are required");
         }
-        return feedItemService.getItems(from, to, page, pageSize, minimumImportance, sort, feedId, categoryId);
+        return PageResponse.of(feedItemService.getItems(from, to, page, pageSize, minimumImportance, sort, feedId, categoryId));
     }
 
     @PostMapping("/read")
