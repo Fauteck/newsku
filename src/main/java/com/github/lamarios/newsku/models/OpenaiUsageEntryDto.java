@@ -6,9 +6,12 @@ public record OpenaiUsageEntryDto(
         String id,
         String useCase,
         String model,
-        int promptTokens,
-        int completionTokens,
-        int totalTokens,
+        Integer promptTokens,
+        Integer completionTokens,
+        Integer totalTokens,
         BigDecimal estimatedCostUsd,
-        long createdAt
+        long createdAt,
+        String status,
+        String errorMessage,
+        Integer durationMs
 ) {}

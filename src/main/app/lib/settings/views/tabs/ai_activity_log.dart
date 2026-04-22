@@ -103,12 +103,18 @@ class _LogEntryTile extends StatelessWidget {
     final locals = AppLocalizations.of(context)!;
 
     final isRelevance = entry.useCase == 'RELEVANCE';
-    final icon = isRelevance ? Icons.auto_awesome : Icons.compress;
+    final isError = entry.isError;
+    final icon = isError
+        ? Icons.error_outline
+        : (isRelevance ? Icons.auto_awesome : Icons.compress);
     final useCaseLabel = isRelevance ? locals.aiLogUseCaseRelevance : locals.aiLogUseCaseShortening;
-    final iconColor = isRelevance ? colors.primary : colors.tertiary;
+    final iconColor = isError
+        ? colors.error
+        : (isRelevance ? colors.primary : colors.tertiary);
 
     return Card(
       margin: EdgeInsets.only(bottom: pu2),
+      color: isError ? colors.errorContainer.withOpacity(0.35) : null,
       child: Padding(
         padding: EdgeInsets.all(pu3),
         child: Row(
@@ -139,28 +145,66 @@ class _LogEntryTile extends StatelessWidget {
                     ],
                   ),
                   Gap(pu1),
-                  Wrap(
-                    spacing: pu2,
-                    runSpacing: 4,
-                    children: [
-                      if (entry.model.isNotEmpty)
-                        _Chip(label: entry.model, icon: Icons.smart_toy_outlined),
-                      _Chip(
-                        label: locals.aiLogTokenCount(entry.totalTokens),
-                        icon: Icons.token_outlined,
+                  if (isError) ...[
+                    Text(
+                      locals.aiLogErrorLabel,
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colors.error,
+                        fontWeight: FontWeight.w600,
                       ),
-                      if (entry.estimatedCostUsd != null && entry.estimatedCostUsd! > 0)
+                    ),
+                    Gap(pu1),
+                    Text(
+                      entry.errorMessage ?? locals.aiLogErrorUnknown,
+                      style: textTheme.bodySmall?.copyWith(color: colors.onErrorContainer),
+                    ),
+                    Gap(pu1),
+                    Wrap(
+                      spacing: pu2,
+                      runSpacing: 4,
+                      children: [
+                        if (entry.model.isNotEmpty)
+                          _Chip(label: entry.model, icon: Icons.smart_toy_outlined),
+                        if (entry.durationMs != null)
+                          _Chip(
+                            label: _formatDuration(entry.durationMs!),
+                            icon: Icons.timer_outlined,
+                          ),
+                      ],
+                    ),
+                  ] else ...[
+                    Wrap(
+                      spacing: pu2,
+                      runSpacing: 4,
+                      children: [
+                        if (entry.model.isNotEmpty)
+                          _Chip(label: entry.model, icon: Icons.smart_toy_outlined),
                         _Chip(
-                          label: _costFormat.format(entry.estimatedCostUsd),
-                          icon: Icons.attach_money,
+                          label: entry.totalTokens != null
+                              ? locals.aiLogTokenCount(entry.totalTokens!)
+                              : locals.aiLogTokensUnknown,
+                          icon: Icons.token_outlined,
                         ),
-                    ],
-                  ),
-                  Gap(pu1),
-                  Text(
-                    locals.aiLogTokenBreakdown(entry.promptTokens, entry.completionTokens),
-                    style: textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant),
-                  ),
+                        if (entry.estimatedCostUsd != null && entry.estimatedCostUsd! > 0)
+                          _Chip(
+                            label: _costFormat.format(entry.estimatedCostUsd),
+                            icon: Icons.attach_money,
+                          ),
+                        if (entry.durationMs != null)
+                          _Chip(
+                            label: _formatDuration(entry.durationMs!),
+                            icon: Icons.timer_outlined,
+                          ),
+                      ],
+                    ),
+                    Gap(pu1),
+                    Text(
+                      (entry.promptTokens != null && entry.completionTokens != null)
+                          ? locals.aiLogTokenBreakdown(entry.promptTokens!, entry.completionTokens!)
+                          : locals.aiLogTokensUnknown,
+                      style: textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -168,6 +212,13 @@ class _LogEntryTile extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  static String _formatDuration(int ms) {
+    if (ms < 1000) return '${ms}ms';
+    final seconds = ms / 1000.0;
+    if (seconds < 10) return '${seconds.toStringAsFixed(1)}s';
+    return '${seconds.toStringAsFixed(0)}s';
   }
 }
 

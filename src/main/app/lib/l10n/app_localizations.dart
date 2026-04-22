@@ -1013,6 +1013,9 @@ abstract class AppLocalizations {
   String get aiLogUseCaseShortening;
   String aiLogTokenCount(int count);
   String aiLogTokenBreakdown(int prompt, int completion);
+  String get aiLogTokensUnknown;
+  String get aiLogErrorLabel;
+  String get aiLogErrorUnknown;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

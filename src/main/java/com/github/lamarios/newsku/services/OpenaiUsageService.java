@@ -5,6 +5,7 @@ import com.github.lamarios.newsku.models.OpenAiUsageStats;
 import com.github.lamarios.newsku.models.OpenAiUseCase;
 import com.github.lamarios.newsku.models.OpenaiUsageEntryDto;
 import com.github.lamarios.newsku.models.PageResponse;
+import com.github.lamarios.newsku.models.UsageStatus;
 import com.github.lamarios.newsku.persistence.entities.OpenaiUsage;
 import com.github.lamarios.newsku.persistence.entities.User;
 import com.github.lamarios.newsku.persistence.repositories.OpenaiUsageRepository;
@@ -28,14 +29,17 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Records each OpenAI call, aggregates monthly usage and enforces token
- * limits configured on the user.
+ * Records every AI call (successful and failed), aggregates monthly usage and
+ * enforces token limits configured on the user. Error entries keep the log
+ * usable for diagnostics (e.g. wrong Ollama URL returning 404), but are not
+ * counted against monthly token limits.
  */
 @Service
 public class OpenaiUsageService {
 
     private static final Logger logger = LogManager.getLogger();
     private static final String UNKNOWN_MODEL = "unknown";
+    private static final int MAX_ERROR_MESSAGE_LENGTH = 2000;
 
     private final OpenaiUsageRepository repository;
 
@@ -45,33 +49,82 @@ public class OpenaiUsageService {
     }
 
     /**
-     * Persists a single call's token usage. Any exception is logged and
+     * Persists a successful call's token usage. Any exception is logged and
      * swallowed — a missing usage row must never block the sync.
+     * Token parameters may be {@code null} when the provider's response did not
+     * include a usage field (typical for some Ollama configurations).
      */
     @Transactional
-    public void record(User user,
-                       OpenAiUseCase useCase,
-                       String model,
-                       int promptTokens,
-                       int completionTokens,
-                       int totalTokens,
-                       BigDecimal estimatedCostUsd) {
+    public void recordSuccess(User user,
+                              OpenAiUseCase useCase,
+                              String model,
+                              Integer promptTokens,
+                              Integer completionTokens,
+                              Integer totalTokens,
+                              Integer durationMs) {
+        save(user, useCase, model,
+                clampNonNegative(promptTokens),
+                clampNonNegative(completionTokens),
+                clampNonNegative(totalTokens),
+                null,
+                UsageStatus.OK,
+                null,
+                durationMs);
+    }
+
+    /**
+     * Persists a failed call so the activity log shows it to the user. Error
+     * rows never contribute to aggregated token counts or monthly limits.
+     */
+    @Transactional
+    public void recordError(User user,
+                            OpenAiUseCase useCase,
+                            String model,
+                            String errorMessage,
+                            Integer durationMs) {
+        save(user, useCase, model, null, null, null, null,
+                UsageStatus.ERROR, truncate(errorMessage), durationMs);
+    }
+
+    private void save(User user,
+                      OpenAiUseCase useCase,
+                      String model,
+                      Integer promptTokens,
+                      Integer completionTokens,
+                      Integer totalTokens,
+                      BigDecimal estimatedCostUsd,
+                      UsageStatus status,
+                      String errorMessage,
+                      Integer durationMs) {
         try {
             OpenaiUsage usage = new OpenaiUsage();
             usage.setId(UUID.randomUUID().toString());
             usage.setUser(user);
             usage.setUseCase(useCase);
             usage.setModel(model);
-            usage.setPromptTokens(Math.max(0, promptTokens));
-            usage.setCompletionTokens(Math.max(0, completionTokens));
-            usage.setTotalTokens(Math.max(0, totalTokens));
+            usage.setPromptTokens(promptTokens);
+            usage.setCompletionTokens(completionTokens);
+            usage.setTotalTokens(totalTokens);
             usage.setEstimatedCostUsd(estimatedCostUsd);
             usage.setCreatedAt(System.currentTimeMillis());
+            usage.setStatus(status);
+            usage.setErrorMessage(errorMessage);
+            usage.setDurationMs(durationMs);
             repository.save(usage);
         } catch (Exception e) {
-            logger.warn("Failed to record OpenAI usage for user {} useCase {}: {}",
-                    user != null ? user.getUsername() : "null", useCase, e.getMessage());
+            logger.warn("Failed to record OpenAI usage for user {} useCase {} status {}: {}",
+                    user != null ? user.getUsername() : "null", useCase, status, e.getMessage());
         }
+    }
+
+    private static Integer clampNonNegative(Integer v) {
+        if (v == null) return null;
+        return Math.max(0, v);
+    }
+
+    private static String truncate(String s) {
+        if (s == null) return null;
+        return s.length() > MAX_ERROR_MESSAGE_LENGTH ? s.substring(0, MAX_ERROR_MESSAGE_LENGTH) : s;
     }
 
     /**
@@ -109,7 +162,7 @@ public class OpenaiUsageService {
     }
 
     private Map<OpenAiUseCase, OpenAiUsageStats> aggregate(User user, long from, long to) {
-        List<OpenaiUsage> rows = repository.findByUserAndCreatedAtBetween(user, from, to);
+        List<OpenaiUsage> rows = repository.findSuccessfulByUserAndCreatedAtBetween(user, from, to);
 
         Map<OpenAiUseCase, long[]> sums = new HashMap<>();
         Map<OpenAiUseCase, BigDecimal> costs = new HashMap<>();
@@ -117,15 +170,19 @@ public class OpenaiUsageService {
         Map<OpenAiUseCase, Map<String, BigDecimal>> perModelCosts = new HashMap<>();
 
         for (OpenaiUsage r : rows) {
+            long total = nullableToLong(r.getTotalTokens());
+            long prompt = nullableToLong(r.getPromptTokens());
+            long completion = nullableToLong(r.getCompletionTokens());
+
             long[] agg = sums.computeIfAbsent(r.getUseCase(), k -> new long[]{0, 0, 0, 0});
-            agg[0] += r.getTotalTokens();
-            agg[1] += r.getPromptTokens();
-            agg[2] += r.getCompletionTokens();
+            agg[0] += total;
+            agg[1] += prompt;
+            agg[2] += completion;
             agg[3] += 1;
 
             BigDecimal rowCost = r.getEstimatedCostUsd();
             if (rowCost == null) {
-                rowCost = OpenAiPricing.estimate(r.getModel(), r.getPromptTokens(), r.getCompletionTokens());
+                rowCost = OpenAiPricing.estimate(r.getModel(), prompt, completion);
             }
             if (rowCost != null) {
                 costs.merge(r.getUseCase(), rowCost, BigDecimal::add);
@@ -134,9 +191,9 @@ public class OpenaiUsageService {
             String modelKey = (r.getModel() == null || r.getModel().isBlank()) ? UNKNOWN_MODEL : r.getModel();
             Map<String, long[]> models = perModel.computeIfAbsent(r.getUseCase(), k -> new LinkedHashMap<>());
             long[] modelAgg = models.computeIfAbsent(modelKey, k -> new long[]{0, 0, 0, 0});
-            modelAgg[0] += r.getTotalTokens();
-            modelAgg[1] += r.getPromptTokens();
-            modelAgg[2] += r.getCompletionTokens();
+            modelAgg[0] += total;
+            modelAgg[1] += prompt;
+            modelAgg[2] += completion;
             modelAgg[3] += 1;
 
             if (rowCost != null) {
@@ -176,6 +233,10 @@ public class OpenaiUsageService {
         return result;
     }
 
+    private static long nullableToLong(Integer v) {
+        return v == null ? 0L : v.longValue();
+    }
+
     private static Integer monthlyLimit(User user, OpenAiUseCase useCase) {
         return switch (useCase) {
             case RELEVANCE -> user.getOpenAiMonthlyTokenLimitRelevance();
@@ -185,7 +246,8 @@ public class OpenaiUsageService {
 
     /**
      * Returns paginated individual AI call log entries for the current user,
-     * newest first.
+     * newest first. Includes both successful and failed calls so the user can
+     * diagnose misconfiguration (e.g. wrong Ollama URL).
      */
     @Transactional(readOnly = true)
     public PageResponse<OpenaiUsageEntryDto> getLog(User user, int page, int size) {
@@ -199,7 +261,10 @@ public class OpenaiUsageService {
                 r.getCompletionTokens(),
                 r.getTotalTokens(),
                 r.getEstimatedCostUsd(),
-                r.getCreatedAt()
+                r.getCreatedAt(),
+                r.getStatus() != null ? r.getStatus().name() : UsageStatus.OK.name(),
+                r.getErrorMessage(),
+                r.getDurationMs()
         )));
     }
 

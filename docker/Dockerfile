@@ -1,12 +1,14 @@
 FROM amazoncorretto:25
 
-RUN mkdir /app
+RUN mkdir -p /app /app/cache/images
 
 COPY ./target/newsku-*.jar  /app/newsku.jar
 
 ADD ./docker/run.sh /run.sh
 
 EXPOSE 8080
+
+VOLUME ["/app/cache/images"]
 
 RUN chmod +x /run.sh
 

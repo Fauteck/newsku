@@ -1,6 +1,7 @@
 package com.github.lamarios.newsku.persistence.entities;
 
 import com.github.lamarios.newsku.models.OpenAiUseCase;
+import com.github.lamarios.newsku.models.UsageStatus;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -23,20 +24,30 @@ public class OpenaiUsage {
     @Column(name = "model")
     private String model;
 
-    @Column(name = "prompt_tokens", nullable = false)
-    private int promptTokens;
+    @Column(name = "prompt_tokens")
+    private Integer promptTokens;
 
-    @Column(name = "completion_tokens", nullable = false)
-    private int completionTokens;
+    @Column(name = "completion_tokens")
+    private Integer completionTokens;
 
-    @Column(name = "total_tokens", nullable = false)
-    private int totalTokens;
+    @Column(name = "total_tokens")
+    private Integer totalTokens;
 
     @Column(name = "estimated_cost_usd")
     private BigDecimal estimatedCostUsd;
 
     @Column(name = "created_at", nullable = false)
     private long createdAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 16)
+    private UsageStatus status = UsageStatus.OK;
+
+    @Column(name = "error_message", length = 2000)
+    private String errorMessage;
+
+    @Column(name = "duration_ms")
+    private Integer durationMs;
 
     public String getId() {
         return id;
@@ -70,27 +81,27 @@ public class OpenaiUsage {
         this.model = model;
     }
 
-    public int getPromptTokens() {
+    public Integer getPromptTokens() {
         return promptTokens;
     }
 
-    public void setPromptTokens(int promptTokens) {
+    public void setPromptTokens(Integer promptTokens) {
         this.promptTokens = promptTokens;
     }
 
-    public int getCompletionTokens() {
+    public Integer getCompletionTokens() {
         return completionTokens;
     }
 
-    public void setCompletionTokens(int completionTokens) {
+    public void setCompletionTokens(Integer completionTokens) {
         this.completionTokens = completionTokens;
     }
 
-    public int getTotalTokens() {
+    public Integer getTotalTokens() {
         return totalTokens;
     }
 
-    public void setTotalTokens(int totalTokens) {
+    public void setTotalTokens(Integer totalTokens) {
         this.totalTokens = totalTokens;
     }
 
@@ -108,5 +119,29 @@ public class OpenaiUsage {
 
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public UsageStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UsageStatus status) {
+        this.status = status;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    public Integer getDurationMs() {
+        return durationMs;
+    }
+
+    public void setDurationMs(Integer durationMs) {
+        this.durationMs = durationMs;
     }
 }
