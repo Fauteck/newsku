@@ -312,7 +312,7 @@ public class GReaderSyncService {
                 ? StringEscapeUtils.unescapeHtml4(HtmlUtils.getTextContent(rawContent))
                 : "no content";
 
-        var analysis = openaiService.processFeedItem(item.getId(), title, content, user, clicks);
+        var analysis = openaiService.processFeedItem(item.getId(), title, content, item.resolveTimestampMs(), user, clicks);
 
         String imageUrl = item.resolveImageUrl();
         if (imageUrl == null && rawContent != null) {

@@ -933,8 +933,11 @@ abstract class AppLocalizations {
   String get enableAiExplanation;
   String get openAiApiKey;
   String get openAiApiKeyHint;
+  String get openAiApiKeyOllamaNote;
   String get openAiModel;
   String get openAiUrl;
+  String get openAiUrlOllamaHint;
+  String get ollamaPreset;
   String get openAiSaved;
   String get namedPrompts;
   String get namedPromptsExplanation;
