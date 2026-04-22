@@ -1,5 +1,6 @@
 package com.github.lamarios.newsku.controllers;
 
+import com.github.lamarios.newsku.models.PageResponse;
 import com.github.lamarios.newsku.persistence.entities.FeedError;
 import com.github.lamarios.newsku.services.FeedErrorService;
 import com.github.lamarios.newsku.services.FeedService;
@@ -7,8 +8,9 @@ import com.github.lamarios.newsku.services.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/feed-errors")
@@ -34,12 +36,12 @@ public class FeedErrorController {
     }
 
     @GetMapping("{id}")
-    public Page<FeedError> getErrors(@PathVariable("id") String feedId, @RequestParam("page") int page, @RequestParam("pageSize") int pageSize) {
+    public PageResponse<FeedError> getErrors(@PathVariable("id") String feedId, @RequestParam("page") int page, @RequestParam("pageSize") int pageSize) {
         var feed = feedService.getFeed(feedId);
         if (feed == null) {
-            return Page.empty();
+            return new PageResponse<>(List.of(), 0, 0, 0, 0);
         }
-        return feedErrorService.getPaginatedErrors(feed, page, pageSize);
+        return PageResponse.of(feedErrorService.getPaginatedErrors(feed, page, pageSize));
 
     }
 }

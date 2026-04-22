@@ -357,16 +357,21 @@ public class OpenaiServiceImpl implements OpenaiService {
     }
 
     /**
-     * Returns true when the user has a usable AI endpoint configured: either an
-     * explicit API key (required for OpenAI / Azure) or a custom URL pointing to a
-     * self-hosted server such as Ollama that does not need a key.
+     * Returns true when the user has a fully usable AI endpoint configured.
+     * - With an API key: both key and effective base URL must be non-blank
+     *   (guards against docker-compose passing OPENAI_URL as an empty string,
+     *    which would override the Spring @Value default and cause failed retries).
+     * - Without an API key: a per-user custom URL is required (Ollama / compatible).
      */
     private boolean hasAiEndpoint(User user) {
         String apiKey = first(user.getOpenAiApiKey(), defaultApiKey);
-        if (apiKey != null && !apiKey.isBlank()) return true;
-        // Custom URL without an API key → assume Ollama / compatible endpoint
-        String url = user.getOpenAiUrl();
-        return url != null && !url.isBlank();
+        if (apiKey != null && !apiKey.isBlank()) {
+            String url = first(user.getOpenAiUrl(), defaultUrl);
+            return url != null && !url.isBlank();
+        }
+        // No API key → assume Ollama: only a per-user URL (not the system default) suffices
+        String perUserUrl = user.getOpenAiUrl();
+        return perUserUrl != null && !perUserUrl.isBlank();
     }
 
     private static String first(String primary, String fallback) {
