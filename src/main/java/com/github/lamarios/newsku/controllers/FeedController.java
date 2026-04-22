@@ -69,7 +69,11 @@ public class FeedController {
         if (demoMode) {
             throw new AccessDeniedException("App in demoMode");
         }
-        gReaderSyncService.syncFeedsAndCategoriesOnDemand(userService.getCurrentUser());
+        var user = userService.getCurrentUser();
+        gReaderSyncService.syncFeedsAndCategoriesOnDemand(user);
+        // Kick off article + starred sync in background so the response returns quickly
+        // while articles become available in the feed shortly after.
+        gReaderSyncService.syncArticlesAsync(user);
         return feedService.getFeeds();
     }
 
