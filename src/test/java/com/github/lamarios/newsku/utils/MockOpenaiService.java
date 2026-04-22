@@ -23,7 +23,7 @@ public class MockOpenaiService implements OpenaiService {
     }
 
     @Override
-    public Optional<OpenAiFeedResponse> processFeedItem(String guid, String title, String content, User user, List<TagClickStat> clickStats) {
+    public Optional<OpenAiFeedResponse> processFeedItem(String guid, String title, String content, long articleTimeMs, User user, List<TagClickStat> clickStats) {
         return Optional.of(new OpenAiFeedResponse(new Random().nextInt(100), false, "This is a test", List.of("my", "tags"), null, null));
     }
 }
