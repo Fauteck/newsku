@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,6 +122,22 @@ public class GReaderSyncService {
             logger.error("On-demand GReader sync failed for user {}: {}", user.getUsername(), e.getMessage(), e);
             String msg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
             throw new NewskuException("GReader sync failed: " + msg);
+        }
+    }
+
+    /**
+     * Fetches articles and starred items for the given user in a background thread
+     * so the on-demand sync endpoint can return immediately after the feed list is ready.
+     */
+    @Async
+    public void syncArticlesAsync(User user) {
+        try {
+            logger.info("Starting background article sync for user {}", user.getUsername());
+            syncArticles(user);
+            syncStarredItems(user);
+            logger.info("Background article sync complete for user {}", user.getUsername());
+        } catch (Exception e) {
+            logger.error("Background article sync failed for user {}: {}", user.getUsername(), e.getMessage(), e);
         }
     }
 
