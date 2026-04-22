@@ -319,7 +319,9 @@ public class GReaderSyncService {
 
     @Transactional
     protected void processArticle(GReaderStreamItem item, User user, List<com.github.lamarios.newsku.models.TagClickStat> clicks) {
-        if (feedItemRepository.findByGReaderItemId(item.getId()) != null) {
+        FeedItem existing = feedItemRepository.findByGReaderItemId(item.getId());
+        if (existing != null) {
+            rescoreIfNeeded(existing, item, user, clicks);
             return;
         }
 
@@ -387,6 +389,44 @@ public class GReaderSyncService {
     // -----------------------------------------------------------------------
     // Helpers
     // -----------------------------------------------------------------------
+
+    /**
+     * Re-runs AI scoring for an article that was previously saved without AI analysis
+     * (reasoning == null indicates the AI pipeline never ran for this article, e.g.
+     * because the endpoint was misconfigured when the article was first imported).
+     * Articles that already have a reasoning value are left untouched.
+     */
+    private void rescoreIfNeeded(FeedItem existing, GReaderStreamItem item, User user,
+                                 List<com.github.lamarios.newsku.models.TagClickStat> clicks) {
+        if (existing.getReasoning() != null) {
+            return;
+        }
+        String rawContent = item.resolveContent();
+        String title = item.getTitle() != null ? item.getTitle() : "no title";
+        String content = rawContent != null
+                ? StringEscapeUtils.unescapeHtml4(HtmlUtils.getTextContent(rawContent))
+                : "no content";
+
+        var analysis = openaiService.processFeedItem(
+                item.getId(), title, content, item.resolveTimestampMs(), user, clicks);
+
+        if (analysis.isEmpty()) {
+            return;
+        }
+
+        var a = analysis.get();
+        existing.setImportance(a.importance());
+        existing.setReasoning(a.reasoning());
+        existing.setShortTitle(a.shortTitle());
+        existing.setShortTeaser(a.shortTeaser());
+        existing.setTags(a.tags().stream()
+                .map(String::toLowerCase)
+                .map(s -> s.replaceAll("[^a-zA-Z0-9 ]", ""))
+                .filter(s -> !s.isEmpty())
+                .toList());
+        feedItemRepository.save(existing);
+        logger.info("Re-scored previously unscored article {} for user {}", existing.getId(), user.getUsername());
+    }
 
     private static String stripFeedPrefix(String streamId) {
         if (streamId != null && streamId.startsWith("feed/")) {
