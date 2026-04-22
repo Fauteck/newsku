@@ -76,21 +76,33 @@ public class OpenaiServiceImpl implements OpenaiService {
         String content = item.getDescription()
                 .filter(s -> !s.isBlank())
                 .orElseGet(() -> item.getContent().orElse("no content"));
+        long articleTimeMs = item.getPubDateAsZonedDateTime()
+                .map(zdt -> zdt.toInstant().toEpochMilli())
+                .orElse(System.currentTimeMillis());
         return processFeedItem(
                 item.getGuid().orElse("unknown"),
                 item.getTitle().orElse("no title"),
                 content,
+                articleTimeMs,
                 user,
                 clickStats);
     }
 
     @Override
-    public Optional<OpenAiFeedResponse> processFeedItem(String guid, String title, String content, User user, List<TagClickStat> clickStats) {
+    public Optional<OpenAiFeedResponse> processFeedItem(String guid, String title, String content, long articleTimeMs, User user, List<TagClickStat> clickStats) {
         if (!user.isAiEnabled()) {
             return Optional.empty();
         }
-        if (!hasApiKey(user)) {
-            logger.debug("Skipping AI analysis for user {} – no API key configured", user.getUsername());
+        if (!hasAiEndpoint(user)) {
+            logger.debug("Skipping AI analysis for user {} – no API key or endpoint configured", user.getUsername());
+            return Optional.empty();
+        }
+        // Fresh-install optimisation: skip AI for articles that predate the day the
+        // user first configured their AI endpoint. This prevents bulk-scoring of all
+        // historical articles on initial import and saves token quota.
+        Long aiEnabledSince = user.getAiEnabledSince();
+        if (aiEnabledSince != null && articleTimeMs < aiEnabledSince) {
+            logger.debug("Skipping AI for article {} – published before AI activation ({})", guid, aiEnabledSince);
             return Optional.empty();
         }
         Optional<OpenAiRelevanceResponse> relevance = scoreRelevance(guid, title, content, user, clickStats);
@@ -315,8 +327,11 @@ public class OpenaiServiceImpl implements OpenaiService {
         String url = first(user.getOpenAiUrl(), defaultUrl);
         String apiKey = first(user.getOpenAiApiKey(), defaultApiKey);
 
+        // Ollama and other self-hosted OpenAI-compatible servers don't require an API
+        // key. The Java SDK still needs a non-empty value for the Authorization header;
+        // the server ignores it. Use "ollama" as a harmless placeholder.
         if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalStateException("No OpenAI API key configured (user or environment)");
+            apiKey = "ollama";
         }
 
         var builder = OpenAIOkHttpClient.builder()
@@ -338,9 +353,17 @@ public class OpenaiServiceImpl implements OpenaiService {
         return flag == null || flag;
     }
 
-    private boolean hasApiKey(User user) {
+    /**
+     * Returns true when the user has a usable AI endpoint configured: either an
+     * explicit API key (required for OpenAI / Azure) or a custom URL pointing to a
+     * self-hosted server such as Ollama that does not need a key.
+     */
+    private boolean hasAiEndpoint(User user) {
         String apiKey = first(user.getOpenAiApiKey(), defaultApiKey);
-        return apiKey != null && !apiKey.isBlank();
+        if (apiKey != null && !apiKey.isBlank()) return true;
+        // Custom URL without an API key → assume Ollama / compatible endpoint
+        String url = user.getOpenAiUrl();
+        return url != null && !url.isBlank();
     }
 
     private static String first(String primary, String fallback) {

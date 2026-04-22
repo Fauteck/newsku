@@ -84,12 +84,43 @@ class AiSettingsTab extends StatelessWidget {
                       onChanged: state.loading ? null : (value) => cubit.setEnableAi(value),
                     ),
                     Gap(pu4),
+                    Text(locals.openAiUrl),
+                    Gap(pu1),
+                    TextField(
+                      key: const Key('openai-url'),
+                      controller: cubit.openAiUrlController,
+                      keyboardType: TextInputType.url,
+                      decoration: InputDecoration(
+                        hintText: 'https://api.openai.com/v1',
+                        helperText: locals.openAiUrlOllamaHint,
+                        helperMaxLines: 2,
+                      ),
+                    ),
+                    Gap(pu1),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: ActionChip(
+                        key: const Key('ollama-preset-chip'),
+                        avatar: const Icon(Icons.bolt, size: 16),
+                        label: Text(locals.ollamaPreset),
+                        onPressed: () {
+                          cubit.openAiUrlController.text = 'http://ollama.fauteck.eu/v1';
+                          cubit.openAiApiKeyController.text = '';
+                        },
+                      ),
+                    ),
+                    Gap(pu2),
                     Text(locals.openAiApiKey),
+                    Gap(pu1),
                     TextField(
                       key: const Key('openai-api-key'),
                       controller: cubit.openAiApiKeyController,
                       obscureText: true,
-                      decoration: InputDecoration(hintText: locals.openAiApiKeyHint),
+                      decoration: InputDecoration(
+                        hintText: locals.openAiApiKeyHint,
+                        helperText: locals.openAiApiKeyOllamaNote,
+                        helperMaxLines: 2,
+                      ),
                     ),
                     Gap(pu2),
                     Text(locals.openAiModel),
@@ -97,14 +128,6 @@ class AiSettingsTab extends StatelessWidget {
                       key: const Key('openai-model'),
                       controller: cubit.openAiModelController,
                       decoration: InputDecoration(hintText: 'gpt-4o-mini'),
-                    ),
-                    Gap(pu2),
-                    Text(locals.openAiUrl),
-                    TextField(
-                      key: const Key('openai-url'),
-                      controller: cubit.openAiUrlController,
-                      keyboardType: TextInputType.url,
-                      decoration: InputDecoration(hintText: 'https://api.openai.com/v1'),
                     ),
                     Gap(pu2),
                     Align(

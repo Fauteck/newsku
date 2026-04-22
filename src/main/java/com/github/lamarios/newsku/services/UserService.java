@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -91,6 +93,11 @@ public class UserService {
         return Optional.ofNullable(userRepository.getUserByOidcSub(sub));
     }
 
+    private static long startOfTodayUtcMs() {
+        return Instant.now().atZone(ZoneOffset.UTC).toLocalDate()
+                .atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+    }
+
     public User updateUser(User user) {
         return userRepository.save(user);
     }
@@ -124,6 +131,24 @@ public class UserService {
             // (the UI intentionally clears the password field after a save).
             if (user.getGReaderApiPassword() == null || user.getGReaderApiPassword().isBlank()) {
                 user.setGReaderApiPassword(currentUser.getGReaderApiPassword());
+            }
+
+            // Detect first-time AI configuration (check BEFORE the API-key preservation
+            // below so we can see the raw incoming value from the client).
+            // On a fresh installation the user sets an API key (OpenAI) or a custom URL
+            // (Ollama / self-hosted). We record the start of today (UTC) so that the sync
+            // engine only applies AI scoring to articles published from that day onward,
+            // avoiding a bulk-scoring of all historical articles on first import.
+            if (currentUser.getAiEnabledSince() != null) {
+                // Already configured – preserve the recorded timestamp.
+                user.setAiEnabledSince(currentUser.getAiEnabledSince());
+            } else {
+                boolean settingKey = user.getOpenAiApiKey() != null && !user.getOpenAiApiKey().isBlank();
+                boolean settingUrl = user.getOpenAiUrl() != null && !user.getOpenAiUrl().isBlank()
+                        && (currentUser.getOpenAiUrl() == null || currentUser.getOpenAiUrl().isBlank());
+                if (settingKey || settingUrl) {
+                    user.setAiEnabledSince(startOfTodayUtcMs());
+                }
             }
 
             // Same for the OpenAI API key — never returned to the client, so a

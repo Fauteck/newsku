@@ -78,6 +78,9 @@ public class User {
     @Column(name = "enable_ai", nullable = false)
     private Boolean enableAi = Boolean.TRUE;
 
+    @Column(name = "ai_enabled_since")
+    private Long aiEnabledSince;
+
     public String getId() {
         return id;
     }
@@ -249,5 +252,13 @@ public class User {
 
     public boolean isAiEnabled() {
         return enableAi == null || enableAi;
+    }
+
+    public Long getAiEnabledSince() {
+        return aiEnabledSince;
+    }
+
+    public void setAiEnabledSince(Long aiEnabledSince) {
+        this.aiEnabledSince = aiEnabledSince;
     }
 }

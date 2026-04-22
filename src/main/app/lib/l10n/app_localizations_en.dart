@@ -600,10 +600,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openAiApiKeyHint => 'Leer lassen, um den bestehenden Schlüssel beizubehalten';
 
   @override
+  String get openAiApiKeyOllamaNote => 'Für Ollama / lokale Endpunkte ist kein API-Schlüssel erforderlich.';
+
+  @override
   String get openAiModel => 'Modell';
 
   @override
   String get openAiUrl => 'API-URL';
+
+  @override
+  String get openAiUrlOllamaHint => 'Ollama-Beispiel: http://mein-ollama-host/v1';
+
+  @override
+  String get ollamaPreset => 'Ollama-Schnelleinrichtung';
 
   @override
   String get openAiSaved => 'KI-Einstellungen gespeichert';
