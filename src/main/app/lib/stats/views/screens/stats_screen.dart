@@ -1,3 +1,4 @@
+import 'package:app/feed/views/components/feed_profile_menu.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/router.dart';
 import 'package:app/stats/states/stats_state.dart';
@@ -27,6 +28,11 @@ class StatsScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text(locals.stats),
           automaticallyImplyLeading: false,
+          leading: BackButton(
+            onPressed: () => AutoRouter.of(context)
+                .navigate(const HomeRoute(children: [FeedRoute()])),
+          ),
+          actions: const [FeedProfileMenu()],
           bottom: TabBar(
             controller: tabController,
             tabs: [

@@ -37,17 +37,14 @@ class ClassicFeedScreen extends StatelessWidget {
                   SliverAppBar(
                     floating: true,
                     snap: true,
+                    leading: BackButton(
+                      onPressed: () => AutoRouter.of(context)
+                          .navigate(const HomeRoute(children: [FeedRoute()])),
+                    ),
                     title: Text(locals.classicFeedsTitle),
                     actions: isMobile
-                        ? null
+                        ? [const FeedProfileMenu()]
                         : [
-                            IconButton(
-                              key: const Key('feeds-button'),
-                              onPressed: () => AutoRouter.of(context)
-                                  .navigate(const HomeRoute(children: [FeedRoute()])),
-                              icon: Icon(Icons.rss_feed, color: colors.primary),
-                              tooltip: locals.classicFeedsTitle,
-                            ),
                             IconButton(
                               onPressed: () => cubit.refresh(),
                               icon: const Icon(Icons.refresh),
