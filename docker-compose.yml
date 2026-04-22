@@ -97,7 +97,7 @@ services:
       - /srv/docker-data/newsku/postgres:/var/lib/postgresql/data
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432"]
       interval: 10s
       timeout: 5s
       retries: 10
