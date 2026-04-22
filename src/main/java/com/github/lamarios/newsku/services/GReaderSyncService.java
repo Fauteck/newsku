@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Synchronises data from a GReader-compatible backend into newsku.
@@ -46,6 +47,8 @@ public class GReaderSyncService {
 
     private static final Logger logger = LogManager.getLogger();
     private static final long PROMPT_TAG_TIME_FRAME = 30L * 24 * 60 * 60 * 1000;
+
+    private final ConcurrentHashMap<String, Boolean> articlesyncInProgress = new ConcurrentHashMap<>();
 
     private final GReaderApiService gReaderApiService;
     private final UserRepository userRepository;
@@ -131,6 +134,11 @@ public class GReaderSyncService {
      */
     @Async
     public void syncArticlesAsync(User user) {
+        String userId = user.getId();
+        if (articlesyncInProgress.putIfAbsent(userId, Boolean.TRUE) != null) {
+            logger.info("Article sync already in progress for user {}, skipping duplicate trigger", user.getUsername());
+            return;
+        }
         try {
             logger.info("Starting background article sync for user {}", user.getUsername());
             syncArticles(user);
@@ -138,6 +146,8 @@ public class GReaderSyncService {
             logger.info("Background article sync complete for user {}", user.getUsername());
         } catch (Exception e) {
             logger.error("Background article sync failed for user {}: {}", user.getUsername(), e.getMessage(), e);
+        } finally {
+            articlesyncInProgress.remove(userId);
         }
     }
 
