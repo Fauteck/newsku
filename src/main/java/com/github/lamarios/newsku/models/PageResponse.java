@@ -20,4 +20,12 @@ public record PageResponse<T>(
                 page.getNumber()
         );
     }
+
+    public List<T> getContent() {
+        return content;
+    }
+
+    public boolean hasContent() {
+        return !content.isEmpty();
+    }
 }
