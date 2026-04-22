@@ -77,7 +77,7 @@ services:
       - proxy
 
   postgres-newsku:
-    image: postgres:18-alpine
+    image: postgres:17-alpine
     container_name: newsku_postgres
     restart: unless-stopped
 
