@@ -51,6 +51,14 @@ class OpenaiServiceImplQuotaTest {
     }
 
     @Test
+    void detects429WithNullBody() {
+        // Google Gemini OpenAI-compat endpoint returns 429 with no body;
+        // the SDK reports it as "429: null" — must still be detected.
+        assertTrue(OpenaiServiceImpl.isQuotaOrRateLimit(
+                new RuntimeException("429: null")));
+    }
+
+    @Test
     void ignoresNullMessage() {
         assertFalse(OpenaiServiceImpl.isQuotaOrRateLimit(new RuntimeException()));
     }
