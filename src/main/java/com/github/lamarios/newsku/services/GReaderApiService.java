@@ -361,7 +361,14 @@ public class GReaderApiService {
 
     private static String stripTrailingSlash(String url) {
         if (url == null) return "";
-        return url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
+        // Strip trailing slash first
+        if (url.endsWith("/")) url = url.substring(0, url.length() - 1);
+        // If the user entered the full GReader endpoint URL (ending with /api/greader.php),
+        // strip that suffix so the base URL is always the server root.
+        if (url.endsWith("/api/greader.php")) {
+            url = url.substring(0, url.length() - "/api/greader.php".length());
+        }
+        return url;
     }
 
     public void invalidateToken(User user) {
