@@ -818,4 +818,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiUsageByModel => 'Nach Modell';
+
+  @override
+  String get aiLog => 'Log';
+
+  @override
+  String get aiLogEmpty => 'Noch keine KI-Aktivität aufgezeichnet.';
+
+  @override
+  String get aiLogRetry => 'Erneut versuchen';
+
+  @override
+  String get aiLogLoadMore => 'Mehr laden';
+
+  @override
+  String get aiLogUseCaseRelevance => 'Relevanz-Bewertung';
+
+  @override
+  String get aiLogUseCaseShortening => 'Text-Kürzung';
+
+  @override
+  String aiLogTokenCount(int count) => '$count Tokens';
+
+  @override
+  String aiLogTokenBreakdown(int prompt, int completion) => '$prompt Prompt · $completion Completion';
 }

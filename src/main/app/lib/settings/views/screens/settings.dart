@@ -3,6 +3,7 @@ import 'package:app/identity/states/identity.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/main.dart';
 import 'package:app/settings/views/tabs/ai.dart';
+import 'package:app/settings/views/tabs/ai_activity_log.dart';
 import 'package:app/settings/views/tabs/feeds.dart';
 import 'package:app/settings/views/tabs/info.dart';
 import 'package:app/settings/views/tabs/layout.dart';
@@ -24,7 +25,7 @@ class SettingsScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) => AiPromptsCubit(const AiPromptsState()),
       child: DefaultTabController(
-        length: 5,
+        length: 6,
         child: Scaffold(
           appBar: AppBar(
             title: Text(locals.settings),
@@ -47,6 +48,7 @@ class SettingsScreen extends StatelessWidget {
                 Tab(text: locals.layout, icon: const Icon(Icons.view_module_outlined)),
                 Tab(text: locals.feeds, icon: const Icon(Icons.rss_feed)),
                 Tab(text: locals.aiTab, icon: const Icon(Icons.auto_awesome)),
+                Tab(text: locals.aiLog, icon: const Icon(Icons.history)),
                 Tab(text: locals.about, icon: const Icon(Icons.info_outline)),
               ],
             ),
@@ -63,6 +65,7 @@ class SettingsScreen extends StatelessWidget {
                     const LayoutSettingsTab(),
                     const FeedsSettingsTab(),
                     const AiSettingsTab(),
+                    const AiActivityLogTab(),
                     const InfoTab(),
                   ],
                 ),
