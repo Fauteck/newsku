@@ -216,29 +216,38 @@ public class OpenaiServiceImpl implements OpenaiService {
     private <T> Optional<T> callWithRetry(User user, OpenAiUseCase useCase, String guid,
                                           String prompt, Class<T> responseClass) {
         String model = effectiveModel(user);
+        long start = System.currentTimeMillis();
         OpenAIClient client;
         try {
             client = buildClient(user);
         } catch (IllegalStateException e) {
             logger.debug("OpenAI client unavailable for user {} ({}): {}",
                     user.getUsername(), useCase, e.getMessage());
+            usageService.recordError(user, useCase, model,
+                    "Client configuration error: " + e.getMessage(),
+                    (int) (System.currentTimeMillis() - start));
             return Optional.empty();
         }
 
+        Exception last = null;
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 return singleCall(client, model, user, useCase, guid, prompt, responseClass);
             } catch (Exception e) {
+                last = e;
                 if (isQuotaOrRateLimit(e)) {
                     logger.error("OpenAI {} quota exceeded for user {} — aborting sync: {}",
                             useCase, user.getUsername(), e.getMessage());
+                    usageService.recordError(user, useCase, model,
+                            "Quota/rate limit: " + shortMessage(e),
+                            (int) (System.currentTimeMillis() - start));
                     throw new OpenAiQuotaExceededException(
                             "OpenAI quota/rate limit hit for user " + user.getUsername() + ": " + e.getMessage());
                 }
                 if (attempt >= maxRetries) {
                     logger.error("OpenAI {} call failed after {} attempts for item {}: {}",
                             useCase, maxRetries, guid, e.getMessage());
-                    return Optional.empty();
+                    break;
                 }
                 long backoffMs = (1L << attempt) * 1000L;
                 logger.warn("OpenAI {} call failed (attempt {}/{}), retrying in {}ms: {}",
@@ -247,11 +256,31 @@ public class OpenaiServiceImpl implements OpenaiService {
                     Thread.sleep(backoffMs);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
+                    usageService.recordError(user, useCase, model,
+                            "Interrupted: " + shortMessage(e),
+                            (int) (System.currentTimeMillis() - start));
                     return Optional.empty();
                 }
             }
         }
+        usageService.recordError(user, useCase, model,
+                shortMessage(last),
+                (int) (System.currentTimeMillis() - start));
         return Optional.empty();
+    }
+
+    /**
+     * Extracts a concise, user-meaningful message from an OpenAI SDK exception.
+     * The SDK typically uses {@code "<status>: <body>"} as its toString; we
+     * prefer that over the stack trace so the UI shows e.g. {@code "404: ..."}.
+     */
+    private static String shortMessage(Throwable t) {
+        if (t == null) return "Unknown error";
+        String msg = t.getMessage();
+        if (msg == null || msg.isBlank()) {
+            msg = t.toString();
+        }
+        return msg;
     }
 
     /**
@@ -294,29 +323,39 @@ public class OpenaiServiceImpl implements OpenaiService {
                 .flatMap(choice -> choice.message().content().stream())
                 .toList();
 
-        recordUsage(user, useCase, model, completion);
+        long durationMs = System.currentTimeMillis() - start;
+        recordUsage(user, useCase, model, completion, durationMs);
 
         Optional<T> first = analysis.stream().findFirst();
         first.ifPresent(r -> logger.info("OpenAI {} result for {} took {}s",
-                useCase, guid, (System.currentTimeMillis() - start) / 1000));
+                useCase, guid, durationMs / 1000));
         return first;
     }
 
-    private void recordUsage(User user, OpenAiUseCase useCase, String model, StructuredChatCompletion<?> completion) {
+    /**
+     * Records a successful call. Token counts may be absent (Ollama and some
+     * other OpenAI-compatible servers don't populate the {@code usage} field);
+     * we still persist the row so the user sees the activity in the log.
+     */
+    private void recordUsage(User user, OpenAiUseCase useCase, String model,
+                             StructuredChatCompletion<?> completion, long durationMs) {
+        Integer prompt = null, comp = null, total = null;
         try {
-            completion.usage().ifPresent(u -> {
-                long prompt = u.promptTokens();
-                long comp = u.completionTokens();
-                long total = u.totalTokens();
-                usageService.record(user, useCase, model,
-                        (int) Math.min(prompt, Integer.MAX_VALUE),
-                        (int) Math.min(comp, Integer.MAX_VALUE),
-                        (int) Math.min(total, Integer.MAX_VALUE),
-                        null);
-            });
+            var usageOpt = completion.usage();
+            if (usageOpt.isPresent()) {
+                var u = usageOpt.get();
+                prompt = clampInt(u.promptTokens());
+                comp = clampInt(u.completionTokens());
+                total = clampInt(u.totalTokens());
+            }
         } catch (Exception e) {
             logger.debug("Could not extract OpenAI usage (SDK incompatibility?): {}", e.getMessage());
         }
+        usageService.recordSuccess(user, useCase, model, prompt, comp, total, (int) durationMs);
+    }
+
+    private static int clampInt(long v) {
+        return (int) Math.min(Math.max(v, 0L), Integer.MAX_VALUE);
     }
 
     // -----------------------------------------------------------------------

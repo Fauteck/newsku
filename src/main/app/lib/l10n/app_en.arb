@@ -265,5 +265,8 @@
             "prompt": {"type": "int"},
             "completion": {"type": "int"}
         }
-    }
+    },
+    "aiLogTokensUnknown": "Tokens unbekannt",
+    "aiLogErrorLabel": "Fehler",
+    "aiLogErrorUnknown": "Unbekannter Fehler"
 }

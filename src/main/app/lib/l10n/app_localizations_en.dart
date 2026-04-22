@@ -842,4 +842,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String aiLogTokenBreakdown(int prompt, int completion) => '$prompt Prompt · $completion Completion';
+
+  @override
+  String get aiLogTokensUnknown => 'Tokens unbekannt';
+
+  @override
+  String get aiLogErrorLabel => 'Fehler';
+
+  @override
+  String get aiLogErrorUnknown => 'Unbekannter Fehler';
 }

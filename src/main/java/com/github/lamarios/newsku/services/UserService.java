@@ -98,6 +98,16 @@ public class UserService {
                 .atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
     }
 
+    static String normaliseOpenAiUrl(String url) {
+        if (url == null) return null;
+        String trimmed = url.trim();
+        if (trimmed.isEmpty()) return trimmed;
+        while (trimmed.endsWith("/")) {
+            trimmed = trimmed.substring(0, trimmed.length() - 1);
+        }
+        return trimmed;
+    }
+
     public User updateUser(User user) {
         return userRepository.save(user);
     }
@@ -132,6 +142,12 @@ public class UserService {
             if (user.getGReaderApiPassword() == null || user.getGReaderApiPassword().isBlank()) {
                 user.setGReaderApiPassword(currentUser.getGReaderApiPassword());
             }
+
+            // Normalise the OpenAI base URL: trim whitespace and strip any trailing
+            // slashes. The OpenAI SDK builds request URLs by appending "/chat/completions"
+            // etc., so a trailing slash produces a double slash and some gateways
+            // (Ollama via reverse proxy, Cloudflare) reject that.
+            user.setOpenAiUrl(normaliseOpenAiUrl(user.getOpenAiUrl()));
 
             // Detect first-time AI configuration (check BEFORE the API-key preservation
             // below so we can see the raw incoming value from the client).
