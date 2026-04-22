@@ -38,9 +38,9 @@ public class OpenaiUsageServiceTest extends TestContainerTest {
     void recordsAndAggregatesPerUseCase() {
         User user = userRepository.getUserByUsername("test").getFirst();
 
-        usageService.record(user, OpenAiUseCase.RELEVANCE, "gpt-4o-mini", 100, 30, 130, null);
-        usageService.record(user, OpenAiUseCase.RELEVANCE, "gpt-4o-mini", 50, 20, 70, null);
-        usageService.record(user, OpenAiUseCase.SHORTENING, "gpt-4o-mini", 80, 40, 120, null);
+        usageService.recordSuccess(user, OpenAiUseCase.RELEVANCE, "gpt-4o-mini", 100, 30, 130, null);
+        usageService.recordSuccess(user, OpenAiUseCase.RELEVANCE, "gpt-4o-mini", 50, 20, 70, null);
+        usageService.recordSuccess(user, OpenAiUseCase.SHORTENING, "gpt-4o-mini", 80, 40, 120, null);
 
         Map<OpenAiUseCase, OpenAiUsageStats> stats = usageService.getMonthlyUsage(user);
 
@@ -69,10 +69,10 @@ public class OpenaiUsageServiceTest extends TestContainerTest {
         assertFalse(usageService.isLimitExceeded(user, OpenAiUseCase.RELEVANCE),
                 "with zero usage and a 100 limit we are not exceeding");
 
-        usageService.record(user, OpenAiUseCase.RELEVANCE, "m", 50, 20, 70, null);
+        usageService.recordSuccess(user, OpenAiUseCase.RELEVANCE, "m", 50, 20, 70, null);
         assertFalse(usageService.isLimitExceeded(user, OpenAiUseCase.RELEVANCE));
 
-        usageService.record(user, OpenAiUseCase.RELEVANCE, "m", 20, 10, 30, null);
+        usageService.recordSuccess(user, OpenAiUseCase.RELEVANCE, "m", 20, 10, 30, null);
         assertTrue(usageService.isLimitExceeded(user, OpenAiUseCase.RELEVANCE),
                 "70 + 30 = 100 ≥ limit — must be flagged exceeded");
     }
@@ -80,7 +80,7 @@ public class OpenaiUsageServiceTest extends TestContainerTest {
     @Test
     void unsetLimitIsNeverExceeded() {
         User user = userRepository.getUserByUsername("test").getFirst();
-        usageService.record(user, OpenAiUseCase.SHORTENING, "m", 1_000_000, 1_000_000, 2_000_000, null);
+        usageService.recordSuccess(user, OpenAiUseCase.SHORTENING, "m", 1_000_000, 1_000_000, 2_000_000, null);
         assertFalse(usageService.isLimitExceeded(user, OpenAiUseCase.SHORTENING),
                 "no limit configured → never blocked");
     }
@@ -90,7 +90,7 @@ public class OpenaiUsageServiceTest extends TestContainerTest {
         User user = userRepository.getUserByUsername("test").getFirst();
 
         // 1M input tokens on gpt-4o-mini → $0.15, 1M output → $0.60, sum $0.75
-        usageService.record(user, OpenAiUseCase.RELEVANCE, "gpt-4o-mini",
+        usageService.recordSuccess(user, OpenAiUseCase.RELEVANCE, "gpt-4o-mini",
                 1_000_000, 1_000_000, 2_000_000, null);
 
         OpenAiUsageStats stats = usageService.getMonthlyUsage(user).get(OpenAiUseCase.RELEVANCE);
@@ -102,7 +102,7 @@ public class OpenaiUsageServiceTest extends TestContainerTest {
     @Test
     void unknownModelLeavesCostNull() {
         User user = userRepository.getUserByUsername("test").getFirst();
-        usageService.record(user, OpenAiUseCase.SHORTENING, "some-other-model",
+        usageService.recordSuccess(user, OpenAiUseCase.SHORTENING, "some-other-model",
                 100, 50, 150, null);
 
         OpenAiUsageStats stats = usageService.getMonthlyUsage(user).get(OpenAiUseCase.SHORTENING);
@@ -113,9 +113,9 @@ public class OpenaiUsageServiceTest extends TestContainerTest {
     @Test
     void modelBreakdownGroupsPerModel() {
         User user = userRepository.getUserByUsername("test").getFirst();
-        usageService.record(user, OpenAiUseCase.RELEVANCE, "gpt-4o-mini", 100, 50, 150, null);
-        usageService.record(user, OpenAiUseCase.RELEVANCE, "gpt-4o-mini", 200, 100, 300, null);
-        usageService.record(user, OpenAiUseCase.RELEVANCE, "gpt-4o", 10, 5, 15, null);
+        usageService.recordSuccess(user, OpenAiUseCase.RELEVANCE, "gpt-4o-mini", 100, 50, 150, null);
+        usageService.recordSuccess(user, OpenAiUseCase.RELEVANCE, "gpt-4o-mini", 200, 100, 300, null);
+        usageService.recordSuccess(user, OpenAiUseCase.RELEVANCE, "gpt-4o", 10, 5, 15, null);
 
         OpenAiUsageStats stats = usageService.getMonthlyUsage(user).get(OpenAiUseCase.RELEVANCE);
         List<OpenAiModelUsage> breakdown = stats.modelBreakdown();
