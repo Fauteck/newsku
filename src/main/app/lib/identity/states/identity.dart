@@ -27,6 +27,18 @@ class IdentityCubit extends Cubit<IdentityState> {
     // Token stored in secure storage (Keystore/Keychain); server URL in SharedPreferences (not sensitive).
     var token = await _secureStorage.read(key: 'token');
     var prefs = await SharedPreferences.getInstance();
+
+    // One-time migration: before F1 the token lived in SharedPreferences. Move any
+    // leftover legacy token into secure storage so existing sessions survive the upgrade.
+    if (token == null) {
+      final legacyToken = prefs.getString('token');
+      if (legacyToken != null) {
+        await _secureStorage.write(key: 'token', value: legacyToken);
+        await prefs.remove('token');
+        token = legacyToken;
+      }
+    }
+
     var server = prefs.getString('server');
 
     if (kIsWeb && !kDebugMode) {

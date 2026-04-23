@@ -17,6 +17,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,7 @@ import java.util.function.Function;
 public class JwtTokenUtil {
     private static final Logger logger = LogManager.getLogger();
     private final SecretKey key;
+    private final SecretKey legacyKey;
 
     public static final long JWT_TOKEN_VALIDITY = 90 * 24 * 60 * 60;
     private static final long serialVersionUID = -2550185165626007488L;
@@ -45,6 +47,7 @@ public class JwtTokenUtil {
         this.salt = salt;
 
         this.key = deriveKey(salt);
+        this.legacyKey = deriveLegacyKey(salt);
 
     }
 
@@ -60,6 +63,23 @@ public class JwtTokenUtil {
         } finally {
             spec.clearPassword();
         }
+    }
+
+    // Pre-B4 key derivation. Only used to verify tokens signed before the PBKDF2 migration
+    // so that existing sessions survive the upgrade. New tokens are always signed with
+    // `key` above. Remove once the 90-day JWT validity window has elapsed post-rollout.
+    private static SecretKey deriveLegacyKey(String salt) {
+        byte[] saltBytes = salt.getBytes(StandardCharsets.UTF_8);
+        if (saltBytes.length < 64) {
+            byte[] extended = new byte[64];
+            for (int i = 0; i < 64; i++) {
+                extended[i] = saltBytes[i % saltBytes.length];
+            }
+            saltBytes = extended;
+        } else if (saltBytes.length > 64) {
+            saltBytes = Arrays.copyOf(saltBytes, 64);
+        }
+        return new SecretKeySpec(saltBytes, "HmacSHA512");
     }
 
 
@@ -83,13 +103,17 @@ public class JwtTokenUtil {
     public Claims getAllClaimsFromToken(String token) {
         try {
             return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
-        } catch (Exception e) {
+        } catch (Exception primaryFailure) {
+            try {
+                return Jwts.parser().verifyWith(legacyKey).build().parseSignedClaims(token).getPayload();
+            } catch (Exception legacyFailure) {
+                throw primaryFailure;
+            }
 /*
             if (oidcService.getParser() != null) {
                 return oidcService.getParser().parseSignedClaims(token).getPayload();
             } else {
 */
-            throw e;
 //            }
         }
     }
