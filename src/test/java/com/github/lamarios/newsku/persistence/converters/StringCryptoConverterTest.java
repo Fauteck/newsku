@@ -1,42 +1,29 @@
 package com.github.lamarios.newsku.persistence.converters;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Round-trip tests for the AES-GCM JPA converter used to encrypt
- * credentials at rest. Runs without Spring context — sets
- * {@code APP_ENCRYPTION_KEY} as a system property.
+ * credentials at rest. Runs without Spring context — the {@link SecretKey}
+ * is built directly from a deterministic test key.
  */
 class StringCryptoConverterTest {
 
     private static final String TEST_KEY_B64 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; // 32 zero bytes, AES-256
 
-    private String previousKey;
-
-    @BeforeEach
-    void setKey() {
-        previousKey = System.getProperty("APP_ENCRYPTION_KEY");
-        System.setProperty("APP_ENCRYPTION_KEY", TEST_KEY_B64);
-        StringCryptoConverter.resetKeyCacheForTests();
-    }
-
-    @AfterEach
-    void restoreKey() {
-        if (previousKey != null) {
-            System.setProperty("APP_ENCRYPTION_KEY", previousKey);
-        } else {
-            System.clearProperty("APP_ENCRYPTION_KEY");
-        }
-        StringCryptoConverter.resetKeyCacheForTests();
+    private static SecretKey testKey() {
+        return new SecretKeySpec(Base64.getDecoder().decode(TEST_KEY_B64), "AES");
     }
 
     @Test
     void roundTripReturnsOriginal() {
-        StringCryptoConverter c = new StringCryptoConverter();
+        StringCryptoConverter c = new StringCryptoConverter(testKey());
         String original = "super-secret-greader-password!";
         String encrypted = c.convertToDatabaseColumn(original);
         assertNotEquals(original, encrypted);
@@ -46,7 +33,7 @@ class StringCryptoConverterTest {
 
     @Test
     void encryptionIsNonDeterministic() {
-        StringCryptoConverter c = new StringCryptoConverter();
+        StringCryptoConverter c = new StringCryptoConverter(testKey());
         String input = "same-value";
         String a = c.convertToDatabaseColumn(input);
         String b = c.convertToDatabaseColumn(input);
@@ -57,7 +44,7 @@ class StringCryptoConverterTest {
 
     @Test
     void nullAndEmptyPassThrough() {
-        StringCryptoConverter c = new StringCryptoConverter();
+        StringCryptoConverter c = new StringCryptoConverter(testKey());
         assertNull(c.convertToDatabaseColumn(null));
         assertNull(c.convertToEntityAttribute(null));
         assertEquals("", c.convertToDatabaseColumn(""));
@@ -69,33 +56,8 @@ class StringCryptoConverterTest {
         // Rows that exist from before encryption was introduced have no prefix
         // and should round-trip readable so the app keeps working until the
         // next save re-encrypts them.
-        StringCryptoConverter c = new StringCryptoConverter();
+        StringCryptoConverter c = new StringCryptoConverter(testKey());
         String legacy = "plaintext-from-older-version";
         assertEquals(legacy, c.convertToEntityAttribute(legacy));
-    }
-
-    @Test
-    void missingKeyFailsLoudly() {
-        System.clearProperty("APP_ENCRYPTION_KEY");
-        StringCryptoConverter.resetKeyCacheForTests();
-        StringCryptoConverter c = new StringCryptoConverter();
-        assertThrows(IllegalStateException.class, () -> c.convertToDatabaseColumn("anything"));
-    }
-
-    @Test
-    void invalidBase64KeyFailsLoudly() {
-        System.setProperty("APP_ENCRYPTION_KEY", "not-base64!!!***");
-        StringCryptoConverter.resetKeyCacheForTests();
-        StringCryptoConverter c = new StringCryptoConverter();
-        assertThrows(IllegalStateException.class, () -> c.convertToDatabaseColumn("anything"));
-    }
-
-    @Test
-    void wrongKeyLengthFailsLoudly() {
-        // 10 bytes — neither 16, 24 nor 32
-        System.setProperty("APP_ENCRYPTION_KEY", java.util.Base64.getEncoder().encodeToString(new byte[10]));
-        StringCryptoConverter.resetKeyCacheForTests();
-        StringCryptoConverter c = new StringCryptoConverter();
-        assertThrows(IllegalStateException.class, () -> c.convertToDatabaseColumn("anything"));
     }
 }
