@@ -174,6 +174,7 @@ Die Anwendung ist erreichbar unter: `http://localhost:8080`
 | `OPENAI_API_KEY` | Nein¹ | — | Fallback-API-Key, wenn kein per-User-Key gesetzt ist |
 | `OPENAI_MODEL` | Nein | `gpt-4o-mini` | Default-Modell (per Benutzer überschreibbar) |
 | `OPENAI_URL` | Nein | `https://api.openai.com/v1` | Default-API-Endpunkt (Ollama, Azure, etc.) |
+| `NEWSKU_OPENAI_QUOTA_COOLDOWN_MINUTES` | Nein | `60` | Cooldown (Minuten) nach einem OpenAI-429 (Quota/Rate-Limit). Während des Cooldowns werden für den betroffenen User keine AI-Calls mehr gemacht. Artikel werden trotzdem aus FreshRSS übernommen und **ohne Score** gespeichert; nach Cooldown-Ablauf füllt der bestehende Rescore-Backfill beim nächsten Sync die fehlenden Scores nach. `0` deaktiviert den Cooldown. |
 | `SALT` | Ja | — | Passwort-Hashing Salt (min. 32 Zeichen) |
 | `APP_ENCRYPTION_KEY` | **Ja** | — | Base64-AES-Schlüssel für verschlüsselte Credential-Spalten (GReader-Passwort, OpenAI-API-Key). Generierung: `openssl rand -base64 32`. Startup bricht ohne diesen Key ab. |
 | `ALLOW_SIGNUP` | Nein | `0` | `1` = Registrierung erlaubt |

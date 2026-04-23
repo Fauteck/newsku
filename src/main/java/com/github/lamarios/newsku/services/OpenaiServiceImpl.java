@@ -1,7 +1,6 @@
 package com.github.lamarios.newsku.services;
 
 import com.apptasticsoftware.rssreader.Item;
-import com.github.lamarios.newsku.errors.OpenAiQuotaExceededException;
 import com.github.lamarios.newsku.models.OpenAiFeedResponse;
 import com.github.lamarios.newsku.models.OpenAiRelevanceResponse;
 import com.github.lamarios.newsku.models.OpenAiShorteningResponse;
@@ -23,6 +22,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -47,8 +47,18 @@ public class OpenaiServiceImpl implements OpenaiService {
     private final String defaultModel;
     private final int maxRetries;
     private final long timeoutMinutes;
+    private final long quotaCooldownMs;
 
     private final OpenaiUsageService usageService;
+
+    /**
+     * Per-user quota cooldown. When a 429 is received from the upstream AI
+     * endpoint we stop issuing further calls for that user until the cooldown
+     * expires. Prevents hammering the API during the rest of a sync run and
+     * during subsequent syncs until upstream capacity recovers. Values are
+     * absolute millis (System.currentTimeMillis() + cooldown).
+     */
+    private final ConcurrentHashMap<String, Long> quotaCooldownUntilMs = new ConcurrentHashMap<>();
 
     @Autowired
     public OpenaiServiceImpl(
@@ -57,14 +67,17 @@ public class OpenaiServiceImpl implements OpenaiService {
             @Value("${OPENAI_MODEL:gpt-4o-mini}") String model,
             @Value("${OPENAI_MAX_RETRIES:3}") int maxRetries,
             @Value("${OPENAI_TIMEOUT_MINUTES:2}") long timeoutMinutes,
+            @Value("${newsku.openai.quota-cooldown-minutes:60}") long quotaCooldownMinutes,
             OpenaiUsageService usageService) {
         this.defaultUrl = url;
         this.defaultApiKey = apiKey;
         this.defaultModel = model;
         this.maxRetries = maxRetries;
         this.timeoutMinutes = timeoutMinutes;
+        this.quotaCooldownMs = Math.max(0L, quotaCooldownMinutes) * 60_000L;
         this.usageService = usageService;
-        logger.info("OpenAI service initialized (default model={}, default url={})", model, url);
+        logger.info("OpenAI service initialized (default model={}, default url={}, quota cooldown={}min)",
+                model, url, quotaCooldownMinutes);
     }
 
     // -----------------------------------------------------------------------
@@ -215,6 +228,11 @@ public class OpenaiServiceImpl implements OpenaiService {
 
     private <T> Optional<T> callWithRetry(User user, OpenAiUseCase useCase, String guid,
                                           String prompt, Class<T> responseClass) {
+        if (isInQuotaCooldown(user)) {
+            logger.debug("Skipping OpenAI {} call for user {} — quota cooldown active",
+                    useCase, user.getUsername());
+            return Optional.empty();
+        }
         String model = effectiveModel(user);
         long start = System.currentTimeMillis();
         OpenAIClient client;
@@ -236,13 +254,13 @@ public class OpenaiServiceImpl implements OpenaiService {
             } catch (Exception e) {
                 last = e;
                 if (isQuotaOrRateLimit(e)) {
-                    logger.error("OpenAI {} quota exceeded for user {} — aborting sync: {}",
+                    logger.error("OpenAI {} quota/rate limit hit for user {} — entering cooldown: {}",
                             useCase, user.getUsername(), e.getMessage());
                     usageService.recordError(user, useCase, model,
                             "Quota/rate limit: " + shortMessage(e),
                             (int) (System.currentTimeMillis() - start));
-                    throw new OpenAiQuotaExceededException(
-                            "OpenAI quota/rate limit hit for user " + user.getUsername() + ": " + e.getMessage());
+                    enterQuotaCooldown(user);
+                    return Optional.empty();
                 }
                 if (attempt >= maxRetries) {
                     logger.error("OpenAI {} call failed after {} attempts for item {}: {}",
@@ -310,6 +328,36 @@ public class OpenaiServiceImpl implements OpenaiService {
             }
         }
         return false;
+    }
+
+    /**
+     * Returns true while the user's per-user quota cooldown is still active.
+     * Expired entries are cleaned up lazily. Package-private for testability.
+     */
+    boolean isInQuotaCooldown(User user) {
+        Long until = quotaCooldownUntilMs.get(user.getId());
+        if (until == null) return false;
+        if (System.currentTimeMillis() < until) return true;
+        quotaCooldownUntilMs.remove(user.getId(), until);
+        return false;
+    }
+
+    /**
+     * Activates a new quota cooldown window for the user. Logs a WARN only on
+     * the first entry (or after a previous cooldown expired) to avoid spamming
+     * the log when many articles in the same sync batch hit the limit.
+     * Package-private for testability.
+     */
+    void enterQuotaCooldown(User user) {
+        if (quotaCooldownMs <= 0L) {
+            return;
+        }
+        long until = System.currentTimeMillis() + quotaCooldownMs;
+        Long prev = quotaCooldownUntilMs.put(user.getId(), until);
+        if (prev == null || prev < System.currentTimeMillis()) {
+            logger.warn("OpenAI quota cooldown activated for user {} (no AI calls for ~{} min)",
+                    user.getUsername(), quotaCooldownMs / 60_000L);
+        }
     }
 
     private <T> Optional<T> singleCall(OpenAIClient client, String model, User user,
