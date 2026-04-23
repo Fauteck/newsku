@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -138,15 +139,33 @@ public class GReaderSyncService {
             logger.info("Article sync already in progress for user {}, skipping duplicate trigger", user.getUsername());
             return;
         }
+        // Each phase runs in its own try/catch (issue B21) so a failure in
+        // syncArticles() no longer causes syncStarredItems() to be skipped.
+        // Per-phase outcomes are logged with a structured "phase=" marker
+        // so operators can slice logs per sync step.
         try {
             logger.info("Starting background article sync for user {}", user.getUsername());
-            syncArticles(user);
-            syncStarredItems(user);
+
+            runSyncPhase("articles", user, () -> syncArticles(user));
+            runSyncPhase("starred", user, () -> syncStarredItems(user));
+
             logger.info("Background article sync complete for user {}", user.getUsername());
-        } catch (Exception e) {
-            logger.error("Background article sync failed for user {}: {}", user.getUsername(), e.getMessage(), e);
         } finally {
             articlesyncInProgress.remove(userId);
+        }
+    }
+
+    private void runSyncPhase(String phase, User user, Runnable task) {
+        long start = System.currentTimeMillis();
+        try {
+            task.run();
+            long durationMs = System.currentTimeMillis() - start;
+            logger.info("Sync phase succeeded phase={} user={} durationMs={}",
+                    phase, user.getUsername(), durationMs);
+        } catch (Exception e) {
+            long durationMs = System.currentTimeMillis() - start;
+            logger.error("Sync phase failed phase={} user={} durationMs={} error={}",
+                    phase, user.getUsername(), durationMs, e.getMessage(), e);
         }
     }
 
@@ -246,6 +265,8 @@ public class GReaderSyncService {
     /**
      * Fetches all unread items from GReader and processes them through OpenAI scoring.
      * Pagination via the GReader continuation token.
+     * New items are persisted in batches via {@code saveAll} so Hibernate can
+     * emit JDBC batch INSERTs (issue B16) instead of one round-trip per item.
      */
     public void syncArticles(User user) {
         var clicks = clickService.tagClicks(
@@ -261,15 +282,23 @@ public class GReaderSyncService {
             List<GReaderStreamItem> items = page.getItems();
             if (items == null || items.isEmpty()) break;
 
+            List<FeedItem> batch = new ArrayList<>(items.size());
             for (GReaderStreamItem item : items) {
                 try {
-                    processArticle(item, user, clicks);
-                    totalNew++;
+                    FeedItem prepared = processArticle(item, user, clicks);
+                    if (prepared != null) {
+                        batch.add(prepared);
+                        totalNew++;
+                    }
                 } catch (Exception e) {
                     logger.error("Failed to process GReader item {} for user {}: {}",
                             item.getId(), user.getUsername(), e.getMessage(), e);
                     saveFeedError(item, user, e);
                 }
+            }
+
+            if (!batch.isEmpty()) {
+                feedItemRepository.saveAll(batch);
             }
 
             continuation = page.getContinuation();
@@ -296,12 +325,18 @@ public class GReaderSyncService {
 
             List<String> gReaderIds = items.stream().map(GReaderStreamItem::getId).toList();
             List<FeedItem> feedItems = feedItemRepository.findByGReaderItemIdInAndFeedIn(gReaderIds, feeds);
+            List<FeedItem> dirty = new ArrayList<>(feedItems.size());
             for (FeedItem feedItem : feedItems) {
                 if (!feedItem.isSaved()) {
                     feedItem.setSaved(true);
-                    feedItemRepository.save(feedItem);
+                    dirty.add(feedItem);
                     markedSaved++;
                 }
+            }
+            if (!dirty.isEmpty()) {
+                // saveAll benefits from the batched UPDATE configured in
+                // application.yml (issue B16).
+                feedItemRepository.saveAll(dirty);
             }
 
             continuation = page.getContinuation();
@@ -312,12 +347,21 @@ public class GReaderSyncService {
         }
     }
 
+    /**
+     * Prepares (and re-scores when necessary) a single GReader article. New
+     * items are returned un-persisted so the caller can batch them via
+     * {@code saveAll}. Re-scoring of pre-existing items is still persisted
+     * individually because it flips a single row in-place.
+     *
+     * @return the new {@link FeedItem} to batch-persist, or {@code null} if
+     *         the item already exists or its feed is not yet synced.
+     */
     @Transactional
-    protected void processArticle(GReaderStreamItem item, User user, List<com.github.lamarios.newsku.models.TagClickStat> clicks) {
+    protected FeedItem processArticle(GReaderStreamItem item, User user, List<com.github.lamarios.newsku.models.TagClickStat> clicks) {
         FeedItem existing = feedItemRepository.findByGReaderItemId(item.getId());
         if (existing != null) {
             rescoreIfNeeded(existing, item, user, clicks);
-            return;
+            return null;
         }
 
         String originStreamId = item.getOrigin() != null ? item.getOrigin().getStreamId() : null;
@@ -327,7 +371,7 @@ public class GReaderSyncService {
 
         if (feed == null) {
             logger.debug("Skipping article {} – feed '{}' not yet in newsku", item.getId(), originStreamId);
-            return;
+            return null;
         }
 
         String rawContent = item.resolveContent();
@@ -378,7 +422,7 @@ public class GReaderSyncService {
             feedItem.setTags(List.of());
         }
 
-        feedItemRepository.save(feedItem);
+        return feedItem;
     }
 
     // -----------------------------------------------------------------------

@@ -18,6 +18,8 @@ import com.github.lamarios.newsku.utils.TemporaryInvalidXmlCharacterFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +66,7 @@ public class FeedService {
 
 
     @Transactional
+    @CacheEvict(value = "feedsByUser", allEntries = true)
     public Feed addFeed(String url) throws NewskuException {
         User currentUser = userService.getCurrentUser();
 
@@ -94,12 +97,22 @@ public class FeedService {
         return feedRepository.save(feed);
     }
 
+    /**
+     * Cached per authenticated username — every request chain hits the feed
+     * list several times (controllers + services). Short TTL + explicit
+     * eviction on mutating calls keeps it fresh (issue B17). The SpEL key
+     * reads from the SecurityContext rather than method args because
+     * {@code getFeeds()} itself is zero-argument.
+     */
+    @Cacheable(value = "feedsByUser",
+            key = "T(org.springframework.security.core.context.SecurityContextHolder).context.authentication.name")
     @Transactional(readOnly = true)
     public List<Feed> getFeeds() {
         return feedRepository.getFeedsByUser(userService.getCurrentUser());
     }
 
     @Transactional
+    @CacheEvict(value = "feedsByUser", allEntries = true)
     public Feed updateFeed(Feed feed) {
 
         var oldFeed = feedRepository.getFirstById(feed.getId());
@@ -113,6 +126,7 @@ public class FeedService {
     }
 
     @Transactional
+    @CacheEvict(value = "feedsByUser", allEntries = true)
     public boolean deleteFeed(String id) {
         Feed firstById = feedRepository.getFirstById(id);
         var user = userService.getCurrentUser();
