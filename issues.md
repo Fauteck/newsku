@@ -18,16 +18,12 @@ Nutzen-Skala: **Niedrig / Mittel / Hoch / Kritisch**.
 
 | # | Titel | Beschreibung | Aufwand | Nutzen |
 |---|---|---|---|---|
-| B1 | SQL/ts_query-Injection in Volltextsuche härten | `FeedItemService.java:282-290` nutzt `websearch_to_tsquery(:textQuery)` mit ungefiltertem User-Input. Whitelist-Regex (`[a-zA-Z0-9\s\-]{1,200}`) vor dem Aufruf erzwingen und Eingabelänge begrenzen. | S | Kritisch |
 | B2 | SSRF-Schutz beim OG-Image-Fetch | `GReaderSyncService.java:445-451` ruft über `Jsoup.connect(url)` beliebige URLs aus Feed-Inhalten ab. Private IP-Ranges (127.0.0.0/8, 10/8, 172.16/12, 192.168/16, 169.254/16, ::1) blockieren, nur `http/https` zulassen, DNS-Rebinding durch Pre-Resolve + Re-Check verhindern. | M | Kritisch |
-| B3 | User-Enumeration beim Signup/Reset verhindern | `UserService.java:57-78` schläft nur 2 s, wenn User existiert — Response-Time leakt Existenz. Konstante Antwortzeit für alle Pfade (gemessene Dauer + Ausgleichs-Sleep), generische Meldung „Falls die Adresse existiert, wurde eine Mail versendet". | S | Hoch |
 | B4 | Schwache JWT-Key-Derivation ersetzen | `JwtTokenUtil.java:46-62` erweitert den Salt durch Byte-Copy statt KDF. Auf PBKDF2WithHmacSHA512 (≥ 100 000 Iterationen) oder HKDF (z. B. via Bouncy Castle) umstellen; Schlüssel einmalig beim Startup ableiten und als `SecretKey` halten. | S | Hoch |
 | B5 | `@Valid` + Bean-Constraints auf allen `@RequestBody` | Controller (`FeedController`, `SignUpController`, `UserController`) akzeptieren unvalidiertes JSON. `@Valid` ergänzen und auf Entities/DTOs `@NotBlank`, `@Email`, `@Size`, `@Pattern` (UUID-Format) setzen. Global `MethodArgumentNotValidExceptionHandler`. | M | Hoch |
 | B6 | Globales API-Rate-Limiting | Derzeit nur `LoginRateLimitFilter`. Bucket4j-Filter für `/api/**` (z. B. 100 req/min/User, 30 req/min/IP für Public-Endpoints), separate Buckets für teure Endpoints (Search, Export, Sync-Trigger). | M | Hoch |
 | B7 | X-Forwarded-For-Spoofing schließen | `LoginRateLimitFilter.java:75-82` vertraut jedem XFF-Header. `server.tomcat.remoteip`-Filter konfigurieren (`internalProxies`, `protocolHeader`) und im Filter `request.getRemoteAddr()` nach Tomcat-Auflösung verwenden. | S | Hoch |
 | B8 | Sicherheits-Header (HSTS, CSP, X-Frame, X-Content-Type) | `WebSecurityConfig.java` setzt keine Header. `httpSecurity.headers(...)` mit HSTS (1 y, preload, includeSubDomains), `frameOptions(DENY)`, `contentTypeOptions()`, minimaler CSP für Swagger/API. | S | Mittel |
-| B9 | Exception-Handling: keine `printStackTrace`/`assert` in Prod | `JwtTokenUtil.java:118` nutzt `e.printStackTrace()` + Rückgabe `null`; `UserService.java:47` nutzt `assert user != null` (in Prod deaktiviert). Auf Logger + typisierte Exceptions umstellen. | XS | Mittel |
-| B10 | Differenzierte HTTP-Status-Codes | `NewskuUserExceptionHandler` mappt alles auf 400. Handler für `EntityNotFoundException` → 404, `AccessDeniedException` → 403, `OptimisticLockException` → 409, Validation-Fehler → 422 mit Feldliste. | S | Mittel |
 | B11 | Audit-Logging für Security-Events | Kein strukturiertes Logging für Failed Login (außer 429), Passwort-Reset, Admin-Aktionen, Ownership-Verletzungen. Eigener Logger `security-audit` mit Event-Codes + korrelierbarer `traceId`. | S | Mittel |
 | B12 | CORS: Header-Whitelist statt `*` | `WebSecurityConfig.java:75-76` erlaubt `setAllowedHeaders(List.of("*"))`. Auf `Authorization, Content-Type, Accept, X-Requested-With` begrenzen; `allowCredentials` prüfen. | XS | Niedrig |
 | B13 | `APP_ENCRYPTION_KEY` nicht als `System.setProperty` | `Config.java:76` legt den Schlüssel als System-Property ab (für alle Threads/Reflection lesbar). Key stattdessen in einem `@Configuration`-Bean halten und per Konstruktor-Injection an `StringCryptoConverter` übergeben. | S | Mittel |
@@ -37,21 +33,16 @@ Nutzen-Skala: **Niedrig / Mittel / Hoch / Kritisch**.
 | # | Titel | Beschreibung | Aufwand | Nutzen |
 |---|---|---|---|---|
 | B14 | N+1 in `FeedItemService.getItems()` beseitigen | `FeedItemService.java:242-269` lädt `feedService.getFeeds()` und filtert in-memory. Direktes Repository-Query mit `@EntityGraph(attributePaths={"category"})` und `WHERE user = :user AND (:feedId IS NULL OR id = :feedId)`. | M | Hoch |
-| B15 | Fehlende DB-Indizes (FKs + Filter-Spalten) | Neue Migration `V30__AddMissingIndices.sql`: `idx_feed_items_feed_id`, `idx_feed_items_time_created(timeCreated DESC)`, `idx_feeds_user_id`, `idx_feed_items_read_saved(feed_id, read, saved)`, `idx_feed_items_importance(feed_id, importance DESC, timeCreated DESC)`, `idx_feed_categories_user_id`. | XS | Hoch |
-| B16 | Hibernate-Batching + `saveAll()` im Sync | `GReaderSyncService.java:315-382` speichert pro Artikel einzeln. Items sammeln → `feedItemRepository.saveAll(...)`; `spring.jpa.properties.hibernate.jdbc.batch_size=50`, `order_inserts=true`, `order_updates=true`. | S | Hoch |
-| B17 | Caching auf Lese-Hotpaths | `@Cacheable` (Caffeine, kurze TTL 60–300 s) auf `FeedService.getFeedsByUser`, `UserService.getUser`, Kategorienlisten; `@CacheEvict` bei Mutation. | S | Mittel |
 | B18 | Cursor-/Keyset-Pagination für Feed-Items | `PageRequest.of(page, size)` wird bei tiefen Seiten teuer (großes OFFSET). `WHERE timeCreated < :cursor … ORDER BY timeCreated DESC LIMIT N` — passt zum bestehenden Sort und ist O(log n). | M | Mittel |
-| B19 | Fehlende UNIQUE-Constraints | Migration: `UNIQUE(freshrss_item_id, user_id) WHERE freshrss_item_id IS NOT NULL` gegen GReader-Dupes, `UNIQUE(oidc_sub) WHERE oidc_sub IS NOT NULL` für OIDC-User. | XS | Mittel |
 | B20 | Retention/Cleanup für Alt-Daten | Kein Cleanup für `feed_items` (unbegrenztes Wachstum), `feed_errors`, `openai_usage`, `feed_clicks`, `tag_clicks`. `DataRetentionService` mit `@Scheduled` (täglich): ungespeicherte Items > 90 d löschen, Errors > 30 d, Click-Rohdaten > 90 d aggregieren, Usage nach 12 M archivieren. Intervalle per ENV. | M | Mittel |
 
 ### 🟡 Robustheit & Qualität
 
 | # | Titel | Beschreibung | Aufwand | Nutzen |
 |---|---|---|---|---|
-| B21 | Isolierte Fehlerpfade im Sync | `GReaderSyncService.syncArticlesAsync` (Z. 135-150): wirft `syncArticles()`, wird `syncStarredItems()` übersprungen. Jede Phase in eigenem try/catch mit strukturiertem Error-Log + Fortschritts-Metrik. | XS | Mittel |
 | B22 | `FEED_SYNC_CRON` per ENV konfigurierbar | Laut CLAUDE.md §10a Pflicht. `@Scheduled(cron = "${FEED_SYNC_CRON:0 15,35,55 * * * *}")` in `ScheduleService` verifizieren/erzwingen; in `application.yml` als Default setzen. | XS | Mittel |
 | B23 | `GReaderSyncService`-Testabdeckung | Aktuell 21 Tests / 102 Klassen (~20 %). Priorität: Sync-Retry, Idempotenz (`gReaderItemId`-Dedup), Transaktions-Rollback, SSRF-Fixtures. TestContainers (Postgres) + WireMock (FreshRSS). | L | Hoch |
-| B24 | Security-Testsuite | Tests gegen die hier gelisteten CVEs: SQL-Injection (B1), SSRF (B2), User-Enumeration (B3), XFF-Spoofing (B7), Token-Bypass (B4), Ownership-Checks (403 bei fremden IDs). | M | Hoch |
+| B24 | Security-Testsuite | Tests gegen die verbleibenden CVEs: SSRF (B2), XFF-Spoofing (B7), Token-Bypass (B4), Ownership-Checks (403 bei fremden IDs) sowie Regressionstests für die bereits behobenen Themen (SQL-Injection, User-Enumeration, Exception-Mapping). | M | Hoch |
 | B25 | Password-Reset-Token mit DB-gespeicherter Expiration | `ResetPasswordService` prüfen: Token-TTL (15–30 min) + Single-Use-Flag in DB, nicht nur im Link. | S | Mittel |
 | B26 | Sensible Request-Bodies in Logs maskieren | Globaler Jackson-Serializer / Logback-Pattern-Converter für Felder `password`, `token`, `apiKey`, `authorization`. | S | Mittel |
 | B27 | Dependency-Audit für `Unirest 4.7.0` | Einmalig CVE-Scan; ggf. ersetzen durch `WebClient`/`RestClient` (Spring 6/Boot 4 nativ) — reduziert auch Dependency-Footprint. | S | Niedrig |
@@ -64,17 +55,13 @@ Nutzen-Skala: **Niedrig / Mittel / Hoch / Kritisch**.
 - Errors: `src/main/java/com/github/lamarios/newsku/errors/handlers/NewskuUserExceptionHandler.java`
 - Persistence: `src/main/java/com/github/lamarios/newsku/persistence/converters/StringCryptoConverter.java`
 - Config: `src/main/java/com/github/lamarios/newsku/Config.java`, `src/main/resources/application.yml`
-- Migrationen: `src/main/resources/db/migration/V1__InitialSetup.sql` … `V29__*.sql` (neue: `V30__AddMissingIndices.sql`, `V31__AddMissingConstraints.sql`, `V32__DataRetentionPolicy.sql`)
+- Migrationen: `src/main/resources/db/migration/V1__InitialSetup.sql` … `V31__AddMissingConstraints.sql` (bereits gesetzt: V30 Indizes, V31 UNIQUE-Constraints. Offen: `V32__DataRetentionPolicy.sql` für B20).
 
 ### Verifikation (am Ende jeder Maßnahme)
 
 - `mvn test` + neue Security-/Integrationstests grün (TestContainers-Postgres).
-- Manuell: `POST /api/signup` mit existierender Adresse vs. neuer Adresse — Response-Time-Differenz < 50 ms (B3).
-- Manuell: Volltextsuche mit `'; DROP TABLE feed_items; --` → 400 Bad Request, keine DB-Änderung (B1).
 - Manuell: `curl -H 'X-Forwarded-For: 1.1.1.1, <eigene-ip>' …` → Rate-Limit zählt gegen tatsächliche Client-IP (B7).
-- `EXPLAIN ANALYZE` vor/nach B15 für die drei häufigsten Queries (Index-Nutzung, Kosten).
 - `curl -I …` zeigt HSTS/X-Frame-Options/X-Content-Type-Options (B8).
-- Sync-Lauf mit 500 Items: Log zeigt < 20 INSERT-Statements statt 500 (B16).
 
 ---
 
@@ -180,7 +167,7 @@ Nutzen-Skala: **Niedrig / Mittel / Hoch / Kritisch**.
 > - Doku-Pflichten nach CLAUDE.md §13/14 (SECURITY.md, deployment/backup-recovery/monitoring/configuration.md)
 > - Betrieb & Wartung (automatisiertes Backup, Restore-Drill, Schlüssel-Rotation, Renovate, Actuator-Härtung)
 >
-> DB-Indizes/Constraints/Retention sind bereits in Teil 1 (B15, B19, B20) enthalten und werden hier nicht dupliziert.
+> DB-Indizes (B15) und UNIQUE-Constraints (B19) sind bereits über die Migrationen V30/V31 umgesetzt. Retention (B20) verbleibt in Teil 1 und wird hier nicht dupliziert.
 
 > **Hinweis:** Die detaillierten Issues/Bewertungen für Teil 3 **fehlen in dieser Version noch** und werden in einer Folgeiteration ergänzt.
 
@@ -188,8 +175,8 @@ Nutzen-Skala: **Niedrig / Mittel / Hoch / Kritisch**.
 
 ## Priorisierte Umsetzungsreihenfolge (Teil 1 + 2)
 
-1. **Security-Patches mit niedrigem Aufwand, hoher Wirkung:** B1, B2, B7, B8, B9, F1, F2, F5 (alle XS–S).
-2. **Performance-Basis (Backend):** B15 (Indizes), B16 (Batching), B14 (N+1) — geringer Codeaufwand, spürbarer Effekt.
+1. **Security-Patches mit niedrigem Aufwand, hoher Wirkung:** B2, B7, B8, F1, F2, F5 (alle XS–S). _(B1, B3, B9 erledigt.)_
+2. **Performance-Basis (Backend):** B14 (N+1). _(B15 Indizes, B16 Batching und B17 Caching erledigt.)_
 3. **Kritische Produktlücken:** F6/F7 (Offline), B6 (globales Rate-Limit), B20 (Retention).
 4. **Qualität & Tests:** B23/B24 (Backend-Testsuite), F27/F31/F32 (Frontend-Tests + CI-Gate).
 5. **Feature-Ausbau:** F10–F18 nach Produkt-Priorität.

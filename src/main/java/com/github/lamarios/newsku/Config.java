@@ -1,6 +1,7 @@
 package com.github.lamarios.newsku;
 
 
+import com.github.benmanes.caffeine.cache.Caffeine;
 import freemarker.template.TemplateExceptionHandler;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -12,6 +13,9 @@ import org.simplejavamail.api.mailer.config.TransportStrategy;
 import org.simplejavamail.mailer.MailerBuilder;
 import org.simplejavamail.mailer.internal.MailerRegularBuilderImpl;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,10 +23,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.concurrent.TimeUnit;
 
 import jakarta.annotation.PostConstruct;
 
 @Configuration
+@EnableCaching
 @SecurityScheme(
         name = "bearerAuth",
         description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
@@ -84,6 +90,24 @@ public class Config {
     @Bean
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * Short-TTL read-through cache for hot lookup paths (issue B17).
+     * Each authenticated request resolves the current user + feed list, which
+     * otherwise triggers the same queries dozens of times per request chain.
+     * 60 s is short enough that mutations are visible almost immediately;
+     * explicit {@code @CacheEvict} annotations on mutating service methods
+     * still take precedence.
+     */
+    @Bean
+    public CacheManager cacheManager() {
+        CaffeineCacheManager manager = new CaffeineCacheManager(
+                "users", "feedsByUser", "feedCategoriesByUser");
+        manager.setCaffeine(Caffeine.newBuilder()
+                .expireAfterWrite(60, TimeUnit.SECONDS)
+                .maximumSize(10_000));
+        return manager;
     }
 
     @Bean(name = "flyway")

@@ -4,6 +4,8 @@ import com.github.lamarios.newsku.persistence.entities.User;
 import com.github.lamarios.newsku.services.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +22,7 @@ import java.util.function.Function;
 
 @Component
 public class JwtTokenUtil {
+    private static final Logger logger = LogManager.getLogger();
     private final SecretKey key;
 
     public static final long JWT_TOKEN_VALIDITY = 90 * 24 * 60 * 60;
@@ -115,8 +118,8 @@ public class JwtTokenUtil {
             claims.put("user", userClaim);
             return doGenerateToken(claims, userDetails.getUsername());
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            logger.error("Failed to generate JWT token for user {}", userDetails.getUsername(), e);
+            throw new IllegalStateException("Could not generate authentication token", e);
         }
     }
 

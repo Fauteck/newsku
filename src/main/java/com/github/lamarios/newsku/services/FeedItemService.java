@@ -278,11 +278,34 @@ public class FeedItemService {
         return feedItemRepository.findallByTimeAndFeeds(minImportance, from, to, feeds, PageRequest.of(page, pageSize, Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "importance"), new Sort.Order(Sort.Direction.DESC, "timeCreated")))));
     }
 
+    // Whitelist for full-text search input — letters, digits, whitespace and '-'.
+    // Everything else (quotes, operators, punctuation) is stripped before the
+    // query is handed to Postgres `websearch_to_tsquery`. Prevents ts_query
+    // operator injection and caps the input length to 200 chars.
+    private static final java.util.regex.Pattern SEARCH_ALLOWED = java.util.regex.Pattern.compile("[^a-zA-Z0-9\\s\\-]");
+    private static final int SEARCH_MAX_LENGTH = 200;
+
+    static String sanitizeSearchQuery(String query) {
+        if (query == null) return "";
+        String trimmed = query.trim();
+        if (trimmed.length() > SEARCH_MAX_LENGTH) {
+            trimmed = trimmed.substring(0, SEARCH_MAX_LENGTH);
+        }
+        // Collapse repeated whitespace so tsquery sees clean tokens.
+        return SEARCH_ALLOWED.matcher(trimmed).replaceAll(" ").replaceAll("\\s+", " ").trim();
+    }
+
     @Transactional(readOnly = true)
     public List<FeedItem> search(String query, int page, int pageSize) {
         var feeds = feedRepository.getFeedsByUser(userService.getCurrentUser());
+
+        String sanitized = sanitizeSearchQuery(query);
+        if (sanitized.isEmpty() || feeds.isEmpty()) {
+            return List.of();
+        }
+
         return entityManager.createNativeQuery("select * from feed_items where search_terms @@ websearch_to_tsquery(:textQuery) and feed_id in :feeds limit :pageSize offset :page", FeedItem.class)
-                .setParameter("textQuery", query)
+                .setParameter("textQuery", sanitized)
                 .setParameter("feeds", feeds.stream().map(Feed::getId).toList())
                 .setParameter("pageSize", pageSize)
                 .setParameter("page", page * pageSize)

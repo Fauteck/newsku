@@ -10,6 +10,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +31,7 @@ public class FeedCategoriesService {
 
 
     @Transactional
+    @CacheEvict(value = "feedCategoriesByUser", allEntries = true)
     public FeedCategory addCategory(String name) throws NewskuException {
 
         if (name == null || name.isBlank()) {
@@ -48,6 +51,7 @@ public class FeedCategoriesService {
     }
 
     @Transactional
+    @CacheEvict(value = "feedCategoriesByUser", allEntries = true)
     public FeedCategory updateCategory(FeedCategory category) {
         User user = userService.getCurrentUser();
         var oldCat = feedCategoryRepository.getFeedCategoriesByIdAndUser(category.getId(), user);
@@ -63,6 +67,7 @@ public class FeedCategoriesService {
     }
 
     @Transactional
+    @CacheEvict(value = "feedCategoriesByUser", allEntries = true)
     public boolean deleteCategory(String id) {
         User user = userService.getCurrentUser();
 
@@ -76,6 +81,14 @@ public class FeedCategoriesService {
         }
     }
 
+    /**
+     * Short-TTL cached by authenticated username (issue B17).
+     * Categories change rarely; the list is requested on every layout render.
+     * Key is derived via SpEL from the SecurityContext because
+     * {@code getCategories()} is zero-argument.
+     */
+    @Cacheable(value = "feedCategoriesByUser",
+            key = "T(org.springframework.security.core.context.SecurityContextHolder).context.authentication.name")
     @Transactional(readOnly = true)
     public List<FeedCategory> getCategories() {
         User user = userService.getCurrentUser();

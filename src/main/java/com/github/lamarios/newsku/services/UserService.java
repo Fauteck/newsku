@@ -4,6 +4,8 @@ import com.github.lamarios.newsku.errors.NewskuUserException;
 import com.github.lamarios.newsku.persistence.entities.User;
 import com.github.lamarios.newsku.persistence.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +35,9 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // Short-TTL cache keyed on username. Every authenticated request resolves
+    // the same user — the request chain triggers this dozens of times.
+    @Cacheable(value = "users", unless = "#result == null || !#result.isPresent()")
     @Transactional(readOnly = true)
     public Optional<User> getUser(String username) {
         return userRepository.getUserByUsername(username).stream().findFirst();
@@ -43,50 +48,64 @@ public class UserService {
     public User getCurrentUser() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        assert authentication != null;
-        org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
-
-        assert user != null;
+        if (authentication == null) {
+            throw new AccessDeniedException("No authenticated user in security context");
+        }
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof org.springframework.security.core.userdetails.User user)) {
+            throw new AccessDeniedException("Unexpected authentication principal");
+        }
         return getUser(user.getUsername()).orElseThrow();
+    }
+
+    // Target wall-clock time for signup responses (both success and failure).
+    // Every path is padded to this constant so response-time attacks can no
+    // longer distinguish "email known" vs. "email new". 2000 ms roughly matches
+    // the cost of a BCrypt hash on a typical server.
+    private static final long SIGNUP_TARGET_MS = 2000L;
+
+    private static void padToConstantTime(long startNanos, long targetMs) {
+        long elapsedMs = (System.nanoTime() - startNanos) / 1_000_000L;
+        long remaining = targetMs - elapsedMs;
+        if (remaining > 0) {
+            try {
+                Thread.sleep(remaining);
+            } catch (InterruptedException _) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     @Transactional
     public User createUser(User user) throws NewskuUserException {
+        long start = System.nanoTime();
         user.setId(UUID.randomUUID().toString());
 
-        boolean emailUsed = userRepository.countUserByEmail(user.getEmail()) > 0;
-        boolean usernameUsed = userRepository.countUserByUsername(user.getUsername()) > 0;
+        try {
+            boolean emailUsed = userRepository.countUserByEmail(user.getEmail()) > 0;
+            boolean usernameUsed = userRepository.countUserByUsername(user.getUsername()) > 0;
 
-        if (emailUsed) {
-            try {
-                // we sleep to limit email scanning
-                Thread.sleep(2000);
-            } catch (InterruptedException _) {
-
+            if (emailUsed) {
+                throw new NewskuUserException("Email already taken");
             }
-            throw new NewskuUserException("Email already taken");
-        }
 
-        if (usernameUsed) {
-            try {
-                // we sleep to limit email scanning
-                Thread.sleep(2000);
-            } catch (InterruptedException _) {
-
+            if (usernameUsed) {
+                throw new NewskuUserException("Username already taken");
             }
-            throw new NewskuUserException("Username already taken");
-        }
 
-        if (!user.getEmail().matches(EMAIL_REGEX)) {
-            throw new NewskuUserException("Invalid email address");
-        }
+            if (!user.getEmail().matches(EMAIL_REGEX)) {
+                throw new NewskuUserException("Invalid email address");
+            }
 
-        // hash password
-        if (user.getPassword() != null) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-        }
+            // hash password
+            if (user.getPassword() != null) {
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
 
-        return userRepository.save(user);
+            return userRepository.save(user);
+        } finally {
+            padToConstantTime(start, SIGNUP_TARGET_MS);
+        }
     }
 
     public Optional<User> getByOidcSub(String sub) {
@@ -108,11 +127,16 @@ public class UserService {
         return trimmed;
     }
 
+    @CacheEvict(value = "users", key = "#user.username")
     public User updateUser(User user) {
         return userRepository.save(user);
     }
 
+    // Evict the short-TTL user cache whenever the user mutates via self-edit.
+    // updateUser() has the same @CacheEvict, but the internal call below
+    // bypasses Spring's AOP proxy, so the annotation has to live here too.
     @Transactional
+    @CacheEvict(value = "users", key = "#user.username")
     public User updateSelf(User user) throws NewskuUserException {
         User currentUser = getCurrentUser();
         if (currentUser.getId().equalsIgnoreCase(user.getId())) {

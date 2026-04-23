@@ -75,7 +75,7 @@ reinen Darstellungs- und KI-Scoring-Schicht über die GReader-API.
                                          │  JPA/JDBC
                                +---------▼---------+
                                |   PostgreSQL 18    |
-                               |   (Flyway V1–V18)  |
+                               |   (Flyway V1–V31)  |
                                +-------------------+
                                          │
                                +---------▼---------+
@@ -100,7 +100,7 @@ abgerufen (Rückwärtskompatibilität).
 | Schicht | Technologie |
 |---------|------------|
 | Backend | Spring Boot 4.0.1, Java 25, Amazon Corretto |
-| Datenbank | PostgreSQL 18, Flyway Migrationen (V1–V18) |
+| Datenbank | PostgreSQL 18, Flyway Migrationen (V1–V31) |
 | Frontend | Flutter ^3.10.0, Material Design 3, BLoC |
 | LLM | OpenAI Java SDK 4.13.0 |
 | RSS Parsing | Apptastic RSS Reader 3.12.0 |
@@ -250,6 +250,20 @@ erfordern einen gültigen JWT-Token: `Authorization: Bearer <token>`
 - **OWASP Top 10:** Implementierung berücksichtigt Injection, Auth, Security Misconfiguration etc.
 - **Registrierung deaktivierbar:** Standard `ALLOW_SIGNUP=0` verhindert öffentliche Anmeldung
 - **robots.txt:** Sensible Pfade gesperrt, KI-Crawler blockiert
+- **Volltextsuche gehärtet:** Suchanfragen werden auf `[a-zA-Z0-9\s\-]` (max. 200 Zeichen) eingeschränkt, bevor sie `websearch_to_tsquery` erreichen — verhindert ts_query-/SQL-Injection über Nutzereingaben.
+- **User-Enumeration verhindert:** Signup- und Forgot-Password-Endpunkte antworten mit konstanter Wall-Clock-Zeit (Signup ≈ 2 s, Forgot-Password ≈ 1,5 s) und generischer Response, sodass keine Timing- oder Inhaltsdifferenz zwischen "bekannt"/"unbekannt" messbar ist.
+- **Differenzierte HTTP-Status-Codes:** Der globale Exception-Handler liefert 404 (Entity nicht gefunden), 403 (Access Denied), 409 (Optimistic Lock) und 422 mit Feldliste für Validierungsfehler — präzisere API-Antworten für Clients und Monitoring.
+- **Strukturiertes Exception-Handling:** Kein `printStackTrace` in Produktion, keine Java-`assert`-Statements in Sicherheits-/Auth-Pfaden; alle Fehler gehen über Log4j-Logger und werfen typisierte Exceptions.
+
+---
+
+## Performance & Robustheit
+
+- **DB-Indizes** (Migration `V30`): Zusätzliche Indizes auf den Hotpaths — `feed_items(feed_id)`, `feed_items(timecreated DESC)`, Composite-Index `feed_items(feed_id, importance DESC, timecreated DESC)` für das Ranking-Query, `feed_items(feed_id, read, saved)` sowie `feeds(user_id)` und `feed_categories(user_id)`. Reduziert Seq-Scans auf großen Feed-Tabellen.
+- **UNIQUE-Constraints** (Migration `V31`): Partielle Unique-Indizes auf `feed_items.freshrss_item_id` (gegen GReader-Dupes bei konkurrierenden Syncs) und `users.oidc_sub` (genau ein lokaler User pro OIDC-Subjekt).
+- **Hibernate Batch-Inserts:** `spring.jpa.properties.hibernate.jdbc.batch_size=50` mit `order_inserts`/`order_updates`. GReader-Sync sammelt neue und starred-markierte Items pro Seite und persistiert sie via `saveAll(...)`, sodass ein Sync von 500 Artikeln deutlich weniger JDBC-Round-Trips braucht.
+- **Read-Cache (Caffeine):** Kurze TTL (60 s, max. 10 000 Einträge) auf `UserService.getUser`, `FeedService.getFeedsByUsername` und `FeedCategoriesService.getCategoriesByUsername`. Mutationen triggern `@CacheEvict`, sodass Änderungen unmittelbar sichtbar werden.
+- **Isolierte Sync-Phasen:** `GReaderSyncService.syncArticlesAsync` führt jede Phase (`articles`, `starred`) in einem eigenen try/catch mit strukturierten Log-Markern (`phase=...`, `durationMs=...`). Ein Fehler in Phase A blockiert Phase B nicht mehr.
 
 ---
 
@@ -260,8 +274,9 @@ erfordern einen gültigen JWT-Token: `Authorization: Bearer <token>`
 | Backend | Spring Boot | 4.0.1 |
 | Sprache (Backend) | Java | 25 (Amazon Corretto) |
 | Datenbank | PostgreSQL | 18 |
-| Migrationen | Flyway | V1–V18 |
-| ORM | Spring Data JPA / Hibernate | — |
+| Migrationen | Flyway | V1–V31 |
+| ORM | Spring Data JPA / Hibernate (JDBC-Batch 50) | — |
+| Read-Cache | Spring Cache + Caffeine (TTL 60 s) | — |
 | Frontend | Flutter | ^3.10.0 |
 | Sprache (Frontend) | Dart | — |
 | UI-Framework | Material Design 3 | — |
