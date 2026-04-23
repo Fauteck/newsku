@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -37,6 +38,9 @@ public class LoginRateLimitFilter implements Filter {
 
     private final ConcurrentHashMap<String, AttemptWindow> attempts = new ConcurrentHashMap<>();
 
+    @Autowired
+    private SecurityAuditLogger auditLogger;
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -59,8 +63,7 @@ public class LoginRateLimitFilter implements Filter {
             });
 
             if (window.count().get() > maxAttempts) {
-                logger.warn("Rate limit exceeded for IP {} on login endpoint ({} attempts in {}ms window)",
-                        ip, window.count().get(), windowMs);
+                auditLogger.loginRateLimitExceeded(ip, window.count().get(), windowMs);
                 httpResponse.setStatus(429);
                 httpResponse.setContentType("application/json");
                 httpResponse.getWriter().write(

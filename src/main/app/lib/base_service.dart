@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
 import 'package:app/utils/models/newsku_error.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 final _log = Logger('BaseService');
+const _secureStorage = FlutterSecureStorage();
 
 abstract class BaseService {
   String get url;
@@ -15,9 +16,7 @@ abstract class BaseService {
   const BaseService();
 
   Future<String?> get token async {
-    var token = (await SharedPreferences.getInstance()).getString('token');
-
-    return token;
+    return _secureStorage.read(key: 'token');
   }
 
   Future<Map<String, String>> get headers async {

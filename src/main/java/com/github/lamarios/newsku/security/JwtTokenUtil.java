@@ -12,9 +12,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,21 +49,17 @@ public class JwtTokenUtil {
     }
 
     private static SecretKey deriveKey(String salt) throws Exception {
-
-        // If shorter than 64 bytes, repeat until length ≥ 64
-        byte[] saltBytes = salt.getBytes();
-        if (saltBytes.length < 64) {
-            byte[] extended = new byte[64];
-            for (int i = 0; i < 64; i++) {
-                extended[i] = saltBytes[i % saltBytes.length];
-            }
-            saltBytes = extended;
-        } else if (saltBytes.length > 64) {
-            // Truncate to 64 bytes if longer
-            saltBytes = Arrays.copyOf(saltBytes, 64);
+        // PBKDF2WithHmacSHA512 with 100 000 iterations → 512-bit key for HmacSHA512.
+        // Static info bytes act as a KDF domain separator; the SALT env var is the password.
+        byte[] info = "newsku-jwt-key".getBytes(StandardCharsets.UTF_8);
+        PBEKeySpec spec = new PBEKeySpec(salt.toCharArray(), info, 100_000, 512);
+        try {
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+            byte[] derived = factory.generateSecret(spec).getEncoded();
+            return new SecretKeySpec(derived, "HmacSHA512");
+        } finally {
+            spec.clearPassword();
         }
-
-        return new SecretKeySpec(saltBytes, "HmacSHA512");
     }
 
 

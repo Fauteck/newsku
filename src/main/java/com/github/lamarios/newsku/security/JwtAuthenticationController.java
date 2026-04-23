@@ -28,14 +28,15 @@ public class JwtAuthenticationController {
     private final UserService userService;
     private final JwtTokenUtil jwtTokenUtil;
     private final OidcService oidcService;
+    private final SecurityAuditLogger auditLogger;
 
     @Autowired
-    public JwtAuthenticationController(PasswordEncoder passwordEncoder, UserService userService, JwtTokenUtil jwtTokenUtil, OidcService oidcService) {
+    public JwtAuthenticationController(PasswordEncoder passwordEncoder, UserService userService, JwtTokenUtil jwtTokenUtil, OidcService oidcService, SecurityAuditLogger auditLogger) {
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
-
         this.jwtTokenUtil = jwtTokenUtil;
         this.oidcService = oidcService;
+        this.auditLogger = auditLogger;
     }
 
     @GetMapping("/oidc-login")
@@ -57,11 +58,25 @@ public class JwtAuthenticationController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody UserCredentials credentials) throws Exception {
-        authenticate(credentials.username(), credentials.password());
+    public String login(@RequestBody UserCredentials credentials, jakarta.servlet.http.HttpServletRequest request) throws Exception {
+        String ip = getClientIp(request);
+        try {
+            authenticate(credentials.username(), credentials.password());
+            UserDetails userDetails = loadUserByUsername(credentials.username(), null);
+            auditLogger.loginSuccess(credentials.username(), ip);
+            return jwtTokenUtil.generateToken(userDetails);
+        } catch (BadCredentialsException e) {
+            auditLogger.loginFailed(credentials.username(), ip);
+            throw e;
+        }
+    }
 
-        UserDetails userDetails = loadUserByUsername(credentials.username(), null);
-        return jwtTokenUtil.generateToken(userDetails);
+    private String getClientIp(jakarta.servlet.http.HttpServletRequest request) {
+        String xff = request.getHeader("X-Forwarded-For");
+        if (xff != null && !xff.isBlank()) {
+            return xff.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 
     private void authenticate(String username, String password) throws Exception {
@@ -75,12 +90,10 @@ public class JwtAuthenticationController {
 
         var user = byUsername.get();
 
-
         boolean cryptMatch = passwordEncoder.matches(password, user.getPassword());
         if (!cryptMatch) {
             throw new BadCredentialsException("Invalid username or password");
         }
-
     }
 
     public UserDetails oidcLoadUser(String subscription, String accessToken) throws Exception {

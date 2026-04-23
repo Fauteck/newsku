@@ -21,6 +21,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import javax.sql.DataSource;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
@@ -57,12 +59,12 @@ public class Config {
     private String appEncryptionKey;
 
     /**
-     * Validates that {@code APP_ENCRYPTION_KEY} is set and well-formed.
-     * Credentials at rest (GReader password, OpenAI API key) are encrypted
-     * with this key via {@link com.github.lamarios.newsku.persistence.converters.StringCryptoConverter}.
+     * Validates {@code APP_ENCRYPTION_KEY} and exposes the derived {@link SecretKey}
+     * as a Spring bean. {@link com.github.lamarios.newsku.persistence.converters.StringCryptoConverter}
+     * injects this bean instead of reading from system properties.
      */
-    @PostConstruct
-    public void validateEncryptionKey() {
+    @Bean
+    public SecretKey encryptionKey() {
         if (appEncryptionKey == null || appEncryptionKey.isBlank()) {
             throw new IllegalStateException(
                     "APP_ENCRYPTION_KEY must be set. Generate one with: openssl rand -base64 32");
@@ -78,8 +80,7 @@ public class Config {
             throw new IllegalStateException(
                     "APP_ENCRYPTION_KEY must decode to 16, 24 or 32 bytes (got " + raw.length + ").");
         }
-        // Propagate to system property so JPA converter can read it in any context.
-        System.setProperty("APP_ENCRYPTION_KEY", appEncryptionKey.trim());
+        return new SecretKeySpec(raw, "AES");
     }
 
     @Bean
