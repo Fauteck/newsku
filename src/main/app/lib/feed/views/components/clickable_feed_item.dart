@@ -56,47 +56,61 @@ class ClickableFeedItem extends StatelessWidget {
                 if (direction == DismissDirection.startToEnd) {
                   context.read<MainFeedCubit>().readItem(item.id);
                 } else if (direction == DismissDirection.endToStart) {
-                  context.read<MainFeedCubit>().toggleSave(item.id ?? '');
+                  await context.read<MainFeedCubit>().toggleSave(item.id ?? '');
                 }
+                // Return false to keep items in the list (only perform the action, no removal).
                 return false;
               },
-              background: Container(
-                color: colors.primaryContainer,
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.only(left: pu6),
-                child: Row(
-                  spacing: pu2,
-                  children: [
-                    Icon(Icons.check_circle_outline, color: colors.onPrimaryContainer),
-                    Text(locals.swipeToRead, style: TextStyle(color: colors.onPrimaryContainer)),
-                  ],
+              background: Semantics(
+                label: locals.swipeToRead,
+                child: Container(
+                  color: colors.primaryContainer,
+                  alignment: Alignment.centerLeft,
+                  padding: EdgeInsets.only(left: pu6),
+                  child: Row(
+                    spacing: pu2,
+                    children: [
+                      Icon(Icons.check_circle_outline,
+                          color: colors.onPrimaryContainer, semanticLabel: locals.swipeToRead),
+                      Text(locals.swipeToRead, style: TextStyle(color: colors.onPrimaryContainer)),
+                    ],
+                  ),
                 ),
               ),
-              secondaryBackground: Container(
-                color: colors.secondaryContainer,
-                alignment: Alignment.centerRight,
-                padding: EdgeInsets.only(right: pu6),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  spacing: pu2,
-                  children: [
-                    Text(
-                      item.saved ? locals.unsaveArticle : locals.saveArticle,
-                      style: TextStyle(color: colors.onSecondaryContainer),
-                    ),
-                    Icon(
-                      item.saved ? Icons.bookmark : Icons.bookmark_border,
-                      color: colors.onSecondaryContainer,
-                    ),
-                  ],
+              secondaryBackground: Semantics(
+                label: item.saved ? locals.unsaveArticle : locals.saveArticle,
+                child: Container(
+                  color: colors.secondaryContainer,
+                  alignment: Alignment.centerRight,
+                  padding: EdgeInsets.only(right: pu6),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    spacing: pu2,
+                    children: [
+                      Text(
+                        item.saved ? locals.unsaveArticle : locals.saveArticle,
+                        style: TextStyle(color: colors.onSecondaryContainer),
+                      ),
+                      Icon(
+                        item.saved ? Icons.bookmark : Icons.bookmark_border,
+                        color: colors.onSecondaryContainer,
+                        semanticLabel: item.saved ? locals.unsaveArticle : locals.saveArticle,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              child: GestureDetector(
-                onTap: () {
-                  FeedService(serverUrl!).click(item.id ?? '');
-                  launchUrl(Uri.parse(item.url!));
-                },
-                child: builder(hovered),
+              child: Semantics(
+                label: item.title ?? '',
+                hint: item.url,
+                button: true,
+                child: GestureDetector(
+                  onTap: () {
+                    FeedService(serverUrl!).click(item.id ?? '');
+                    launchUrl(Uri.parse(item.url!));
+                  },
+                  child: builder(hovered),
+                ),
               ),
             ),
           ),

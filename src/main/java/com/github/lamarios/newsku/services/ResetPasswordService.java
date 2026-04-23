@@ -1,8 +1,11 @@
 package com.github.lamarios.newsku.services;
 
+import com.github.lamarios.newsku.persistence.entities.PasswordResetToken;
 import com.github.lamarios.newsku.persistence.entities.User;
+import com.github.lamarios.newsku.persistence.repositories.PasswordResetTokenRepository;
 import com.github.lamarios.newsku.persistence.repositories.UserRepository;
 import com.github.lamarios.newsku.security.JwtTokenUtil;
+import com.github.lamarios.newsku.security.SecurityAuditLogger;
 import freemarker.template.TemplateException;
 import io.jsonwebtoken.security.SignatureException;
 import org.apache.logging.log4j.LogManager;
@@ -14,9 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -31,18 +34,22 @@ public class ResetPasswordService {
 
     public static final int RESET_PASSOWRD_EXPIRY = 24 * 60 * 60 * 1000;
     private final UserRepository userRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final String rootUrl;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
+    private final SecurityAuditLogger auditLogger;
 
     @Autowired
-    public ResetPasswordService(UserRepository userRepository, JwtTokenUtil jwtTokenUtil, String rootUrl, EmailService emailService, PasswordEncoder passwordEncoder) {
+    public ResetPasswordService(UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository, JwtTokenUtil jwtTokenUtil, String rootUrl, EmailService emailService, PasswordEncoder passwordEncoder, SecurityAuditLogger auditLogger) {
         this.userRepository = userRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.jwtTokenUtil = jwtTokenUtil;
         this.rootUrl = rootUrl;
         this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
+        this.auditLogger = auditLogger;
     }
 
     @Transactional(readOnly = true)
@@ -58,8 +65,13 @@ public class ResetPasswordService {
                 return;
             }
 
-            String token = jwtTokenUtil.doGenerateToken(Map.of("type", "reset-password", "request-id", UUID.randomUUID()
-                    .toString(), "server-url", rootUrl), user.getId(), RESET_PASSOWRD_EXPIRY);
+            auditLogger.passwordResetRequested(user.getId());
+            String requestId = UUID.randomUUID().toString();
+            Instant expiresAt = Instant.now().plusMillis(RESET_PASSOWRD_EXPIRY);
+            passwordResetTokenRepository.save(new PasswordResetToken(requestId, user.getId(), expiresAt));
+
+            String token = jwtTokenUtil.doGenerateToken(Map.of("type", "reset-password", "request-id", requestId,
+                    "server-url", rootUrl), user.getId(), RESET_PASSOWRD_EXPIRY);
 
             Map<String, Object> templateData = new HashMap<>();
 
@@ -92,20 +104,34 @@ public class ResetPasswordService {
     public void resetPassword(String token, String password) {
         try {
             var claims = jwtTokenUtil.getAllClaimsFromToken(token);
+            String requestId = (String) claims.get("request-id");
             User user = userRepository.findFirstById(claims.getSubject());
 
             if (user == null) {
+                auditLogger.passwordResetTokenInvalid("user not found");
                 throw new InvalidParameterException("Invalid token");
             }
 
-            user.setPassword(passwordEncoder.encode(password));
+            PasswordResetToken dbToken = requestId != null
+                    ? passwordResetTokenRepository.findById(requestId).orElse(null)
+                    : null;
 
+            if (dbToken == null || dbToken.isExpired() || dbToken.isUsed()) {
+                auditLogger.passwordResetTokenInvalid(dbToken == null ? "not found in db"
+                        : dbToken.isExpired() ? "expired" : "already used");
+                throw new InvalidParameterException("Invalid or expired token");
+            }
+
+            dbToken.markUsed();
+            passwordResetTokenRepository.save(dbToken);
+
+            user.setPassword(passwordEncoder.encode(password));
             userRepository.save(user);
+            auditLogger.passwordResetCompleted(user.getId());
 
         } catch (SignatureException e) {
+            auditLogger.passwordResetTokenInvalid("invalid signature");
             throw new InvalidParameterException("Invalid token");
         }
-
-
     }
 }
