@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,13 +47,14 @@ public class UserControllerTest extends TestContainerTest {
         assertThrows(AccessDeniedException.class, () -> userController.updateUser(user));
 
         user.setId(currentUser.getId());
+        var request = new MockHttpServletRequest();
         // test the current password
-        var token = authenticationController.login(new UserCredentials(user.getUsername(), "test"));
+        var token = authenticationController.login(new UserCredentials(user.getUsername(), "test"), request);
         assertTrue(token != null && !token.isEmpty());
 
         user.setPassword("changed");
         userController.updateUser(user);
-        token = authenticationController.login(new UserCredentials(user.getUsername(), "changed"));
+        token = authenticationController.login(new UserCredentials(user.getUsername(), "changed"), request);
         assertTrue(token != null && !token.isEmpty());
 
         // now we try to change the email
