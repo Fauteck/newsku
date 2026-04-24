@@ -89,10 +89,31 @@ public class WebSecurityConfig {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // Security-Header (cb6e41f B8 + 576f55c) sind temporär
-                // deaktiviert, um zu verifizieren, ob sie Ursache der
-                // unsichtbaren Flutter-Web-Text-Labels sind.
-                .headers(headers -> headers.disable())
+                .headers(headers -> headers
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .includeSubDomains(true)
+                                .preload(true)
+                                .maxAgeInSeconds(31_536_000))
+                        .frameOptions(frame -> frame.deny())
+                        .contentTypeOptions(withDefaults -> {})
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(
+                                "default-src 'self'; " +
+                                // Flutter Web (CanvasKit-Renderer) lädt canvaskit.js
+                                // von gstatic und führt WebAssembly aus. 'unsafe-eval'
+                                // zusätzlich nötig: CanvasKit nutzt new Function() für
+                                // Text-Layout/Glyph-Caching — ohne das rendert Text
+                                // unsichtbar, während Icons (aus Asset-Bundle) gehen.
+                                "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.gstatic.com; " +
+                                "style-src 'self' 'unsafe-inline'; " +
+                                // blob: für dynamisch generierte Image-Daten in Flutter.
+                                "img-src 'self' data: https: blob:; " +
+                                // blob: für dynamisch generierte Font-Daten durch CanvasKit.
+                                "font-src 'self' data: blob:; " +
+                                // canvaskit.wasm wird per fetch() nachgeladen; blob: für
+                                // interne Flutter-Ressourcen (z. B. Worker-Bootstrap).
+                                "connect-src 'self' https://www.gstatic.com blob:; " +
+                                "worker-src 'self' blob:; " +
+                                "child-src 'self' blob:")))
                 .securityContext(context -> context
                         .requireExplicitSave(false))
                 .authorizeHttpRequests(authz -> authz
