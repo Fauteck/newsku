@@ -4,7 +4,6 @@ import 'package:app/user/services/server_url_service.dart';
 import 'package:app/user/services/user_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,8 +13,6 @@ part 'identity.freezed.dart';
 
 final _log = Logger('IdentityCubit');
 
-const _secureStorage = FlutterSecureStorage();
-
 class IdentityCubit extends Cubit<IdentityState> {
   IdentityCubit(super.initialState);
 
@@ -24,21 +21,8 @@ class IdentityCubit extends Cubit<IdentityState> {
   }
 
   Future<void> init() async {
-    // Token stored in secure storage (Keystore/Keychain); server URL in SharedPreferences (not sensitive).
-    var token = await _secureStorage.read(key: 'token');
     var prefs = await SharedPreferences.getInstance();
-
-    // One-time migration: before F1 the token lived in SharedPreferences. Move any
-    // leftover legacy token into secure storage so existing sessions survive the upgrade.
-    if (token == null) {
-      final legacyToken = prefs.getString('token');
-      if (legacyToken != null) {
-        await _secureStorage.write(key: 'token', value: legacyToken);
-        await prefs.remove('token');
-        token = legacyToken;
-      }
-    }
-
+    var token = prefs.getString('token');
     var server = prefs.getString('server');
 
     if (kIsWeb && !kDebugMode) {
@@ -74,18 +58,18 @@ class IdentityCubit extends Cubit<IdentityState> {
   }
 
   Future<void> logout() async {
-    await _secureStorage.delete(key: 'token');
+    var prefs = await SharedPreferences.getInstance();
+    prefs.remove('token');
     var removeServer = !kIsWeb || kDebugMode;
     if (removeServer) {
-      final prefs = await SharedPreferences.getInstance();
       prefs.remove('server');
     }
     emit(state.copyWith(serverUrl: removeServer ? null : state.serverUrl, token: null));
   }
 
   Future<void> setToken(String token) async {
-    await _secureStorage.write(key: 'token', value: token);
-    final prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', token);
     await prefs.setString('server', state.serverUrl!);
 
     User? user;

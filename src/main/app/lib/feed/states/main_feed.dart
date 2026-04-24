@@ -29,11 +29,6 @@ class MainFeedCubit extends Cubit<MainFeedState> {
 
   final List<String> readItems = [];
 
-  // Incremented on every refresh/tab-switch so in-flight responses from a
-  // previous request are silently discarded when they arrive late.
-  int _requestVersion = 0;
-  int _searchVersion = 0;
-
   MainFeedCubit(super.initialState) {
     init();
   }
@@ -161,7 +156,6 @@ class MainFeedCubit extends Cubit<MainFeedState> {
   }
 
   Future<void> getFeed() async {
-    final version = ++_requestVersion;
     try {
       emit(state.copyWith(loading: true));
       var identityCubit = getIt.get<IdentityCubit>();
@@ -185,9 +179,6 @@ class MainFeedCubit extends Cubit<MainFeedState> {
             .then((value) => value.content),
       );
 
-      // Discard stale response if a newer request was started.
-      if (version != _requestVersion) return;
-
       // if required, we sort by read status then by the importance
       if (identityCubit.currentUser?.readItemHandling == .unreadFirstThenDim) {
         data.sort((a, b) {
@@ -207,7 +198,6 @@ class MainFeedCubit extends Cubit<MainFeedState> {
 
       emit(state.copyWith(loading: false, items: map, currentTime: from));
     } catch (e, s) {
-      if (version != _requestVersion) return;
       emit(state.copyWith(error: e, stackTrace: s, loading: false));
       rethrow;
     }
@@ -220,15 +210,11 @@ class MainFeedCubit extends Cubit<MainFeedState> {
   }
 
   Future<void> setActiveTab(MagazineTab? tab) async {
-    // Invalidate in-flight feed requests for the previous tab.
-    _requestVersion++;
     emit(state.copyWith(activeTab: tab, items: {}, currentTime: DateTime.now().copyWith(hour: 23, minute: 59, second: 59, millisecond: 999)));
     await refresh();
   }
 
   Future<void> refresh() async {
-    // Invalidate any in-flight getFeed() calls from a previous refresh cycle.
-    _requestVersion++;
     try {
       emit(state.copyWith(loading: true));
       final activeTab = state.activeTab;
@@ -264,17 +250,14 @@ class MainFeedCubit extends Cubit<MainFeedState> {
   }
 
   Future<void> search(String value) async {
-    final version = ++_searchVersion;
     emit(state.copyWith(searchPage: 0, searchResults: []));
     EasyDebounce.debounce('search', Duration(milliseconds: 500), () async {
       try {
         final results = await FeedService(
           serverUrl!,
         ).search(query: value, page: state.searchPage, pageSize: searchPageSize);
-        if (version != _searchVersion) return;
         emit(state.copyWith(searchPage: 0, searchResults: results, searchTerms: value));
       } catch (e, s) {
-        if (version != _searchVersion) return;
         emit(state.copyWith(error: e, stackTrace: s));
       }
     });
