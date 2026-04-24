@@ -98,11 +98,17 @@ public class WebSecurityConfig {
                         .contentTypeOptions(withDefaults -> {})
                         .contentSecurityPolicy(csp -> csp.policyDirectives(
                                 "default-src 'self'; " +
-                                "script-src 'self' 'unsafe-inline'; " +
+                                // Flutter Web (CanvasKit-Renderer) lädt canvaskit.js
+                                // von gstatic und führt WebAssembly aus. Ohne
+                                // 'wasm-unsafe-eval' + gstatic-Host bleibt die Seite weiß.
+                                "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.gstatic.com; " +
                                 "style-src 'self' 'unsafe-inline'; " +
                                 "img-src 'self' data: https:; " +
-                                "font-src 'self'; " +
-                                "connect-src 'self'")))
+                                "font-src 'self' data:; " +
+                                // canvaskit.wasm wird per fetch() nachgeladen.
+                                "connect-src 'self' https://www.gstatic.com; " +
+                                "worker-src 'self' blob:; " +
+                                "child-src 'self' blob:")))
                 .securityContext(context -> context
                         .requireExplicitSave(false))
                 .authorizeHttpRequests(authz -> authz
