@@ -42,6 +42,7 @@ class ResetPasswordScreen extends StatelessWidget {
       }
 
       var claims = JwtDecoder.decode(token!);
+      print('claims: $claims');
       getIt.get<IdentityCubit>().setUrl(claims['server-url']);
     });
 

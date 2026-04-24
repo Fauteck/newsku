@@ -17,6 +17,7 @@ class ResetPasswordService extends BaseService {
 
   Future<void> submitRequest({required String email}) async {
     final uri = await formatUrl('/forgot-password');
+    print('email: $email');
 
     final response = await http.post(uri, headers: {'Content-Type': 'application/json'}, body: email);
 
