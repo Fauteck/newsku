@@ -15,6 +15,12 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
 
+    <!-- Tomcat loggt bei jedem Keep-Alive-Close des Clients eine EOFException
+         auf DEBUG. Das ist normales Verhalten (Browser schließt Socket nach
+         Request), verrauscht aber jedes Log. Auf INFO heben statt komplett
+         stumm, damit echte HTTP-Parser-Fehler sichtbar bleiben. -->
+    <logger name="org.apache.coyote.http11.Http11Processor" level="INFO"/>
+
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
