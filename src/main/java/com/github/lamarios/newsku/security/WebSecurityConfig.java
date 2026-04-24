@@ -95,12 +95,12 @@ public class WebSecurityConfig {
                                 .preload(true)
                                 .maxAgeInSeconds(31_536_000))
                         .frameOptions(frame -> frame.deny())
-                        .contentTypeOptions(withDefaults -> {})
-                        // CSP diagnostisch deaktiviert: wenn Text jetzt sichtbar ist,
+                        .contentTypeOptions(withDefaults -> {}))
+                        // CSP diagnostisch weggelassen: Spring Security fügt CSP
+                        // nicht by default hinzu. Wenn Text jetzt sichtbar ist,
                         // liegt die Ursache im CSP-Block. Wenn nicht, ist es HSTS,
                         // X-Frame-Options, X-Content-Type-Options oder ein Spring-
                         // Default-Header (Cache-Control/Pragma/Expires).
-                        .contentSecurityPolicy(csp -> csp.disable()))
                 .securityContext(context -> context
                         .requireExplicitSave(false))
                 .authorizeHttpRequests(authz -> authz
