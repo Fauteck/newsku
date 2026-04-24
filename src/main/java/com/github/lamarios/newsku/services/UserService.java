@@ -37,7 +37,7 @@ public class UserService {
 
     // Short-TTL cache keyed on username. Every authenticated request resolves
     // the same user — the request chain triggers this dozens of times.
-    @Cacheable(value = "users", unless = "#result == null || !#result.isPresent()")
+    @Cacheable(value = "users", unless = "#result == null")
     @Transactional(readOnly = true)
     public Optional<User> getUser(String username) {
         return userRepository.getUserByUsername(username).stream().findFirst();
