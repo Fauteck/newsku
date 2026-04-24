@@ -89,26 +89,10 @@ public class WebSecurityConfig {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .headers(headers -> headers
-                        .httpStrictTransportSecurity(hsts -> hsts
-                                .includeSubDomains(true)
-                                .preload(true)
-                                .maxAgeInSeconds(31_536_000))
-                        .frameOptions(frame -> frame.deny())
-                        .contentTypeOptions(withDefaults -> {})
-                        .contentSecurityPolicy(csp -> csp.policyDirectives(
-                                "default-src 'self'; " +
-                                // Flutter Web (CanvasKit-Renderer) lädt canvaskit.js
-                                // von gstatic und führt WebAssembly aus. Ohne
-                                // 'wasm-unsafe-eval' + gstatic-Host bleibt die Seite weiß.
-                                "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.gstatic.com; " +
-                                "style-src 'self' 'unsafe-inline'; " +
-                                "img-src 'self' data: https:; " +
-                                "font-src 'self' data:; " +
-                                // canvaskit.wasm wird per fetch() nachgeladen.
-                                "connect-src 'self' https://www.gstatic.com; " +
-                                "worker-src 'self' blob:; " +
-                                "child-src 'self' blob:")))
+                // Security-Header (cb6e41f B8 + 576f55c) sind temporär
+                // deaktiviert, um zu verifizieren, ob sie Ursache der
+                // unsichtbaren Flutter-Web-Text-Labels sind.
+                .headers(headers -> headers.disable())
                 .securityContext(context -> context
                         .requireExplicitSave(false))
                 .authorizeHttpRequests(authz -> authz
