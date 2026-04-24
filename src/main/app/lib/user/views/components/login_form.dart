@@ -35,17 +35,17 @@ class LoginFormScreen extends StatelessWidget {
                 crossAxisAlignment: .center,
                 mainAxisAlignment: .center,
                 children: [
-                  Align(alignment: .centerLeft, child: Text(locals.username)),
                   TextField(
                     key: Key('username'),
+                    decoration: InputDecoration(labelText: locals.username),
                     onChanged: (value) => cubit.setUser(value),
                     autofillHints: [AutofillHints.username],
                     autocorrect: false,
                   ),
                   Gap(pu4),
-                  Align(alignment: .centerLeft, child: Text(locals.password)),
                   TextField(
                     key: Key('password'),
+                    decoration: InputDecoration(labelText: locals.password),
                     obscureText: true,
                     onChanged: (value) => cubit.setPassword(value),
                     autofillHints: [AutofillHints.password],
