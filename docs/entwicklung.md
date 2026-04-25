@@ -1,26 +1,26 @@
-# Entwicklung
+# Development
 
-← [Zurueck zum Index](../CLAUDE.md)
+← [Back to Index](../CLAUDE.md)
 
 ---
 
-## Voraussetzungen
+## Prerequisites
 
-| Tool | Version | Zweck |
-|------|---------|-------|
-| JDK | 25 (Amazon Corretto) | Backend Runtime + Build |
-| Maven | 3.9+ | Build-Tool |
-| PostgreSQL | 18 | Datenbank |
-| Flutter SDK | ^3.10.0 | Frontend Build |
-| Docker | 24+ | Lokale Container-Entwicklung |
-| Python | 3.10+ | MkDocs Dokumentation (optional) |
+| Tool | Version | Purpose |
+|------|---------|---------|
+| JDK | 25 (Amazon Corretto) | Backend runtime + build |
+| Maven | 3.9+ | Build tool |
+| PostgreSQL | 18 | Database |
+| Flutter SDK | ^3.10.0 | Frontend build |
+| Docker | 24+ | Local container development |
+| Python | 3.10+ | MkDocs documentation (optional) |
 
-### Nix-Shell (empfohlen)
+### Nix Shell (recommended)
 
-Das Repository enthaelt eine `shell.nix` mit JDK 25, Maven und Python:
+The repository includes a `shell.nix` with JDK 25, Maven, and Python:
 
 ```bash
-nix-shell   # Stellt JDK 25 + Maven + Python bereit
+nix-shell   # provides JDK 25 + Maven + Python
 ```
 
 ---
@@ -28,26 +28,26 @@ nix-shell   # Stellt JDK 25 + Maven + Python bereit
 ## Installation
 
 ```bash
-# Repository klonen
+# Clone repository
 git clone git@github.com:fauteck/newsku.git
 cd newsku
 
-# .env-Datei erstellen
+# Create .env file
 cp .env.example .env
-# Pflichtfelder setzen:
+# Set required fields:
 #   DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD
 #   OPENAI_API_KEY, OPENAI_MODEL
-#   SALT  (min. 32 Zeichen Zufallsstring)
+#   SALT  (min. 32 characters random string)
 ```
 
 ---
 
-## Backend starten (Spring Boot)
+## Start Backend (Spring Boot)
 
-### Option A: Mit lokaler PostgreSQL-Instanz
+### Option A: With local PostgreSQL instance
 
 ```bash
-# Umgebungsvariablen setzen (oder in .env und mit source laden)
+# Set environment variables (or load from .env with source)
 export DB_HOST=localhost
 export DB_PORT=5432
 export DB_DATABASE=newsku
@@ -55,22 +55,22 @@ export DB_USER=newsku
 export DB_PASSWORD=secret
 export OPENAI_API_KEY=sk-...
 export OPENAI_MODEL=gpt-4o
-export SALT=mein-random-salt-mindestens-32-zeichen
+export SALT=my-random-salt-at-least-32-characters
 
-# JAR bauen
+# Build JAR
 mvn clean package -DskipTests
 
-# Starten
+# Start
 java -jar target/newsku-*.jar
 ```
 
-Server laeuft auf `http://localhost:8080`
+Server runs at `http://localhost:8080`
 Swagger UI: `http://localhost:8080/swagger-ui.html`
 
-### Option B: Nur PostgreSQL per Docker, Backend lokal
+### Option B: PostgreSQL via Docker, backend local
 
 ```bash
-# Nur die Datenbank starten
+# Start only the database
 docker run -d \
   --name newsku_postgres \
   -e POSTGRES_DB=newsku \
@@ -79,69 +79,69 @@ docker run -d \
   -p 5432:5432 \
   postgres:18-alpine
 
-# Backend wie in Option A starten
+# Start backend as in Option A
 ```
 
 ---
 
-## Datenbank-Migrationen
+## Database Migrations
 
-Flyway laeuft **automatisch beim Start** und fuehrt alle ausstehenden Migrationen aus.
-Keine manuelle Ausfuehrung noetig.
+Flyway runs **automatically on startup** and executes all pending migrations.
+No manual execution needed.
 
-Neue Migration anlegen:
+Create new migration:
 
 ```bash
-# Naechste Versionsnummer waehlen (aktuell: V16)
-touch src/main/resources/db/migration/V17__meine_aenderung.sql
+# Choose next version number (currently: V16)
+touch src/main/resources/db/migration/V17__my_change.sql
 ```
 
 ```sql
--- V17__meine_aenderung.sql
-ALTER TABLE users ADD COLUMN language VARCHAR(10) DEFAULT 'de';
+-- V17__my_change.sql
+ALTER TABLE users ADD COLUMN language VARCHAR(10) DEFAULT 'en';
 ```
 
 ---
 
-## Frontend starten (Flutter)
+## Start Frontend (Flutter)
 
 ```bash
 cd src/main/app
 
-# Flutter-Abhaengigkeiten installieren
+# Install Flutter dependencies
 flutter pub get
 
-# Code-Generierung (Routing, nach Aenderungen an router.dart)
+# Code generation (routing, after changes to router.dart)
 flutter pub run build_runner build --delete-conflicting-outputs
 
-# Web Dev-Server (zeigt auf http://localhost:8080 als Backend)
+# Web dev server (points to http://localhost:8080 as backend)
 flutter run -d chrome
 
-# Oder: Web Build fuer Produktion (Ausgabe: build/web/)
+# Or: web build for production (output: build/web/)
 flutter build web
 ```
 
-Der Web Build wird dann vom Spring Boot Backend ausgeliefert.
-Fuer Produktion: `build/web/` in `src/main/resources/static/` kopieren, dann `mvn package`.
+The web build is then served by the Spring Boot backend.
+For production: copy `build/web/` to `src/main/resources/static/`, then `mvn package`.
 
 ---
 
-## Docker-basierte Entwicklung
+## Docker-Based Development
 
 ```bash
-# .env-Datei benoetigt (oder Variablen direkt setzen)
+# .env file required (or set variables directly)
 cp .env.example .env
 
-# JAR bauen (wird ins Docker Image kopiert)
+# Build JAR (copied into Docker image)
 mvn clean package -DskipTests
 
-# Alle Services starten (App + PostgreSQL)
+# Start all services (app + PostgreSQL)
 docker compose up -d
 
-# Logs ansehen
+# View logs
 docker compose logs -f newsku
 
-# Services stoppen
+# Stop services
 docker compose down
 ```
 
@@ -149,84 +149,84 @@ docker compose down
 
 ## Maven Build
 
-| Befehl | Beschreibung |
-|--------|-------------|
-| `mvn clean package` | JAR bauen (inkl. Tests) |
-| `mvn clean package -DskipTests` | JAR bauen (Tests ueberspringen) |
-| `mvn test` | Nur Tests ausfuehren |
-| `mvn spring-boot:run` | Backend direkt starten (ohne JAR) |
-| `mvn dependency:tree` | Abhaengigkeitsbaum anzeigen |
+| Command | Description |
+|---------|-------------|
+| `mvn clean package` | Build JAR (including tests) |
+| `mvn clean package -DskipTests` | Build JAR (skip tests) |
+| `mvn test` | Run tests only |
+| `mvn spring-boot:run` | Start backend directly (without JAR) |
+| `mvn dependency:tree` | Show dependency tree |
 
 ---
 
-## Umgebungsvariablen
+## Environment Variables
 
-Vollstaendige Liste in `.env.example`:
+Full list in `.env.example`:
 
-| Variable | Pflicht | Beschreibung |
+| Variable | Required | Description |
 |----------|---------|-------------|
-| `DB_HOST` | Ja | PostgreSQL Hostname |
-| `DB_PORT` | Ja | PostgreSQL Port (Standard: 5432) |
-| `DB_DATABASE` | Ja | Datenbankname |
-| `DB_USER` | Ja | Datenbankbenutzer |
-| `DB_PASSWORD` | Ja | Datenbankpasswort |
-| `OPENAI_API_KEY` | Nein* | Globaler API-Key (Fallback, wenn kein per-User-Key gesetzt ist) |
-| `OPENAI_MODEL` | Nein | Default-Modell (z. B. `gpt-4o-mini`) |
-| `OPENAI_URL` | Nein | Default-API-Endpunkt (Standard: `https://api.openai.com/v1`) |
-| `SALT` | Ja | Passwort-Hashing Salt (min. 32 Zeichen) |
-| `APP_ENCRYPTION_KEY` | **Ja** | Base64-AES-Schluessel fuer verschluesselte Credential-Spalten. Generierung: `openssl rand -base64 32`. Startup bricht ohne diesen Key ab. Nach Inbetriebnahme nicht aendern. |
-| `ALLOW_SIGNUP` | Nein | `0` = deaktiviert (Standard), `1` = aktiv |
-| `TZ` | Nein | Zeitzone (Standard: `Europe/Berlin`) |
+| `DB_HOST` | Yes | PostgreSQL hostname |
+| `DB_PORT` | Yes | PostgreSQL port (default: 5432) |
+| `DB_DATABASE` | Yes | Database name |
+| `DB_USER` | Yes | Database user |
+| `DB_PASSWORD` | Yes | Database password |
+| `OPENAI_API_KEY` | No* | Global API key (fallback when no per-user key is set) |
+| `OPENAI_MODEL` | No | Default model (e.g. `gpt-4o-mini`) |
+| `OPENAI_URL` | No | Default API endpoint (default: `https://api.openai.com/v1`) |
+| `SALT` | Yes | Password hashing salt (min. 32 characters) |
+| `APP_ENCRYPTION_KEY` | **Yes** | Base64 AES key for encrypted credential columns. Generate: `openssl rand -base64 32`. Startup aborts without this key. Do not change after initial deployment. |
+| `ALLOW_SIGNUP` | No | `0` = disabled (default), `1` = active |
+| `TZ` | No | Timezone (default: `Europe/Berlin`) |
 
-\* Nutzer koennen eigene Keys im KI-Tab hinterlegen; diese haben Vorrang vor `OPENAI_API_KEY`.
+\* Users can store their own keys in the AI tab; these take precedence over `OPENAI_API_KEY`.
 
 ---
 
-## Dokumentation bauen (MkDocs)
+## Build Documentation (MkDocs)
 
 ```bash
-# Python-Umgebung einrichten (oder via nix-shell)
+# Set up Python environment (or via nix-shell)
 python -m venv .venv
 source .venv/bin/activate
 pip install -r mkdocs/requirements.txt
 
-# Vorschau
+# Preview
 cd mkdocs && mkdocs serve
 
 # Build
 make docs-build
-# Ausgabe: docs/documentation/
+# Output: docs/documentation/
 ```
 
 ---
 
-## Feature-Walkthrough: "Neues Feld an FeedItem"
+## Feature Walkthrough: "New Field on FeedItem"
 
-Beispiel: Feld `estimated_read_time` (Lesedauer in Sekunden) hinzufuegen.
+Example: add field `estimated_read_time` (reading time in seconds).
 
-### 1. Flyway-Migration erstellen
+### 1. Create Flyway Migration
 
 ```sql
 -- src/main/resources/db/migration/V17__add_read_time.sql
 ALTER TABLE feed_items ADD COLUMN estimated_read_time INTEGER;
 ```
 
-### 2. JPA Entity erweitern
+### 2. Extend JPA Entity
 
 ```java
 // src/main/java/com/github/lamarios/newsku/persistence/entities/FeedItem.java
 private Integer estimatedReadTime;
 ```
 
-### 3. Service-Logik ergaenzen
+### 3. Add Service Logic
 
 ```java
-// FeedItemService.java oder FeedService.java
-// Feld beim Parsen des RSS-Inhalts berechnen und setzen
+// FeedItemService.java or FeedService.java
+// Calculate and set field when parsing RSS content
 feedItem.setEstimatedReadTime(calculateReadTime(content));
 ```
 
-### 4. Flutter-Modell aktualisieren
+### 4. Update Flutter Model
 
 ```dart
 // lib/feed/models/feed_item.dart
@@ -240,28 +240,28 @@ class FeedItem {
 }
 ```
 
-### 5. UI anzeigen
+### 5. Display in UI
 
 ```dart
-// In der Feed-Item-Ansicht
+// In the feed item view
 if (item.estimatedReadTime != null)
-  Text('Lesezeit: ~${item.estimatedReadTime}s'),
+  Text('Read time: ~${item.estimatedReadTime}s'),
 ```
 
 ---
 
 ## Debugging
 
-- **Backend-Logs:** Spring Boot Logback → Konsole (Level INFO, in `application.yml` konfigurierbar)
-- **Flyway-Debug:** In `application.yml` aktiviert (`logging.level.org.flywaydb: DEBUG`)
-- **DB-Queries:** In `application.yml` auskommentiert: `jpa.show-sql: true` einkommentieren
-- **Swagger UI:** `http://localhost:8080/swagger-ui.html` fuer API-Exploration
+- **Backend logs:** Spring Boot Logback → console (level INFO, configurable in `application.yml`)
+- **Flyway debug:** Enabled in `application.yml` (`logging.level.org.flywaydb: DEBUG`)
+- **DB queries:** Uncomment in `application.yml`: `jpa.show-sql: true`
+- **Swagger UI:** `http://localhost:8080/swagger-ui.html` for API exploration
 - **Flutter:** Browser DevTools + `flutter logs`
 
 ---
 
-## Verwandte Dokumente
+## Related Documents
 
-- [README.md](../README.md) — Installations-Kurzanleitung
-- [docs/datenbank.md](datenbank.md) — Schema-Details, Migrations-Workflow
-- [docs/testing.md](testing.md) — Test-Ausfuehrung
+- [README.md](../README.md) — Quick-start installation guide
+- [docs/datenbank.md](datenbank.md) — Schema details, migrations workflow
+- [docs/testing.md](testing.md) — Running tests

@@ -1,41 +1,41 @@
-# Datenbank
+# Database
 
-← [Zurueck zum Index](../CLAUDE.md)
+← [Back to Index](../CLAUDE.md)
 
 ---
 
-## Uebersicht
+## Overview
 
-- **Datenbank:** PostgreSQL 18
+- **Database:** PostgreSQL 18
 - **ORM:** Spring Data JPA (Hibernate)
-- **Schema-Verwaltung:** Flyway (automatisch beim Start)
-- **Migrationen:** `src/main/resources/db/migration/V*.sql` (V1–V16)
-- **Konfiguration:** `src/main/resources/application.yml`
+- **Schema management:** Flyway (automatically on startup)
+- **Migrations:** `src/main/resources/db/migration/V*.sql` (V1–V16)
+- **Configuration:** `src/main/resources/application.yml`
 
-Flyway fuehrt beim Anwendungsstart automatisch alle ausstehenden Migrationen aus.
-Der Verbindungsstring wird aus Umgebungsvariablen gebildet:
+Flyway automatically runs all pending migrations on application startup.
+The connection string is built from environment variables:
 ```
 jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}
 ```
 
 ---
 
-## Tabellen-Uebersicht
+## Table Overview
 
-| Tabelle | Beschreibung | Primaerschluessel |
-|---------|-------------|-------------------|
-| `users` | Benutzerkonten | `id` (UUID/String) |
-| `feeds` | RSS-Feed-Abonnements | `id` |
-| `feed_items` | Einzelne RSS-Beitraege | `id` |
-| `feed_categories` | Benutzerdefinierte Kategorien | `id` |
-| `feed_errors` | Fehlerprotokoll beim Feed-Abruf | `id` |
-| `layout_blocks` | Konfigurierbare UI-Bloecke | `id` |
-| `feed_clicks` / `click_stats` / `tag_clicks` | Klick-Statistiken | `id` |
-| `user_settings` | Benutzereinstellungen | `user_id` |
+| Table | Description | Primary Key |
+|-------|-------------|-------------|
+| `users` | User accounts | `id` (UUID/String) |
+| `feeds` | RSS feed subscriptions | `id` |
+| `feed_items` | Individual RSS articles | `id` |
+| `feed_categories` | User-defined categories | `id` |
+| `feed_errors` | Feed fetch error log | `id` |
+| `layout_blocks` | Configurable UI blocks | `id` |
+| `feed_clicks` / `click_stats` / `tag_clicks` | Click statistics | `id` |
+| `user_settings` | User settings | `user_id` |
 
 ---
 
-## JPA Entities (Schluessel-Entities)
+## JPA Entities (Key Entities)
 
 ### `User` (`users`)
 
@@ -51,10 +51,10 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private String password;      // BCrypt-Hash
+    private String password;      // BCrypt hash
 
-    private String settings;      // JSON: Benutzereinstellungen
-    private String oidcSub;       // OIDC Subject (optional)
+    private String settings;      // JSON: user settings
+    private String oidcSub;       // OIDC subject (optional)
     // ...
 }
 ```
@@ -76,7 +76,7 @@ public class Feed {
 
     private String title;
     private String description;
-    private String categoryId;    // Referenz auf feed_categories
+    private String categoryId;    // reference to feed_categories
     private Instant lastFetched;
     // ...
 }
@@ -101,7 +101,7 @@ public class FeedItem {
     private String[] tags;
     private Instant publishedAt;
     private boolean read;
-    private Double importanceScore;   // LLM-Bewertung (0.0 – 1.0)
+    private Double importanceScore;   // LLM score (0.0 – 1.0)
     // ...
 }
 ```
@@ -136,8 +136,8 @@ public class LayoutBlock {
     @Column(nullable = false)
     private String userId;
 
-    private String blockType;    // z. B. "feed", "category", "all"
-    private String settings;     // JSON: Block-spezifische Einstellungen
+    private String blockType;    // e.g. "feed", "category", "all"
+    private String settings;     // JSON: block-specific settings
     private Integer sortOrder;
     // ...
 }
@@ -145,7 +145,7 @@ public class LayoutBlock {
 
 ---
 
-## Beziehungen (ER-Diagramm)
+## Relationships (ER Diagram)
 
 ```
 users ──1:n──▶ feeds (userId)
@@ -160,54 +160,54 @@ feed_items ──1:n──▶ feed_clicks (itemId)
 
 ---
 
-## Flyway-Migrationen
+## Flyway Migrations
 
-### Migration-Konvention
+### Migration Convention
 
-Migrationsdateien liegen in `src/main/resources/db/migration/` und folgen dem Muster:
+Migration files are in `src/main/resources/db/migration/` and follow the pattern:
 
 ```
-V{version}__{beschreibung}.sql
+V{version}__{description}.sql
 ```
 
-**Wichtig:** Versionsnummer muss eindeutig und aufsteigend sein. Bestehende Migrationen
-duerfen nach dem ersten Ausrollen **niemals** veraendert werden.
+**Important:** Version numbers must be unique and ascending. Existing migrations
+**must never** be modified after they have been deployed.
 
-### Vorhandene Migrationen (V1–V16)
+### Existing Migrations (V1–V16)
 
-| Version | Beschreibung |
+| Version | Description |
 |---------|-------------|
-| V1 | Initiales Schema (users, feeds, feed_items, layout_blocks) |
-| V2 | OIDC-Support (oidc_sub Spalte) |
-| V3 | Feed-Fehlerprotokoll (feed_errors) |
-| V4 | Benutzerpraeferenzen (user_settings) |
-| V5 | Volltextsuche (search-Index / Hilfstabelle) |
-| V6 | Klick-Tracking Tabellen (feed_clicks) |
-| V7 | Gelesen-Status Tracking |
-| V8 | Bild-URL an feed_items |
-| V9 | Tags an feed_items |
-| V10–V12 | Statistische Erweiterungen |
-| V13 | Tag-Klick-Statistiken (tag_clicks) |
-| V14–V15 | Feed-Kategorien Grundstruktur |
-| V16 | Feed-Kategorien Erweiterungen |
+| V1 | Initial schema (users, feeds, feed_items, layout_blocks) |
+| V2 | OIDC support (oidc_sub column) |
+| V3 | Feed error log (feed_errors) |
+| V4 | User preferences (user_settings) |
+| V5 | Full-text search (search index / helper table) |
+| V6 | Click tracking tables (feed_clicks) |
+| V7 | Read status tracking |
+| V8 | Image URL on feed_items |
+| V9 | Tags on feed_items |
+| V10–V12 | Statistical extensions |
+| V13 | Tag click statistics (tag_clicks) |
+| V14–V15 | Feed category base structure |
+| V16 | Feed category extensions |
 
-### Neue Migration anlegen
+### Create New Migration
 
 ```bash
-# Datei erstellen (naechste Versionsnummer, z. B. V17)
-touch src/main/resources/db/migration/V17__beschreibung.sql
+# Create file (next version number, e.g. V17)
+touch src/main/resources/db/migration/V17__description.sql
 ```
 
 ```sql
--- Beispiel: V17__add_user_language.sql
-ALTER TABLE users ADD COLUMN language VARCHAR(10) DEFAULT 'de';
+-- Example: V17__add_user_language.sql
+ALTER TABLE users ADD COLUMN language VARCHAR(10) DEFAULT 'en';
 ```
 
-Flyway fuehrt die Migration automatisch beim naechsten Start aus.
+Flyway runs the migration automatically on next startup.
 
 ---
 
-## JPA Repository-Pattern
+## JPA Repository Pattern
 
 ```java
 // src/main/java/com/github/lamarios/newsku/persistence/repositories/FeedItemRepository.java
@@ -215,7 +215,7 @@ Flyway fuehrt die Migration automatisch beim naechsten Start aus.
 @Repository
 public interface FeedItemRepository extends JpaRepository<FeedItem, String> {
 
-    // Spring Data Query-Methoden
+    // Spring Data query methods
     List<FeedItem> findByFeedIdOrderByImportanceScoreDesc(String feedId);
 
     List<FeedItem> findByFeedIdAndReadFalseOrderByPublishedAtDesc(String feedId);
@@ -223,61 +223,60 @@ public interface FeedItemRepository extends JpaRepository<FeedItem, String> {
     @Query("SELECT fi FROM FeedItem fi WHERE fi.feedId IN :feedIds AND fi.read = false")
     List<FeedItem> findUnreadByFeedIds(@Param("feedIds") List<String> feedIds);
 
-    // Paginiert
+    // Paginated
     Page<FeedItem> findByFeedIdOrderByPublishedAtDesc(String feedId, Pageable pageable);
 }
 ```
 
 ---
 
-## Umgebungsvariablen (Datenbankverbindung)
+## Environment Variables (Database Connection)
 
-| Variable | Standard | Beschreibung |
-|----------|----------|-------------|
-| `DB_HOST` | `localhost` | Hostname des PostgreSQL-Servers |
-| `DB_PORT` | `15432` (dev) / `5432` (prod) | PostgreSQL-Port |
-| `DB_DATABASE` | `postgres` | Datenbankname |
-| `DB_USER` | `postgres` | Datenbankbenutzer |
-| `DB_PASSWORD` | `postgres` | Datenbankpasswort |
-| `APP_ENCRYPTION_KEY` | — (Pflicht) | Base64-AES-Schluessel (16/24/32 Byte) fuer Feldverschluesselung at rest. Startup bricht ab, wenn nicht gesetzt. `openssl rand -base64 32`. |
-
----
-
-## Verschluesselung sensibler Felder
-
-Felder mit Anmeldedaten werden ueber den JPA-`AttributeConverter`
-`StringCryptoConverter` transparent mit AES-GCM verschluesselt.
-
-| Spalte | Tabelle | Verschluesselt | Hinweis |
-|---|---|---|---|
-| `password` | `users` | Nein — BCrypt-Hash (Login) | Einweg-Hash, kein Entschluesseln |
-| `freshrss_api_password` | `users` | **Ja (AES-GCM)** | Klartext im Code, Ciphertext in DB |
-| `openai_api_key` | `users` | **Ja (AES-GCM)** | Per-User-Key (optional) |
-
-Jeder Ciphertext hat das Praefix `enc:v1:` gefolgt von `Base64(iv || ciphertext || tag)`.
-Bestands-Plaintext-Zeilen werden beim Lesen transparent durchgereicht und beim
-naechsten Speichern automatisch verschluesselt.
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DB_HOST` | `localhost` | PostgreSQL server hostname |
+| `DB_PORT` | `15432` (dev) / `5432` (prod) | PostgreSQL port |
+| `DB_DATABASE` | `postgres` | Database name |
+| `DB_USER` | `postgres` | Database user |
+| `DB_PASSWORD` | `postgres` | Database password |
+| `APP_ENCRYPTION_KEY` | — (required) | Base64 AES key (16/24/32 bytes) for field encryption at rest. Startup aborts if missing. Generate: `openssl rand -base64 32`. |
 
 ---
 
-## OpenAI-Verbrauchs-Tracking (ab V25)
+## Encrypted Fields
+
+Fields containing credentials are transparently encrypted with AES-GCM via
+the JPA `AttributeConverter` `StringCryptoConverter`.
+
+| Column | Table | Encrypted | Notes |
+|--------|-------|-----------|-------|
+| `password` | `users` | No — BCrypt hash (login) | One-way hash, no decryption |
+| `freshrss_api_password` | `users` | **Yes (AES-GCM)** | Plaintext in code, ciphertext in DB |
+| `openai_api_key` | `users` | **Yes (AES-GCM)** | Per-user key (optional) |
+
+Each ciphertext has the prefix `enc:v1:` followed by `Base64(iv || ciphertext || tag)`.
+Existing plaintext rows are passed through transparently on read and automatically
+encrypted on next write.
+
+---
+
+## OpenAI Usage Tracking (from V25)
 
 ```
 users (1) ──< (n) openai_usage
 ```
 
 - `openai_usage.use_case` ∈ {`RELEVANCE`, `SHORTENING`}
-- `openai_usage.total_tokens` wird pro Monat summiert gegen
-  `users.openai_monthly_token_limit_relevance` bzw.
-  `users.openai_monthly_token_limit_shortening` geprueft.
-- Ueberschreitet die Monats-Summe das Limit, ueberspringt
-  `OpenaiServiceImpl` weitere Aufrufe fuer diesen Use-Case bis zum
-  Monatswechsel (UTC).
+- `openai_usage.total_tokens` is summed per month against
+  `users.openai_monthly_token_limit_relevance` and
+  `users.openai_monthly_token_limit_shortening`.
+- When the monthly sum exceeds the limit, `OpenaiServiceImpl` skips
+  further calls for that use case until the month resets (UTC).
 
 ---
 
-## Verwandte Dokumente
+## Related Documents
 
-- [docs/api-patterns.md](api-patterns.md) — Wie Services auf die DB zugreifen
-- [docs/haeufige-aufgaben.md](haeufige-aufgaben.md) — Neue Tabelle / Spalte hinzufuegen
-- [docs/entwicklung.md](entwicklung.md) — Lokales DB-Setup
+- [docs/api-patterns.md](api-patterns.md) — How services access the DB
+- [docs/haeufige-aufgaben.md](haeufige-aufgaben.md) — Add new table / column
+- [docs/entwicklung.md](entwicklung.md) — Local DB setup

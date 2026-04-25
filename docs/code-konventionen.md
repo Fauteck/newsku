@@ -1,49 +1,49 @@
-# Code-Konventionen
+# Code Conventions
 
-← [Zurueck zum Index](../CLAUDE.md)
+← [Back to Index](../CLAUDE.md)
 
 ---
 
 ## Java (Backend)
 
-### Allgemein
+### General
 
-- **Java 25** mit modernen Sprachfeatures (Records, Pattern Matching wo sinnvoll)
-- **Spring-Konventionen:** Constructor Injection bevorzugen (kein `@Autowired` auf Felder)
-- **Lombok:** Vermeiden — explizite Getter/Setter oder Records verwenden
-- **Transaktionen:** `@Transactional` auf Service-Methoden, nicht auf Controller
-- **Validation:** Jakarta Validation Annotationen (`@NotBlank`, `@Email`, `@Size`, etc.)
+- **Java 25** with modern language features (records, pattern matching where appropriate)
+- **Spring conventions:** Prefer constructor injection (no `@Autowired` on fields)
+- **Lombok:** Avoid — use explicit getters/setters or records
+- **Transactions:** `@Transactional` on service methods, not on controllers
+- **Validation:** Jakarta Validation annotations (`@NotBlank`, `@Email`, `@Size`, etc.)
 
 ### Naming
 
-| Kontext | Konvention | Beispiel |
+| Context | Convention | Example |
 |---------|-----------|---------|
-| Klassen | `PascalCase` | `FeedItemService`, `UserController` |
-| Methoden | `camelCase` | `getFeedsForUser()`, `markAsRead()` |
-| Variablen | `camelCase` | `feedItems`, `userId` |
-| Konstanten | `UPPER_SNAKE_CASE` | `MAX_FEEDS_PER_USER` |
-| Pakete | `lowercase` | `com.github.lamarios.newsku.services` |
-| DB-Spalten (JPA `@Column`) | `snake_case` | `feed_url`, `created_at`, `importance_score` |
-| REST-Pfade | `kebab-case` | `/api/feed-items`, `/api/feed-categories` |
-| DTO-Klassen | `PascalCaseRequest/Response` | `CreateFeedRequest`, `FeedItemResponse` |
+| Classes | `PascalCase` | `FeedItemService`, `UserController` |
+| Methods | `camelCase` | `getFeedsForUser()`, `markAsRead()` |
+| Variables | `camelCase` | `feedItems`, `userId` |
+| Constants | `UPPER_SNAKE_CASE` | `MAX_FEEDS_PER_USER` |
+| Packages | `lowercase` | `com.github.lamarios.newsku.services` |
+| DB columns (JPA `@Column`) | `snake_case` | `feed_url`, `created_at`, `importance_score` |
+| REST paths | `kebab-case` | `/api/feed-items`, `/api/feed-categories` |
+| DTO classes | `PascalCaseRequest/Response` | `CreateFeedRequest`, `FeedItemResponse` |
 
-### Paketstruktur
+### Package Structure
 
 ```
-controllers/   → REST Controller (HTTP-Layer, kein Business-Code)
-services/      → Geschaeftslogik + Orchestrierung
+controllers/   → REST controllers (HTTP layer, no business code)
+services/      → Business logic + orchestration
 persistence/
-  entities/    → JPA Entities (direkt auf DB-Tabellen gemappt)
-  repositories/→ Spring Data JPA Interfaces
-security/      → JWT, OIDC, Spring Security Config
-errors/        → Custom Exceptions + GlobalExceptionHandler
-utils/         → Reine Hilfsfunktionen (stateless)
+  entities/    → JPA entities (mapped directly to DB tables)
+  repositories/→ Spring Data JPA interfaces
+security/      → JWT, OIDC, Spring Security config
+errors/        → Custom exceptions + GlobalExceptionHandler
+utils/         → Pure helper functions (stateless)
 ```
 
-### Service-Muster
+### Service Pattern
 
 ```java
-// Bevorzugt: Constructor Injection
+// Preferred: constructor injection
 @Service
 @Transactional
 public class FeedService {
@@ -58,13 +58,13 @@ public class FeedService {
 }
 ```
 
-### Fehlerbehandlung
+### Error Handling
 
 ```java
-// Custom Exception
+// Custom exception
 public class FeedNotFoundException extends RuntimeException {
     public FeedNotFoundException(String id) {
-        super("Feed nicht gefunden: " + id);
+        super("Feed not found: " + id);
     }
 }
 
@@ -88,11 +88,11 @@ public class FeedService {
     private static final Logger log = LoggerFactory.getLogger(FeedService.class);
 
     public void refreshFeed(String feedId) {
-        log.info("Feed wird aktualisiert: feedId={}", feedId);
+        log.info("Refreshing feed: feedId={}", feedId);
         try {
             // ...
         } catch (Exception e) {
-            log.error("Feed-Aktualisierung fehlgeschlagen: feedId={}", feedId, e);
+            log.error("Feed refresh failed: feedId={}", feedId, e);
         }
     }
 }
@@ -102,43 +102,43 @@ public class FeedService {
 
 ## Dart / Flutter (Frontend)
 
-### Allgemein
+### General
 
-- **Dart Analyzer:** `analysis_options.yaml` konfiguriert, keine Warnungen ignorieren
-- **const-First:** `const` bei Widgets nutzen wo moeglich (Performance)
-- **Immutability:** Modell-Klassen unveraenderlich (finale Felder)
-- **Null Safety:** Dart Null Safety konsequent nutzen, `!` nur wenn sicher
+- **Dart Analyzer:** `analysis_options.yaml` configured — do not suppress warnings
+- **const-first:** Use `const` on widgets where possible (performance)
+- **Immutability:** Model classes immutable (final fields)
+- **Null safety:** Use Dart null safety consistently; `!` only when certain
 
 ### Naming
 
-| Kontext | Konvention | Beispiel |
+| Context | Convention | Example |
 |---------|-----------|---------|
-| Klassen | `PascalCase` | `FeedItem`, `AuthBloc`, `FeedService` |
-| Methoden / Funktionen | `camelCase` | `getFeeds()`, `markAsRead()` |
-| Variablen | `camelCase` | `feedItems`, `isLoading` |
-| Konstanten | `camelCase` (Dart-Konvention) | `maxFeedsPerPage` |
-| Dateien | `snake_case` | `feed_item.dart`, `feed_service.dart` |
-| BLoC-Events | `PascalCase + Event-Suffix` | `LoadFeedsEvent`, `MarkAsReadEvent` |
-| BLoC-States | `PascalCase + State-Suffix` | `FeedsLoadedState`, `FeedsErrorState` |
+| Classes | `PascalCase` | `FeedItem`, `AuthBloc`, `FeedService` |
+| Methods / Functions | `camelCase` | `getFeeds()`, `markAsRead()` |
+| Variables | `camelCase` | `feedItems`, `isLoading` |
+| Constants | `camelCase` (Dart convention) | `maxFeedsPerPage` |
+| Files | `snake_case` | `feed_item.dart`, `feed_service.dart` |
+| BLoC events | `PascalCase + Event suffix` | `LoadFeedsEvent`, `MarkAsReadEvent` |
+| BLoC states | `PascalCase + State suffix` | `FeedsLoadedState`, `FeedsErrorState` |
 
-### Datei-Struktur pro Modul
+### File Structure per Module
 
 ```
-lib/mein_modul/
-├── mein_modul_bloc.dart         # BLoC (Events + States + Logik)
-├── mein_modul_service.dart      # HTTP-Service
-├── mein_modul_view.dart         # Haupt-Widget (Screen)
+lib/my_module/
+├── my_module_bloc.dart         # BLoC (events + states + logic)
+├── my_module_service.dart      # HTTP service
+├── my_module_view.dart         # Main widget (screen)
 └── models/
-    └── mein_model.dart          # Datenmodell (fromJson/toJson)
+    └── my_model.dart           # Data model (fromJson/toJson)
 ```
 
-### Modell-Pattern
+### Model Pattern
 
 ```dart
 class FeedItem {
   final String id;
   final String title;
-  final String? imageUrl;         // nullable Felder als ?
+  final String? imageUrl;         // nullable fields as ?
   final double? importanceScore;
   final bool read;
 
@@ -170,10 +170,10 @@ class FeedItem {
 }
 ```
 
-### Widget-Pattern
+### Widget Pattern
 
 ```dart
-// Bevorzugt: StatelessWidget + BlocBuilder
+// Preferred: StatelessWidget + BlocBuilder
 class FeedList extends StatelessWidget {
   const FeedList({super.key});
 
@@ -183,7 +183,7 @@ class FeedList extends StatelessWidget {
       builder: (context, state) => switch (state) {
         FeedLoading() => const CircularProgressIndicator(),
         FeedLoaded(:final feeds) => _buildList(feeds),
-        FeedError(:final message) => Text('Fehler: $message'),
+        FeedError(:final message) => Text('Error: $message'),
         _ => const SizedBox.shrink(),
       },
     );
@@ -198,34 +198,34 @@ class FeedList extends StatelessWidget {
 
 ---
 
-## API-Konventionen
+## API Conventions
 
-### REST-Endpunkte
+### REST Endpoints
 
-- **Plural:** `/api/feeds`, `/api/feed-items` (nicht Singular)
-- **Verschachtelung:** nur eine Ebene: `/api/feeds/{id}/items`
-- **Spezial-Endpunkte:** `/api/search`, `/api/config`
+- **Plural:** `/api/feeds`, `/api/feed-items` (not singular)
+- **Nesting:** one level only: `/api/feeds/{id}/items`
+- **Special endpoints:** `/api/search`, `/api/config`
 
-### Response-Format
+### Response Format
 
 ```json
-// Einzelnes Objekt
+// Single object
 { "id": "...", "title": "...", "feedUrl": "..." }
 
-// Liste
+// List
 [ { "id": "..." }, { "id": "..." } ]
 
-// Paginiert (wenn implementiert)
+// Paginated (if implemented)
 { "content": [...], "totalElements": 42, "totalPages": 3 }
 
-// Fehler
-{ "message": "Feed nicht gefunden", "status": 404 }
+// Error
+{ "message": "Feed not found", "status": 404 }
 ```
 
 ---
 
-## Verwandte Dokumente
+## Related Documents
 
-- [docs/api-patterns.md](api-patterns.md) — Route-Struktur, Controller-Muster
-- [docs/frontend-patterns.md](frontend-patterns.md) — Flutter BLoC, Widgets
-- [docs/testing.md](testing.md) — Test-Organisation
+- [docs/api-patterns.md](api-patterns.md) — Route structure, controller patterns
+- [docs/frontend-patterns.md](frontend-patterns.md) — Flutter BLoC, widgets
+- [docs/testing.md](testing.md) — Test organisation

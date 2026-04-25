@@ -1,29 +1,34 @@
-# Design System
+# Design System (Flutter Reference)
 
-← [Zurueck zum Index](../CLAUDE.md)
+← [Back to Index](../CLAUDE.md)
+
+> **Note:** This file documents Flutter/M3 implementation patterns.
+> The canonical design token specification (colours, typography, spacing, motion)
+> lives in [DESIGN.md](../DESIGN.md).
 
 ---
 
-## Uebersicht
+## Overview
 
-Newsku nutzt **Flutter Material Design 3** als UI-Framework fuer alle Plattformen (Web, Android).
-Es gibt kein separates CSS-basiertes Design System — alle UI-Komponenten werden in Dart/Flutter implementiert.
+Newsku uses **Flutter Material Design 3** as the UI framework for all platforms
+(Web, Android). There is no separate CSS-based design system — all UI components
+are implemented in Dart/Flutter.
 
 ---
 
 ## Material Design 3
 
-Das Flutter-Frontend basiert auf Material Design 3:
+The Flutter frontend is based on Material Design 3:
 
 - **Package:** `material` (Flutter Core)
-- **Dynamic Color:** `dynamic_color` Package — nutzt die Systemfarbe des Geraets
-- **Dark/Light Mode:** Automatisch via `ThemeMode.system`
-- **Dokumentation:** https://m3.material.io
+- **Dynamic Colour:** `dynamic_color` package — uses the device's system colour
+- **Dark/Light mode:** Automatic via `ThemeMode.system`
+- **Documentation:** https://m3.material.io
 
-### Theme-Konfiguration
+### Theme Configuration
 
 ```dart
-// lib/main.dart (vereinfacht)
+// lib/main.dart (simplified)
 MaterialApp.router(
   theme: ThemeData(
     useMaterial3: true,
@@ -38,10 +43,10 @@ MaterialApp.router(
 )
 ```
 
-### Dynamic Color (Systemfarbe)
+### Dynamic Colour (System Colour)
 
 ```dart
-// Mit dynamic_color Package
+// With dynamic_color package
 DynamicColorBuilder(
   builder: (lightDynamic, darkDynamic) {
     final lightScheme = lightDynamic ?? ColorScheme.fromSeed(seedColor: Colors.blue);
@@ -59,25 +64,25 @@ DynamicColorBuilder(
 
 ---
 
-## Typografie
+## Typography
 
-Flutter M3 Typografiesystem wird direkt ueber `Theme.of(context).textTheme` genutzt:
+Flutter M3 typography is used directly via `Theme.of(context).textTheme`:
 
-| Style | Verwendung |
-|-------|-----------|
-| `displayLarge` | Grosse Ueberschriften (selten) |
-| `headlineLarge` | Seiten-Titel |
-| `headlineMedium` | Abschnitts-Titel |
-| `titleLarge` | Karten-Titel, Feed-Namen |
-| `titleMedium` | Sub-Titel |
-| `bodyLarge` | Haupttext, Beitraege |
-| `bodyMedium` | Standard-Text |
-| `bodySmall` | Metadaten, Timestamps |
-| `labelLarge` | Buttons, Actions |
-| `labelSmall` | Tags, Badges |
+| Style | Usage |
+|-------|-------|
+| `displayLarge` | Large headlines (rare) |
+| `headlineLarge` | Page titles |
+| `headlineMedium` | Section titles |
+| `titleLarge` | Card titles, feed names |
+| `titleMedium` | Sub-titles |
+| `bodyLarge` | Main text, articles |
+| `bodyMedium` | Standard text |
+| `bodySmall` | Metadata, timestamps |
+| `labelLarge` | Buttons, actions |
+| `labelSmall` | Tags, badges |
 
 ```dart
-// Verwendung
+// Usage
 Text(
   feed.title,
   style: Theme.of(context).textTheme.titleLarge,
@@ -86,26 +91,26 @@ Text(
 
 ---
 
-## Farben
+## Colours
 
-Alle Farben aus dem `ColorScheme` verwenden — **keine hardcodierten Hex-Farben**:
+Use all colours from `ColorScheme` — **no hardcoded hex values**:
 
-| Farbe | Verwendung |
-|-------|-----------|
-| `colorScheme.primary` | Hauptaktionsfarbe, Buttons |
-| `colorScheme.secondary` | Sekundaere Aktionen |
-| `colorScheme.surface` | Karten-Hintergrund |
-| `colorScheme.surfaceVariant` | Leicht abgehobene Flaechen |
-| `colorScheme.background` | Seiten-Hintergrund |
-| `colorScheme.error` | Fehlermeldungen |
-| `colorScheme.onPrimary` | Text auf Primary-Farbe |
-| `colorScheme.onSurface` | Text auf Surface |
+| Colour | Usage |
+|--------|-------|
+| `colorScheme.primary` | Main action colour, buttons |
+| `colorScheme.secondary` | Secondary actions |
+| `colorScheme.surface` | Card background |
+| `colorScheme.surfaceVariant` | Slightly elevated surfaces |
+| `colorScheme.background` | Page background |
+| `colorScheme.error` | Error messages |
+| `colorScheme.onPrimary` | Text on primary colour |
+| `colorScheme.onSurface` | Text on surface |
 
 ```dart
 Container(
   color: Theme.of(context).colorScheme.surface,
   child: Text(
-    'Feed-Eintrag',
+    'Feed entry',
     style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
   ),
 )
@@ -113,23 +118,23 @@ Container(
 
 ---
 
-## Kern-Widgets
+## Core Widgets
 
-### Wichtigkeitsanzeige (LLM Score)
+### Importance Indicator (LLM Score)
 
-Feed-Items erhalten einen `importanceScore` (0.0–1.0) vom LLM.
-Dieser wird visuell dargestellt (z. B. farbige Markierung, Reihenfolge).
+Feed items receive an `importanceScore` (0.0–1.0) from the LLM.
+This is visualised (e.g. colour marker, ordering).
 
 ```dart
-// Farbe nach Score
+// Colour by score
 Color getImportanceColor(double score) {
-  if (score >= 0.8) return Colors.red.shade400;     // Sehr wichtig
-  if (score >= 0.5) return Colors.orange.shade400;  // Wichtig
-  return Colors.grey.shade400;                       // Normal
+  if (score >= 0.8) return const Color(0xFFEF5350); // High priority
+  if (score >= 0.5) return const Color(0xFFFFA726); // Medium priority
+  return const Color(0xFFBDBDBD);                   // Normal
 }
 ```
 
-### Feed-Karte
+### Feed Card
 
 ```dart
 Card(
@@ -152,13 +157,13 @@ Card(
 
 ## Responsive Layout
 
-Breakpoints (angelehnt an Material Design):
+Breakpoints (aligned with Material Design):
 
-| Breite | Layout |
-|--------|--------|
-| < 600 dp | Mobile (einspaltiger Feed) |
-| 600–1200 dp | Tablet (optionale Sidebar) |
-| > 1200 dp | Desktop (permanente Sidebar) |
+| Width | Layout |
+|-------|--------|
+| < 500 dp | Mobile (single-column feed) |
+| 500–800 dp | Tablet (optional sidebar) |
+| > 800 dp | Desktop (permanent sidebar) |
 
 ```dart
 LayoutBuilder(
@@ -177,32 +182,33 @@ LayoutBuilder(
 
 ## Icons
 
-Flutter Material Icons werden direkt genutzt:
+Flutter Material Icons are used directly:
 
 ```dart
-Icon(Icons.rss_feed)           // Feed-Symbol
-Icon(Icons.search)             // Suche
-Icon(Icons.settings)           // Einstellungen
-Icon(Icons.mark_email_read)    // Als gelesen markieren
-Icon(Icons.refresh)            // Feed aktualisieren
-Icon(Icons.category)           // Kategorie
-Icon(Icons.bar_chart)          // Statistiken
-Icon(Icons.open_in_new)        // Externen Link oeffnen
+Icon(Icons.rss_feed)           // Feed symbol
+Icon(Icons.search)             // Search
+Icon(Icons.settings)           // Settings
+Icon(Icons.mark_email_read)    // Mark as read
+Icon(Icons.refresh)            // Refresh feed
+Icon(Icons.category)           // Category
+Icon(Icons.bar_chart)          // Statistics
+Icon(Icons.open_in_new)        // Open external link
 ```
 
 ---
 
 ## PWA (Web)
 
-Der Flutter Web Build ist als PWA konfiguriert:
+The Flutter web build is configured as a PWA:
 
 - **Manifest:** `src/main/app/web/manifest.json`
 - **Icons:** `src/main/app/web/icons/` (192x192, 512x512)
-- **Service Worker:** Flutter generiert automatisch einen Service Worker
+- **Service Worker:** Flutter automatically generates a service worker
 
 ---
 
-## Verwandte Dokumente
+## Related Documents
 
-- [docs/frontend-patterns.md](frontend-patterns.md) — BLoC, Routing, Services
-- [docs/code-konventionen.md](code-konventionen.md) — Dart/Flutter Code-Stil
+- [DESIGN.md](../DESIGN.md) — Canonical token specification (colours, spacing, motion)
+- [docs/frontend-patterns.md](frontend-patterns.md) — BLoC, routing, services
+- [docs/code-konventionen.md](code-konventionen.md) — Dart/Flutter code style
