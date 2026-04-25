@@ -1,46 +1,46 @@
 # Testing
 
-← [Zurueck zum Index](../CLAUDE.md)
+← [Back to Index](../CLAUDE.md)
 
 ---
 
-## Uebersicht
+## Overview
 
-| Schicht | Framework | Ort | Befehl |
-|---------|-----------|-----|--------|
-| Backend (Unit) | JUnit 5 + Mockito | `src/test/java/` | `mvn test` |
-| Backend (Integration) | Spring Boot Test + TestContainers | `src/test/java/` | `mvn verify` |
+| Layer | Framework | Location | Command |
+|-------|-----------|----------|---------|
+| Backend (unit) | JUnit 5 + Mockito | `src/test/java/` | `mvn test` |
+| Backend (integration) | Spring Boot Test + TestContainers | `src/test/java/` | `mvn verify` |
 | Frontend | Flutter Test | `src/main/app/test/` | `flutter test` |
 
 ---
 
-## Backend-Tests (Java)
+## Backend Tests (Java)
 
-### Voraussetzungen
+### Prerequisites
 
-TestContainers startet automatisch eine echte PostgreSQL-Instanz fuer Integrationstests.
-Docker muss auf dem Entwicklungsrechner laufen.
+TestContainers automatically starts a real PostgreSQL instance for integration
+tests. Docker must be running on the development machine.
 
-### Test-Befehle
+### Test Commands
 
 ```bash
-# Alle Tests (Unit + Integration)
+# All tests (unit + integration)
 mvn test
 
-# Nur Tests, kein Package
+# Tests only, no package
 mvn test -pl .
 
-# Tests ueberspringen (fuer schnellen Build)
+# Skip tests (for fast build)
 mvn clean package -DskipTests
 
-# Einzelne Test-Klasse ausfuehren
+# Run single test class
 mvn test -Dtest=FeedServiceTest
 
-# Einzelne Test-Methode
+# Run single test method
 mvn test -Dtest=FeedServiceTest#shouldReturnFeedsForUser
 ```
 
-### Unit-Test-Pattern
+### Unit Test Pattern
 
 ```java
 // src/test/java/com/github/lamarios/newsku/services/FeedServiceTest.java
@@ -89,7 +89,7 @@ class FeedServiceTest {
 }
 ```
 
-### Integrations-Test-Pattern (TestContainers)
+### Integration Test Pattern (TestContainers)
 
 ```java
 // src/test/java/com/github/lamarios/newsku/integration/FeedControllerIT.java
@@ -116,7 +116,7 @@ class FeedControllerIT {
 
     @Test
     void shouldReturnEmptyFeedsForNewUser() {
-        // JWT-Token fuer Testbenutzer generieren (oder Mock-Auth)
+        // Generate JWT token for test user (or mock auth)
         ResponseEntity<List> response = restTemplate.exchange(
             "/api/feeds",
             HttpMethod.GET,
@@ -130,7 +130,7 @@ class FeedControllerIT {
 }
 ```
 
-### Controller-Test (MockMvc)
+### Controller Test (MockMvc)
 
 ```java
 @WebMvcTest(FeedController.class)
@@ -158,24 +158,24 @@ class FeedControllerTest {
 
 ---
 
-## Frontend-Tests (Flutter)
+## Frontend Tests (Flutter)
 
-### Test-Befehle
+### Test Commands
 
 ```bash
 cd src/main/app
 
-# Alle Tests ausfuehren
+# Run all tests
 flutter test
 
-# Einzelne Test-Datei
+# Single test file
 flutter test test/feed_service_test.dart
 
-# Mit Coverage
+# With coverage
 flutter test --coverage
 ```
 
-### Unit-Test-Pattern (Dart)
+### Unit Test Pattern (Dart)
 
 ```dart
 // src/main/app/test/feed_item_test.dart
@@ -188,7 +188,7 @@ void main() {
     test('fromJson parses correctly', () {
       final json = {
         'id': 'item-1',
-        'title': 'Test Artikel',
+        'title': 'Test Article',
         'imageUrl': null,
         'importanceScore': 0.85,
         'read': false,
@@ -197,7 +197,7 @@ void main() {
       final item = FeedItem.fromJson(json);
 
       expect(item.id, equals('item-1'));
-      expect(item.title, equals('Test Artikel'));
+      expect(item.title, equals('Test Article'));
       expect(item.imageUrl, isNull);
       expect(item.importanceScore, closeTo(0.85, 0.001));
       expect(item.read, isFalse);
@@ -219,7 +219,7 @@ void main() {
 }
 ```
 
-### BLoC-Test-Pattern
+### BLoC Test Pattern
 
 ```dart
 // src/main/app/test/feed_bloc_test.dart
@@ -255,7 +255,7 @@ void main() {
 }
 ```
 
-### Widget-Test-Pattern
+### Widget Test Pattern
 
 ```dart
 // src/main/app/test/widgets/feed_tile_test.dart
@@ -264,8 +264,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('FeedTile zeigt Titel an', (WidgetTester tester) async {
-    final feed = Feed(id: '1', title: 'Mein Test-Feed');
+  testWidgets('FeedTile displays title', (WidgetTester tester) async {
+    final feed = Feed(id: '1', title: 'My Test Feed');
 
     await tester.pumpWidget(
       MaterialApp(
@@ -275,38 +275,38 @@ void main() {
       ),
     );
 
-    expect(find.text('Mein Test-Feed'), findsOneWidget);
+    expect(find.text('My Test Feed'), findsOneWidget);
   });
 }
 ```
 
 ---
 
-## How-To: Neuen Test schreiben
+## How-To: Write a New Test
 
-### Backend (Service-Test)
+### Backend (Service Test)
 
-1. Datei erstellen: `src/test/java/com/github/lamarios/newsku/services/MeinServiceTest.java`
-2. `@ExtendWith(MockitoExtension.class)` verwenden
-3. Abhaengigkeiten mit `@Mock` mocken
-4. Service mit `@InjectMocks` instanziieren
+1. Create file: `src/test/java/com/github/lamarios/newsku/services/MyServiceTest.java`
+2. Use `@ExtendWith(MockitoExtension.class)`
+3. Mock dependencies with `@Mock`
+4. Instantiate service with `@InjectMocks`
 
-### Backend (Integrations-Test)
+### Backend (Integration Test)
 
-1. Datei erstellen: `src/test/java/com/github/lamarios/newsku/integration/MeinIT.java`
-2. `@SpringBootTest` + `@Testcontainers` nutzen
-3. PostgreSQL Container via `@Container` starten
-4. Properties via `@DynamicPropertySource` einfuegen
+1. Create file: `src/test/java/com/github/lamarios/newsku/integration/MyIT.java`
+2. Use `@SpringBootTest` + `@Testcontainers`
+3. Start PostgreSQL container via `@Container`
+4. Inject properties via `@DynamicPropertySource`
 
-### Flutter (Unit-Test)
+### Flutter (Unit Test)
 
-1. Datei erstellen: `src/main/app/test/mein_test.dart`
-2. `flutter_test` importieren
-3. `group()` + `test()` / `testWidgets()` nutzen
+1. Create file: `src/main/app/test/my_test.dart`
+2. Import `flutter_test`
+3. Use `group()` + `test()` / `testWidgets()`
 
 ---
 
-## Verwandte Dokumente
+## Related Documents
 
-- [docs/entwicklung.md](entwicklung.md) — Dev-Setup, Build-Befehle
-- [docs/api-patterns.md](api-patterns.md) — Was getestet werden soll
+- [docs/entwicklung.md](entwicklung.md) — Dev setup, build commands
+- [docs/api-patterns.md](api-patterns.md) — What should be tested

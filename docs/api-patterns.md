@@ -1,52 +1,52 @@
-# API-Patterns
+# API Patterns
 
-← [Zurueck zum Index](../CLAUDE.md)
+← [Back to Index](../CLAUDE.md)
 
 ---
 
-## Uebersicht
+## Overview
 
-Die API folgt einem klassischen Spring Boot Schicht-Muster:
+The API follows a classic Spring Boot layered pattern:
 
 ```
-Controller (HTTP-Handler)
+Controller (HTTP handler)
   │
   ├─ Spring Validation (@Valid, @RequestBody)
   ├─ Spring Security (@PreAuthorize / SecurityContext)
   │
-  └─ Service (Geschaeftslogik)
+  └─ Service (business logic)
        │
-       └─ JPA Repository (Datenbankzugriff via Spring Data)
+       └─ JPA Repository (database access via Spring Data)
 ```
 
-API-Dokumentation (Swagger UI) erreichbar unter: `/swagger-ui.html`
+API documentation (Swagger UI) available at: `/swagger-ui.html`
 
 ---
 
-## Controller-Uebersicht
+## Controller Overview
 
-Alle Controller liegen in `src/main/java/com/github/lamarios/newsku/controllers/`:
+All controllers are in `src/main/java/com/github/lamarios/newsku/controllers/`:
 
-| Klasse | Prefix | Beschreibung |
-|--------|--------|-------------|
-| `UserController` | `/api/users` | Login, OIDC-Auth, Profil, Einstellungen |
-| `SignUpController` | `/api/signup` | Benutzerregistrierung (nur wenn `ALLOW_SIGNUP=1`) |
-| `ResetPasswordController` | `/api/reset-password` | Passwort-Reset via E-Mail |
-| `FeedController` | `/api/feeds` | CRUD RSS-Feeds |
-| `FeedItemController` | `/api/feed-items` | Feed-Beitraege abrufen, als gelesen markieren |
-| `FeedCategoryController` | `/api/feed-categories` | CRUD Feed-Kategorien |
-| `FeedErrorController` | `/api/feed-errors` | Feed-Fehlerprotokoll abrufen |
-| `LayoutController` | `/api/layouts` | CRUD Layout-Bloecke (Startseiten-Konfiguration) |
-| `ClickController` | `/api/clicks` | Klick-Tracking fuer Statistiken |
-| `SearchController` | `/api/search` | Volltextsuche ueber Feed-Beitraege |
-| `ConfigController` | `/api/config` | Anwendungskonfiguration (Signup erlaubt?) |
-| `StaticContentController` | `/**` | Flutter Web Build ausliefern |
+| Class | Prefix | Description |
+|-------|--------|-------------|
+| `UserController` | `/api/users` | Login, OIDC auth, profile, settings |
+| `SignUpController` | `/api/signup` | User registration (only when `ALLOW_SIGNUP=1`) |
+| `ResetPasswordController` | `/api/reset-password` | Password reset via email |
+| `FeedController` | `/api/feeds` | CRUD RSS feeds |
+| `FeedItemController` | `/api/feed-items` | Retrieve feed articles, mark as read |
+| `FeedCategoryController` | `/api/feed-categories` | CRUD feed categories |
+| `FeedErrorController` | `/api/feed-errors` | Retrieve feed error log |
+| `LayoutController` | `/api/layouts` | CRUD layout blocks (home page configuration) |
+| `ClickController` | `/api/clicks` | Click tracking for statistics |
+| `SearchController` | `/api/search` | Full-text search over feed articles |
+| `ConfigController` | `/api/config` | Application configuration (signup allowed?) |
+| `StaticContentController` | `/**` | Serve Flutter Web build |
 
 ---
 
-## Controller-Pattern
+## Controller Pattern
 
-Spring Boot REST Controller mit JWT-Absicherung:
+Spring Boot REST controller with JWT protection:
 
 ```java
 // src/main/java/com/github/lamarios/newsku/controllers/FeedController.java
@@ -61,14 +61,14 @@ public class FeedController {
         this.feedService = feedService;
     }
 
-    // Alle Feeds des authentifizierten Benutzers
+    // All feeds for the authenticated user
     @GetMapping
     public List<Feed> getFeeds(Authentication auth) {
         String userId = auth.getName();
         return feedService.getFeedsForUser(userId);
     }
 
-    // Neuen Feed erstellen
+    // Create new feed
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Feed createFeed(@RequestBody @Valid CreateFeedRequest request, Authentication auth) {
@@ -76,7 +76,7 @@ public class FeedController {
         return feedService.createFeed(userId, request);
     }
 
-    // Feed aktualisieren
+    // Update feed
     @PutMapping("/{id}")
     public Feed updateFeed(@PathVariable String id,
                            @RequestBody @Valid UpdateFeedRequest request,
@@ -85,7 +85,7 @@ public class FeedController {
         return feedService.updateFeed(userId, id, request);
     }
 
-    // Feed loeschen
+    // Delete feed
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFeed(@PathVariable String id, Authentication auth) {
@@ -97,28 +97,28 @@ public class FeedController {
 
 ---
 
-## Authentifizierung
+## Authentication
 
-Geschuetzte Endpunkte werden via Spring Security + JWT-Filter abgesichert.
-Der `JwtAuthFilter` setzt den `SecurityContext` bei gueltigem Bearer-Token.
+Protected endpoints are secured via Spring Security + JWT filter.
+`JwtAuthFilter` sets the `SecurityContext` for valid bearer tokens.
 
-Der authentifizierte Benutzer ist in `Authentication auth` verfuegbar:
+The authenticated user is available via `Authentication auth`:
 
 ```java
-// Benutzer-ID aus JWT-Subject holen
+// Get user ID from JWT subject
 String userId = auth.getName();
 
-// Alternativ: Vollstaendiges Principal-Objekt
+// Alternative: full principal object
 UserDetails user = (UserDetails) auth.getPrincipal();
 ```
 
-Fuer OIDC-Authentifizierung: `OidcService` validiert den OIDC-Token und gibt den lokalen Benutzer zurueck.
+For OIDC authentication: `OidcService` validates the OIDC token and returns the local user.
 
 ---
 
-## Validierung
+## Validation
 
-Request-Bodies werden via Jakarta Validation validiert:
+Request bodies are validated via Jakarta Validation:
 
 ```java
 // Request DTO
@@ -131,33 +131,33 @@ public class CreateFeedRequest {
     @Size(max = 255)
     private String title;
 
-    // Getter/Setter oder Lombok @Data
+    // Getters/setters or Lombok @Data
 }
 
-// Im Controller
+// In the controller
 @PostMapping
 public Feed createFeed(@RequestBody @Valid CreateFeedRequest request, ...) {
-    // Bei Validierungsfehler: 400 Bad Request (automatisch durch Spring)
+    // On validation error: 400 Bad Request (automatic via Spring)
 }
 ```
 
 ---
 
-## Service-Layer
+## Service Layer
 
-Services kapseln die Geschaeftslogik und Datenbank-Zugriffe:
+Services encapsulate business logic and database access:
 
-| Klasse | Wichtige Methoden |
-|--------|------------------|
+| Class | Key Methods |
+|-------|------------|
 | `FeedService` | `getFeedsForUser()`, `createFeed()`, `refreshFeed()`, `deleteFeed()` |
 | `FeedItemService` | `getItemsForUser()`, `markAsRead()`, `getUnreadCount()` |
 | `UserService` | `login()`, `createUser()`, `updateSettings()` |
 | `OpenaiServiceImpl` | `rankItems(userId, items)` → importance_score |
-| `ScheduleService` | `refreshAllFeeds()`, `sendDigests()` (Scheduled) |
+| `ScheduleService` | `refreshAllFeeds()`, `sendDigests()` (scheduled) |
 | `EmailServiceImpl` | `sendDigest()`, `sendPasswordReset()` |
 | `ClickService` | `trackClick()`, `getStats()` |
 
-### Beispiel: Service-Implementierung
+### Example: Service Implementation
 
 ```java
 // src/main/java/com/github/lamarios/newsku/services/FeedService.java
@@ -196,7 +196,7 @@ public class FeedService {
 
 ## JPA Repositories
 
-Repositories erweitern `JpaRepository` und koennen Spring Data Query-Methods nutzen:
+Repositories extend `JpaRepository` and can use Spring Data query methods:
 
 ```java
 // src/main/java/com/github/lamarios/newsku/persistence/repositories/FeedRepository.java
@@ -210,27 +210,27 @@ public interface FeedRepository extends JpaRepository<Feed, String> {
 
 ---
 
-## HTTP-Status-Codes
+## HTTP Status Codes
 
-| Code | Verwendung |
-|------|-----------|
-| `200` | Erfolg (GET, PUT) |
-| `201` | Erstellt (POST) |
-| `204` | Kein Inhalt (DELETE) |
-| `400` | Validierungsfehler |
-| `401` | Nicht authentifiziert |
-| `403` | Keine Berechtigung |
-| `404` | Nicht gefunden |
-| `503` | Health Check degraded |
+| Code | Usage |
+|------|-------|
+| `200` | Success (GET, PUT) |
+| `201` | Created (POST) |
+| `204` | No content (DELETE) |
+| `400` | Validation error |
+| `401` | Not authenticated |
+| `403` | Forbidden |
+| `404` | Not found |
+| `503` | Health check degraded |
 
 ---
 
-## Fehlerbehandlung
+## Error Handling
 
-Globale Fehlerbehandlung via `@ControllerAdvice`:
+Global error handling via `@ControllerAdvice`:
 
 ```java
-// In errors/ Package
+// In errors/ package
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -241,49 +241,49 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleForbidden(AccessDeniedException ex) {
-        return ResponseEntity.status(403).body(new ErrorResponse("Zugriff verweigert"));
+        return ResponseEntity.status(403).body(new ErrorResponse("Access denied"));
     }
 }
 ```
 
 ---
 
-## How-To: Neuen Endpunkt hinzufuegen
+## How-To: Add a New Endpoint
 
-1. **Controller erstellen** (oder bestehenden erweitern):
+1. **Create controller** (or extend existing one):
 
 ```java
-// src/main/java/com/github/lamarios/newsku/controllers/MeinController.java
+// src/main/java/com/github/lamarios/newsku/controllers/MyController.java
 @RestController
-@RequestMapping("/api/mein-resource")
-public class MeinController {
-    private final MeinService meinService;
+@RequestMapping("/api/my-resource")
+public class MyController {
+    private final MyService myService;
 
     @GetMapping
-    public List<MeinDto> getAll(Authentication auth) {
-        return meinService.getAll(auth.getName());
+    public List<MyDto> getAll(Authentication auth) {
+        return myService.getAll(auth.getName());
     }
 }
 ```
 
-2. **Service erstellen** in `services/`:
+2. **Create service** in `services/`:
 
 ```java
 @Service
 @Transactional
-public class MeinService {
-    // Logik + Repository-Aufrufe
+public class MyService {
+    // Logic + repository calls
 }
 ```
 
-3. **Entity + Repository** in `persistence/` anlegen (falls neue Tabelle)
+3. **Entity + repository** in `persistence/` (if new table)
 
-4. **Flyway-Migration** in `src/main/resources/db/migration/` hinzufuegen
+4. **Flyway migration** in `src/main/resources/db/migration/`
 
 ---
 
-## Verwandte Dokumente
+## Related Documents
 
-- [docs/architektur.md](architektur.md) — Request-Flow, Auth-Flow
-- [docs/datenbank.md](datenbank.md) — JPA Entities, Flyway-Schema
-- [docs/haeufige-aufgaben.md](haeufige-aufgaben.md) — End-to-End Feature-Guide
+- [docs/architektur.md](architektur.md) — Request flow, auth flow
+- [docs/datenbank.md](datenbank.md) — JPA entities, Flyway schema
+- [docs/haeufige-aufgaben.md](haeufige-aufgaben.md) — End-to-end feature guide

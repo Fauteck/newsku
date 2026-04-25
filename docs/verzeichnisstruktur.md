@@ -1,6 +1,6 @@
-# Verzeichnisstruktur
+# Directory Structure
 
-← [Zurueck zum Index](../CLAUDE.md)
+← [Back to Index](../CLAUDE.md)
 
 ---
 
@@ -8,23 +8,24 @@
 
 ```
 /home/user/newsku/
-├── CLAUDE.md                          # KI-Entwicklungsregeln + Dokumentations-Index
-├── README.md                          # Projekt-Dokumentation (Features, Setup)
-├── pom.xml                            # Maven Build-Konfiguration
-├── .env.example                       # Umgebungsvariablen-Vorlage
-├── docker-compose.yml                 # Docker-Stack (App + PostgreSQL)
-├── Makefile                           # Dokumentations-Build (mkdocs)
-├── shell.nix                          # Nix Entwicklungsumgebung (JDK 25, Maven, Python)
+├── CLAUDE.md                          # AI development rules + documentation index
+├── DESIGN.md                          # Design system (tokens, colours, typography, motion)
+├── README.md                          # Project documentation (features, setup)
+├── pom.xml                            # Maven build configuration
+├── .env.example                       # Environment variable template
+├── docker-compose.yml                 # Docker stack (app + PostgreSQL)
+├── Makefile                           # Documentation build (mkdocs)
+├── shell.nix                          # Nix development environment (JDK 25, Maven, Python)
 ├── LICENSE
 ├── .github/
 │   └── workflows/
-│       └── build-docker.yml           # CI/CD: JAR bauen + Docker-Image nach GHCR
+│       └── build-docker.yml           # CI/CD: build JAR + Docker image to GHCR
 ├── docker/
-│   ├── Dockerfile                     # Production Docker Image (Amazon Corretto 25)
-│   └── run.sh                         # JVM-Startskript (RAM-Limits)
-├── docs/                              # KI-optimierte Entwicklungsdokumentation (Deutsch)
+│   ├── Dockerfile                     # Production Docker image (Amazon Corretto 25)
+│   └── run.sh                         # JVM startup script (RAM limits)
+├── docs/                              # AI-optimised development documentation (English)
 │   ├── architektur.md
-│   ├── verzeichnisstruktur.md         # (diese Datei)
+│   ├── verzeichnisstruktur.md         # (this file)
 │   ├── api-patterns.md
 │   ├── frontend-patterns.md
 │   ├── datenbank.md
@@ -34,8 +35,8 @@
 │   ├── haeufige-aufgaben.md
 │   ├── design-system.md
 │   ├── issue-analyse.md
-│   └── assets/                        # Screenshots und Logos
-├── mkdocs/                            # Oeffentliche Dokumentationsseite
+│   └── assets/                        # Screenshots and logos
+├── mkdocs/                            # Public documentation website
 │   ├── mkdocs.yml
 │   ├── docs/
 │   │   ├── index.md
@@ -43,12 +44,12 @@
 │   │   ├── 2-configuration.md
 │   │   ├── 3-API.md
 │   │   └── 4-UserManual.md
-│   └── requirements.txt               # Python-Abhaengigkeiten (mkdocs-Plugins)
+│   └── requirements.txt               # Python dependencies (mkdocs plugins)
 └── src/
     └── main/
-        ├── java/                      # Spring Boot Backend (Java 25)
-        ├── resources/                 # Konfiguration + Migrationen
-        └── app/                       # Flutter App (Web + Android)
+        ├── java/                      # Spring Boot backend (Java 25)
+        ├── resources/                 # Configuration + migrations
+        └── app/                       # Flutter app (Web + Android)
 ```
 
 ---
@@ -57,80 +58,80 @@
 
 ```
 src/main/java/com/github/lamarios/newsku/
-├── Application.java                   # Spring Boot Einstiegspunkt
-├── Config.java                        # Anwendungskonfiguration (Beans, Security)
-├── Constants.java                     # Globale Konstanten
+├── Application.java                   # Spring Boot entry point
+├── Config.java                        # Application configuration (beans, security)
+├── Constants.java                     # Global constants
 ├── controllers/
-│   ├── ClickController.java           # GET/POST /api/clicks – Klick-Tracking
-│   ├── ConfigController.java          # GET /api/config – Anwendungskonfiguration
+│   ├── ClickController.java           # GET/POST /api/clicks — click tracking
+│   ├── ConfigController.java          # GET /api/config — application configuration
 │   ├── FeedCategoryController.java    # CRUD /api/feed-categories
-│   ├── FeedController.java            # CRUD /api/feeds – Feed-Verwaltung
-│   ├── FeedErrorController.java       # GET /api/feed-errors – Fehlerprotokoll
-│   ├── FeedItemController.java        # GET/PATCH /api/feed-items – Beitraege
-│   ├── LayoutController.java          # CRUD /api/layouts – Layout-Bloecke
+│   ├── FeedController.java            # CRUD /api/feeds — feed management
+│   ├── FeedErrorController.java       # GET /api/feed-errors — error log
+│   ├── FeedItemController.java        # GET/PATCH /api/feed-items — articles
+│   ├── LayoutController.java          # CRUD /api/layouts — layout blocks
 │   ├── ResetPasswordController.java   # POST /api/reset-password
 │   ├── SearchController.java          # GET /api/search
 │   ├── SignUpController.java          # POST /api/signup
-│   ├── StaticContentController.java   # Ausliefern des Flutter Web Builds
-│   └── UserController.java            # Auth: Login, OIDC, Profil, Einstellungen
+│   ├── StaticContentController.java   # Serve Flutter web build
+│   └── UserController.java            # Auth: login, OIDC, profile, settings
 ├── services/
-│   ├── ClickService.java              # Klick-Statistiken verwalten
-│   ├── EmailDigestService.java        # E-Mail Digest Versand (Scheduler)
-│   ├── EmailService.java              # E-Mail Interface
-│   ├── EmailServiceImpl.java          # Simple Java Mail Implementierung
-│   ├── FeedCategoriesService.java     # Feed-Kategorien Geschaeftslogik
-│   ├── FeedErrorService.java          # Feed-Fehler protokollieren
-│   ├── FeedItemService.java           # FeedItems laden, filtern, als gelesen markieren
-│   ├── FeedService.java               # RSS abrufen, Items persistieren, LLM triggern
-│   ├── LayoutService.java             # Layout-Bloecke verwalten
-│   ├── OidcService.java               # OpenID Connect Token validieren
-│   ├── OpenaiService.java             # LLM Ranking Interface
-│   ├── OpenaiServiceImpl.java         # OpenAI SDK Implementierung
-│   ├── ResetPasswordService.java      # Passwort-Reset Logik
-│   ├── ScheduleService.java           # Scheduled Tasks (Feed-Refresh, Digest)
-│   └── UserService.java               # Benutzer verwalten, Auth
+│   ├── ClickService.java              # Manage click statistics
+│   ├── EmailDigestService.java        # Email digest sending (scheduler)
+│   ├── EmailService.java              # Email interface
+│   ├── EmailServiceImpl.java          # Simple Java Mail implementation
+│   ├── FeedCategoriesService.java     # Feed category business logic
+│   ├── FeedErrorService.java          # Log feed errors
+│   ├── FeedItemService.java           # Load, filter, mark feed items as read
+│   ├── FeedService.java               # Fetch RSS, persist items, trigger LLM
+│   ├── LayoutService.java             # Manage layout blocks
+│   ├── OidcService.java               # Validate OpenID Connect tokens
+│   ├── OpenaiService.java             # LLM ranking interface
+│   ├── OpenaiServiceImpl.java         # OpenAI SDK implementation
+│   ├── ResetPasswordService.java      # Password reset logic
+│   ├── ScheduleService.java           # Scheduled tasks (feed refresh, digest)
+│   └── UserService.java               # Manage users, auth
 ├── persistence/
 │   ├── entities/
-│   │   ├── Feed.java                  # JPA Entity: feeds
-│   │   ├── FeedCategory.java          # JPA Entity: feed_categories
-│   │   ├── FeedError.java             # JPA Entity: feed_errors
-│   │   ├── FeedItem.java              # JPA Entity: feed_items
-│   │   ├── LayoutBlock.java           # JPA Entity: layout_blocks
-│   │   ├── User.java                  # JPA Entity: users
-│   │   └── ...                        # weitere Entities
+│   │   ├── Feed.java                  # JPA entity: feeds
+│   │   ├── FeedCategory.java          # JPA entity: feed_categories
+│   │   ├── FeedError.java             # JPA entity: feed_errors
+│   │   ├── FeedItem.java              # JPA entity: feed_items
+│   │   ├── LayoutBlock.java           # JPA entity: layout_blocks
+│   │   ├── User.java                  # JPA entity: users
+│   │   └── ...                        # further entities
 │   └── repositories/
-│       ├── FeedRepository.java        # Spring Data JPA Repository
+│       ├── FeedRepository.java        # Spring Data JPA repository
 │       ├── FeedItemRepository.java
 │       ├── UserRepository.java
-│       └── ...                        # weitere Repositories
+│       └── ...                        # further repositories
 ├── security/
-│   ├── JwtAuthFilter.java             # JWT-Validierung in der Filter-Chain
-│   ├── JwtService.java                # JWT erzeugen/validieren (JJWT)
-│   └── ...                            # weitere Security-Klassen
+│   ├── JwtAuthFilter.java             # JWT validation in filter chain
+│   ├── JwtService.java                # Generate/validate JWT (JJWT)
+│   └── ...                            # further security classes
 ├── errors/
-│   └── ...                            # Custom Exceptions + GlobalExceptionHandler
+│   └── ...                            # Custom exceptions + GlobalExceptionHandler
 └── utils/
-    └── ...                            # HTML-, Image-, Transaktions-Hilfklassen
+    └── ...                            # HTML, image, transaction helpers
 ```
 
 ---
 
-## Ressourcen: `src/main/resources/`
+## Resources: `src/main/resources/`
 
 ```
 src/main/resources/
-├── application.yml                    # Spring Boot Konfiguration (DB, Flyway, Port)
+├── application.yml                    # Spring Boot configuration (DB, Flyway, port)
 ├── db/
 │   └── migration/
-│       ├── V1__initial_schema.sql     # Initiales Schema
-│       ├── V2__oidc.sql               # OIDC-Unterstuetzung
+│       ├── V1__initial_schema.sql     # Initial schema
+│       ├── V2__oidc.sql               # OIDC support
 │       ├── V3__*.sql
 │       ├── ...
-│       └── V16__feed_categories.sql   # Feed-Kategorien (neueste Migration)
+│       └── V16__feed_categories.sql   # Feed categories (latest migration)
 └── templates/
     └── email/
-        ├── digest.ftl                 # Freemarker: E-Mail Digest Template
-        └── reset-password.ftl         # Freemarker: Passwort-Reset Template
+        ├── digest.ftl                 # Freemarker: email digest template
+        └── reset-password.ftl         # Freemarker: password reset template
 ```
 
 ---
@@ -139,39 +140,39 @@ src/main/resources/
 
 ```
 src/main/app/
-├── pubspec.yaml                       # Dart/Flutter Abhaengigkeiten
-├── analysis_options.yaml              # Dart Linter-Konfiguration
-├── l10n.yaml                          # Internationalisierungs-Konfiguration
+├── pubspec.yaml                       # Dart/Flutter dependencies
+├── analysis_options.yaml              # Dart linter configuration
+├── l10n.yaml                          # Internationalisation configuration
 ├── lib/
-│   ├── main.dart                      # Flutter Einstiegspunkt
-│   ├── router.dart                    # auto_route Routing-Definition
-│   ├── router.gr.dart                 # Generiertes Routing (auto_route)
-│   ├── base_service.dart              # Basis HTTP-Service
-│   ├── feed/                          # Feed-Modul (Modelle, Services, Views)
-│   ├── user/                          # Benutzer/Auth-Modul
-│   ├── config/                        # Konfigurations-Modul
-│   ├── settings/                      # Einstellungs-UI
-│   ├── layouts/                       # Layout-Anpassung
-│   ├── stats/                         # Statistik-Modul
-│   ├── home/                          # Startseite
-│   ├── identity/                      # Login/Logout-State
-│   └── utils/                         # Gemeinsame Hilfsfunktionen
+│   ├── main.dart                      # Flutter entry point
+│   ├── router.dart                    # auto_route routing definition
+│   ├── router.gr.dart                 # Generated routing (auto_route)
+│   ├── base_service.dart              # Base HTTP service
+│   ├── feed/                          # Feed module (models, services, views)
+│   ├── user/                          # User/auth module
+│   ├── config/                        # Configuration module
+│   ├── settings/                      # Settings UI
+│   ├── layouts/                       # Layout customisation
+│   ├── stats/                         # Statistics module
+│   ├── home/                          # Home screen
+│   ├── identity/                      # Login/logout state
+│   └── utils/                         # Shared helpers
 ├── web/
-│   ├── index.html                     # PWA Einstiegspunkt
-│   ├── manifest.json                  # PWA Manifest
+│   ├── index.html                     # PWA entry point
+│   ├── manifest.json                  # PWA manifest
 │   ├── redirect.html
-│   └── icons/                         # PWA Icons (192x192, 512x512)
-├── android/                           # Native Android-Projekt (Gradle)
-├── ios/                               # iOS-Projektdateien
-├── linux/                             # Linux Desktop Build
-├── macos/                             # macOS Desktop Build
-└── test/                              # Flutter Unit- und Widget-Tests
+│   └── icons/                         # PWA icons (192x192, 512x512)
+├── android/                           # Native Android project (Gradle)
+├── ios/                               # iOS project files
+├── linux/                             # Linux desktop build
+├── macos/                             # macOS desktop build
+└── test/                              # Flutter unit and widget tests
 ```
 
 ---
 
-## Verwandte Dokumente
+## Related Documents
 
-- [docs/api-patterns.md](api-patterns.md) — Controller-Struktur im Detail
-- [docs/frontend-patterns.md](frontend-patterns.md) — Flutter-Module und -Patterns
-- [docs/datenbank.md](datenbank.md) — Schema-Referenz und Migrationen
+- [docs/api-patterns.md](api-patterns.md) — Controller structure in detail
+- [docs/frontend-patterns.md](frontend-patterns.md) — Flutter modules and patterns
+- [docs/datenbank.md](datenbank.md) — Schema reference and migrations

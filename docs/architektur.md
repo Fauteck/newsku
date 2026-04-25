@@ -1,20 +1,20 @@
-# Architektur
+# Architecture
 
-← [Zurueck zum Index](../CLAUDE.md)
+← [Back to Index](../CLAUDE.md)
 
 ---
 
-## Monorepo-Uebersicht
+## Monorepo Overview
 
-Newsku ist ein selbst-gehosteter RSS-Reader, der LLMs (OpenAI) nutzt, um Feed-Beitraege nach Relevanz zu sortieren.
-Das Repository ist ein Monorepo mit Backend (Java/Spring Boot) und Frontend (Flutter):
+Newsku is a self-hosted RSS reader that uses LLMs (OpenAI) to sort feed articles by relevance.
+The repository is a monorepo containing backend (Java/Spring Boot) and frontend (Flutter):
 
 ```
 newsku/
   src/main/java/   → Spring Boot REST API (Java 25)
   src/main/app/    → Flutter App (Web + Android)
-  src/main/resources/db/migration/  → Flyway SQL-Migrationen
-  docker/          → Dockerfile + Entrypoint
+  src/main/resources/db/migration/  → Flyway SQL migrations
+  docker/          → Dockerfile + entrypoint
 ```
 
 ---
@@ -23,106 +23,105 @@ newsku/
 
 ### Backend (`src/main/java/com/github/lamarios/newsku/`)
 
-| Technologie | Version | Zweck |
-|-------------|---------|-------|
-| Spring Boot | 4.0.1 | HTTP-Server, DI, Auto-Konfiguration |
-| Spring Data JPA | — | ORM, Repository-Pattern |
-| Spring Security | — | JWT-Authentifizierung, OIDC |
-| Flyway | — | Datenbank-Migrationen |
-| PostgreSQL JDBC | — | Datenbank-Treiber |
-| OpenAI Java SDK | 4.13.0 | LLM-Integration (Ranking) |
-| Apptastic RSS Reader | 3.12.0 | RSS/Atom Feed Parsing |
-| JJWT | 0.13.0 | JWT-Tokens |
-| jsoup | 1.21.2 | HTML-Parsing & -Bereinigung |
-| Simple Java Mail | 6.6.1 | E-Mail Digest & Passwort-Reset |
-| SpringDoc OpenAPI | 3.0.0 | Swagger-UI (`/swagger-ui.html`) |
-| Spring Actuator | — | Health-Endpunkt (`/actuator/health`) |
-| TestContainers | 1.21.0 | Integrationstests mit echter DB |
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| Spring Boot | 4.0.1 | HTTP server, DI, auto-configuration |
+| Spring Data JPA | — | ORM, repository pattern |
+| Spring Security | — | JWT authentication, OIDC |
+| Flyway | — | Database migrations |
+| PostgreSQL JDBC | — | Database driver |
+| OpenAI Java SDK | 4.13.0 | LLM integration (ranking) |
+| Apptastic RSS Reader | 3.12.0 | RSS/Atom feed parsing |
+| JJWT | 0.13.0 | JWT tokens |
+| jsoup | 1.21.2 | HTML parsing & sanitisation |
+| Simple Java Mail | 6.6.1 | Email digest & password reset |
+| SpringDoc OpenAPI | 3.0.0 | Swagger UI (`/swagger-ui.html`) |
+| Spring Actuator | — | Health endpoint (`/actuator/health`) |
+| TestContainers | 1.21.0 | Integration tests with real DB |
 
 ### Frontend (`src/main/app/`)
 
-| Technologie | Version | Zweck |
-|-------------|---------|-------|
-| Flutter | ^3.10.0 | UI-Framework (Web + Android) |
-| flutter_bloc | — | State Management (BLoC-Pattern) |
-| auto_route | — | Deklaratives Routing |
-| http | — | HTTP-Client fuer API-Aufrufe |
-| jwt_decoder | — | JWT-Token Dekodierung |
-| oidc | — | OpenID Connect Authentifizierung |
-| cached_network_image | — | Bild-Caching |
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| Flutter | ^3.10.0 | UI framework (Web + Android) |
+| flutter_bloc | — | State management (BLoC pattern) |
+| auto_route | — | Declarative routing |
+| http | — | HTTP client for API calls |
+| jwt_decoder | — | JWT token decoding |
+| oidc | — | OpenID Connect authentication |
+| cached_network_image | — | Image caching |
 | dynamic_color | — | Material Design 3 Dynamic Color |
-| shared_preferences | — | Lokale Einstellungen |
-| intl | — | Internationalisierung |
+| shared_preferences | — | Local settings |
+| intl | — | Internationalisation |
 
-### Datenbank
+### Database
 
-| Technologie | Version | Zweck |
-|-------------|---------|-------|
-| PostgreSQL | 18-alpine | Relationale Datenbank |
-| Flyway | — | Schema-Migrationen (V1–V16) |
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| PostgreSQL | 18-alpine | Relational database |
+| Flyway | — | Schema migrations (V1–V16) |
 
 ---
 
-## Request-Flow (API)
+## Request Flow (API)
 
 ```
 HTTP Request
   │
   ├─ Spring Security Filter Chain
-  │     ├─ JwtAuthFilter (JWT validieren, SecurityContext setzen)
-  │     └─ OidcFilter (optional, OIDC-Token validieren)
+  │     ├─ JwtAuthFilter (validate JWT, set SecurityContext)
+  │     └─ OidcFilter (optional, validate OIDC token)
   │
   ├─ REST Controller (controllers/*.java)
   │     │
   │     ├─ Spring Validation (@Valid, @RequestBody)
   │     │
   │     ├─ Service Layer (services/*.java)
-  │     │     ├─ Geschaeftslogik
-  │     │     ├─ OpenAI-Integration (OpenaiService)
-  │     │     ├─ RSS-Parsing (FeedService)
-  │     │     └─ JPA-Repositories (persistence/repositories/)
+  │     │     ├─ Business logic
+  │     │     ├─ OpenAI integration (OpenaiService)
+  │     │     ├─ RSS parsing (FeedService)
+  │     │     └─ JPA repositories (persistence/repositories/)
   │     │
   │     └─ Response (JSON via Jackson)
   │
-  └─ Statische Inhalte (Flutter Web Build)
+  └─ Static content (Flutter Web Build)
        → StaticContentController
 ```
 
 ---
 
-## Authentifizierung
+## Authentication
 
-### JWT-Flow
+### JWT Flow
 
-1. **Login:** `POST /api/users/login` → JWT Access Token
-2. **Jeder Request:** `Authorization: Bearer <token>` → JwtAuthFilter validiert
-3. **Token-Payload:** `{ sub: userId, email: "..." }`
+1. **Login:** `POST /api/users/login` → JWT access token
+2. **Every request:** `Authorization: Bearer <token>` → JwtAuthFilter validates
+3. **Token payload:** `{ sub: userId, email: "..." }`
 
 ### OIDC (optional)
 
-- Aktivierung via Konfiguration: OIDC-Provider-URL setzen
-- Forward-Auth via OpenID Connect Token
+- Activation via configuration: set OIDC provider URL
+- Forward-auth via OpenID Connect token
 - Route: `POST /api/users/oidc`
 
-### Passwort-Hashing
+### Password Hashing
 
-- BCrypt mit konfigurierbarem `SALT`
-- Niemals Klartextpasswoerter speichern
+- BCrypt with configurable `SALT`
+- Never store plaintext passwords
 
-### Credential-Verschluesselung at rest
+### Credential Encryption at Rest
 
-Zugangsdaten, die wir im Klartext wieder benoetigen (GReader-API-Passwort,
-per-User OpenAI-API-Key), werden mit AES-GCM transparent per
-`StringCryptoConverter` verschluesselt. Key aus `APP_ENCRYPTION_KEY` (ENV,
-Base64, 16/24/32 Byte). Startup schlaegt fehl, wenn der Key fehlt oder
-formal ungueltig ist.
+Credentials that need to be retrieved in plaintext (GReader API password,
+per-user OpenAI API key) are transparently encrypted with AES-GCM via
+`StringCryptoConverter`. Key from `APP_ENCRYPTION_KEY` (ENV, Base64, 16/24/32 bytes).
+Startup fails if the key is missing or formally invalid.
 
 ---
 
-## LLM-Integration (OpenAI)
+## LLM Integration (OpenAI)
 
-Pro Artikel werden **zwei getrennte** OpenAI-Aufrufe ausgefuehrt, damit
-Token-Verbrauch und Limits je Use-Case verwaltbar sind:
+Two **separate** OpenAI calls are made per article so token consumption and
+limits are manageable per use case:
 
 ```
 GReaderSyncService.processArticle
@@ -131,51 +130,51 @@ GReaderSyncService.processArticle
        │
        ├─ scoreRelevance    → importance, possibleAd, tags          (use_case = RELEVANCE)
        └─ shortenText       → shortTitle, shortTeaser               (use_case = SHORTENING)
-              (nur wenn users.enable_text_shortening != false)
+              (only when users.enable_text_shortening != false)
 
-Pro Call:
-  1. OpenaiUsageService.isLimitExceeded(user, useCase)  → ggf. Skip
-  2. OpenAI API aufrufen (Chat Completion, strukturierte Response)
+Per call:
+  1. OpenaiUsageService.isLimitExceeded(user, useCase)  → skip if over limit
+  2. Call OpenAI API (chat completion, structured response)
   3. OpenaiUsageService.record(user, useCase, tokens…)  → openai_usage
 ```
 
-- Per-User-API-Key/Model/URL ueberschreibt `OPENAI_API_KEY` / `OPENAI_MODEL`
-  / `OPENAI_URL` aus der Umgebung.
-- Monats-Limits (`users.openai_monthly_token_limit_{relevance,shortening}`):
-  hart blockend, werden mit Beginn des naechsten UTC-Monats zurueckgesetzt.
-- Stats-Endpoint: `GET /api/openai/usage[?from=&to=]`.
+- Per-user API key/model/URL overrides `OPENAI_API_KEY` / `OPENAI_MODEL`
+  / `OPENAI_URL` from the environment.
+- Monthly limits (`users.openai_monthly_token_limit_{relevance,shortening}`):
+  hard-blocking, reset at the start of the next UTC month.
+- Stats endpoint: `GET /api/openai/usage[?from=&to=]`.
 
-Der `ScheduleService` triggert Feed-Updates und LLM-Ranking periodisch.
+`ScheduleService` triggers feed updates and LLM ranking periodically.
 
 ---
 
-## Deployment-Architektur
+## Deployment Architecture
 
 ```
 Developer
   │
-  ├─ Feature-Branch → PR → Merge in main
+  ├─ Feature branch → PR → merge to main
   │
-  ├─ GitHub Actions (Self-Hosted Runner)
+  ├─ GitHub Actions (self-hosted runner)
   │     → mvn clean package -DskipTests
-  │     → Docker Build (docker/Dockerfile)
-  │     → Push nach GHCR (Tags: latest + SHA)
+  │     → Docker build (docker/Dockerfile)
+  │     → Push to GHCR (tags: latest + SHA)
   │
-  └─ Portainer (GitOps Polling)
-       → docker-compose.yml aus docker-configs Repo
-       → Automatisches Redeploy bei Aenderungen
+  └─ Portainer (GitOps polling)
+       → docker-compose.yml from docker-configs repo
+       → Automatic redeploy on changes
 ```
 
 - **Registry:** `ghcr.io/fauteck/newsku`
-- **Image-Tags:** `latest` + kurzer SHA-Commit-Hash
-- **Kein SemVer / keine Git-Tags** fuer Image-Releases
-- **Laufzeit:** Amazon Corretto 25 (JVM), Port 8080
+- **Image tags:** `latest` + short SHA commit hash
+- **No SemVer / no Git tags** for image releases
+- **Runtime:** Amazon Corretto 25 (JVM), port 8080
 
 ---
 
-## Verwandte Dokumente
+## Related Documents
 
-- [README.md](../README.md) — Feature-Uebersicht, Setup
-- [docs/datenbank.md](datenbank.md) — Flyway-Schema, Tabellen, Beziehungen
-- [docs/api-patterns.md](api-patterns.md) — Controller-Struktur, Services
-- [docs/entwicklung.md](entwicklung.md) — Lokales Setup
+- [README.md](../README.md) — Feature overview, setup
+- [docs/datenbank.md](datenbank.md) — Flyway schema, tables, relationships
+- [docs/api-patterns.md](api-patterns.md) — Controller structure, services
+- [docs/entwicklung.md](entwicklung.md) — Local setup

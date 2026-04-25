@@ -1,75 +1,76 @@
-# Frontend-Patterns
+# Frontend Patterns
 
-← [Zurueck zum Index](../CLAUDE.md)
+← [Back to Index](../CLAUDE.md)
 
 ---
 
-## Uebersicht
+## Overview
 
-Das Frontend ist eine Flutter-App, die sowohl als Progressive Web App (PWA) als auch als native Android-App laeuft.
-Der Flutter Web Build wird vom Spring Boot Backend statisch ausgeliefert (`StaticContentController`).
+The frontend is a Flutter app that runs as both a Progressive Web App (PWA) and
+a native Android app. The Flutter web build is served statically by the Spring
+Boot backend (`StaticContentController`).
 
 ```
-main.dart (Flutter Einstiegspunkt)
+main.dart (Flutter entry point)
   │
-  ├─ router.dart (auto_route Routing)
+  ├─ router.dart (auto_route routing)
   │
-  ├─ identity/ (Login-State, Auth-BLoC)
+  ├─ identity/ (login state, auth BLoC)
   │
   └─ Screens / Views
        │
-       ├─ feed/ (Feed-Uebersicht, Item-Detail)
-       ├─ settings/ (Feeds, Layout, Benutzerkonto)
-       ├─ stats/ (Klick-Statistiken)
-       ├─ layouts/ (Layout-Anpassung)
-       └─ home/ (Startseite)
+       ├─ feed/ (feed overview, item detail)
+       ├─ settings/ (feeds, layout, user account)
+       ├─ stats/ (click statistics)
+       ├─ layouts/ (layout customisation)
+       └─ home/ (home screen)
 ```
 
 ---
 
 ## Routing
 
-Routing wird via `auto_route` deklarativ definiert in `lib/router.dart`.
-Die generierten Routen liegen in `lib/router.gr.dart` (nicht manuell bearbeiten).
+Routing is defined declaratively via `auto_route` in `lib/router.dart`.
+Generated routes are in `lib/router.gr.dart` (do not edit manually).
 
-| Route | Beschreibung |
+| Route | Description |
 |-------|-------------|
-| `/login` | Login-Formular |
-| `/` | Startseite (Feed-Uebersicht) |
-| `/feed/:id` | Feed-Detail / Beitraege eines Feeds |
-| `/item/:id` | Feed-Beitrag Detail |
-| `/search` | Suchergebnisse |
-| `/settings` | Einstellungen (Feeds, Layout, Konto) |
-| `/settings/feeds` | Feed-Verwaltung |
-| `/settings/layout` | Layout-Anpassung |
-| `/stats` | Klick-Statistiken |
+| `/login` | Login form |
+| `/` | Home screen (feed overview) |
+| `/feed/:id` | Feed detail / articles of a feed |
+| `/item/:id` | Feed article detail |
+| `/search` | Search results |
+| `/settings` | Settings (feeds, layout, account) |
+| `/settings/feeds` | Feed management |
+| `/settings/layout` | Layout customisation |
+| `/stats` | Click statistics |
 
-Alle Routen ausser `/login` sind durch Auth-Guard geschuetzt.
+All routes except `/login` are protected by an auth guard.
 
 ---
 
 ## State Management (BLoC)
 
-Das Projekt nutzt `flutter_bloc` fuer State Management:
+The project uses `flutter_bloc` for state management:
 
 ```
 Event → BLoC → State → UI (rebuild)
 ```
 
-### Wichtige BLoCs
+### Key BLoCs
 
-| BLoC | Ort | Zweck |
-|------|-----|-------|
-| `AuthBloc` / `IdentityBloc` | `lib/identity/` | Login/Logout-State, Token-Verwaltung |
-| `FeedBloc` | `lib/feed/` | Feed-Liste, aktuell selektierter Feed |
-| `FeedItemBloc` | `lib/feed/` | Feed-Beitraege laden, gelesen-Status |
-| `SettingsBloc` | `lib/settings/` | Einstellungen lesen/schreiben |
-| `LayoutBloc` | `lib/layouts/` | Layout-Bloecke |
+| BLoC | Location | Purpose |
+|------|----------|---------|
+| `AuthBloc` / `IdentityBloc` | `lib/identity/` | Login/logout state, token management |
+| `FeedBloc` | `lib/feed/` | Feed list, currently selected feed |
+| `FeedItemBloc` | `lib/feed/` | Load feed articles, read status |
+| `SettingsBloc` | `lib/settings/` | Read/write settings |
+| `LayoutBloc` | `lib/layouts/` | Layout blocks |
 
-### BLoC-Pattern Beispiel
+### BLoC Pattern Example
 
 ```dart
-// Event definieren
+// Define event
 abstract class FeedEvent {}
 class LoadFeeds extends FeedEvent {}
 class RefreshFeed extends FeedEvent {
@@ -77,7 +78,7 @@ class RefreshFeed extends FeedEvent {
   RefreshFeed(this.feedId);
 }
 
-// State definieren
+// Define state
 abstract class FeedState {}
 class FeedLoading extends FeedState {}
 class FeedLoaded extends FeedState {
@@ -89,7 +90,7 @@ class FeedError extends FeedState {
   FeedError(this.message);
 }
 
-// BLoC implementieren
+// Implement BLoC
 class FeedBloc extends Bloc<FeedEvent, FeedState> {
   final FeedService feedService;
 
@@ -109,14 +110,14 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
 }
 ```
 
-### BLoC in der UI verwenden
+### Using BLoC in UI
 
 ```dart
-// Widget mit BlocBuilder
+// Widget with BlocBuilder
 BlocBuilder<FeedBloc, FeedState>(
   builder: (context, state) {
     if (state is FeedLoading) return CircularProgressIndicator();
-    if (state is FeedError) return Text('Fehler: ${state.message}');
+    if (state is FeedError) return Text('Error: ${state.message}');
     if (state is FeedLoaded) {
       return ListView(
         children: state.feeds.map((f) => FeedTile(feed: f)).toList(),
@@ -129,20 +130,20 @@ BlocBuilder<FeedBloc, FeedState>(
 
 ---
 
-## HTTP-Services
+## HTTP Services
 
-Basis-HTTP-Funktionalitaet ist in `lib/base_service.dart` definiert.
-Jedes Modul hat seinen eigenen Service:
+Base HTTP functionality is defined in `lib/base_service.dart`.
+Each module has its own service:
 
-| Service | Ort | Zweck |
-|---------|-----|-------|
-| `FeedService` | `lib/feed/` | Feeds + Feed-Items via REST API |
-| `UserService` | `lib/user/` | Login, OIDC, Profil |
-| `SettingsService` | `lib/settings/` | Einstellungen |
-| `LayoutService` | `lib/layouts/` | Layout-Bloecke |
-| `StatsService` | `lib/stats/` | Klick-Statistiken |
+| Service | Location | Purpose |
+|---------|----------|---------|
+| `FeedService` | `lib/feed/` | Feeds + feed items via REST API |
+| `UserService` | `lib/user/` | Login, OIDC, profile |
+| `SettingsService` | `lib/settings/` | Settings |
+| `LayoutService` | `lib/layouts/` | Layout blocks |
+| `StatsService` | `lib/stats/` | Click statistics |
 
-### Service-Pattern Beispiel
+### Service Pattern Example
 
 ```dart
 // lib/feed/services/feed_service.dart
@@ -164,24 +165,26 @@ class FeedService extends BaseService {
 
 ---
 
-## Authentifizierung
+## Authentication
 
-- **JWT:** Token wird nach Login im lokalen Speicher (`shared_preferences`) gesichert
-- **OIDC:** Optional via `oidc` Package (wenn Server OIDC konfiguriert hat)
-- **Token-Handling:** `BaseService` fuegt `Authorization: Bearer <token>` automatisch hinzu
-- **Redirect:** Bei 401 → Logout und Weiterleitung zu `/login`
+- **JWT:** Token is stored in local storage (`shared_preferences`) after login
+- **OIDC:** Optional via `oidc` package (when server has OIDC configured)
+- **Token handling:** `BaseService` automatically adds `Authorization: Bearer <token>`
+- **Redirect:** On 401 → logout and redirect to `/login`
 
 ---
 
 ## Styling (Material Design 3)
 
 - **Framework:** Flutter Material Design 3
-- **Dynamic Color:** `dynamic_color` Package (System-Akzentfarbe nutzen)
-- **Dark/Light Mode:** Systemeinstellung wird respektiert
-- **Responsive:** Anpassung an verschiedene Bildschirmgroessen via MediaQuery + LayoutBuilder
+- **Dynamic Colour:** `dynamic_color` package (use system accent colour)
+- **Dark/Light mode:** System setting is respected
+- **Responsive:** Adapts to different screen sizes via MediaQuery + LayoutBuilder
+
+See [DESIGN.md](../DESIGN.md) for the complete token specification.
 
 ```dart
-// Beispiel: Responsive Layout
+// Example: responsive layout
 LayoutBuilder(
   builder: (context, constraints) {
     if (constraints.maxWidth > 600) {
@@ -194,48 +197,49 @@ LayoutBuilder(
 
 ---
 
-## Plattformen
+## Platforms
 
-| Plattform | Build-Befehl | Besonderheiten |
-|-----------|-------------|----------------|
-| Web (PWA) | `flutter build web` | Wird in `src/main/resources/static/` eingebettet |
-| Android | `flutter build apk` / `flutter build appbundle` | Release im GitHub Releases |
-| iOS | `flutter build ios` | Nicht offiziell unterstuetzt |
-| Linux/macOS | `flutter build linux/macos` | Community-Support |
+| Platform | Build Command | Notes |
+|----------|--------------|-------|
+| Web (PWA) | `flutter build web` | Embedded in `src/main/resources/static/` |
+| Android | `flutter build apk` / `flutter build appbundle` | Release in GitHub Releases |
+| iOS | `flutter build ios` | Not officially supported |
+| Linux/macOS | `flutter build linux/macos` | Community support |
 
-Der Web Build wird vom Spring Boot Backend ausgeliefert (`StaticContentController` → alle nicht-API Routen).
+The web build is served by the Spring Boot backend (`StaticContentController` → all
+non-API routes).
 
 ---
 
-## How-To: Neues Modul / neue Seite hinzufuegen
+## How-To: Add New Module / Screen
 
-1. **Verzeichnis anlegen** in `lib/`:
+1. **Create directory** in `lib/`:
 
 ```
-lib/mein-modul/
-├── mein_modul_service.dart    # HTTP-Service
-├── mein_modul_bloc.dart       # BLoC (Events, States, Logik)
-├── mein_modul_view.dart       # Haupt-UI-Widget
+lib/my-module/
+├── my_module_service.dart    # HTTP service
+├── my_module_bloc.dart       # BLoC (events, states, logic)
+├── my_module_view.dart       # Main UI widget
 └── models/
-    └── mein_model.dart        # Datenmodell + fromJson/toJson
+    └── my_model.dart         # Data model + fromJson/toJson
 ```
 
-2. **Route registrieren** in `lib/router.dart`:
+2. **Register route** in `lib/router.dart`:
 
 ```dart
-AutoRoute(page: MeinModulPage, path: '/mein-modul'),
+AutoRoute(page: MyModulePage, path: '/my-module'),
 ```
 
-3. **BLoC bereitstellen** im Widget-Tree (z. B. in `main.dart` oder direkt im Screen):
+3. **Provide BLoC** in the widget tree (e.g. in `main.dart` or directly in the screen):
 
 ```dart
-BlocProvider<MeinModulBloc>(
-  create: (context) => MeinModulBloc(MeinModulService()),
-  child: MeinModulView(),
+BlocProvider<MyModulBloc>(
+  create: (context) => MyModulBloc(MyModulService()),
+  child: MyModulView(),
 )
 ```
 
-4. **Route generieren** (einmalig nach Aenderung von `router.dart`):
+4. **Regenerate routes** (once after changing `router.dart`):
 
 ```bash
 flutter pub run build_runner build --delete-conflicting-outputs
@@ -243,8 +247,9 @@ flutter pub run build_runner build --delete-conflicting-outputs
 
 ---
 
-## Verwandte Dokumente
+## Related Documents
 
-- [docs/api-patterns.md](api-patterns.md) — Backend-Endpunkte
-- [docs/code-konventionen.md](code-konventionen.md) — Dart/Flutter Code-Stil
-- [docs/entwicklung.md](entwicklung.md) — Flutter Setup, Dev-Server
+- [docs/api-patterns.md](api-patterns.md) — Backend endpoints
+- [docs/code-konventionen.md](code-konventionen.md) — Dart/Flutter code style
+- [docs/entwicklung.md](entwicklung.md) — Flutter setup, dev server
+- [DESIGN.md](../DESIGN.md) — Design tokens, colours, typography

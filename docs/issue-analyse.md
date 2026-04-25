@@ -1,131 +1,131 @@
-# Todoteck Issues — Analyse gegen aktuellen Codestand
+# Issue Analysis — Code Review Against Current State
 
-> **Datum:** 2026-04-10
-> **Methode:** Automatisierte Code-Analyse aller gemeldeten Issues gegen den aktuellen `main`-Stand.
-> **Legende Aufwand:** XS (<1h) | S (1-2h) | M (2-4h) | L (4-8h) | XL (>1 Tag)
-> **Legende Nutzen:** Hoch (Sicherheit/Stabilitaet) | Mittel (UX/DX) | Niedrig (Nice-to-have)
+> **Date:** 2026-04-10
+> **Method:** Automated code analysis of all reported issues against current `main` state.
+> **Effort legend:** XS (<1h) | S (1-2h) | M (2-4h) | L (4-8h) | XL (>1 day)
+> **Value legend:** High (security/stability) | Medium (UX/DX) | Low (nice-to-have)
 
 ---
 
-## Audit-Report Findings
+## Audit Report Findings
 
-### Hoch
+### High
 
-| ID | Titel | Obsolet? | Aufwand | Nutzen | Empfehlung |
-|----|-------|----------|---------|--------|------------|
-| F-05 | Cookies `sameSite: 'none'` ohne CSRF | Nein — `sameSite: 'none'` in `routes/auth.ts:79,176,243` | M | Hoch | Fix jetzt |
-| F-06 | Projects-PATCH erlaubt Nicht-Owner-Aenderungen | Nein — `routes/projects.ts:102` prueft nur `owner_id !== userId && !is_shared`; Member kann `is_shared`/`name` aendern | M | Hoch | Fix jetzt |
-| F-07 | Hardcoded CORS-Origin `claude.ai` | Nein — `index.ts:121-122` fuegt `https://claude.ai` ohne Feature-Flag hinzu | S | Hoch | Fix jetzt |
-| F-08 | Stack-Traces leaken an Client | Nein — kein `setErrorHandler`; `comments.ts:170` hat `JSON.parse(e.meta)` ohne try/catch | M | Hoch | Fix jetzt |
-| F-09 | CI-Pipeline ohne Quality-Gates | Nein — `publish.yml` nur Docker-Build/Push, kein Lint/Test/Typecheck/Audit | M | Hoch | Fix jetzt |
-| F-11 | Touch-Targets unter 44x44 px | Nein — `TaskItem.tsx` Icons `w-5 h-5` (20px) ohne Padding/Min-Size | M | Mittel | Backlog |
-| F-12 | Icon-Buttons ohne `aria-label` | Teilweise — `title` vorhanden, `aria-label` fehlt | S | Mittel | Backlog |
-| F-13 | `focus:outline-none` ohne sichtbaren Ring | **Ja** — `focus-visible:ring-2` korrekt in `TaskEditModal.tsx:375,495,583` | — | — | Skip |
-| F-14 | API-Fehler nur in `console.error` | Nein — `AppLayout.tsx:54-60` kein Toast/User-Feedback | M | Mittel | Backlog |
-| F-15 | `JSON.parse(e.meta)` ohne try/catch | **Ja** in `activity.ts` (safeParseMeta existiert); **Nein** in `comments.ts:170` | S | Hoch | Fix jetzt |
-| F-16 | Encryption-Key nicht fail-fast validiert | **Ja** — `encryption.ts:8-12` validiert korrekt | — | — | Skip |
-| F-17 | Seed-Passwoerter im Prozess-Memory | **Ja** — `migrate.ts:340-341` loescht Env-Vars nach Seeding | — | — | Skip |
-| F-18 | `:latest`-Tags in docker-compose.yml | Nein — Zeilen 5, 43, 62 nutzen `:latest` | M | Mittel | Backlog |
-| F-19 | Android-Keystore-Ignore auskommentiert | **Ja** — `.gitignore:56-57` hat `*.jks`/`*.keystore` aktiv | — | — | Skip |
-| F-20 | Monolithische Komponenten | Nein — TaskDetailPage 1232 LoC, RichEditor 1455 LoC | L | Mittel | Backlog |
+| ID | Title | Obsolete? | Effort | Value | Recommendation |
+|----|-------|-----------|--------|-------|----------------|
+| F-05 | Cookies `sameSite: 'none'` without CSRF | No — `sameSite: 'none'` in `routes/auth.ts:79,176,243` | M | High | Fix now |
+| F-06 | Projects PATCH allows non-owner changes | No — `routes/projects.ts:102` only checks `owner_id !== userId && !is_shared`; member can change `is_shared`/`name` | M | High | Fix now |
+| F-07 | Hardcoded CORS origin `claude.ai` | No — `index.ts:121-122` adds `https://claude.ai` without feature flag | S | High | Fix now |
+| F-08 | Stack traces leak to client | No — no `setErrorHandler`; `comments.ts:170` has `JSON.parse(e.meta)` without try/catch | M | High | Fix now |
+| F-09 | CI pipeline without quality gates | No — `publish.yml` only Docker build/push, no lint/test/typecheck/audit | M | High | Fix now |
+| F-11 | Touch targets below 44x44 px | No — `TaskItem.tsx` icons `w-5 h-5` (20px) without padding/min-size | M | Medium | Backlog |
+| F-12 | Icon buttons without `aria-label` | Partially — `title` present, `aria-label` missing | S | Medium | Backlog |
+| F-13 | `focus:outline-none` without visible ring | **Yes** — `focus-visible:ring-2` correct in `TaskEditModal.tsx:375,495,583` | — | — | Skip |
+| F-14 | API errors only in `console.error` | No — `AppLayout.tsx:54-60` no toast/user feedback | M | Medium | Backlog |
+| F-15 | `JSON.parse(e.meta)` without try/catch | **Yes** in `activity.ts` (safeParseMeta exists); **No** in `comments.ts:170` | S | High | Fix now |
+| F-16 | Encryption key not fail-fast validated | **Yes** — `encryption.ts:8-12` validates correctly | — | — | Skip |
+| F-17 | Seed passwords in process memory | **Yes** — `migrate.ts:340-341` deletes env vars after seeding | — | — | Skip |
+| F-18 | `:latest` tags in docker-compose.yml | No — lines 5, 43, 62 use `:latest` | M | Medium | Backlog |
+| F-19 | Android keystore ignore commented out | **Yes** — `.gitignore:56-57` has `*.jks`/`*.keystore` active | — | — | Skip |
+| F-20 | Monolithic components | No — TaskDetailPage 1232 LoC, RichEditor 1455 LoC | L | Medium | Backlog |
 
-### Mittel
+### Medium
 
-| ID | Titel | Obsolet? | Aufwand | Nutzen | Empfehlung |
-|----|-------|----------|---------|--------|------------|
-| F-21 | Fehlende DB-Indizes auf FKs | Teilweise — `comments.author_id`, `google_keep_accounts.user_id`, `google_keep_todo_config.user_id` fehlen | S | Mittel | Fix jetzt |
-| F-22 | Inkonsistente Authorization | Groesstenteils obsolet — `lib/authorization.ts` bietet konsistente Helpers; Rest durch F-06 abgedeckt | — | — | Skip |
-| F-23 | Schwache Passwort-Regel | Nein — 10 Zeichen, kein Sonderzeichen/zxcvbn | S | Mittel | Backlog |
-| F-25 | `as any`-Casts in Routes | Nein — nur 2 Stellen in `auth.ts:128,196` | XS | Niedrig | Backlog |
-| F-26 | nginx.conf ohne Cache-Control | Nein — keine Cache-Header fuer hashed Assets | S | Mittel | Fix jetzt |
-| F-28 | CSP erlaubt `ws:` in Production | Nein — `index.ts:94` erlaubt `ws:` neben `wss:` | S | Mittel | Fix jetzt |
-| F-32 | Inline-Hex-Farben | Nein — `#3498db` u.a. in 10+ Dateien hardcoded | M | Niedrig | Backlog |
-| F-35 | Tests extrem duenn | Nein — 14 Testdateien, ~130 Cases, kein Coverage/E2E | M | Mittel | Backlog |
-| F-36 | Keine ESLint/Prettier | Nein — keine Config-Dateien | M | Mittel | Backlog |
-| F-37 | Keine `.editorconfig` | Nein | XS | Niedrig | Backlog |
-| F-38 | Dockerfiles ohne HEALTHCHECK | Teilweise obsolet — docker-compose.yml definiert Healthchecks | XS | Niedrig | Skip |
-| F-39 | Dockerfile Non-Root-User zu spaet | **Ja** — User korrekt vor CMD gesetzt | — | — | Skip |
-| F-40 | Activity-Cleanup ohne Transaktion | Nein — SQLite autocommit reicht fuer einzelnes DELETE | XS | Niedrig | Skip |
-| F-41 | tsconfig ohne noUnusedLocals | Nein — fehlt | XS | Niedrig | Backlog |
-| F-42 | Brotli nicht konfiguriert | Nein — nur gzip | S | Niedrig | Backlog |
-| F-43 | Kein Dependabot/npm audit | Nein — keine Config, kein CI-Step | S | Mittel | Fix jetzt |
-| F-46 | Timing-Attack im Login | Nein — `auth.ts:131` gibt sofort 401 ohne Dummy-Hash | S | Hoch | Fix jetzt |
+| ID | Title | Obsolete? | Effort | Value | Recommendation |
+|----|-------|-----------|--------|-------|----------------|
+| F-21 | Missing DB indexes on FKs | Partially — `comments.author_id`, `google_keep_accounts.user_id`, `google_keep_todo_config.user_id` missing | S | Medium | Fix now |
+| F-22 | Inconsistent authorisation | Mostly obsolete — `lib/authorization.ts` provides consistent helpers; rest covered by F-06 | — | — | Skip |
+| F-23 | Weak password rules | No — 10 characters, no special character/zxcvbn | S | Medium | Backlog |
+| F-25 | `as any` casts in routes | No — only 2 places in `auth.ts:128,196` | XS | Low | Backlog |
+| F-26 | nginx.conf without Cache-Control | No — no cache headers for hashed assets | S | Medium | Fix now |
+| F-28 | CSP allows `ws:` in production | No — `index.ts:94` allows `ws:` alongside `wss:` | S | Medium | Fix now |
+| F-32 | Inline hex colours | No — `#3498db` and others hardcoded in 10+ files | M | Low | Backlog |
+| F-35 | Tests extremely thin | No — 14 test files, ~130 cases, no coverage/E2E | M | Medium | Backlog |
+| F-36 | No ESLint/Prettier | No — no config files | M | Medium | Backlog |
+| F-37 | No `.editorconfig` | No | XS | Low | Backlog |
+| F-38 | Dockerfiles without HEALTHCHECK | Partially obsolete — docker-compose.yml defines healthchecks | XS | Low | Skip |
+| F-39 | Dockerfile non-root user too late | **Yes** — user correctly set before CMD | — | — | Skip |
+| F-40 | Activity cleanup without transaction | No — SQLite autocommit sufficient for single DELETE | XS | Low | Skip |
+| F-41 | tsconfig without noUnusedLocals | No — missing | XS | Low | Backlog |
+| F-42 | Brotli not configured | No — gzip only | S | Low | Backlog |
+| F-43 | No Dependabot/npm audit | No — no config, no CI step | S | Medium | Fix now |
+| F-46 | Timing attack in login | No — `auth.ts:131` returns 401 immediately without dummy hash | S | High | Fix now |
 
-### Niedrig
+### Low
 
-| ID | Titel | Obsolet? | Aufwand | Nutzen | Empfehlung |
-|----|-------|----------|---------|--------|------------|
-| F-47 | Health-Check mit DB-Query | Nein — `/health` mit `SELECT 1`, keine Liveness/Readiness-Trennung | S | Niedrig | Backlog |
-| F-48 | `console.error` in bootstrap() | Nein — vor Fastify-Init teils vertretbar | XS | Niedrig | Skip |
-| F-49 | Filter-JSON nicht Zod-validiert | **Ja** — `routes/filters.ts` nutzt Zod safeParse | — | — | Skip |
-| F-50 | robots.txt blockiert alle Crawler | Teilweise — existiert, blockiert alles; fuer private App vertretbar | XS | Niedrig | Skip |
-| F-53 | Service-Layer partial | Teilweise erledigt — `keepService` extrahiert (`keep.ts` 631→293 LoC, 47→0 DB-Ops); `public.ts` dedupliziert via `taskService.createTask`/`buildTaskUpdates`/`getTaskLabelsMap` (23→17 DB-Ops). `auth.ts`/`labels.ts`/`widget.ts`/`filters.ts`/`ics.ts`/`activity.ts`/`google-calendar.ts` bewusst nicht refactored — Audit-Nutzen "Niedrig" | S | Niedrig | Rest Skip |
+| ID | Title | Obsolete? | Effort | Value | Recommendation |
+|----|-------|-----------|--------|-------|----------------|
+| F-47 | Health check with DB query | No — `/health` with `SELECT 1`, no liveness/readiness separation | S | Low | Backlog |
+| F-48 | `console.error` in bootstrap() | No — before Fastify init partly justifiable | XS | Low | Skip |
+| F-49 | Filter JSON not Zod-validated | **Yes** — `routes/filters.ts` uses Zod safeParse | — | — | Skip |
+| F-50 | robots.txt blocks all crawlers | Partially — exists, blocks everything; acceptable for private app | XS | Low | Skip |
+| F-53 | Service layer partial | Partially done — `keepService` extracted (`keep.ts` 631→293 LoC, 47→0 DB ops); `public.ts` deduplicated via `taskService.createTask`/`buildTaskUpdates`/`getTaskLabelsMap` (23→17 DB ops). `auth.ts`/`labels.ts`/`widget.ts`/`filters.ts`/`ics.ts`/`activity.ts`/`google-calendar.ts` deliberately not refactored — audit value "Low" | S | Low | Rest skip |
 
 ---
 
 ## GitHub Issues
 
-### Sicherheit
+### Security
 
-| ID | Titel | Obsolet? | Aufwand | Nutzen | Empfehlung |
-|----|-------|----------|---------|--------|------------|
-| SEC-009 (#346) | CSP `unsafe-inline` in styleSrc | Nein — Tailwind+TipTap erfordern es aktuell | L | Mittel | Backlog |
-| SEC-006 (#345) | Kein Account-Lockout | Nein — Rate-Limit 10/min vorhanden, kein Lockout nach Fehlversuchen | M | Hoch | Fix jetzt |
+| ID | Title | Obsolete? | Effort | Value | Recommendation |
+|----|-------|-----------|--------|-------|----------------|
+| SEC-009 (#346) | CSP `unsafe-inline` in styleSrc | No — Tailwind+TipTap currently require it | L | Medium | Backlog |
+| SEC-006 (#345) | No account lockout | No — rate limit 10/min present, no lockout after failed attempts | M | High | Fix now |
 
-### Architektur / Datenbank
+### Architecture / Database
 
-| ID | Titel | Obsolet? | Aufwand | Nutzen | Empfehlung |
-|----|-------|----------|---------|--------|------------|
-| #339 | Filter-IDs als kommagetrennte Strings | Nein — `schema.ts:166,171,172` weiterhin Text-Spalten, keine Junction-Tabellen | M | Mittel | Backlog |
+| ID | Title | Obsolete? | Effort | Value | Recommendation |
+|----|-------|-----------|--------|-------|----------------|
+| #339 | Filter IDs as comma-separated strings | No — `schema.ts:166,171,172` still text columns, no junction tables | M | Medium | Backlog |
 
 ### Features / UX
 
-| ID | Titel | Obsolet? | Aufwand | Nutzen | Empfehlung |
-|----|-------|----------|---------|--------|------------|
-| #143 | Archivierte Projekte UI | Nein — Backend ready, keine Management-UI | M | Mittel | Backlog |
-| #64 | Bildupload im Rich-Editor | Nein — nur URL-Prompt, kein Upload-Endpoint | L | Mittel | Backlog |
-| #43 | Admin-Panel mit Storage-Metriken | Nein — nicht implementiert | XL | Niedrig | Backlog |
-| #42 | Thumbnail-Vorschau im Raster | Nein — nicht implementiert, abhaengig von #64 | M | Niedrig | Backlog |
-| #41 | Client-seitige Bildkomprimierung | Nein — nicht implementiert, abhaengig von #64 | M | Niedrig | Backlog |
+| ID | Title | Obsolete? | Effort | Value | Recommendation |
+|----|-------|-----------|--------|-------|----------------|
+| #143 | Archived projects UI | No — backend ready, no management UI | M | Medium | Backlog |
+| #64 | Image upload in rich editor | No — URL prompt only, no upload endpoint | L | Medium | Backlog |
+| #43 | Admin panel with storage metrics | No — not implemented | XL | Low | Backlog |
+| #42 | Thumbnail preview in grid | No — not implemented, depends on #64 | M | Low | Backlog |
+| #41 | Client-side image compression | No — not implemented, depends on #64 | M | Low | Backlog |
 
 ---
 
-## Roadmap-Features
+## Roadmap Features
 
-| Feature | Implementiert? | Aufwand | Nutzen | Empfehlung |
-|---------|---------------|---------|--------|------------|
-| Release + Portainer + APK | Teilweise — Docker-CI vorhanden, APK-Build fehlt | M | Mittel | Backlog |
-| Notification-Center + Web/Capacitor Push | Nein — Activity-Feed existiert, kein Push | XL | Hoch | Backlog |
-| @Mentions in Tiptap-Kommentaren | Teilweise — Projekt-Mentions implementiert, User-@Mentions fehlen | M | Mittel | Backlog |
-| Datei-Anhaenge mit Object-Store + Dedup | Nein — Voraussetzung fuer #41, #42, #64 | XL | Hoch | Backlog |
-| Voice-First | Nein | XL | Niedrig | Backlog |
-| Links in Notizen rauskopieren | Nein | S | Niedrig | Backlog |
+| Feature | Implemented? | Effort | Value | Recommendation |
+|---------|-------------|--------|-------|----------------|
+| Release + Portainer + APK | Partially — Docker CI present, APK build missing | M | Medium | Backlog |
+| Notification center + Web/Capacitor push | No — activity feed exists, no push | XL | High | Backlog |
+| @Mentions in Tiptap comments | Partially — project mentions implemented, user @mentions missing | M | Medium | Backlog |
+| File attachments with object store + dedup | No — prerequisite for #41, #42, #64 | XL | High | Backlog |
+| Voice-first | No | XL | Low | Backlog |
+| Copy links from notes | No | S | Low | Backlog |
 
 ---
 
-## Zusammenfassung
+## Summary
 
-### Fix jetzt (12 Items — Sicherheit + Quick-Wins)
+### Fix Now (12 items — security + quick wins)
 
-| # | ID | Titel | Aufwand |
-|---|-----|-------|---------|
-| 1 | F-06 | Owner-only Guard auf Projects-PATCH | M |
-| 2 | SEC-006 | Account-Lockout nach Fehlversuchen | M |
-| 3 | F-46 | Timing-Attack: Dummy-bcrypt bei unbekanntem User | S |
-| 4 | F-05 | sameSite auf strict/lax umstellen | M |
-| 5 | F-08 | Zentraler setErrorHandler + safeParseMeta in comments.ts | M |
-| 6 | F-15 | JSON.parse in comments.ts:170 absichern | S |
-| 7 | F-07 | CORS Feature-Flag fuer claude.ai | S |
-| 8 | F-28 | ws: aus CSP entfernen (nur wss: in Prod) | S |
-| 9 | F-09 | Quality-Gates in CI (Lint, Test, Typecheck) | M |
+| # | ID | Title | Effort |
+|---|-----|-------|--------|
+| 1 | F-06 | Owner-only guard on Projects PATCH | M |
+| 2 | SEC-006 | Account lockout after failed attempts | M |
+| 3 | F-46 | Timing attack: dummy bcrypt for unknown user | S |
+| 4 | F-05 | Set sameSite to strict/lax | M |
+| 5 | F-08 | Central setErrorHandler + safeParseMeta in comments.ts | M |
+| 6 | F-15 | Secure JSON.parse in comments.ts:170 | S |
+| 7 | F-07 | CORS feature flag for claude.ai | S |
+| 8 | F-28 | Remove ws: from CSP (only wss: in prod) | S |
+| 9 | F-09 | Quality gates in CI (lint, test, typecheck) | M |
 | 10 | F-43 | Dependabot + npm audit in CI | S |
-| 11 | F-21 | Fehlende DB-Indizes auf FKs | S |
-| 12 | F-26 | Cache-Control fuer hashed Assets | S |
+| 11 | F-21 | Missing DB indexes on FKs | S |
+| 12 | F-26 | Cache-Control for hashed assets | S |
 
-### Skip (11 Items — obsolet oder nicht relevant)
+### Skip (11 items — obsolete or not relevant)
 
 F-13, F-16, F-17, F-19, F-22, F-38, F-39, F-40, F-48, F-49, F-50
 
-### Backlog (Rest)
+### Backlog (remainder)
 
-Alle uebrigen Items — mittlerer/niedriger Nutzen, hoehere Aufwaende.
+All remaining items — medium/low value, higher effort.

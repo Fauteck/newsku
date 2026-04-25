@@ -1,29 +1,29 @@
-# Haeufige Aufgaben
+# Common Tasks
 
-← [Zurueck zum Index](../CLAUDE.md)
+← [Back to Index](../CLAUDE.md)
 
 ---
 
-## 1. Neuen REST-Endpunkt + Flutter-Screen (End-to-End)
+## 1. New REST Endpoint + Flutter Screen (End-to-End)
 
-### Betroffene Dateien
+### Affected Files
 
-| Datei | Aktion |
-|-------|--------|
-| `src/main/resources/db/migration/V{n}__*.sql` | Migration (falls neue Tabelle/Spalte) |
-| `src/main/java/.../persistence/entities/MeinEntity.java` | JPA Entity |
-| `src/main/java/.../persistence/repositories/MeinRepository.java` | JPA Repository |
-| `src/main/java/.../services/MeinService.java` | Geschaeftslogik |
-| `src/main/java/.../controllers/MeinController.java` | REST Controller |
-| `src/main/app/lib/mein_modul/models/mein_model.dart` | Dart Modell |
-| `src/main/app/lib/mein_modul/mein_service.dart` | HTTP-Service |
-| `src/main/app/lib/mein_modul/mein_bloc.dart` | BLoC |
-| `src/main/app/lib/mein_modul/mein_view.dart` | Flutter Screen |
-| `src/main/app/lib/router.dart` | Route registrieren |
+| File | Action |
+|------|--------|
+| `src/main/resources/db/migration/V{n}__*.sql` | Migration (if new table/column) |
+| `src/main/java/.../persistence/entities/MyEntity.java` | JPA entity |
+| `src/main/java/.../persistence/repositories/MyRepository.java` | JPA repository |
+| `src/main/java/.../services/MyService.java` | Business logic |
+| `src/main/java/.../controllers/MyController.java` | REST controller |
+| `src/main/app/lib/my_module/models/my_model.dart` | Dart model |
+| `src/main/app/lib/my_module/my_service.dart` | HTTP service |
+| `src/main/app/lib/my_module/my_bloc.dart` | BLoC |
+| `src/main/app/lib/my_module/my_view.dart` | Flutter screen |
+| `src/main/app/lib/router.dart` | Register route |
 
-### Schritte
+### Steps
 
-1. **Migration** (falls neue Tabelle):
+1. **Migration** (if new table):
 
 ```sql
 -- src/main/resources/db/migration/V17__create_my_table.sql
@@ -46,7 +46,7 @@ public class MyEntity {
     @Column(nullable = false) private String userId;
     @Column(nullable = false) private String name;
     private Instant createdAt;
-    // Getter/Setter
+    // Getters/setters
 }
 ```
 
@@ -90,7 +90,7 @@ public class MyController {
 }
 ```
 
-6. **Dart Modell**:
+6. **Dart Model**:
 
 ```dart
 class MyModel {
@@ -102,25 +102,25 @@ class MyModel {
 }
 ```
 
-7. **Flutter Screen + Route** (siehe [frontend-patterns.md](frontend-patterns.md))
+7. **Flutter Screen + Route** (see [frontend-patterns.md](frontend-patterns.md))
 
 ---
 
-## 2. Neue Flyway-Migration anlegen
+## 2. Create New Flyway Migration
 
 ```bash
-# Naechste freie Versionsnummer bestimmen
+# Determine next available version number
 ls src/main/resources/db/migration/
 
-# Datei anlegen (z. B. V17)
-touch src/main/resources/db/migration/V17__meine_aenderung.sql
+# Create file (e.g. V17)
+touch src/main/resources/db/migration/V17__my_change.sql
 ```
 
 ```sql
--- Beispiel: Neue Spalte hinzufuegen
+-- Example: add column
 ALTER TABLE feed_items ADD COLUMN reading_time_seconds INTEGER;
 
--- Beispiel: Neue Tabelle
+-- Example: new table
 CREATE TABLE feed_tags (
     id VARCHAR(36) PRIMARY KEY,
     feed_id VARCHAR(36) NOT NULL REFERENCES feeds(id) ON DELETE CASCADE,
@@ -128,21 +128,21 @@ CREATE TABLE feed_tags (
 );
 ```
 
-Flyway fuehrt die Migration beim naechsten Start automatisch aus.
-**Bestehende Migrationen niemals nachtraeglich aendern.**
+Flyway runs the migration automatically on next startup.
+**Never modify existing migrations retroactively.**
 
 ---
 
-## 3. Docker-Image lokal bauen und testen
+## 3. Build and Test Docker Image Locally
 
 ```bash
-# JAR bauen
+# Build JAR
 mvn clean package -DskipTests
 
-# Image bauen
+# Build image
 docker build -t newsku:local -f docker/Dockerfile .
 
-# Testen (PostgreSQL muss laufen oder per docker-compose bereitgestellt werden)
+# Test (PostgreSQL must be running or provided via docker-compose)
 docker run --rm \
   -p 8080:8080 \
   -e DB_HOST=host.docker.internal \
@@ -152,39 +152,39 @@ docker run --rm \
   -e DB_PASSWORD=secret \
   -e OPENAI_API_KEY=sk-test \
   -e OPENAI_MODEL=gpt-4o \
-  -e SALT=test-salt-mindestens-32-zeichen-lang \
+  -e SALT=test-salt-at-least-32-characters-long \
   newsku:local
 
-# Health Check pruefen
+# Check health
 curl http://localhost:8080/actuator/health
 ```
 
 ---
 
-## 4. Flutter Web Build in Backend einbinden
+## 4. Embed Flutter Web Build in Backend
 
 ```bash
-# Flutter Web Build erstellen
+# Create Flutter web build
 cd src/main/app
 flutter build web
 
-# Build-Ausgabe in Spring Boot Static-Verzeichnis kopieren
+# Copy build output to Spring Boot static directory
 cp -r build/web/* ../resources/static/
 
-# Backend neu bauen
+# Rebuild backend
 cd ../../..
 mvn clean package -DskipTests
 ```
 
-Der `StaticContentController` liefert dann den Flutter Build aus, wenn keine API-Route zutrifft.
+`StaticContentController` then serves the Flutter build when no API route matches.
 
 ---
 
-## 5. Neuen Feed-Typ / neue LLM-Funktion hinzufuegen
+## 5. Add New Feed Type / LLM Feature
 
-### LLM-Ranking anpassen
+### Adjust LLM Ranking
 
-Die LLM-Logik liegt in `src/main/java/.../services/OpenaiServiceImpl.java`:
+The LLM logic is in `src/main/java/.../services/OpenaiServiceImpl.java`:
 
 ```java
 @Service
@@ -192,10 +192,10 @@ public class OpenaiServiceImpl implements OpenaiService {
 
     @Override
     public void rankItems(String userId, List<FeedItem> items) {
-        // Prompt mit Benutzer-Praeferenzen + Item-Titeln aufbauen
+        // Build prompt with user preferences + item titles
         String prompt = buildRankingPrompt(userPreferences, items);
 
-        // OpenAI API aufrufen
+        // Call OpenAI API
         ChatCompletion response = openaiClient.chat().completions().create(
             ChatCompletionCreateParams.builder()
                 .model(openaiModel)
@@ -203,7 +203,7 @@ public class OpenaiServiceImpl implements OpenaiService {
                 .build()
         );
 
-        // Scores parsen und an Items setzen
+        // Parse and apply scores
         parseAndApplyScores(response, items);
     }
 }
@@ -211,27 +211,27 @@ public class OpenaiServiceImpl implements OpenaiService {
 
 ---
 
-## 6. Neues E-Mail-Template hinzufuegen
+## 6. Add New Email Template
 
-1. **Freemarker Template** erstellen:
+1. **Create Freemarker template**:
 
 ```
-src/main/resources/templates/email/mein-template.ftl
+src/main/resources/templates/email/my-template.ftl
 ```
 
-2. **EmailService erweitern**:
+2. **Extend EmailService**:
 
 ```java
-// EmailService.java Interface
-void sendMeinEmail(String toEmail, Map<String, Object> model);
+// EmailService.java interface
+void sendMyEmail(String toEmail, Map<String, Object> model);
 
 // EmailServiceImpl.java
 @Override
-public void sendMeinEmail(String toEmail, Map<String, Object> model) {
+public void sendMyEmail(String toEmail, Map<String, Object> model) {
     Email email = EmailBuilder.startingBlank()
         .to(toEmail)
-        .withSubject("Betreff")
-        .withHTMLText(renderTemplate("mein-template.ftl", model))
+        .withSubject("Subject")
+        .withHTMLText(renderTemplate("my-template.ftl", model))
         .buildEmail();
     mailer.sendMail(email);
 }
@@ -239,48 +239,49 @@ public void sendMeinEmail(String toEmail, Map<String, Object> model) {
 
 ---
 
-## 7. Health-Check pruefen
+## 7. Check Health Endpoint
 
 ```bash
-# Actuator Health-Endpunkt
+# Actuator health endpoint
 curl http://localhost:8080/actuator/health
 
-# Erwartete Antwort:
+# Expected response:
 # { "status": "UP", "components": { "db": { "status": "UP" }, ... } }
 ```
 
 ---
 
-## 8. API via Swagger UI erkunden
+## 8. Explore API via Swagger UI
 
-Spring Boot startet automatisch eine Swagger UI:
+Spring Boot automatically starts a Swagger UI:
 
 ```
 http://localhost:8080/swagger-ui.html
 ```
 
-Alle Endpunkte koennen dort interaktiv getestet werden.
-JWT-Token einmalig oben rechts (Authorize-Button) eingeben, dann alle Auth-Endpunkte direkt aufrufen.
+All endpoints can be tested interactively there.
+Enter the JWT token once at the top right (Authorize button), then call all
+authenticated endpoints directly.
 
 ---
 
-## 9. Benutzer manuell erstellen / Passwort zuruecksetzen
+## 9. Create User Manually / Reset Password
 
-Wenn `ALLOW_SIGNUP=0`: Benutzer muessen manuell in der Datenbank angelegt werden.
+When `ALLOW_SIGNUP=0`: users must be created manually in the database.
 
 ```sql
--- Passwort-Hash mit BCrypt generieren (z. B. via https://bcrypt-generator.com)
+-- Generate password hash with BCrypt (e.g. via https://bcrypt-generator.com)
 INSERT INTO users (id, email, password)
 VALUES (gen_random_uuid(), 'admin@example.com', '$2a$10$...');
 ```
 
-Passwort-Reset-Funktion ist per E-Mail erreichbar via `POST /api/reset-password`.
+Password reset is available via email at `POST /api/reset-password`.
 
 ---
 
-## Verwandte Dokumente
+## Related Documents
 
-- [docs/api-patterns.md](api-patterns.md) — Controller- und Service-Muster
-- [docs/frontend-patterns.md](frontend-patterns.md) — Flutter Module und Screens
-- [docs/datenbank.md](datenbank.md) — Schema, Migrations-Workflow
-- [docs/entwicklung.md](entwicklung.md) — Setup, Build-Befehle
+- [docs/api-patterns.md](api-patterns.md) — Controller and service patterns
+- [docs/frontend-patterns.md](frontend-patterns.md) — Flutter modules and screens
+- [docs/datenbank.md](datenbank.md) — Schema, migrations workflow
+- [docs/entwicklung.md](entwicklung.md) — Setup, build commands
