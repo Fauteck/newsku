@@ -1016,6 +1016,9 @@ abstract class AppLocalizations {
   String get aiLogTokensUnknown;
   String get aiLogErrorLabel;
   String get aiLogErrorUnknown;
+  String get navMagazine;
+  String get navMore;
+  String get openProfileMenu;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

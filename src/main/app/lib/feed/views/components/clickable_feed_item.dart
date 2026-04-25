@@ -91,12 +91,16 @@ class ClickableFeedItem extends StatelessWidget {
                   ],
                 ),
               ),
-              child: GestureDetector(
-                onTap: () {
-                  FeedService(serverUrl!).click(item.id ?? '');
-                  launchUrl(Uri.parse(item.url!));
-                },
-                child: builder(hovered),
+              child: Semantics(
+                label: item.title ?? '',
+                button: true,
+                child: GestureDetector(
+                  onTap: () {
+                    FeedService(serverUrl!).click(item.id ?? '');
+                    launchUrl(Uri.parse(item.url!));
+                  },
+                  child: builder(hovered),
+                ),
               ),
             ),
           ),

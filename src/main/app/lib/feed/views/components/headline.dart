@@ -23,7 +23,7 @@ class Headline extends StatelessWidget {
         builder: (hovered) => Column(
           crossAxisAlignment: .stretch,
           children: [
-            FeedItemImage(item: item, height: 350, borderRadius: .circular(10)),
+            ExcludeSemantics(child: FeedItemImage(item: item, height: 350, borderRadius: .circular(10))),
             Gap(pu4),
             ItemTitle(item: item, style: textTheme.displaySmall, hovered: hovered),
             Gap(pu2),

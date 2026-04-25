@@ -268,5 +268,8 @@
     },
     "aiLogTokensUnknown": "Tokens unbekannt",
     "aiLogErrorLabel": "Fehler",
-    "aiLogErrorUnknown": "Unbekannter Fehler"
+    "aiLogErrorUnknown": "Unbekannter Fehler",
+    "navMagazine": "Magazin",
+    "navMore": "Mehr",
+    "openProfileMenu": "Profilmenü"
 }

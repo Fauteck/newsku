@@ -31,6 +31,7 @@ class FeedProfileMenu extends StatelessWidget {
       key: const Key('profile-button'),
       builder: (context, controller, child) => IconButton(
         onPressed: () => controller.isOpen ? controller.close() : controller.open(),
+        tooltip: locals.openProfileMenu,
         icon: const UserProfilePicture(),
       ),
       menuChildren: [

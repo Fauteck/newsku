@@ -87,6 +87,7 @@ class _MobileBottomNavState extends State<MobileBottomNav> {
     }
 
     final router = AutoRouter.of(context);
+    final locals = AppLocalizations.of(context)!;
 
     final int selected;
     if (router.isRouteActive(StatsRoute.name)) {
@@ -123,21 +124,21 @@ class _MobileBottomNavState extends State<MobileBottomNav> {
         NavigationDestination(
           icon: const Icon(Icons.newspaper_outlined),
           selectedIcon: const Icon(Icons.newspaper),
-          label: 'Magazin',
+          label: locals.navMagazine,
         ),
         NavigationDestination(
           icon: const Icon(Icons.rss_feed_outlined),
           selectedIcon: const Icon(Icons.rss_feed),
-          label: 'Feeds',
+          label: locals.feeds,
         ),
         NavigationDestination(
           icon: const Icon(Icons.insights_outlined),
           selectedIcon: const Icon(Icons.insights),
-          label: 'Stats',
+          label: locals.stats,
         ),
         NavigationDestination(
           icon: const Icon(Icons.more_horiz),
-          label: 'Mehr',
+          label: locals.navMore,
         ),
       ],
     );

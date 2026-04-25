@@ -851,4 +851,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiLogErrorUnknown => 'Unbekannter Fehler';
+
+  @override
+  String get navMagazine => 'Magazin';
+
+  @override
+  String get navMore => 'Mehr';
+
+  @override
+  String get openProfileMenu => 'Profilmenü';
 }
