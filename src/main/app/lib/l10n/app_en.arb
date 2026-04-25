@@ -16,6 +16,7 @@
     "noNews": "Keine Nachrichten",
     "readItems": "{count, plural, =0{Keine gelesenen Artikel} =1{1 gelesener Artikel} other{{count} gelesene Artikel}}",
     "loadMore": "Mehr laden",
+    "appTitle": "Feedteck",
     "reasoning": "Begründung",
     "search": "Suche",
     "feeds": "Feeds",

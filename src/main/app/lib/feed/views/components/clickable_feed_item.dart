@@ -53,12 +53,11 @@ class ClickableFeedItem extends StatelessWidget {
               key: ValueKey('swipe-${item.id}'),
               direction: DismissDirection.horizontal,
               confirmDismiss: (direction) async {
+                final cubit = context.read<MainFeedCubit>();
                 if (direction == DismissDirection.startToEnd) {
-                  context.read<MainFeedCubit>().readItem(item.id);
-                } else if (direction == DismissDirection.endToStart) {
-                  context.read<MainFeedCubit>().toggleSave(item.id ?? '');
+                  return await cubit.readItem(item.id);
                 }
-                return false;
+                return await cubit.toggleSave(item.id ?? '');
               },
               background: Container(
                 color: colors.primaryContainer,

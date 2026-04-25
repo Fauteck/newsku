@@ -108,9 +108,9 @@ class MainFeedCubit extends Cubit<MainFeedState> {
     super.close();
   }
 
-  void readItem(String? id) {
+  Future<bool> readItem(String? id) {
     if (id == null) {
-      return;
+      return Future.value(false);
     }
     readItems.add(id);
 
@@ -119,9 +119,10 @@ class MainFeedCubit extends Cubit<MainFeedState> {
       FeedService(serverUrl!).readItems(List.from(readItems));
       readItems.clear();
     });
+    return Future.value(true);
   }
 
-  Future<void> toggleSave(String id) async {
+  Future<bool> toggleSave(String id) async {
     try {
       final updated = await FeedService(serverUrl!).toggleSaved(id);
       // Update the item in all date buckets
@@ -130,9 +131,11 @@ class MainFeedCubit extends Cubit<MainFeedState> {
         return MapEntry(range, newList);
       });
       emit(state.copyWith(items: newItems));
+      return true;
     } catch (e, s) {
       _log.severe('Could not toggle save for item $id', e);
       emit(state.copyWith(error: e, stackTrace: s));
+      return false;
     }
   }
 

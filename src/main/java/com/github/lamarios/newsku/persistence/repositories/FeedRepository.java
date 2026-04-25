@@ -3,6 +3,7 @@ package com.github.lamarios.newsku.persistence.repositories;
 
 import com.github.lamarios.newsku.persistence.entities.Feed;
 import com.github.lamarios.newsku.persistence.entities.User;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface FeedRepository extends JpaRepository<Feed, String> {
+    @EntityGraph(attributePaths = {"category"})
     List<Feed> getFeedsByUser(User user);
 
     User user(User user);

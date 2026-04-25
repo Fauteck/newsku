@@ -32,7 +32,7 @@ public class ResetPasswordService {
     // clock so attackers cannot enumerate registered addresses via timing.
     private static final long FORGOT_TARGET_MS = 1500L;
 
-    public static final int RESET_PASSOWRD_EXPIRY = 24 * 60 * 60 * 1000;
+    public static final int RESET_PASSOWRD_EXPIRY = 30 * 60 * 1000; // 30 minutes
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final JwtTokenUtil jwtTokenUtil;

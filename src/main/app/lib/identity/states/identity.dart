@@ -2,11 +2,11 @@ import 'package:app/config/models/config.dart';
 import 'package:app/user/models/user.dart';
 import 'package:app/user/services/server_url_service.dart';
 import 'package:app/user/services/user_service.dart';
+import 'package:app/utils/service/token_store.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:logging/logging.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 part 'identity.freezed.dart';
@@ -21,9 +21,9 @@ class IdentityCubit extends Cubit<IdentityState> {
   }
 
   Future<void> init() async {
-    var prefs = await SharedPreferences.getInstance();
-    var token = prefs.getString('token');
-    var server = prefs.getString('server');
+    final store = TokenStore();
+    var token = await store.readToken();
+    var server = await store.readServer();
 
     if (kIsWeb && !kDebugMode) {
       Uri base = Uri.base;
@@ -58,19 +58,19 @@ class IdentityCubit extends Cubit<IdentityState> {
   }
 
   Future<void> logout() async {
-    var prefs = await SharedPreferences.getInstance();
-    prefs.remove('token');
+    final store = TokenStore();
+    await store.deleteToken();
     var removeServer = !kIsWeb || kDebugMode;
     if (removeServer) {
-      prefs.remove('server');
+      await store.deleteServer();
     }
     emit(state.copyWith(serverUrl: removeServer ? null : state.serverUrl, token: null));
   }
 
   Future<void> setToken(String token) async {
-    var prefs = await SharedPreferences.getInstance();
-    await prefs.setString('token', token);
-    await prefs.setString('server', state.serverUrl!);
+    final store = TokenStore();
+    await store.writeToken(token);
+    await store.writeServer(state.serverUrl!);
 
     User? user;
     if (state.serverUrl != null) {

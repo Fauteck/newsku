@@ -193,6 +193,12 @@ abstract class AppLocalizations {
   /// **'Load more'**
   String get loadMore;
 
+  /// Application name shown in the OS task switcher.
+  ///
+  /// In en, this message translates to:
+  /// **'Feedteck'**
+  String get appTitle;
+
   /// No description provided for @reasoning.
   ///
   /// In en, this message translates to:
