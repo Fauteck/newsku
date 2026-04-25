@@ -72,6 +72,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadMore => 'Load more';
 
   @override
+  String get appTitle => 'Feedteck';
+
+  @override
   String get reasoning => 'Reasoning';
 
   @override
