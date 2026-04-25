@@ -15,7 +15,7 @@ public class SensitiveMaskingConverter extends ClassicConverter {
 
     // Matches JSON-style key:"value" and key=value pairs for sensitive fields.
     private static final Pattern SENSITIVE_PATTERN = Pattern.compile(
-            "(?i)(\"?(?:password|token|apiKey|api_key|authorization|secret|credential)\"?\\s*[=:]\\s*)([\"']?)([^\"',;\\s}{\\]\\[]{1,500})\\2",
+            "(?i)(\"?(?:password|token|apiKey|api_key|authorization|secret|credential|OPENAI_API_KEY|openai_api_key|GREADER_API_PASSWORD|greader_api_password)\"?\\s*[=:]\\s*)([\"']?)([^\"',;\\s}{\\]\\[]{1,500})\\2",
             Pattern.CASE_INSENSITIVE);
 
     @Override

@@ -2,6 +2,7 @@ package com.github.lamarios.newsku.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.lamarios.newsku.models.OIDCConfig;
 import com.github.lamarios.newsku.persistence.entities.User;
@@ -10,10 +11,6 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Jwk;
 import io.jsonwebtoken.security.Jwks;
-import kong.unirest.core.GetRequest;
-import kong.unirest.core.Unirest;
-import kong.unirest.core.UnirestException;
-import kong.unirest.core.json.JSONObject;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -54,12 +53,13 @@ public class OidcService implements ApplicationContextAware {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-
     private final UserService userService;
+    private final RestClient restClient;
 
     @Autowired
-    public OidcService(UserService userService) {
+    public OidcService(UserService userService, RestClient.Builder restClientBuilder) {
         this.userService = userService;
+        this.restClient = restClientBuilder.build();
         objectMapper.disable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
@@ -75,15 +75,13 @@ public class OidcService implements ApplicationContextAware {
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 
         if (oidcDiscoveryUrl != null && !oidcDiscoveryUrl.isBlank()) {
-            GetRequest request = Unirest.get(oidcDiscoveryUrl);
             try {
-                var body = request.asString();
+                String discoveryBody = restClient.get().uri(oidcDiscoveryUrl)
+                        .retrieve().body(String.class);
+                oidcConfig = objectMapper.readValue(discoveryBody, OIDCConfig.class);
 
-                String bodyStr = body.getBody();
-                oidcConfig = objectMapper.readValue(bodyStr, OIDCConfig.class);
-
-                request = Unirest.get(oidcConfig.getJwksUri());
-                bodyStr = request.asString().getBody();
+                String jwksBody = restClient.get().uri(oidcConfig.getJwksUri())
+                        .retrieve().body(String.class);
 
                 oidcConfig.setDiscoveryUrl(oidcDiscoveryUrl);
                 oidcConfig.setClientId(clientId);
@@ -91,10 +89,9 @@ public class OidcService implements ApplicationContextAware {
                 oidcConfig.setUsernameClaim(oidcPreferredUsernameClaim);
                 oidcConfig.setName(oidcName);
 
-
                 var keyMap = Jwks.setParser()
                         .build()
-                        .parse(bodyStr)
+                        .parse(jwksBody)
                         .getKeys()
                         .stream()
                         .collect(toMap(Identifiable::getId, Jwk::toKey));
@@ -103,8 +100,7 @@ public class OidcService implements ApplicationContextAware {
                         .keyLocator(header -> keyMap.get(header.getOrDefault("kid", "").toString()))
                         .build();
 
-
-            } catch (UnirestException | JsonProcessingException e) {
+            } catch (RestClientException | JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -130,13 +126,12 @@ public class OidcService implements ApplicationContextAware {
         // if we don't get the info
         if (userOpt.isEmpty()) {
 
-            GetRequest request = Unirest.get(oidcConfig.getUserInfoUrl())
-                    .header("Authorization", "Bearer " + accessToken);
-            var body = request.asJson().getBody();
+            JsonNode object = restClient.get().uri(oidcConfig.getUserInfoUrl())
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve().body(JsonNode.class);
 
-            JSONObject object = body.getObject();
-            if (object.has(oidcPreferredUsernameClaim)) {
-                var user = userService.getUser(object.getString(oidcPreferredUsernameClaim)).orElse(null);
+            if (object != null && object.has(oidcPreferredUsernameClaim)) {
+                var user = userService.getUser(object.get(oidcPreferredUsernameClaim).asText()).orElse(null);
 
                 // if we still don't have  auser we might need to sign it up
                 if (user != null) {
@@ -151,8 +146,8 @@ public class OidcService implements ApplicationContextAware {
                     user = new User();
                     user.setOidcSub(sub);
                     user.setPassword(RandomStringUtils.secure().nextAlphabetic(70));
-                    user.setEmail(object.getString(oidcEmailClaim));
-                    user.setUsername(object.getString(oidcPreferredUsernameClaim));
+                    user.setEmail(object.get(oidcEmailClaim).asText());
+                    user.setUsername(object.get(oidcPreferredUsernameClaim).asText());
 
                     return Optional.ofNullable(userService.createUser(user));
                 } else {

@@ -119,20 +119,6 @@
             <artifactId>caffeine</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.konghq/unirest-java-core -->
-        <dependency>
-            <groupId>com.konghq</groupId>
-            <artifactId>unirest-java-core</artifactId>
-            <version>4.7.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.konghq/unirest-objectmapper-jackson -->
-        <dependency>
-            <groupId>com.konghq</groupId>
-            <artifactId>unirest-objectmapper-jackson</artifactId>
-            <version>4.2.9</version>
-        </dependency>
-
         <dependency>
             <!-- jsoup HTML parser library @ https://jsoup.org/ -->
             <groupId>org.jsoup</groupId>
