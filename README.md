@@ -184,6 +184,12 @@ Die Anwendung ist erreichbar unter: `http://localhost:8080`
 
 ¹ Ein Benutzer kann im KI-Tab einen eigenen API-Key hinterlegen; dieser hat Vorrang vor `OPENAI_API_KEY`.
 
+### Sync-Kadenz
+
+newsku poll FreshRSS über die GReader-API. Der Default-Cron (`FEED_SYNC_CRON=0 15,35,55 * * * *`) läuft 3×/Stunde, jeweils ca. 5 Min nach der empfohlenen FreshRSS-Fetch-Kadenz `CRON_MIN=10,30,50`. So fängt newsku frische Inhalte ein, ohne Leerlauf-Polls auf einen FreshRSS-Stand zu produzieren, der noch nicht aktualisiert wurde.
+
+> **Nicht unter 20 Min reduzieren**, ohne FreshRSS selbst auf eine kürzere Kadenz umzustellen. Häufigere newsku-Syncs liefern keine neueren Daten — sie erzeugen nur zusätzliche Last auf FreshRSS und der eigenen DB. Wenn du die Frequenz wirklich erhöhen willst, passe zuerst `CRON_MIN` in FreshRSS an und richte `FEED_SYNC_CRON` daran aus (jeweils ein paar Minuten dahinter).
+
 ### Sicherheit sensibler Felder
 
 - **Login-Passwort:** BCrypt-Hash (einweg).
