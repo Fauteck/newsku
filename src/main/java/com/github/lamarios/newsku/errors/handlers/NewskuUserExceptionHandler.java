@@ -4,6 +4,7 @@ import com.github.lamarios.newsku.errors.NewskuException;
 import com.github.lamarios.newsku.errors.NewskuUserException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.OptimisticLockException;
+import jakarta.validation.ConstraintViolationException;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
@@ -47,6 +48,22 @@ public class NewskuUserExceptionHandler extends ResponseEntityExceptionHandler {
     @Nullable
     ResponseEntity<@NotNull Object> handleOptimisticLock(OptimisticLockException exception, WebRequest request) {
         return build(exception, "OptimisticLockException", HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @Nullable
+    ResponseEntity<@NotNull Object> handleConstraintViolation(ConstraintViolationException exception, WebRequest request) {
+        List<Map<String, String>> fieldErrors = exception.getConstraintViolations().stream()
+                .map(v -> Map.of(
+                        "field", v.getPropertyPath().toString(),
+                        "message", v.getMessage()))
+                .toList();
+        Map<String, Object> body = Map.of(
+                "message", "Validation failed",
+                "type", "ConstraintViolationException",
+                "uuid", UUID.randomUUID().toString(),
+                "fields", fieldErrors);
+        return super.handleExceptionInternal(exception, body, jsonHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
     @Override

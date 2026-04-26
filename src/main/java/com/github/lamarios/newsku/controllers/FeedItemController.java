@@ -6,12 +6,14 @@ import com.github.lamarios.newsku.services.FeedItemService;
 import com.github.lamarios.newsku.services.ImageCacheService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -28,6 +30,7 @@ import java.util.List;
 @RequestMapping("/api/feeds/items")
 @Tag(name = "Feeds")
 @SecurityRequirement(name = "bearerAuth")
+@Validated
 public class FeedItemController {
     private final FeedItemService feedItemService;
     private final ImageCacheService imageCacheService;
@@ -43,8 +46,8 @@ public class FeedItemController {
     public PageResponse<FeedItem> getItems(
             @RequestParam("from") Long from,
             @RequestParam("to") Long to,
-            @DefaultValue("0") @RequestParam("page") int page,
-            @DefaultValue("100") @RequestParam("pageSize") int pageSize,
+            @RequestParam(value = "page", defaultValue = "0") @Min(0) int page,
+            @RequestParam(value = "pageSize", defaultValue = "100") @Min(1) @Max(500) int pageSize,
             @RequestParam(value = "minimumImportance", required = false) Integer minimumImportance,
             @RequestParam(value = "sort", required = false) String sort,
             @RequestParam(value = "feedId", required = false) String feedId,
