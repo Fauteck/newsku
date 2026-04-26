@@ -95,7 +95,13 @@ public class WebSecurityConfig {
                                 .preload(true)
                                 .maxAgeInSeconds(31_536_000))
                         .frameOptions(frame -> frame.deny())
-                        .contentTypeOptions(withDefaults -> {}))
+                        .contentTypeOptions(withDefaults -> {})
+                        // F8: Spring Security's default Cache-Control header is "no-cache,
+                        // no-store, max-age=0, must-revalidate" for every authenticated
+                        // response. Disable it so CacheControlFilter can apply targeted
+                        // cache hints (immutable for images, short max-age for lists,
+                        // no-store as the safe default for everything else under /api/).
+                        .cacheControl(cache -> cache.disable()))
                         // CSP diagnostisch weggelassen: Spring Security fügt CSP
                         // nicht by default hinzu. Wenn Text jetzt sichtbar ist,
                         // liegt die Ursache im CSP-Block. Wenn nicht, ist es HSTS,
