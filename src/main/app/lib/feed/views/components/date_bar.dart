@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:motor/motor.dart';
 
-final _df = DateFormat.yMMMd();
+final _df = DateFormat('dd.MM.yyyy');
 
 class DateBar extends StatelessWidget {
   final DateTime date;
