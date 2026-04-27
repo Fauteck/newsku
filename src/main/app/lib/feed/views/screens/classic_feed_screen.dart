@@ -38,11 +38,12 @@ class ClassicFeedScreen extends StatelessWidget {
                   SliverAppBar(
                     floating: true,
                     snap: true,
-                    leading: BackButton(
-                      onPressed: () => AutoRouter.of(context)
+                    automaticallyImplyLeading: false,
+                    title: AppName(
+                      style: textTheme.titleMedium,
+                      onTap: () => AutoRouter.of(context)
                           .navigate(const HomeRoute(children: [FeedRoute()])),
                     ),
-                    title: AppName(style: textTheme.titleMedium),
                     actions: isMobile
                         ? [const FeedProfileMenu()]
                         : [

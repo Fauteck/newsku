@@ -29,10 +29,10 @@ class SettingsScreen extends StatelessWidget {
         length: 6,
         child: Scaffold(
           appBar: AppBar(
-            title: AppName(style: Theme.of(context).textTheme.titleMedium),
             automaticallyImplyLeading: false,
-            leading: BackButton(
-              onPressed: () => AutoRouter.of(context).navigate(const HomeRoute(children: [FeedRoute()])),
+            title: AppName(
+              style: Theme.of(context).textTheme.titleMedium,
+              onTap: () => AutoRouter.of(context).navigate(const HomeRoute(children: [FeedRoute()])),
             ),
             actions: const [FeedProfileMenu()],
             bottom: TabBar(

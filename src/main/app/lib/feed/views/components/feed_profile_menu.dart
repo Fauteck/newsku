@@ -41,6 +41,11 @@ class FeedProfileMenu extends StatelessWidget {
           child: Text(locals.navMagazine),
         ),
         MenuItemButton(
+          leadingIcon: const Icon(Icons.rss_feed_outlined),
+          onPressed: () => AutoRouter.of(context).navigate(const HomeRoute(children: [ClassicFeedRoute()])),
+          child: Text(locals.feeds),
+        ),
+        MenuItemButton(
           leadingIcon: const Icon(Icons.show_chart),
           onPressed: () => AutoRouter.of(context).push(const StatsRoute()),
           child: Text(locals.stats),
