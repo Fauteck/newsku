@@ -1,6 +1,8 @@
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/settings/states/feeds.dart';
 import 'package:app/settings/views/components/feed_category.dart';
+import 'package:app/sync/models/sync_status_response.dart';
+import 'package:app/sync/services/sync_status_service.dart';
 import 'package:app/utils/dialog.dart';
 import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/error_listener.dart';
@@ -11,6 +13,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:material_loading_indicator/loading_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+Future<SyncStatusResponse?> _pollSyncStatus(String serverUrl) async {
+  final service = SyncStatusService(serverUrl);
+  for (int i = 0; i < 20; i++) {
+    try {
+      final status = await service.getStatus();
+      if (status.isTerminal) return status;
+    } catch (_) {
+      // Transient polling failures are non-fatal: retry on next tick.
+    }
+    await Future.delayed(const Duration(seconds: 3));
+  }
+  try {
+    return await service.getStatus();
+  } catch (_) {
+    return null;
+  }
+}
 
 const _validUrl = r"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)";
 
@@ -90,7 +110,37 @@ class FeedsSettingsTab extends StatelessWidget {
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: FilledButton.tonalIcon(
-                                  onPressed: state.loading ? null : () => cubit.syncGreader(),
+                                  onPressed: state.loading
+                                      ? null
+                                      : () async {
+                                          final messenger = ScaffoldMessenger.of(context);
+                                          messenger.hideCurrentSnackBar();
+                                          messenger.showSnackBar(SnackBar(
+                                            content: Text(locals.syncing),
+                                            duration: const Duration(minutes: 2),
+                                          ));
+                                          await cubit.syncGreader();
+                                          if (!context.mounted) return;
+                                          final status = await _pollSyncStatus(serverUrl!);
+                                          if (!context.mounted) return;
+                                          messenger.hideCurrentSnackBar();
+                                          if (status == null) {
+                                            messenger.showSnackBar(SnackBar(
+                                              content: Text(locals.syncCompleted(0)),
+                                            ));
+                                          } else if (status.status == SyncStatus.failed) {
+                                            messenger.showSnackBar(SnackBar(
+                                              content: Text(locals.syncFailedReason(
+                                                  status.errorMessage ?? '—')),
+                                              backgroundColor: colors.errorContainer,
+                                            ));
+                                          } else {
+                                            messenger.showSnackBar(SnackBar(
+                                              content: Text(
+                                                  locals.syncCompleted(status.itemsAdded ?? 0)),
+                                            ));
+                                          }
+                                        },
                                   icon: const Icon(Icons.sync),
                                   label: Text(locals.syncNow),
                                 ),

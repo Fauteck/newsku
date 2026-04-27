@@ -272,5 +272,26 @@
     "aiLogErrorUnknown": "Unbekannter Fehler",
     "navMagazine": "Magazin",
     "navMore": "Mehr",
-    "openProfileMenu": "Profilmenü"
+    "openProfileMenu": "Profilmenü",
+    "markAllAsRead": "Alle als gelesen markieren",
+    "markAllAsReadConfirm": "Möchtest du wirklich alle Artikel im aktuellen Zeitraum als gelesen markieren?",
+    "markAllAsReadDone": "{count, plural, =0{Keine Artikel zu markieren} =1{1 Artikel als gelesen markiert} other{{count} Artikel als gelesen markiert}}",
+    "@markAllAsReadDone": {
+        "placeholders": {
+            "count": {"type": "int"}
+        }
+    },
+    "syncing": "Synchronisation läuft …",
+    "syncCompleted": "{count, plural, =0{Sync abgeschlossen – keine neuen Artikel} =1{Sync abgeschlossen – 1 neuer Artikel} other{Sync abgeschlossen – {count} neue Artikel}}",
+    "@syncCompleted": {
+        "placeholders": {
+            "count": {"type": "int"}
+        }
+    },
+    "syncFailedReason": "Sync fehlgeschlagen: {reason}",
+    "@syncFailedReason": {
+        "placeholders": {
+            "reason": {"type": "String"}
+        }
+    }
 }

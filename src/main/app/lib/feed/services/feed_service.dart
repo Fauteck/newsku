@@ -168,6 +168,18 @@ class FeedService extends BaseService {
     processResponse(response);
   }
 
+  Future<int> markAllRead({required int beforeMs, String? feedId}) async {
+    final query = <String, dynamic>{'before': beforeMs};
+    if (feedId != null) query['feedId'] = feedId;
+    var uri = await formatUrl('/api/feeds/items/mark-all-read', query: query);
+
+    var response = await http.post(uri, headers: await headers);
+
+    processResponse(response);
+
+    return jsonDecode(response.body) as int;
+  }
+
   Future<FeedItem> toggleSaved(String id) async {
     var uri = await formatUrl('/api/feeds/items/$id/saved');
 

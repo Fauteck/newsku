@@ -863,4 +863,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openProfileMenu => 'Profilmenü';
+
+  @override
+  String get markAllAsRead => 'Alle als gelesen markieren';
+
+  @override
+  String get markAllAsReadConfirm =>
+      'Möchtest du wirklich alle Artikel im aktuellen Zeitraum als gelesen markieren?';
+
+  @override
+  String markAllAsReadDone(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Artikel als gelesen markiert',
+      one: '1 Artikel als gelesen markiert',
+      zero: 'Keine Artikel zu markieren',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncing => 'Synchronisation läuft …';
+
+  @override
+  String syncCompleted(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Sync abgeschlossen – $count neue Artikel',
+      one: 'Sync abgeschlossen – 1 neuer Artikel',
+      zero: 'Sync abgeschlossen – keine neuen Artikel',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncFailedReason(Object reason) {
+    return 'Sync fehlgeschlagen: $reason';
+  }
 }
