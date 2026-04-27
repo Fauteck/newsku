@@ -13,7 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class PublicMagazineScreen extends StatefulWidget {
   final String tabId;
 
-  const PublicMagazineScreen({super.key, required this.tabId});
+  const PublicMagazineScreen({super.key, @PathParam('tabId') required this.tabId});
 
   @override
   State<PublicMagazineScreen> createState() => _PublicMagazineScreenState();
