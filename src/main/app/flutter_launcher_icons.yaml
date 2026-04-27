@@ -1,0 +1,13 @@
+flutter_launcher_icons:
+  # Source SVG — will be rasterized by the tool
+  image_path: "assets/feedteck.svg"
+
+  android: true
+  ios: true
+  web:
+    generate: true
+    image_path: "assets/feedteck.svg"
+
+  # Adaptive icon for Android 8+ (API 26+)
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/feedteck.svg"

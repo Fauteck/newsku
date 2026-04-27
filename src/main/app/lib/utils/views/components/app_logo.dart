@@ -13,7 +13,7 @@ class AppLogo extends StatelessWidget {
     return MainColorProvider(
       builder: (context, mainColor) {
         return SvgPicture.asset(
-          'assets/newsku.svg',
+          'assets/feedteck.svg',
           width: size,
           height: size,
           colorFilter: ColorFilter.mode(color ?? mainColor, BlendMode.srcIn),
