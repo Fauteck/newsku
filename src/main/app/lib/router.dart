@@ -57,6 +57,8 @@ class AppRouter extends RootStackRouter {
   List<AutoRoute> get routes {
     var hasServerUrlSetup = !kIsWeb || kDebugMode;
     return [
+      AutoRoute(page: PublicMagazineRoute.page, path: "/public/magazine/:tabId"),
+      AutoRoute(page: ResetPasswordRoute.page, path: "/reset-password"),
       AutoRoute.guarded(
         page: HomeRoute.page,
         path: '/',
@@ -89,8 +91,6 @@ class AppRouter extends RootStackRouter {
           AutoRoute(page: InfoRoute.page, path: 'info'),
         ],
       ),
-      AutoRoute(page: ResetPasswordRoute.page, path: "/reset-password"),
-      AutoRoute(page: PublicMagazineRoute.page, path: "/public/magazine/:tabId"),
       AutoRoute(
         page: LandingRoute.page,
         initial: !loggedInOnStart,
