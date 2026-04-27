@@ -257,7 +257,7 @@ public class OpenaiServiceImpl implements OpenaiService {
                     logger.error("OpenAI {} quota/rate limit hit for user {} — entering cooldown: {}",
                             useCase, user.getUsername(), e.getMessage());
                     usageService.recordError(user, useCase, model,
-                            "Quota/rate limit: " + shortMessage(e),
+                            friendlyError(e),
                             (int) (System.currentTimeMillis() - start));
                     enterQuotaCooldown(user);
                     return Optional.empty();
@@ -282,7 +282,7 @@ public class OpenaiServiceImpl implements OpenaiService {
             }
         }
         usageService.recordError(user, useCase, model,
-                shortMessage(last),
+                friendlyError(last),
                 (int) (System.currentTimeMillis() - start));
         return Optional.empty();
     }
@@ -305,6 +305,98 @@ public class OpenaiServiceImpl implements OpenaiService {
             msg = msg.substring(0, msg.length() - 6);
         }
         return msg;
+    }
+
+    /** Coarse classification of upstream AI failures so the UI can show a
+     * meaningful label instead of "an error occurred". */
+    enum ErrorCategory {
+        AUTH,
+        QUOTA_EXHAUSTED,
+        RATE_LIMITED,
+        INVALID_MODEL,
+        SERVER_ERROR,
+        TIMEOUT,
+        NETWORK,
+        UNKNOWN
+    }
+
+    /**
+     * Categorises an upstream AI failure by inspecting class names and the
+     * SDK's "<status>: <body>" message format. The SDK names are matched as
+     * strings so we don't need a hard compile-time dependency on every
+     * version's exception hierarchy.
+     */
+    static ErrorCategory classifyError(Throwable e) {
+        for (Throwable t = e; t != null; t = t.getCause()) {
+            String cn = t.getClass().getName();
+            String msg = t.getMessage() == null ? "" : t.getMessage().toLowerCase();
+
+            if (cn.equals("com.openai.errors.RateLimitException")) {
+                if (msg.contains("insufficient_quota") || msg.contains("exceeded your current quota")) {
+                    return ErrorCategory.QUOTA_EXHAUSTED;
+                }
+                return ErrorCategory.RATE_LIMITED;
+            }
+            if (cn.equals("com.openai.errors.AuthenticationException")
+                    || msg.startsWith("401")
+                    || msg.startsWith("403")
+                    || msg.contains("invalid_api_key")
+                    || msg.contains("incorrect api key")) {
+                return ErrorCategory.AUTH;
+            }
+            if (msg.contains("model_not_found")
+                    || msg.contains("does not exist")
+                    || (msg.startsWith("404") && msg.contains("model"))) {
+                return ErrorCategory.INVALID_MODEL;
+            }
+            if (msg.startsWith("429")
+                    || msg.contains("insufficient_quota")
+                    || msg.contains("exceeded your current quota")) {
+                return msg.contains("quota") ? ErrorCategory.QUOTA_EXHAUSTED : ErrorCategory.RATE_LIMITED;
+            }
+            if (msg.startsWith("5")
+                    && msg.length() >= 3
+                    && Character.isDigit(msg.charAt(1))
+                    && Character.isDigit(msg.charAt(2))) {
+                return ErrorCategory.SERVER_ERROR;
+            }
+            if (cn.contains("Timeout")
+                    || cn.endsWith("InterruptedIOException")
+                    || msg.contains("timeout")
+                    || msg.contains("timed out")) {
+                return ErrorCategory.TIMEOUT;
+            }
+            if (cn.endsWith("UnknownHostException")
+                    || cn.endsWith("ConnectException")
+                    || cn.endsWith("NoRouteToHostException")
+                    || cn.endsWith("SSLException")
+                    || msg.contains("connection refused")
+                    || msg.contains("unknown host")
+                    || msg.contains("network is unreachable")) {
+                return ErrorCategory.NETWORK;
+            }
+        }
+        return ErrorCategory.UNKNOWN;
+    }
+
+    /**
+     * Builds the message we persist in {@code openai_usage.error_message}.
+     * The category prefix lets the UI render a typed badge ("API key invalid",
+     * "Quota exhausted", …) instead of dumping a raw stack-traceish string.
+     */
+    static String friendlyError(Throwable e) {
+        ErrorCategory cat = classifyError(e);
+        String detail = shortMessage(e);
+        return switch (cat) {
+            case AUTH -> "Invalid OpenAI API key — please check your credentials (" + detail + ")";
+            case QUOTA_EXHAUSTED -> "OpenAI quota exhausted — top up or wait for the reset (" + detail + ")";
+            case RATE_LIMITED -> "OpenAI rate limit reached — retrying automatically (" + detail + ")";
+            case INVALID_MODEL -> "Configured model not available on the selected endpoint (" + detail + ")";
+            case SERVER_ERROR -> "OpenAI provider unavailable — will retry (" + detail + ")";
+            case TIMEOUT -> "OpenAI request timed out (" + detail + ")";
+            case NETWORK -> "Connection to OpenAI failed (" + detail + ")";
+            case UNKNOWN -> detail;
+        };
     }
 
     /**
