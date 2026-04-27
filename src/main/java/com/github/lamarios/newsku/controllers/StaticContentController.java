@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class StaticContentController {
     @RequestMapping(value = {"/", "/feed", "/stats", "/settings", "/reset-password", "/public/magazine/**"})
     public String serveIndex() {
-        return "index.html";
+        return "forward:/index.html";
     }
 }
