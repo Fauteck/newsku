@@ -33,6 +33,11 @@ public class PublicMagazineController {
         this.feedItemService = feedItemService;
     }
 
+    @GetMapping("/{tabId}")
+    public MagazineTab getPublicTab(@PathVariable String tabId) {
+        return magazineTabService.getPublicTab(tabId);
+    }
+
     @GetMapping("/{tabId}/layout")
     public List<LayoutBlock> getPublicTabLayout(@PathVariable String tabId) {
         MagazineTab tab = magazineTabService.getPublicTab(tabId);

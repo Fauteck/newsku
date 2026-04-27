@@ -6,6 +6,8 @@ import 'package:app/layouts/models/layout_block.dart';
 import 'package:app/magazine/models/magazine_tab.dart';
 import 'package:http/http.dart' as http;
 
+const int _publicMaxPageSize = 2000;
+
 class MagazineTabService extends BaseService {
   @override
   final String url;
@@ -63,6 +65,13 @@ class PublicMagazineService extends BaseService {
 
   const PublicMagazineService(this.url);
 
+  Future<MagazineTab> getTab(String tabId) async {
+    final uri = await formatUrl('/api/public/magazine/$tabId');
+    final response = await http.get(uri, headers: await headers);
+    processResponse(response, logoutOn401: false);
+    return MagazineTab.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+  }
+
   Future<List<LayoutBlock>> getTabLayout(String tabId) async {
     final uri = await formatUrl('/api/public/magazine/$tabId/layout');
     final response = await http.get(uri, headers: await headers);
@@ -71,11 +80,17 @@ class PublicMagazineService extends BaseService {
     return list.map((e) => LayoutBlock.fromJson(e as Map<String, dynamic>)).toList();
   }
 
-  Future<List<FeedItem>> getItems(String tabId, {int page = 0, int pageSize = 50}) async {
-    final uri = await formatUrl('/api/public/magazine/$tabId/items', query: {
-      'page': page.toString(),
-      'pageSize': pageSize.toString(),
-    });
+  Future<List<FeedItem>> getItems(
+    String tabId, {
+    int page = 0,
+    int pageSize = _publicMaxPageSize,
+    int? from,
+    int? to,
+  }) async {
+    final query = <String, dynamic>{'page': page.toString(), 'pageSize': pageSize.toString()};
+    if (from != null) query['from'] = from.toString();
+    if (to != null) query['to'] = to.toString();
+    final uri = await formatUrl('/api/public/magazine/$tabId/items', query: query);
     final response = await http.get(uri, headers: await headers);
     processResponse(response, logoutOn401: false);
     final map = jsonDecode(response.body) as Map<String, dynamic>;
