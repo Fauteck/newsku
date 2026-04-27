@@ -42,8 +42,8 @@ public class PublicMagazineController {
     @GetMapping("/{tabId}/items")
     public PageResponse<FeedItem> getPublicTabItems(
             @PathVariable String tabId,
-            @RequestParam("from") long from,
-            @RequestParam("to") long to,
+            @RequestParam(value = "from", defaultValue = "0") long from,
+            @RequestParam(value = "to", defaultValue = "9223372036854775807") long to,
             @RequestParam(value = "page", defaultValue = "0") @Min(0) int page,
             @RequestParam(value = "pageSize", defaultValue = "100") @Min(1) @Max(2000) int pageSize
     ) {
