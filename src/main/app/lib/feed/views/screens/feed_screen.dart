@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:app/feed/models/feed_item.dart';
 import 'package:app/feed/states/main_feed.dart';
+import 'package:flutter/services.dart';
 import 'package:app/feed/views/components/date_bar.dart';
 import 'package:app/feed/views/components/feed_profile_menu.dart';
 import 'package:app/identity/states/identity.dart';
@@ -221,6 +222,18 @@ class FeedScreen extends StatelessWidget {
                                                   onPressed: () => cubit.refresh(),
                                                   icon: const Icon(Icons.refresh),
                                                 ),
+                                              if (tabsState.selectedTab?.isPublic == true && tabsState.selectedTab?.id != null)
+                                                IconButton(
+                                                  icon: const Icon(Icons.link),
+                                                  tooltip: 'Link kopieren',
+                                                  onPressed: () {
+                                                    final url = '${serverUrl ?? ''}/public/magazine/${tabsState.selectedTab!.id}';
+                                                    Clipboard.setData(ClipboardData(text: url));
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      const SnackBar(content: Text('Link kopiert'), duration: Duration(seconds: 2)),
+                                                    );
+                                                  },
+                                                ),
                                               IconButton(
                                                 key: const Key('mark-all-read-button'),
                                                 onPressed: () => _confirmMarkAllRead(context, cubit),
@@ -392,31 +405,40 @@ class _MagazineTabBar extends StatelessWidget {
     final allTabs = <MagazineTab?>[null, ...tabs];
 
     if (isMobile) {
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: pu3, vertical: pu2),
-        child: Row(
-          spacing: pu2,
-          children: allTabs.map((tab) {
-            final isSelected = tab?.id == selectedTab?.id;
-            return FilterChip(
-              label: Text(
-                tab?.name ?? 'Alle',
-                style: textTheme.labelMedium?.copyWith(
-                  color: isSelected ? colors.onSecondaryContainer : colors.onSurface,
+      return Container(
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: colors.outlineVariant, width: 1)),
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: EdgeInsets.symmetric(horizontal: pu3, vertical: pu2),
+          child: Row(
+            spacing: pu2,
+            children: allTabs.map((tab) {
+              final isSelected = tab?.id == selectedTab?.id;
+              return FilterChip(
+                label: Text(
+                  tab?.name ?? 'Alle',
+                  style: textTheme.labelMedium?.copyWith(
+                    color: isSelected ? colors.onSecondaryContainer : colors.onSurface,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
                 ),
-              ),
-              selected: isSelected,
-              onSelected: (_) => onTabSelected(tab),
-              showCheckmark: false,
-            );
-          }).toList(),
+                selected: isSelected,
+                onSelected: (_) => onTabSelected(tab),
+                showCheckmark: false,
+              );
+            }).toList(),
+          ),
         ),
       );
     }
 
     return Container(
-      color: colors.surface,
+      decoration: BoxDecoration(
+        color: colors.surface,
+        border: Border(bottom: BorderSide(color: colors.outlineVariant, width: 1)),
+      ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: pu4),
@@ -424,25 +446,25 @@ class _MagazineTabBar extends StatelessWidget {
           spacing: pu1,
           children: allTabs.map((tab) {
             final isSelected = tab?.id == selectedTab?.id;
-            return TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: isSelected ? colors.primary : colors.onSurface,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-              ),
-              onPressed: () => onTabSelected(tab),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(tab?.name ?? 'Alle', style: textTheme.labelLarge),
-                  if (isSelected)
-                    Container(
-                      height: 2,
-                      width: 24,
-                      color: colors.primary,
-                    )
-                  else
-                    SizedBox(height: 2),
-                ],
+            return InkWell(
+              onTap: () => onTabSelected(tab),
+              borderRadius: BorderRadius.circular(4),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: pu3, vertical: pu2),
+                decoration: isSelected
+                    ? BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: colors.primary, width: 2),
+                        ),
+                      )
+                    : null,
+                child: Text(
+                  tab?.name ?? 'Alle',
+                  style: textTheme.labelLarge?.copyWith(
+                    color: isSelected ? colors.primary : colors.onSurfaceVariant,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
               ),
             );
           }).toList(),
