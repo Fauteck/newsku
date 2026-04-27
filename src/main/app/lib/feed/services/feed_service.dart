@@ -190,16 +190,24 @@ class FeedService extends BaseService {
     return FeedItem.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
-  Future<List<FeedItem>> getSavedItems() async {
-    var uri = await formatUrl('/api/feeds/items/saved');
+  /// Loads saved articles via the bounded paginated endpoint so a power user
+  /// with thousands of bookmarks does not pull the entire list into memory in
+  /// a single response. Sorted by save time (most recent first); page size is
+  /// capped at the backend's @Max (500). A future change can add a "load
+  /// more" affordance once that becomes a real concern.
+  Future<List<FeedItem>> getSavedItems({int page = 0, int pageSize = 500}) async {
+    var uri = await formatUrl(
+      '/api/feeds/items/saved/page',
+      query: {'page': page, 'pageSize': pageSize, 'sort': 'savedAt', 'direction': 'desc'},
+    );
 
     var response = await http.get(uri, headers: await headers);
 
     processResponse(response);
 
-    Iterable json = jsonDecode(response.body);
-
-    return json.map((e) => FeedItem.fromJson(e as Map<String, dynamic>)).toList();
+    final json = jsonDecode(response.body) as Map<String, dynamic>;
+    final content = (json['content'] as List?) ?? const [];
+    return content.map((e) => FeedItem.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   Future<List<FeedCategory>> getFeedCategories() async {
