@@ -9,6 +9,7 @@ import 'package:app/settings/views/tabs/info.dart';
 import 'package:app/settings/views/tabs/layout.dart';
 import 'package:app/settings/views/tabs/user.dart';
 import 'package:app/utils/models/breakpoints.dart';
+import 'package:app/utils/views/components/app_name.dart';
 import 'package:app/utils/views/components/mobile_bottom_nav.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,7 @@ class SettingsScreen extends StatelessWidget {
         length: 6,
         child: Scaffold(
           appBar: AppBar(
-            title: Text(locals.settings),
+            title: AppName(style: Theme.of(context).textTheme.titleMedium),
             automaticallyImplyLeading: false,
             leading: BackButton(
               onPressed: () => AutoRouter.of(context).navigate(const HomeRoute(children: [FeedRoute()])),

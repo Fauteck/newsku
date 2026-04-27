@@ -27,12 +27,21 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+  <link rel="icon" type="image/png" href="icons/icon-192.png"/>
 
   <title>Feedteck</title>
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <script>
+    // Re-dispatch 'change' events as 'input' so password managers (Bitwarden,
+    // 1Password, etc.) that fire 'change' on autofill are picked up by Flutter.
+    document.addEventListener('change', function(e) {
+      if (e.target instanceof HTMLInputElement) {
+        e.target.dispatchEvent(new InputEvent('input', { bubbles: true, data: e.target.value }));
+      }
+    }, true);
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

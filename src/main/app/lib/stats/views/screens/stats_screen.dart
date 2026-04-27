@@ -4,6 +4,7 @@ import 'package:app/router.dart';
 import 'package:app/stats/states/stats_state.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
+import 'package:app/utils/views/components/app_name.dart';
 import 'package:app/utils/views/components/conditional_wrap.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:auto_route/auto_route.dart';
@@ -26,7 +27,7 @@ class StatsScreen extends StatelessWidget {
       routes: [TagStatsRoute(), FeedStatsRoute(), AiStatsRoute()],
       builder: (context, child, tabController) => Scaffold(
         appBar: AppBar(
-          title: Text(locals.stats),
+          title: AppName(style: Theme.of(context).textTheme.titleMedium),
           automaticallyImplyLeading: false,
           leading: BackButton(
             onPressed: () => AutoRouter.of(context)

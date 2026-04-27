@@ -7,6 +7,7 @@ import 'package:app/l10n/app_localizations.dart';
 import 'package:app/router.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
+import 'package:app/utils/views/components/app_name.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,7 +42,7 @@ class ClassicFeedScreen extends StatelessWidget {
                       onPressed: () => AutoRouter.of(context)
                           .navigate(const HomeRoute(children: [FeedRoute()])),
                     ),
-                    title: Text(locals.classicFeedsTitle),
+                    title: AppName(style: textTheme.titleMedium),
                     actions: isMobile
                         ? [const FeedProfileMenu()]
                         : [

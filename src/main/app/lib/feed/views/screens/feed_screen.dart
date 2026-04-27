@@ -234,9 +234,7 @@ class FeedScreen extends StatelessWidget {
                                                         label: Text(locals.search),
                                                       ),
                                                     )
-                                                  : isMobile
-                                                  ? AppName(style: textTheme.titleMedium)
-                                                  : const SizedBox.shrink(),
+                                                  : AppName(style: textTheme.titleMedium),
                                             ),
                                             actions: [
                                               if (state.searchMode)
