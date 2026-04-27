@@ -45,7 +45,7 @@ public class FeedItemControllerTest extends TestContainerTest {
         feedItemController.readArticles(items.getContent().stream().map(FeedItem::getId).toList());
 
 
-        items = feedItemController.getItems(0L, System.currentTimeMillis(), 0, 9999999, null, null, null, null);
+        items = feedItemController.getItems(0L, System.currentTimeMillis(), 0, 2000, null, null, null, null);
         assertTrue(items.getContent().stream().allMatch(FeedItem::isRead));
     }
 }

@@ -49,7 +49,7 @@ public class FeedItemController {
             @RequestParam("from") Long from,
             @RequestParam("to") Long to,
             @RequestParam(value = "page", defaultValue = "0") @Min(0) int page,
-            @RequestParam(value = "pageSize", defaultValue = "100") @Min(1) @Max(500) int pageSize,
+            @RequestParam(value = "pageSize", defaultValue = "100") @Min(1) @Max(2000) int pageSize,
             @RequestParam(value = "minimumImportance", required = false) Integer minimumImportance,
             @RequestParam(value = "sort", required = false) String sort,
             @RequestParam(value = "feedId", required = false) String feedId,

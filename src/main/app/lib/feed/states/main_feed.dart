@@ -174,7 +174,7 @@ class MainFeedCubit extends Cubit<MainFeedState> {
         await service
             .getFeedItems(
               page: 0,
-              pageSize: 999999,
+              pageSize: 2000,
               from: from.millisecondsSinceEpoch,
               to: now.millisecondsSinceEpoch,
               minimumImportance: activeTab?.minimumImportance,
