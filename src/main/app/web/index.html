@@ -27,6 +27,7 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
 
   <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="feedteck.svg"/>
   <link rel="icon" type="image/png" href="icons/icon-192.png"/>
 
   <title>Feedteck</title>
@@ -41,6 +42,23 @@
         e.target.dispatchEvent(new InputEvent('input', { bubbles: true, data: e.target.value }));
       }
     }, true);
+
+    // Polling fallback: detect value changes on autocomplete inputs that password
+    // managers set directly without dispatching any DOM events (e.g. Bitwarden).
+    (function() {
+      var prev = new WeakMap();
+      setInterval(function() {
+        document.querySelectorAll('input[autocomplete]').forEach(function(el) {
+          var current = el.value;
+          if (prev.get(el) !== current) {
+            prev.set(el, current);
+            if (current) {
+              el.dispatchEvent(new InputEvent('input', { bubbles: true, data: current }));
+            }
+          }
+        });
+      }, 300);
+    })();
   </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>

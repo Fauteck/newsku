@@ -5,7 +5,6 @@ import 'package:app/feed/models/feed_item.dart';
 import 'package:app/feed/states/main_feed.dart';
 import 'package:app/feed/views/components/date_bar.dart';
 import 'package:app/feed/views/components/feed_profile_menu.dart';
-import 'package:app/feed/views/components/search_result.dart';
 import 'package:app/identity/states/identity.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/layouts/models/layout_block.dart';
@@ -15,7 +14,6 @@ import 'package:app/router.dart';
 import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/app_name.dart';
-import 'package:app/utils/views/components/conditional_wrap.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:app/utils/views/components/main_color_provider.dart';
 import 'package:auto_route/auto_route.dart';
@@ -203,101 +201,36 @@ class FeedScreen extends StatelessWidget {
                                             snap: true,
                                             elevation: 0,
                                             scrolledUnderElevation: 0,
-                                            centerTitle: isMobile,
-                                            leading: isMobile
-                                                ? IconButton(
-                                                    onPressed: () => AutoRouter.of(
-                                                      context,
-                                                    ).push(SettingsRoute()).then((_) => cubit.refresh()),
-                                                    icon: ConditionalWrap(
-                                                      wrapIf: state.errorCount > 0,
-                                                      wrapper: (child) => Badge(
-                                                        offset: const Offset(5, 0),
-                                                        backgroundColor: colors.errorContainer,
-                                                        textColor: colors.error,
-                                                        label: Text('${state.errorCount}'),
-                                                        child: child,
-                                                      ),
-                                                      child: const Icon(Icons.settings_outlined),
-                                                    ),
-                                                  )
-                                                : null,
-                                            title: AnimatedSwitcher(
-                                              duration: Duration(milliseconds: 250),
-                                              child: state.searchMode
-                                                  ? TextField(
-                                                      controller: cubit.searchController,
-                                                      autofocus: true,
-                                                      onChanged: (value) => cubit.search(value),
-                                                      decoration: InputDecoration(
-                                                        border: UnderlineInputBorder(),
-                                                        label: Text(locals.search),
-                                                      ),
-                                                    )
-                                                  : AppName(style: textTheme.titleMedium),
+                                            automaticallyImplyLeading: false,
+                                            title: AppName(
+                                              style: textTheme.titleMedium,
+                                              onTap: () => AutoRouter.of(context).navigate(const HomeRoute(children: [FeedRoute()])),
                                             ),
                                             actions: [
-                                              if (state.searchMode)
-                                                IconButton(
-                                                  onPressed: () => cubit.setSearch(false),
-                                                  icon: Icon(Icons.close),
-                                                )
-                                              else if (isMobile) ...[
-                                                IconButton(
-                                                  key: Key('saved-filter-button'),
-                                                  onPressed: () => cubit.setSavedFilter(!state.showSavedOnly),
-                                                  icon: Icon(
-                                                    state.showSavedOnly ? Icons.bookmarks : Icons.bookmarks_outlined,
-                                                    color: state.showSavedOnly ? colors.primary : null,
-                                                  ),
-                                                  tooltip: locals.savedArticles,
+                                              IconButton(
+                                                key: Key('saved-filter-button'),
+                                                onPressed: () => cubit.setSavedFilter(!state.showSavedOnly),
+                                                icon: Icon(
+                                                  state.showSavedOnly ? Icons.bookmarks : Icons.bookmarks_outlined,
+                                                  color: state.showSavedOnly ? colors.primary : null,
                                                 ),
-                                                IconButton(
-                                                  key: const Key('mark-all-read-button'),
-                                                  onPressed: () => _confirmMarkAllRead(context, cubit),
-                                                  icon: const Icon(Icons.done_all),
-                                                  tooltip: locals.markAllAsRead,
-                                                ),
-                                                IconButton(
-                                                  onPressed: () => cubit.setSearch(true),
-                                                  icon: const Icon(Icons.search),
-                                                ),
-                                              ] else ...[
-                                                IconButton(
-                                                  onPressed: () => cubit.setSearch(true),
-                                                  icon: const Icon(Icons.search),
-                                                ),
-                                                IconButton(
-                                                  key: const Key('feeds-button'),
-                                                  onPressed: () =>
-                                                      AutoRouter.of(context).push(const ClassicFeedRoute()),
-                                                  icon: const Icon(Icons.rss_feed_outlined),
-                                                  tooltip: locals.classicFeedsTitle,
-                                                ),
-                                                IconButton(
-                                                  key: const Key('saved-filter-button'),
-                                                  onPressed: () => cubit.setSavedFilter(!state.showSavedOnly),
-                                                  icon: Icon(
-                                                    state.showSavedOnly ? Icons.bookmarks : Icons.bookmarks_outlined,
-                                                    color: state.showSavedOnly ? colors.primary : null,
-                                                  ),
-                                                  tooltip: locals.savedArticles,
-                                                ),
+                                                tooltip: locals.savedArticles,
+                                              ),
+                                              if (!isMobile)
                                                 IconButton(
                                                   onPressed: () => cubit.refresh(),
                                                   icon: const Icon(Icons.refresh),
                                                 ),
-                                                IconButton(
-                                                  key: const Key('mark-all-read-button-desktop'),
-                                                  onPressed: () => _confirmMarkAllRead(context, cubit),
-                                                  icon: const Icon(Icons.done_all),
-                                                  tooltip: locals.markAllAsRead,
-                                                ),
-                                                FeedProfileMenu(
-                                                  errorCount: state.errorCount,
-                                                  onSettingsClosed: () => cubit.refresh(),
-                                                ),
-                                              ],
+                                              IconButton(
+                                                key: const Key('mark-all-read-button'),
+                                                onPressed: () => _confirmMarkAllRead(context, cubit),
+                                                icon: const Icon(Icons.done_all),
+                                                tooltip: locals.markAllAsRead,
+                                              ),
+                                              FeedProfileMenu(
+                                                errorCount: state.errorCount,
+                                                onSettingsClosed: () => cubit.refresh(),
+                                              ),
                                             ],
                                           ),
                                           if (tabsState.tabs.isNotEmpty)
@@ -312,23 +245,7 @@ class FeedScreen extends StatelessWidget {
                                                 },
                                               ),
                                             ),
-                                          if (state.searchMode)
-                                            SliverPadding(
-                                              padding: .symmetric(horizontal: padding),
-                                              sliver: SliverList.builder(
-                                                itemCount: state.searchResults.length,
-                                                itemBuilder: (context, index) {
-                                                  return SearchResult(
-                                                    key: ValueKey(state.searchResults[index]),
-                                                    item: state.searchResults[index],
-                                                    fullDate: true,
-                                                    noDimming: true,
-                                                  );
-                                                },
-                                              ),
-                                            )
-                                          else
-                                            ...state.items.keys.expand((value) {
+                                          ...state.items.keys.expand((value) {
                                               var feed = state.items[value] ?? [];
                                               final totalItemCount = feed.length;
                                               // if the user wants ti hide read item, we do so
@@ -399,17 +316,11 @@ class FeedScreen extends StatelessWidget {
                                                 child: SizedBox(width: 50, height: 50, child: LoadingIndicator()),
                                               ),
                                             )
-                                          else if (!state.showSavedOnly &&
-                                              (!state.searchMode ||
-                                                  (state.searchMode &&
-                                                      state.searchResults.length ==
-                                                          searchPageSize * (state.searchPage + 1))))
+                                          else if (!state.showSavedOnly)
                                             SliverToBoxAdapter(
                                               child: Center(
                                                 child: FilledButton.tonalIcon(
-                                                  onPressed: () => state.searchMode
-                                                      ? cubit.loadMoreSearchResults()
-                                                      : cubit.getFeed(),
+                                                  onPressed: () => cubit.getFeed(),
                                                   label: Text(locals.loadMore),
                                                   icon: Icon(Icons.expand_more),
                                                 ),
