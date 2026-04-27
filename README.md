@@ -1,4 +1,4 @@
-# Newsku — fauteck Fork
+# Feedteck
 
 [![Build](https://github.com/fauteck/newsku/actions/workflows/build-docker.yml/badge.svg)](https://github.com/fauteck/newsku/actions/workflows/build-docker.yml)
 [![License](https://img.shields.io/github/license/fauteck/newsku)](LICENSE)

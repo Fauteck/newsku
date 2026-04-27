@@ -72,7 +72,7 @@ class _PublicMagazineScreenState extends State<PublicMagazineScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Newsku'),
+        title: const Text('Feedteck'),
         actions: [
           BlocBuilder<IdentityCubit, IdentityState>(
             bloc: getIt.get<IdentityCubit>(),

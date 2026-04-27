@@ -6,6 +6,7 @@ import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:logging/logging.dart';
@@ -13,8 +14,23 @@ import 'package:logging/logging.dart';
 final _log = Logger('LoginFormScreen');
 
 @RoutePage()
-class LoginFormScreen extends StatelessWidget {
+class LoginFormScreen extends StatefulWidget {
   const LoginFormScreen({super.key});
+
+  @override
+  State<LoginFormScreen> createState() => _LoginFormScreenState();
+}
+
+class _LoginFormScreenState extends State<LoginFormScreen> {
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,93 +47,101 @@ class LoginFormScreen extends StatelessWidget {
           return ErrorHandler<LoginCubit, LoginState>(
             child: Padding(
               padding: .only(right: pu6),
-              child: Column(
-                crossAxisAlignment: .center,
-                mainAxisAlignment: .center,
-                children: [
-                  TextField(
-                    key: Key('username'),
-                    decoration: InputDecoration(labelText: locals.username),
-                    onChanged: (value) => cubit.setUser(value),
-                    autofillHints: [AutofillHints.username],
-                    autocorrect: false,
-                  ),
-                  Gap(pu4),
-                  TextField(
-                    key: Key('password'),
-                    decoration: InputDecoration(labelText: locals.password),
-                    obscureText: true,
-                    onChanged: (value) => cubit.setPassword(value),
-                    autofillHints: [AutofillHints.password],
-                    autocorrect: false,
-                  ),
-                  if (state.failedLogin) ...[
+              child: AutofillGroup(
+                child: Column(
+                  crossAxisAlignment: .center,
+                  mainAxisAlignment: .center,
+                  children: [
+                    TextField(
+                      key: Key('username'),
+                      controller: _usernameController,
+                      decoration: InputDecoration(labelText: locals.username),
+                      onChanged: (value) => cubit.setUser(value),
+                      autofillHints: [AutofillHints.username],
+                      autocorrect: false,
+                    ),
                     Gap(pu4),
-                    Text(locals.invalidCredentials, style: textTheme.bodyMedium?.copyWith(color: colors.error)),
+                    TextField(
+                      key: Key('password'),
+                      controller: _passwordController,
+                      decoration: InputDecoration(labelText: locals.password),
+                      obscureText: true,
+                      onChanged: (value) => cubit.setPassword(value),
+                      autofillHints: [AutofillHints.password],
+                      autocorrect: false,
+                    ),
+                    if (state.failedLogin) ...[
+                      Gap(pu4),
+                      Text(locals.invalidCredentials, style: textTheme.bodyMedium?.copyWith(color: colors.error)),
+                      Gap(pu4),
+                    ],
                     Gap(pu4),
-                  ],
-                  Gap(pu4),
-                  Row(
-                    mainAxisAlignment: .spaceBetween,
-                    children: [
-                      if ((config?.allowSignup ?? false) && !(config?.demoMode ?? false))
-                        TextButton(
-                          onPressed: () => AutoRouter.of(context).replace(SignupFormRoute()),
-                          child: Text(locals.signUp),
-                        ),
-                      Spacer(),
-                      FilledButton.tonalIcon(
-                        key: Key('login-button'),
-                        onPressed: state.loading
-                            ? null
-                            : () async {
-                                try {
-                                  cubit.setLoading(true);
-                                  var token = await cubit.login();
-                                  if (context.mounted) {
-                                    await context.read<IdentityCubit>().setToken(token);
+                    Row(
+                      mainAxisAlignment: .spaceBetween,
+                      children: [
+                        if ((config?.allowSignup ?? false) && !(config?.demoMode ?? false))
+                          TextButton(
+                            onPressed: () => AutoRouter.of(context).replace(SignupFormRoute()),
+                            child: Text(locals.signUp),
+                          ),
+                        Spacer(),
+                        FilledButton.tonalIcon(
+                          key: Key('login-button'),
+                          onPressed: state.loading
+                              ? null
+                              : () async {
+                                  try {
+                                    cubit.setLoading(true);
+                                    // Sync controller values in case autofill bypassed onChanged
+                                    cubit.setUser(_usernameController.text);
+                                    cubit.setPassword(_passwordController.text);
+                                    var token = await cubit.login();
+                                    TextInput.finishAutofillContext();
                                     if (context.mounted) {
-                                      AutoRouter.of(context).replaceAll([HomeRoute()]);
+                                      await context.read<IdentityCubit>().setToken(token);
+                                      if (context.mounted) {
+                                        AutoRouter.of(context).replaceAll([HomeRoute()]);
+                                      }
+                                    }
+                                  } catch (e) {
+                                    _log.severe('Log in failed', e);
+                                  } finally {
+                                    if (context.mounted) {
+                                      cubit.setLoading(false);
                                     }
                                   }
-                                } catch (e) {
-                                  _log.severe('Log in failed', e);
-                                } finally {
-                                  if (context.mounted) {
-                                    cubit.setLoading(false);
-                                  }
-                                }
-                              },
-                        label: Text(locals.login),
-                        icon: Icon(Icons.login),
+                                },
+                          label: Text(locals.login),
+                          icon: Icon(Icons.login),
+                        ),
+                      ],
+                    ),
+                    if (config?.oidcConfig != null) ...[
+                      Text(locals.or),
+                      Gap(pu2),
+                      FilledButton.tonal(
+                        onPressed: () async {
+                          final token = await cubit.logInWithOidc();
+
+                          if (context.mounted) {
+                            await context.read<IdentityCubit>().setToken(token);
+                            if (context.mounted) {
+                              AutoRouter.of(context).replaceAll([HomeRoute()]);
+                            }
+                          }
+                        },
+                        child: Text(locals.loginWith(config?.oidcConfig?.name ?? '')),
                       ),
                     ],
-                  ),
-                  if (config?.oidcConfig != null) ...[
-                    Text(locals.or),
-                    Gap(pu2),
-                    FilledButton.tonal(
-                      onPressed: () async {
-                        final token = await cubit.logInWithOidc();
-
-                        if (context.mounted) {
-                          await context.read<IdentityCubit>().setToken(token);
-                          if (context.mounted) {
-                            AutoRouter.of(context).replaceAll([HomeRoute()]);
-                          }
-                        }
-                      },
-                      child: Text(locals.loginWith(config?.oidcConfig?.name ?? '')),
-                    ),
+                    if (config?.canResetPassword ?? false) ...[
+                      Gap(pu2),
+                      TextButton(
+                        onPressed: () => AutoRouter.of(context).push(ForgotPasswordRoute()),
+                        child: Text(locals.forgotPassword),
+                      ),
+                    ],
                   ],
-                  if (config?.canResetPassword ?? false) ...[
-                    Gap(pu2),
-                    TextButton(
-                      onPressed: () => AutoRouter.of(context).push(ForgotPasswordRoute()),
-                      child: Text(locals.forgotPassword),
-                    ),
-                  ],
-                ],
+                ),
               ),
             ),
           );

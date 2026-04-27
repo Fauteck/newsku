@@ -73,7 +73,7 @@
     "done": "Fertig",
     "back": "Zurück",
     "setupComplete": "Einrichtung abgeschlossen!",
-    "welcomeText": "Willkommen bei Newsku!\n\nDiese Einrichtung hilft dir bei der Erstkonfiguration. Alle Einstellungen können später im Einstellungsmenü angepasst werden.",
+    "welcomeText": "Willkommen bei Feedteck!\n\nDiese Einrichtung hilft dir bei der Erstkonfiguration. Alle Einstellungen können später im Einstellungsmenü angepasst werden.",
     "noFeeds": "Noch keine Feeds vorhanden. Füge einen Feed über die URL hinzu oder importiere eine OPML-Datei",
     "addBlock": "Block hinzufügen",
     "selectBlock": "Block-Typ für das Layout auswählen",

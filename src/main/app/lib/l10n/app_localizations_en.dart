@@ -275,7 +275,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get welcomeText =>
-      'Welcome to Newsku!\n\nThis walkthrough will help you complete the initial configuration of the application.You can adjust any of these settings later in the Application Settings menu.';
+      'Welcome to Feedteck!\n\nThis walkthrough will help you complete the initial configuration of the application.You can adjust any of these settings later in the Application Settings menu.';
 
   @override
   String get noFeeds => 'No feeds added, either add a feed via its url or import an OPML file';

@@ -538,7 +538,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeText.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Newsku!\n\nThis walkthrough will help you complete the initial configuration of the application.You can adjust any of these settings later in the Application Settings menu.'**
+  /// **'Welcome to Feedteck!\n\nThis walkthrough will help you complete the initial configuration of the application.You can adjust any of these settings later in the Application Settings menu.'**
   String get welcomeText;
 
   /// No description provided for @noFeeds.

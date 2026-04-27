@@ -27,7 +27,7 @@ void main() {
     await tester.pumpAndSettle();
     // await snap();
     final dialog = find.byType(Dialog);
-    expect(find.descendant(of: dialog, matching: find.textContaining('Welcome to Newsku!')), findsNothing);
+    expect(find.descendant(of: dialog, matching: find.textContaining('Welcome to Feedteck!')), findsNothing);
   });
 
   testWidgets('Test if the first time setup dialog shows up', (WidgetTester tester) async {
@@ -43,7 +43,7 @@ void main() {
 
     final dialog = find.byType(Dialog);
     expect(dialog, findsOneWidget);
-    expect(find.descendant(of: dialog, matching: find.textContaining('Welcome to Newsku!')), findsOneWidget);
+    expect(find.descendant(of: dialog, matching: find.textContaining('Welcome to Feedteck!')), findsOneWidget);
   });
 
   testWidgets('Test the proper walkthrough of the first time setup to make sure all steps work fine', (
@@ -67,7 +67,7 @@ void main() {
     final doneButton = find.descendant(of: dialog, matching: find.byKey(Key('done')));
 
     // in the first step we should just have the welcome text
-    expect(find.descendant(of: dialog, matching: find.textContaining('Welcome to Newsku!')), findsOneWidget);
+    expect(find.descendant(of: dialog, matching: find.textContaining('Welcome to Feedteck!')), findsOneWidget);
 
     expect(nextButton, findsOneWidget);
     expect(backButton, findsOneWidget);

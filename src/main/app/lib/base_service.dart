@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:app/identity/states/identity.dart';
 import 'package:app/main.dart';
-import 'package:app/utils/models/newsku_error.dart';
+import 'package:app/utils/models/feedteck_error.dart';
 import 'package:app/utils/service/token_store.dart';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
@@ -70,15 +70,15 @@ abstract class BaseService {
     _processStatusCode(response.statusCode, body: response.body, logoutOn401: logoutOn401);
   }
 
-  void _processNewskuError(String? body) {
+  void _processFeedteckError(String? body) {
     if (body == null) {
       return;
     }
-    late NewskuError error;
+    late FeedteckError error;
     try {
-      error = NewskuError.fromJson(jsonDecode(body));
+      error = FeedteckError.fromJson(jsonDecode(body));
     } catch (e) {
-      _log.fine("Not a Newsku error");
+      _log.fine("Not a Feedteck error");
       return;
     }
     throw error;
@@ -92,10 +92,10 @@ abstract class BaseService {
         if (logoutOn401) {
           getIt.get<IdentityCubit>().logout();
         }
-        _processNewskuError(body);
+        _processFeedteckError(body);
         throw Exception("Couldn't execute request, unauthorized}");
       default:
-        _processNewskuError(body);
+        _processFeedteckError(body);
         throw Exception("Couldn't execute request $statusCode -> $body");
     }
   }
