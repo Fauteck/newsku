@@ -69,12 +69,12 @@ class SignupFormScreen extends StatelessWidget {
                     onChanged: (value) => cubit.setRepeatPassword(value),
                     autocorrect: false,
                   ),
-                  Gap(pu4),
-                  if (state.password != state.repeatPassword) ...[
+                  if ((state.repeatPassword ?? '').isNotEmpty &&
+                      state.password != state.repeatPassword) ...[
                     Gap(pu),
                     Text(locals.passwordsNotMatch, style: textTheme.bodyMedium?.copyWith(color: colors.error)),
-                    Gap(pu4),
                   ],
+                  Gap(pu4),
                   Row(
                     children: [
                       TextButton(
