@@ -29,7 +29,7 @@ public class SearchController {
 
 
     @GetMapping
-    public List<FeedItem> seeach(
+    public List<FeedItem> search(
             @RequestParam("query") String query,
             @RequestParam(value = "page", defaultValue = "0") @Min(0) int page,
             @RequestParam(value = "pageSize", defaultValue = "100") @Min(1) @Max(500) int size) {

@@ -48,7 +48,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get email => 'Email';
 
   @override
-  String get repeatPassword => 'RepeatPassword';
+  String get repeatPassword => 'Repeat password';
 
   @override
   String get passwordsNotMatch => 'Passwords do not match';

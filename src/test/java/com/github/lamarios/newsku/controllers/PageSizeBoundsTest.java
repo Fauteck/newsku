@@ -42,7 +42,7 @@ public class PageSizeBoundsTest extends TestContainerTest {
     @Test
     public void searchController_rejects_pageSize_above_max() {
         assertThrows(ConstraintViolationException.class,
-                () -> searchController.seeach("anything", 0, 501));
+                () -> searchController.search("anything", 0, 501));
     }
 
     @Test
