@@ -8,7 +8,10 @@ import com.github.lamarios.newsku.services.FeedItemService;
 import com.github.lamarios.newsku.services.LayoutService;
 import com.github.lamarios.newsku.services.MagazineTabService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/public/magazine")
 @Tag(name = "Public Magazine")
+@Validated
 public class PublicMagazineController {
 
     private final MagazineTabService magazineTabService;
@@ -40,8 +44,8 @@ public class PublicMagazineController {
             @PathVariable String tabId,
             @RequestParam("from") long from,
             @RequestParam("to") long to,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "pageSize", defaultValue = "100") int pageSize
+            @RequestParam(value = "page", defaultValue = "0") @Min(0) int page,
+            @RequestParam(value = "pageSize", defaultValue = "100") @Min(1) @Max(500) int pageSize
     ) {
         MagazineTab tab = magazineTabService.getPublicTab(tabId);
         return PageResponse.of(feedItemService.getPublicItems(tab, from, to, page, pageSize));

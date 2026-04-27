@@ -35,7 +35,7 @@ public class FeedItemControllerTest extends TestContainerTest {
 
         feedItemService.refreshFeedWorker(feed);
 
-        var items = feedItemController.getItems(0L, System.currentTimeMillis(), 0, 9999999, null, null, null, null);
+        var items = feedItemController.getItems(0L, System.currentTimeMillis(), 0, 500, null, null, null, null);
 
         assertTrue(items.hasContent());
 

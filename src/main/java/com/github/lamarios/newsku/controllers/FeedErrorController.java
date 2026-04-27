@@ -7,7 +7,10 @@ import com.github.lamarios.newsku.services.FeedService;
 import com.github.lamarios.newsku.services.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +19,7 @@ import java.util.List;
 @RequestMapping("/api/feed-errors")
 @Tag(name = "FeedsErrors")
 @SecurityRequirement(name = "bearerAuth")
+@Validated
 public class FeedErrorController {
 
     private final FeedService feedService;
@@ -36,7 +40,10 @@ public class FeedErrorController {
     }
 
     @GetMapping("{id}")
-    public PageResponse<FeedError> getErrors(@PathVariable("id") String feedId, @RequestParam("page") int page, @RequestParam("pageSize") int pageSize) {
+    public PageResponse<FeedError> getErrors(
+            @PathVariable("id") String feedId,
+            @RequestParam(value = "page", defaultValue = "0") @Min(0) int page,
+            @RequestParam(value = "pageSize", defaultValue = "100") @Min(1) @Max(500) int pageSize) {
         var feed = feedService.getFeed(feedId);
         if (feed == null) {
             return new PageResponse<>(List.of(), 0, 0, 0, 0);

@@ -5,6 +5,7 @@ import com.github.lamarios.newsku.persistence.entities.FeedItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -28,6 +29,8 @@ public interface FeedItemRepository extends JpaRepository<FeedItem, String> {
 
     List<FeedItem> findBySavedTrueAndFeedIn(Collection<Feed> feeds);
 
+    Page<FeedItem> findBySavedTrueAndFeedIn(Collection<Feed> feeds, Pageable pageable);
+
     // Spring Data interprets the "GR" prefix as an acronym and would look up a
     // non-existent "GReaderItemId" property, so the JPQL is written by hand.
     @Query("select i from FeedItem i where i.gReaderItemId = :gReaderItemId")
@@ -35,4 +38,15 @@ public interface FeedItemRepository extends JpaRepository<FeedItem, String> {
 
     @Query("select i from FeedItem i where i.gReaderItemId in :gReaderItemIds and i.feed in :feeds")
     List<FeedItem> findByGReaderItemIdInAndFeedIn(@Param("gReaderItemIds") Collection<String> gReaderItemIds, @Param("feeds") Collection<Feed> feeds);
+
+    // F2: Bulk mark-as-read. Two-step: first collect the GReader IDs we are
+    // about to flip (so we can sync them upstream), then run the UPDATE in
+    // one statement instead of N individual SQL writes.
+
+    @Query("select i.gReaderItemId from FeedItem i where i.read = false and i.feed in :feeds and i.timeCreated <= :before and i.gReaderItemId is not null")
+    List<String> findUnreadGReaderIdsBefore(@Param("feeds") Collection<Feed> feeds, @Param("before") long before);
+
+    @Modifying
+    @Query("update FeedItem i set i.read = true where i.read = false and i.feed in :feeds and i.timeCreated <= :before")
+    int markAllReadBefore(@Param("feeds") Collection<Feed> feeds, @Param("before") long before);
 }

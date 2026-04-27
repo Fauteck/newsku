@@ -3,6 +3,7 @@ package com.github.lamarios.newsku.persistence.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.lamarios.newsku.models.EmailDigestFrequency;
 import com.github.lamarios.newsku.models.ReadItemHandling;
+import com.github.lamarios.newsku.models.SyncStatus;
 import com.github.lamarios.newsku.persistence.converters.StringCryptoConverter;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -80,6 +81,16 @@ public class User {
 
     @Column(name = "ai_enabled_since")
     private Long aiEnabledSince;
+
+    @Column(name = "last_sync_time")
+    private Long lastSyncTime;
+
+    @Column(name = "last_sync_status")
+    @Enumerated(EnumType.STRING)
+    private SyncStatus lastSyncStatus;
+
+    @Column(name = "last_sync_error_message")
+    private String lastSyncErrorMessage;
 
     public String getId() {
         return id;
@@ -260,5 +271,29 @@ public class User {
 
     public void setAiEnabledSince(Long aiEnabledSince) {
         this.aiEnabledSince = aiEnabledSince;
+    }
+
+    public Long getLastSyncTime() {
+        return lastSyncTime;
+    }
+
+    public void setLastSyncTime(Long lastSyncTime) {
+        this.lastSyncTime = lastSyncTime;
+    }
+
+    public SyncStatus getLastSyncStatus() {
+        return lastSyncStatus;
+    }
+
+    public void setLastSyncStatus(SyncStatus lastSyncStatus) {
+        this.lastSyncStatus = lastSyncStatus;
+    }
+
+    public String getLastSyncErrorMessage() {
+        return lastSyncErrorMessage;
+    }
+
+    public void setLastSyncErrorMessage(String lastSyncErrorMessage) {
+        this.lastSyncErrorMessage = lastSyncErrorMessage;
     }
 }

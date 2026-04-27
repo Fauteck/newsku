@@ -33,6 +33,14 @@ public class FeedItem {
     private boolean read;
     private boolean saved;
 
+    /**
+     * Epoch-millis at which the item was last marked as saved. Set automatically
+     * by {@link #setSaved(boolean)} so callers (UI toggle, GReader starred sync)
+     * never have to remember it. Null when the item has never been saved.
+     */
+    @Column(name = "saved_at")
+    private Long savedAt;
+
     @Column(name = "freshrss_item_id")
     private String gReaderItemId;
 
@@ -144,7 +152,20 @@ public class FeedItem {
     }
 
     public void setSaved(boolean saved) {
+        if (saved && !this.saved) {
+            this.savedAt = System.currentTimeMillis();
+        } else if (!saved) {
+            this.savedAt = null;
+        }
         this.saved = saved;
+    }
+
+    public Long getSavedAt() {
+        return savedAt;
+    }
+
+    public void setSavedAt(Long savedAt) {
+        this.savedAt = savedAt;
     }
 
     public List<String> getTags() {

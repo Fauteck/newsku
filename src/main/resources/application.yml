@@ -27,6 +27,16 @@ spring:
         order_inserts: true
         order_updates: true
         batch_versioned_data: true
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    # Don't try fetching the spec from a remote URL on first load
+    url: /v3/api-docs
+
 logging:
   level:
     org.springframework.boot.autoconfigure.flyway: INFO

@@ -2,6 +2,7 @@ package com.github.lamarios.newsku.services;
 
 import com.github.lamarios.newsku.Constants;
 import com.github.lamarios.newsku.errors.NewskuException;
+import com.github.lamarios.newsku.models.SyncStatus;
 import com.github.lamarios.newsku.models.greader.GReaderStreamContents;
 import com.github.lamarios.newsku.models.greader.GReaderStreamItem;
 import com.github.lamarios.newsku.models.greader.GReaderSubscription;
@@ -98,6 +99,7 @@ public class GReaderSyncService {
                 syncUser(user);
             } catch (Exception e) {
                 logger.error("GReader sync failed for user {}: {}", user.getUsername(), e.getMessage(), e);
+                recordSyncFailure(user, e);
             }
         }
     }
@@ -116,13 +118,18 @@ public class GReaderSyncService {
         if (!gReaderApiService.isCredentialsConfigured(user)) {
             throw new NewskuException("GReader credentials not configured");
         }
+        markSyncRunning(user);
         try {
             syncCategoriesStrict(user);
             syncFeedsStrict(user);
+            // Articles + starred run async; flip to SUCCESS only after they finish.
+            // Until then status stays RUNNING (cleared in syncArticlesAsync).
         } catch (NewskuException e) {
+            recordSyncFailure(user, e);
             throw e;
         } catch (Exception e) {
             logger.error("On-demand GReader sync failed for user {}: {}", user.getUsername(), e.getMessage(), e);
+            recordSyncFailure(user, e);
             String msg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
             throw new NewskuException("GReader sync failed: " + msg);
         }
@@ -143,29 +150,50 @@ public class GReaderSyncService {
         // syncArticles() no longer causes syncStarredItems() to be skipped.
         // Per-phase outcomes are logged with a structured "phase=" marker
         // so operators can slice logs per sync step.
+        boolean anyPhaseFailed = false;
+        Exception lastFailure = null;
         try {
             logger.info("Starting background article sync for user {}", user.getUsername());
 
-            runSyncPhase("articles", user, () -> syncArticles(user));
-            runSyncPhase("starred", user, () -> syncStarredItems(user));
+            Exception articlesEx = runSyncPhase("articles", user, () -> syncArticles(user));
+            Exception starredEx = runSyncPhase("starred", user, () -> syncStarredItems(user));
+            if (articlesEx != null || starredEx != null) {
+                anyPhaseFailed = true;
+                lastFailure = starredEx != null ? starredEx : articlesEx;
+            }
 
             logger.info("Background article sync complete for user {}", user.getUsername());
         } finally {
             articlesyncInProgress.remove(userId);
+            if (anyPhaseFailed) {
+                if (lastFailure != null) {
+                    recordSyncFailure(user, lastFailure);
+                }
+                User reload = userRepository.findById(userId).orElse(user);
+                reload.setLastSyncStatus(SyncStatus.PARTIAL);
+                try {
+                    userRepository.save(reload);
+                } catch (Exception ignored) {
+                }
+            } else {
+                recordSyncSuccess(user);
+            }
         }
     }
 
-    private void runSyncPhase(String phase, User user, Runnable task) {
+    private Exception runSyncPhase(String phase, User user, Runnable task) {
         long start = System.currentTimeMillis();
         try {
             task.run();
             long durationMs = System.currentTimeMillis() - start;
             logger.info("Sync phase succeeded phase={} user={} durationMs={}",
                     phase, user.getUsername(), durationMs);
+            return null;
         } catch (Exception e) {
             long durationMs = System.currentTimeMillis() - start;
             logger.error("Sync phase failed phase={} user={} durationMs={} error={}",
                     phase, user.getUsername(), durationMs, e.getMessage(), e);
+            return e;
         }
     }
 
@@ -175,10 +203,22 @@ public class GReaderSyncService {
 
     public void syncUser(User user) {
         logger.info("Starting GReader sync for user {}", user.getUsername());
-        syncCategories(user);
-        syncFeeds(user);
-        syncArticles(user);
-        syncStarredItems(user);
+        markSyncRunning(user);
+        boolean anyFailure = false;
+        try {
+            syncCategories(user);
+            syncFeeds(user);
+            syncArticles(user);
+            syncStarredItems(user);
+        } catch (Exception e) {
+            anyFailure = true;
+            recordSyncFailure(user, e);
+            throw e;
+        } finally {
+            if (!anyFailure) {
+                recordSyncSuccess(user);
+            }
+        }
         logger.info("GReader sync complete for user {}", user.getUsername());
     }
 
@@ -501,6 +541,57 @@ public class GReaderSyncService {
             logger.debug("og:image fetch failed for {}: {}", url, e.getMessage());
         }
         return null;
+    }
+
+    // -----------------------------------------------------------------------
+    // Sync status tracking (F5)
+    // -----------------------------------------------------------------------
+
+    private void markSyncRunning(User user) {
+        try {
+            user.setLastSyncStatus(SyncStatus.RUNNING);
+            user.setLastSyncErrorMessage(null);
+            userRepository.save(user);
+        } catch (Exception ex) {
+            logger.warn("Could not record RUNNING sync status for user {}: {}", user.getUsername(), ex.getMessage());
+        }
+    }
+
+    private void recordSyncSuccess(User user) {
+        try {
+            user.setLastSyncStatus(SyncStatus.SUCCESS);
+            user.setLastSyncTime(System.currentTimeMillis());
+            user.setLastSyncErrorMessage(null);
+            userRepository.save(user);
+        } catch (Exception ex) {
+            logger.warn("Could not record SUCCESS sync status for user {}: {}", user.getUsername(), ex.getMessage());
+        }
+    }
+
+    private void recordSyncFailure(User user, Exception cause) {
+        try {
+            user.setLastSyncStatus(SyncStatus.FAILED);
+            user.setLastSyncTime(System.currentTimeMillis());
+            user.setLastSyncErrorMessage(sanitiseErrorMessage(cause));
+            userRepository.save(user);
+        } catch (Exception ex) {
+            logger.warn("Could not record FAILED sync status for user {}: {}", user.getUsername(), ex.getMessage());
+        }
+    }
+
+    /**
+     * Returns a short, user-presentable description of {@code cause} that does not
+     * leak credentials, tokens or full URLs. Anything beyond the exception class
+     * and a trimmed message is dropped.
+     */
+    private static String sanitiseErrorMessage(Exception cause) {
+        if (cause == null) return "Unknown error";
+        String raw = cause.getMessage();
+        if (raw == null || raw.isBlank()) {
+            return cause.getClass().getSimpleName();
+        }
+        String trimmed = raw.length() > 200 ? raw.substring(0, 200) + "…" : raw;
+        return trimmed;
     }
 
     private void saveFeedError(GReaderStreamItem item, User user, Exception e) {

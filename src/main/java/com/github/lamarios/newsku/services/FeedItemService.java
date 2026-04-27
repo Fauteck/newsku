@@ -17,6 +17,7 @@ import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -375,5 +376,51 @@ public class FeedItemService {
     public List<FeedItem> getSavedItems() {
         var feeds = feedRepository.getFeedsByUser(userService.getCurrentUser());
         return feedItemRepository.findBySavedTrueAndFeedIn(feeds);
+    }
+
+    /**
+     * Marks every unread item created on or before {@code beforeMs} as read.
+     * If {@code feedId} is non-null, the operation is restricted to that feed
+     * (and is a no-op if the feed does not belong to the current user).
+     * GReader is synced best-effort with the same set of items.
+     *
+     * @return number of newly-read items
+     */
+    @Transactional
+    public int markAllRead(long beforeMs, String feedId) {
+        User user = userService.getCurrentUser();
+        var feeds = feedRepository.getFeedsByUser(user);
+        if (feeds == null || feeds.isEmpty()) return 0;
+
+        List<Feed> targetFeeds;
+        if (feedId == null || feedId.isBlank()) {
+            targetFeeds = feeds;
+        } else {
+            targetFeeds = feeds.stream().filter(f -> feedId.equals(f.getId())).toList();
+            if (targetFeeds.isEmpty()) return 0;
+        }
+
+        // Collect upstream IDs before the UPDATE so we can sync them to GReader.
+        List<String> gReaderIds = feedItemRepository.findUnreadGReaderIdsBefore(targetFeeds, beforeMs);
+        int updated = feedItemRepository.markAllReadBefore(targetFeeds, beforeMs);
+
+        if (!gReaderIds.isEmpty()) {
+            try {
+                gReaderApiService.markAsRead(user, gReaderIds);
+            } catch (Exception e) {
+                logger.warn("Could not sync bulk mark-as-read to GReader for user {} ({} ids): {}",
+                        user.getUsername(), gReaderIds.size(), e.getMessage());
+            }
+        }
+        return updated;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FeedItem> getSavedItems(Pageable pageable) {
+        var feeds = feedRepository.getFeedsByUser(userService.getCurrentUser());
+        if (feeds == null || feeds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+        return feedItemRepository.findBySavedTrueAndFeedIn(feeds, pageable);
     }
 }
