@@ -14,6 +14,7 @@ Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 
 ### Docs
 - Introduce `CHANGELOG.md` and make it mandatory in `CLAUDE.md` (Doc Index, §12 DoD, §13 Documentation Requirements)
+- Backfill pre-2026-04-22 history (PRs #1–#56) from GitHub PR titles
 
 ## [2026-04-27]
 
@@ -107,8 +108,11 @@ Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 
 ### Added
 - AI activity log page in settings (#64)
+- Ollama support and optimised AI scoring for fresh installations (#55)
 
 ### Fixed
+- Add environment variable validation and improve database healthcheck (#57)
+- CI build: update `MockOpenaiService` signature (#56)
 - Consistent back button and profile menu on all secondary pages (#70)
 - Article-shortening toggle now also controls server-side AI generation (#69)
 - Gemini API 429 error message no longer shows `: null` (#69)
@@ -122,7 +126,6 @@ Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 - Prevent concurrent article sync and Tomcat header overflow (#61)
 - NPE in `resolveImageUrl` and silent OpenAI blank-URL failure (#60)
 - Trigger article sync asynchronously on GReader on-demand sync (#58)
-- Tomcat startup fix (#57)
 
 ### Chore
 - Remove `OPENAI_API_KEY` / `URL` / `MODEL` from `docker-compose` (#62)
@@ -131,8 +134,88 @@ Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 ### Docs
 - Add `DESIGN.md` and translate all technical docs to English (#88, dated 2026-04-25 in git but logically part of the docs overhaul)
 
+## [2026-04-17]
+
+### Added
+- Cron-based GReader sync 3×/h + `CLAUDE.md` corrections (#51)
+- Stats page: AI tab, consistent menu, compact mobile filters (#48)
+- Encrypt GReader/OpenAI credentials, persist settings, per-use-case usage tracking (#43)
+
+### Changed
+- Use FreshRSS timestamps; lower sync interval to 15 min (#50)
+
+### Fixed
+- Persist articles on OpenAI failure + manual disable path (#54)
+- Abort sync cycle immediately on OpenAI 429 quota error (#53)
+- Forward missing ENV variables to `newsku` container in compose (#52)
+- Import `Settings-AI-Tab` in `router.dart` (#49)
+- JPA query resolution for `gReader*Id` properties (#47)
+- Load feeds in settings tab immediately when GReader mode active (#46)
+- Restore `gReader` JSON property names so settings persist (#45)
+- Flutter web build errors in generated freezed files (#44)
+- Persist per-user GReader credentials and refresh bottom-nav (#41)
+- Persist RSS items even when OpenAI analysis is unavailable (#42)
+- Align `FeedItemController` test calls with new `getItems` signature (#40)
+- Two Flutter web build compilation errors (#39)
+- Feeds page navigation, mobile fixes & filter (#38)
+
+## [2026-04-16]
+
+### Added
+- Magazine tabs with per-tab AI settings and public access (#29)
+- Configurable feed-sync interval via `FEED_SYNC_INTERVAL_MS` (#35)
+- Standard layout config, classic-feeds nav, page-level scroll, grouped block config (#36)
+- Cache clearing, AI text shortening, UI cleanups (#20)
+- Sync FreshRSS bookmarks (#33)
+- FreshRSS feed settings (#17)
+
+### Security
+- Move FreshRSS credentials from per-user DB fields to environment variables (#15)
+
+### Changed
+- Redesign settings page: German UI, merged tabs, FreshRSS env-var flow (#14)
+- Remove tag display, more text, hide empty image slot, og:image fallback (#19)
+- Reworked settings tabs (Flutter) (#26)
+- FreshRSS integration settings (#27)
+- Align menu navigation (#23)
+- Simplify licenses page (#24)
+
+### Fixed
+- Auto-route navigation (#30)
+- Magazine tabs display (#34)
+- Settings page issues (#22)
+- Import `utils.dart` in `ClassicFeedCubit` for `serverUrl` getter (#37)
+- Keyboard shortcuts no longer block text input; horizontal section titles; `media:content` image support (#18)
+- Remove `const` from non-const `LoadingIndicator` constructor call (#16)
+- JWT auth filter setting 401 before chain continues (#10)
+- Missing `processFeedItem` overload in `MockOpenaiService` (#9)
+
+### Chore
+- Update runner versions (#25, #28, #31, #32)
+- Pass `shortTitle`/`shortTeaser` to `MockOpenaiService` in tests (#21)
+- Postgres config setup (#11)
+- Spring Boot news setup (#12)
+- New session housekeeping (#13)
+
+## [2026-04-15]
+
+### Added
+- Feed category management (#1)
+- Saved articles, text-truncation settings, swipe gestures, keyboard shortcuts (#5)
+- FreshRSS backend integration via Google Reader API (#7, #8)
+
+### Changed
+- Build Flutter web before Maven and embed into `static/` (#3)
+
+### Chore
+- Initial newsku fork setup (#2)
+- App-review improvements (#4)
+- Docker setup for newsku (#6)
+
 ---
 
-> **Earlier history:** Commits prior to 2026-04-22 are not present in the
-> currently visible `git log` snapshot. They can be reconstructed from
-> `origin/master` history and prepended here when needed.
+> **Earlier history reconstructed from GitHub PR titles** (PRs #1–#56), since
+> the local `git log` snapshot only goes back to 2026-04-22. The corresponding
+> commits are not present in `origin/master` (history was rewritten at some
+> point); these entries reflect what was merged according to the GitHub PR
+> record.
