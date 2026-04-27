@@ -92,6 +92,12 @@ public class User {
     @Column(name = "last_sync_error_message")
     private String lastSyncErrorMessage;
 
+    @Column(name = "last_sync_items_added")
+    private Integer lastSyncItemsAdded;
+
+    @Column(name = "last_sync_items_updated")
+    private Integer lastSyncItemsUpdated;
+
     public String getId() {
         return id;
     }
@@ -295,5 +301,21 @@ public class User {
 
     public void setLastSyncErrorMessage(String lastSyncErrorMessage) {
         this.lastSyncErrorMessage = lastSyncErrorMessage;
+    }
+
+    public Integer getLastSyncItemsAdded() {
+        return lastSyncItemsAdded;
+    }
+
+    public void setLastSyncItemsAdded(Integer lastSyncItemsAdded) {
+        this.lastSyncItemsAdded = lastSyncItemsAdded;
+    }
+
+    public Integer getLastSyncItemsUpdated() {
+        return lastSyncItemsUpdated;
+    }
+
+    public void setLastSyncItemsUpdated(Integer lastSyncItemsUpdated) {
+        this.lastSyncItemsUpdated = lastSyncItemsUpdated;
     }
 }
