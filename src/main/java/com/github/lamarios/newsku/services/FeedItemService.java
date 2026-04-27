@@ -274,6 +274,9 @@ public class FeedItemService {
     public Page<@NotNull FeedItem> getPublicItems(com.github.lamarios.newsku.persistence.entities.MagazineTab tab, long from, long to, int page, int pageSize) {
         var user = tab.getUser();
         List<Feed> feeds = feedRepository.getFeedsByUser(user);
+        if (feeds.isEmpty()) {
+            return Page.empty(PageRequest.of(page, pageSize));
+        }
         int minImportance = tab.getMinimumImportance() != null ? tab.getMinimumImportance() : user.getMinimumImportance();
 
         return feedItemRepository.findallByTimeAndFeeds(minImportance, from, to, feeds, PageRequest.of(page, pageSize, Sort.by(List.of(new Sort.Order(Sort.Direction.DESC, "importance"), new Sort.Order(Sort.Direction.DESC, "timeCreated")))));
