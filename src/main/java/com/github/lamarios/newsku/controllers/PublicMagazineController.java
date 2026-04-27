@@ -45,7 +45,7 @@ public class PublicMagazineController {
             @RequestParam("from") long from,
             @RequestParam("to") long to,
             @RequestParam(value = "page", defaultValue = "0") @Min(0) int page,
-            @RequestParam(value = "pageSize", defaultValue = "100") @Min(1) @Max(500) int pageSize
+            @RequestParam(value = "pageSize", defaultValue = "100") @Min(1) @Max(2000) int pageSize
     ) {
         MagazineTab tab = magazineTabService.getPublicTab(tabId);
         return PageResponse.of(feedItemService.getPublicItems(tab, from, to, page, pageSize));

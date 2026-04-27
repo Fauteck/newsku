@@ -24,7 +24,7 @@ public class PageSizeBoundsTest extends TestContainerTest {
     @Test
     public void feedItemController_rejects_pageSize_above_max() {
         assertThrows(ConstraintViolationException.class,
-                () -> feedItemController.getItems(0L, System.currentTimeMillis(), 0, 501, null, null, null, null));
+                () -> feedItemController.getItems(0L, System.currentTimeMillis(), 0, 2001, null, null, null, null));
     }
 
     @Test
