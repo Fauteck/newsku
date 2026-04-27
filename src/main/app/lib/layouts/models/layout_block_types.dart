@@ -31,7 +31,7 @@ const double smallPreviewSize = 150;
 
 enum LayoutBlockTypes {
   bigHeadline(1, HeadlineSmall(), LayoutBlockSettings()),
-  topStories(4, TopStoriesSmall(), LayoutBlockSettings(title: 'Top stories')),
+  topStories(4, TopStoriesSmall(), LayoutBlockSettings()),
   bigGrid(null, BigGridSmall(), LayoutBlockSettings(items: 6)),
   smallGrid(null, SmallGridSmall(), LayoutBlockSettings(items: 10)),
   bigHeadlinePicture(1, HeadlinePictureSmall(), LayoutBlockSettings()),
