@@ -8,6 +8,7 @@ import 'package:app/utils/models/breakpoints.dart';
 import 'package:app/utils/utils.dart';
 import 'package:app/utils/views/components/error_listener.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
@@ -322,6 +323,10 @@ class _TabDetailsState extends State<_TabDetails> {
             value: tab.isPublic,
             onChanged: (value) => cubit.updateSelectedTabField(isPublic: value),
           ),
+          if (tab.isPublic && tab.id != null) ...[
+            Gap(pu2),
+            _ShareLinkRow(tabId: tab.id!),
+          ],
           Gap(pu2),
           const Divider(),
           Gap(pu2),
@@ -411,6 +416,50 @@ class _TabDetailsState extends State<_TabDetails> {
     final newBlock = LayoutBlock(type: type, order: currentBlocks.length, settings: type.defaultSettings);
     currentBlocks.add(newBlock);
     cubit.saveTabLayout(currentBlocks);
+  }
+}
+
+class _ShareLinkRow extends StatelessWidget {
+  final String tabId;
+
+  const _ShareLinkRow({required this.tabId});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final url = '${serverUrl ?? ''}/public/magazine/$tabId';
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: pu3, vertical: pu2),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.link, size: 16, color: colors.primary),
+          Gap(pu2),
+          Expanded(
+            child: Text(
+              url,
+              style: textTheme.bodySmall?.copyWith(color: colors.onSurface),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.copy, size: 18),
+            tooltip: 'Link kopieren',
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: url));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Link kopiert'), duration: Duration(seconds: 2)),
+              );
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
 
