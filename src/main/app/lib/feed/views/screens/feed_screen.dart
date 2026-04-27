@@ -229,7 +229,10 @@ class FeedScreen extends StatelessWidget {
                                               ),
                                               FeedProfileMenu(
                                                 errorCount: state.errorCount,
-                                                onSettingsClosed: () => cubit.refresh(),
+                                                onSettingsClosed: () {
+                                                  tabsCubit.loadTabs();
+                                                  cubit.refresh();
+                                                },
                                               ),
                                             ],
                                           ),
