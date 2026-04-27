@@ -1,6 +1,7 @@
 import 'package:app/ai/states/ai_prompts.dart';
 import 'package:app/feed/views/components/feed_profile_menu.dart';
 import 'package:app/l10n/app_localizations.dart';
+import 'package:app/router.dart';
 import 'package:app/settings/views/tabs/ai.dart';
 import 'package:app/settings/views/tabs/ai_activity_log.dart';
 import 'package:app/settings/views/tabs/feeds.dart';
@@ -30,7 +31,7 @@ class SettingsScreen extends StatelessWidget {
             title: Text(locals.settings),
             automaticallyImplyLeading: false,
             leading: BackButton(
-              onPressed: () => AutoRouter.of(context).maybePop(),
+              onPressed: () => AutoRouter.of(context).navigate(const HomeRoute(children: [FeedRoute()])),
             ),
             actions: const [FeedProfileMenu()],
             bottom: TabBar(
