@@ -46,6 +46,12 @@ public class CacheControlFilterTest {
     }
 
     @Test
+    public void savedPagedEndpoint_getsShortPrivateCache() throws Exception {
+        var response = run("GET", "/api/feeds/items/saved/page");
+        assertEquals("private, max-age=60", response.getHeader("Cache-Control"));
+    }
+
+    @Test
     public void otherApiEndpoints_defaultToNoStore() throws Exception {
         var response = run("GET", "/api/sync-status");
         assertEquals("no-store", response.getHeader("Cache-Control"));

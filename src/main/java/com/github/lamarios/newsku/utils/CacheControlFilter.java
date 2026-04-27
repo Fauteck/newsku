@@ -63,6 +63,7 @@ public class CacheControlFilter extends OncePerRequestFilter {
         if (path.equals("/api/feeds")) return true;
         if (path.equals("/api/feeds/items")) return true;
         if (path.equals("/api/feeds/items/saved")) return true;
+        if (path.equals("/api/feeds/items/saved/page")) return true;
         return false;
     }
 }
