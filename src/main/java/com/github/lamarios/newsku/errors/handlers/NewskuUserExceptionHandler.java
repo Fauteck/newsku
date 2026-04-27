@@ -1,5 +1,6 @@
 package com.github.lamarios.newsku.errors.handlers;
 
+import com.github.lamarios.newsku.errors.DuplicateFeedException;
 import com.github.lamarios.newsku.errors.NewskuException;
 import com.github.lamarios.newsku.errors.NewskuUserException;
 import jakarta.persistence.EntityNotFoundException;
@@ -30,6 +31,12 @@ public class NewskuUserExceptionHandler extends ResponseEntityExceptionHandler {
     @Nullable
     ResponseEntity<@NotNull Object> handleError(NewskuException exception, WebRequest request) {
         return build(exception, exception.getClass().getSimpleName(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(DuplicateFeedException.class)
+    @Nullable
+    ResponseEntity<@NotNull Object> handleDuplicateFeed(DuplicateFeedException exception, WebRequest request) {
+        return build(exception, "DuplicateFeedException", HttpStatus.CONFLICT, request);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)

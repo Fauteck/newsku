@@ -27,7 +27,7 @@ class FeedImage extends StatelessWidget {
       imageRenderMethodForWeb: .HttpGet,
       placeholder: (context, url) => ImagePlaceholder(width: width, height: height, icon: Icons.rss_feed, iconSize: 10),
       errorWidget: (context, url, error) =>
-          ImagePlaceholder(width: width, height: height, icon: Icons.rss_feed, iconSize: 10),
+          ImagePlaceholder(width: width, height: height, iconSize: 10, isError: true),
       httpHeaders: {'Authorization': 'Bearer ${cubit.state.token}'},
     );
   }

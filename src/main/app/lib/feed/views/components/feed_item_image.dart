@@ -38,7 +38,8 @@ class FeedItemImage extends StatelessWidget {
                 imageRenderMethodForWeb: .HttpGet,
                 httpHeaders: {'Authorization': 'Bearer ${cubit.state.token}'},
                 placeholder: (context, url) => ImagePlaceholder(width: width, height: height),
-                errorWidget: (context, url, error) => ImagePlaceholder(width: width, height: height),
+                errorWidget: (context, url, error) =>
+                    ImagePlaceholder(width: width, height: height, isError: true),
               ),
       ),
     );

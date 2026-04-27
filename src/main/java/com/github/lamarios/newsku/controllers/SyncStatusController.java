@@ -29,7 +29,9 @@ public class SyncStatusController {
         return new SyncStatusResponse(
                 user.getLastSyncTime(),
                 status,
-                user.getLastSyncErrorMessage()
+                user.getLastSyncErrorMessage(),
+                user.getLastSyncItemsAdded(),
+                user.getLastSyncItemsUpdated()
         );
     }
 }

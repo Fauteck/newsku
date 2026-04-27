@@ -108,6 +108,17 @@ class MainFeedCubit extends Cubit<MainFeedState> {
     super.close();
   }
 
+  /// Marks every article older than `beforeMs` (defaults to "now") as read on
+  /// the backend, then refreshes the visible feed. Returns the number of items
+  /// that were actually flipped from unread → read so the UI can show
+  /// "X Artikel als gelesen markiert".
+  Future<int> markAllReadBefore({int? beforeMs}) async {
+    final cutoff = beforeMs ?? DateTime.now().millisecondsSinceEpoch;
+    final count = await FeedService(serverUrl!).markAllRead(beforeMs: cutoff);
+    await refresh();
+    return count;
+  }
+
   Future<bool> readItem(String? id) {
     if (id == null) {
       return Future.value(false);

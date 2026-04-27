@@ -10,6 +10,7 @@ import be.ceau.opml.entity.Opml;
 import be.ceau.opml.entity.Outline;
 import com.apptasticsoftware.rssreader.*;
 import com.github.lamarios.newsku.Constants;
+import com.github.lamarios.newsku.errors.DuplicateFeedException;
 import com.github.lamarios.newsku.errors.NewskuException;
 import com.github.lamarios.newsku.persistence.entities.Feed;
 import com.github.lamarios.newsku.persistence.entities.User;
@@ -69,6 +70,14 @@ public class FeedService {
     @CacheEvict(value = "feedsByUser", allEntries = true)
     public Feed addFeed(String url) throws NewskuException {
         User currentUser = userService.getCurrentUser();
+
+        // Reject duplicate subscriptions before we hit the network: the user
+        // already has this URL, so we map this to HTTP 409 with a clear
+        // message instead of silently creating a second row.
+        var existing = feedRepository.findFirstByUrlAndUser(url, currentUser);
+        if (existing != null && !existing.isEmpty()) {
+            throw new DuplicateFeedException("Feed already subscribed");
+        }
 
         List<Item> list;
         try {

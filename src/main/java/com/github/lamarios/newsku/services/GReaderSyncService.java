@@ -152,14 +152,18 @@ public class GReaderSyncService {
         // so operators can slice logs per sync step.
         boolean anyPhaseFailed = false;
         Exception lastFailure = null;
+        int itemsAdded = 0;
+        int itemsUpdated = 0;
         try {
             logger.info("Starting background article sync for user {}", user.getUsername());
 
-            Exception articlesEx = runSyncPhase("articles", user, () -> syncArticles(user));
-            Exception starredEx = runSyncPhase("starred", user, () -> syncStarredItems(user));
-            if (articlesEx != null || starredEx != null) {
+            PhaseResult articles = runCountingPhase("articles", user, () -> syncArticles(user));
+            PhaseResult starred = runCountingPhase("starred", user, () -> syncStarredItems(user));
+            itemsAdded = articles.count;
+            itemsUpdated = starred.count;
+            if (articles.failure != null || starred.failure != null) {
                 anyPhaseFailed = true;
-                lastFailure = starredEx != null ? starredEx : articlesEx;
+                lastFailure = starred.failure != null ? starred.failure : articles.failure;
             }
 
             logger.info("Background article sync complete for user {}", user.getUsername());
@@ -171,29 +175,34 @@ public class GReaderSyncService {
                 }
                 User reload = userRepository.findById(userId).orElse(user);
                 reload.setLastSyncStatus(SyncStatus.PARTIAL);
+                reload.setLastSyncItemsAdded(itemsAdded);
+                reload.setLastSyncItemsUpdated(itemsUpdated);
                 try {
                     userRepository.save(reload);
                 } catch (Exception ignored) {
                 }
             } else {
-                recordSyncSuccess(user);
+                recordSyncSuccess(user, itemsAdded, itemsUpdated);
             }
         }
     }
 
-    private Exception runSyncPhase(String phase, User user, Runnable task) {
+    private record PhaseResult(int count, Exception failure) {
+    }
+
+    private PhaseResult runCountingPhase(String phase, User user, java.util.function.IntSupplier task) {
         long start = System.currentTimeMillis();
         try {
-            task.run();
+            int count = task.getAsInt();
             long durationMs = System.currentTimeMillis() - start;
-            logger.info("Sync phase succeeded phase={} user={} durationMs={}",
-                    phase, user.getUsername(), durationMs);
-            return null;
+            logger.info("Sync phase succeeded phase={} user={} durationMs={} count={}",
+                    phase, user.getUsername(), durationMs, count);
+            return new PhaseResult(count, null);
         } catch (Exception e) {
             long durationMs = System.currentTimeMillis() - start;
             logger.error("Sync phase failed phase={} user={} durationMs={} error={}",
                     phase, user.getUsername(), durationMs, e.getMessage(), e);
-            return e;
+            return new PhaseResult(0, e);
         }
     }
 
@@ -205,18 +214,20 @@ public class GReaderSyncService {
         logger.info("Starting GReader sync for user {}", user.getUsername());
         markSyncRunning(user);
         boolean anyFailure = false;
+        int itemsAdded = 0;
+        int itemsUpdated = 0;
         try {
             syncCategories(user);
             syncFeeds(user);
-            syncArticles(user);
-            syncStarredItems(user);
+            itemsAdded = syncArticles(user);
+            itemsUpdated = syncStarredItems(user);
         } catch (Exception e) {
             anyFailure = true;
             recordSyncFailure(user, e);
             throw e;
         } finally {
             if (!anyFailure) {
-                recordSyncSuccess(user);
+                recordSyncSuccess(user, itemsAdded, itemsUpdated);
             }
         }
         logger.info("GReader sync complete for user {}", user.getUsername());
@@ -308,7 +319,7 @@ public class GReaderSyncService {
      * New items are persisted in batches via {@code saveAll} so Hibernate can
      * emit JDBC batch INSERTs (issue B16) instead of one round-trip per item.
      */
-    public void syncArticles(User user) {
+    public int syncArticles(User user) {
         var clicks = clickService.tagClicks(
                 System.currentTimeMillis() - PROMPT_TAG_TIME_FRAME,
                 System.currentTimeMillis(),
@@ -345,14 +356,17 @@ public class GReaderSyncService {
         } while (continuation != null && !continuation.isBlank());
 
         logger.info("Processed {} new articles from GReader for user {}", totalNew, user.getUsername());
+        return totalNew;
     }
 
     /**
      * Fetches all starred items from GReader and marks the corresponding local
      * FeedItems as saved (best-effort, does not unmark items no longer starred).
+     *
+     * @return the number of items that were newly marked as saved on this run
      */
-    public void syncStarredItems(User user) {
-        if (!gReaderApiService.isCredentialsConfigured(user)) return;
+    public int syncStarredItems(User user) {
+        if (!gReaderApiService.isCredentialsConfigured(user)) return 0;
 
         List<Feed> feeds = feedRepository.getFeedsByUser(user);
         String continuation = null;
@@ -385,6 +399,7 @@ public class GReaderSyncService {
         if (markedSaved > 0) {
             logger.info("Marked {} items as saved from GReader starred stream for user {}", markedSaved, user.getUsername());
         }
+        return markedSaved;
     }
 
     /**
@@ -557,11 +572,13 @@ public class GReaderSyncService {
         }
     }
 
-    private void recordSyncSuccess(User user) {
+    private void recordSyncSuccess(User user, int itemsAdded, int itemsUpdated) {
         try {
             user.setLastSyncStatus(SyncStatus.SUCCESS);
             user.setLastSyncTime(System.currentTimeMillis());
             user.setLastSyncErrorMessage(null);
+            user.setLastSyncItemsAdded(itemsAdded);
+            user.setLastSyncItemsUpdated(itemsUpdated);
             userRepository.save(user);
         } catch (Exception ex) {
             logger.warn("Could not record SUCCESS sync status for user {}: {}", user.getUsername(), ex.getMessage());

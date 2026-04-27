@@ -33,6 +33,31 @@ final double feedItemBorderRadius = 8;
 
 final _log = Logger('FeedScreen');
 
+Future<void> _confirmMarkAllRead(BuildContext context, MainFeedCubit cubit) async {
+  final locals = AppLocalizations.of(context)!;
+  final messenger = ScaffoldMessenger.of(context);
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(locals.markAllAsRead),
+      content: Text(locals.markAllAsReadConfirm),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(locals.cancel)),
+        TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(locals.ok)),
+      ],
+    ),
+  );
+  if (confirmed != true) return;
+  try {
+    final count = await cubit.markAllReadBefore();
+    if (!context.mounted) return;
+    messenger.showSnackBar(SnackBar(content: Text(locals.markAllAsReadDone(count))));
+  } catch (e) {
+    if (!context.mounted) return;
+    messenger.showSnackBar(SnackBar(content: Text(e.toString())));
+  }
+}
+
 @RoutePage()
 class FeedScreen extends StatelessWidget {
   const FeedScreen({super.key});
@@ -230,6 +255,12 @@ class FeedScreen extends StatelessWidget {
                                                   tooltip: locals.savedArticles,
                                                 ),
                                                 IconButton(
+                                                  key: const Key('mark-all-read-button'),
+                                                  onPressed: () => _confirmMarkAllRead(context, cubit),
+                                                  icon: const Icon(Icons.done_all),
+                                                  tooltip: locals.markAllAsRead,
+                                                ),
+                                                IconButton(
                                                   onPressed: () => cubit.setSearch(true),
                                                   icon: const Icon(Icons.search),
                                                 ),
@@ -257,6 +288,12 @@ class FeedScreen extends StatelessWidget {
                                                 IconButton(
                                                   onPressed: () => cubit.refresh(),
                                                   icon: const Icon(Icons.refresh),
+                                                ),
+                                                IconButton(
+                                                  key: const Key('mark-all-read-button-desktop'),
+                                                  onPressed: () => _confirmMarkAllRead(context, cubit),
+                                                  icon: const Icon(Icons.done_all),
+                                                  tooltip: locals.markAllAsRead,
                                                 ),
                                                 FeedProfileMenu(
                                                   errorCount: state.errorCount,

@@ -1025,6 +1025,12 @@ abstract class AppLocalizations {
   String get navMagazine;
   String get navMore;
   String get openProfileMenu;
+  String get markAllAsRead;
+  String get markAllAsReadConfirm;
+  String markAllAsReadDone(num count);
+  String get syncing;
+  String syncCompleted(num count);
+  String syncFailedReason(Object reason);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
