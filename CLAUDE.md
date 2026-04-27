@@ -12,6 +12,7 @@
 | Document | Contents |
 |----------|--------|
 | [README.md](README.md) | Feature overview, architecture diagram, API reference |
+| [CHANGELOG.md](CHANGELOG.md) | Chronological log of merged changes (date-grouped, no SemVer) |
 | [DESIGN.md](DESIGN.md) | Design system — tokens, components, colour, typography, motion |
 | [docs/architektur.md](docs/architektur.md) | Tech stack, data models, request flow, auth |
 | [docs/verzeichnisstruktur.md](docs/verzeichnisstruktur.md) | Complete file tree with absolute paths |
@@ -261,6 +262,7 @@ A change is "done" when:
 - Code implemented
 - Tests green
 - Documentation updated (at minimum README, if affected)
+- `CHANGELOG.md` updated (entry under `[Unreleased]` or under a date block — see §13)
 - PR reviewed and merged
 - **If image-based:** CI image built & available (GHCR), deployment triggered/completed
 - **If release-based (libraries):** Release/tag built (only if the repo works this way)
@@ -274,6 +276,21 @@ For every change that can go to production:
 
 - Check/update README
 - Changes described in a traceable manner in the PR
+- **`CHANGELOG.md` updated** (see rules below)
+
+### CHANGELOG.md (mandatory)
+
+- **Every PR that lands on `main` MUST update `CHANGELOG.md`.**
+- Add the entry under `## [Unreleased]` while the PR is open. On merge, either
+  the PR itself or a follow-up housekeeping PR moves the `[Unreleased]` items
+  into a dated block `## [YYYY-MM-DD]` (the merge date on `main`).
+- Format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/)
+  with the categories **Added / Changed / Fixed / Security / Removed /
+  Deprecated / Docs / Chore**.
+- Each entry: short imperative description plus PR number in parentheses, e.g.
+  `- Guard against empty feeds list in getPublicItems (#103)`.
+- Pure refactors / whitespace-only / merge commits may be omitted.
+- **No SemVer / no Git tags** — sections are date-grouped (see §4, §11).
 
 ---
 
