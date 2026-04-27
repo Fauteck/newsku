@@ -78,7 +78,8 @@ class PublicMagazineService extends BaseService {
     });
     final response = await http.get(uri, headers: await headers);
     processResponse(response, logoutOn401: false);
-    final Iterable list = jsonDecode(response.body);
+    final map = jsonDecode(response.body) as Map<String, dynamic>;
+    final Iterable list = map['content'] as List;
     return list.map((e) => FeedItem.fromJson(e as Map<String, dynamic>)).toList();
   }
 }
