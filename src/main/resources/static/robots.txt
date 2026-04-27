@@ -1,6 +1,9 @@
 User-agent: *
 Disallow: /api/
 Disallow: /actuator/
+Disallow: /swagger-ui.html
+Disallow: /swagger-ui/
+Disallow: /v3/api-docs
 
 User-agent: GPTBot
 Disallow: /

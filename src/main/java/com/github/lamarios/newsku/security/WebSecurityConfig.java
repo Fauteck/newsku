@@ -113,6 +113,10 @@ public class WebSecurityConfig {
                         .requestMatchers(request -> request.getMethod().equalsIgnoreCase("OPTIONS")).permitAll()
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/**").authenticated()
+                        // F6: Swagger UI + OpenAPI spec are gated to authenticated
+                        // users so the API surface is not enumerable from the public
+                        // internet. robots.txt also disallows both paths.
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling(ex -> ex
