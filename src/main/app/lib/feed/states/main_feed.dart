@@ -29,8 +29,14 @@ class MainFeedCubit extends Cubit<MainFeedState> {
 
   final List<String> readItems = [];
 
-  MainFeedCubit(super.initialState) {
-    init();
+  /// When true, the cubit is running on the public (anonymous) magazine route:
+  /// no auto-refresh, and read/save calls are no-ops to avoid 401 → logout.
+  final bool publicMode;
+
+  MainFeedCubit(super.initialState, {this.publicMode = false}) {
+    if (!publicMode) {
+      init();
+    }
   }
 
   bool _handleKeyEvent(KeyEvent event) {
@@ -120,7 +126,7 @@ class MainFeedCubit extends Cubit<MainFeedState> {
   }
 
   Future<bool> readItem(String? id) {
-    if (id == null) {
+    if (publicMode || id == null) {
       return Future.value(false);
     }
     readItems.add(id);
@@ -134,6 +140,9 @@ class MainFeedCubit extends Cubit<MainFeedState> {
   }
 
   Future<bool> toggleSave(String id) async {
+    if (publicMode) {
+      return false;
+    }
     try {
       final updated = await FeedService(serverUrl!).toggleSaved(id);
       // Update the item in all date buckets

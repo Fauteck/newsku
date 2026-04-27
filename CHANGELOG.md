@@ -12,6 +12,9 @@ Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 
 ## [Unreleased]
 
+### Fixed
+- Public magazine route now renders the configured layout (Top Stories, grids, headlines) instead of a plain feed list
+
 ### Docs
 - Introduce `CHANGELOG.md` and make it mandatory in `CLAUDE.md` (Doc Index, §12 DoD, §13 Documentation Requirements)
 - Backfill pre-2026-04-22 history (PRs #1–#56) from GitHub PR titles
