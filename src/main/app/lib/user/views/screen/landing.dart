@@ -1,4 +1,5 @@
 import 'package:app/utils/utils.dart';
+import 'package:app/utils/views/components/app_name.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +20,11 @@ class LandingScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: .center,
                   mainAxisAlignment: .center,
-                  children: [Center(child: AutoRouter(clipBehavior: .none))],
+                  children: [
+                    AppName(style: Theme.of(context).textTheme.headlineMedium),
+                    SizedBox(height: pu8),
+                    Center(child: AutoRouter(clipBehavior: .none)),
+                  ],
                 ),
               ),
             ),

@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class StaticContentController {
-    @RequestMapping(value = "/")
+    @RequestMapping(value = {"/", "/feed", "/stats", "/settings", "/reset-password", "/public/magazine/**"})
     public String serveIndex() {
         return "index.html";
     }
