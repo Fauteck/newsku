@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Synchronises data from a GReader-compatible backend into newsku.
@@ -51,6 +53,15 @@ public class GReaderSyncService {
 
     private final ConcurrentHashMap<String, Boolean> articlesyncInProgress = new ConcurrentHashMap<>();
 
+    /**
+     * Cron-level guard so that overlapping ticks of {@link #syncAll()} do not pile
+     * up when a previous run is still draining a slow AI backend. Without this,
+     * a 20-min cron interval combined with multi-hour syncs would trigger
+     * concurrent {@code syncUser()} calls per user and race on
+     * {@code User.lastSyncStatus}.
+     */
+    private final AtomicBoolean syncAllInProgress = new AtomicBoolean(false);
+
     private final GReaderApiService gReaderApiService;
     private final UserRepository userRepository;
     private final FeedRepository feedRepository;
@@ -60,6 +71,16 @@ public class GReaderSyncService {
     private final OpenaiService openaiService;
     private final ClickService clickService;
     private final PlatformTransactionManager transactionManager;
+
+    /**
+     * Self-reference used to invoke {@link #enrichBatchAsync(List, User)} via
+     * the Spring proxy so the {@code @Async} annotation actually dispatches to
+     * the task executor. Direct {@code this.enrichBatchAsync(...)} calls would
+     * bypass the proxy and run the enrichment on the calling thread.
+     */
+    @Autowired
+    @Lazy
+    private GReaderSyncService self;
 
     @Autowired
     public GReaderSyncService(
@@ -89,18 +110,26 @@ public class GReaderSyncService {
 
     /** Runs a full sync for every user with GReader credentials configured. */
     public void syncAll() {
-        List<User> users = userRepository.findAll();
-        for (User user : users) {
-            if (!gReaderApiService.isCredentialsConfigured(user)) {
-                logger.debug("GReader not configured for user {} – skipping", user.getUsername());
-                continue;
+        if (!syncAllInProgress.compareAndSet(false, true)) {
+            logger.warn("syncAll already running — skipping this tick");
+            return;
+        }
+        try {
+            List<User> users = userRepository.findAll();
+            for (User user : users) {
+                if (!gReaderApiService.isCredentialsConfigured(user)) {
+                    logger.debug("GReader not configured for user {} – skipping", user.getUsername());
+                    continue;
+                }
+                try {
+                    syncUser(user);
+                } catch (Exception e) {
+                    logger.error("GReader sync failed for user {}: {}", user.getUsername(), e.getMessage(), e);
+                    recordSyncFailure(user, e);
+                }
             }
-            try {
-                syncUser(user);
-            } catch (Exception e) {
-                logger.error("GReader sync failed for user {}: {}", user.getUsername(), e.getMessage(), e);
-                recordSyncFailure(user, e);
-            }
+        } finally {
+            syncAllInProgress.set(false);
         }
     }
 
@@ -314,10 +343,17 @@ public class GReaderSyncService {
     // -----------------------------------------------------------------------
 
     /**
-     * Fetches all unread items from GReader and processes them through OpenAI scoring.
-     * Pagination via the GReader continuation token.
-     * New items are persisted in batches via {@code saveAll} so Hibernate can
-     * emit JDBC batch INSERTs (issue B16) instead of one round-trip per item.
+     * Fetches all unread items from GReader and persists them.
+     *
+     * <p>Items are saved <strong>without</strong> AI analysis first so they
+     * become visible in the feed/magazine view within seconds, regardless of
+     * how slow the AI backend is. After each page commits, AI enrichment
+     * (relevance score, tags, short title/teaser) runs asynchronously via
+     * {@link #enrichBatchAsync(List, User)} and back-fills the rows in place.
+     *
+     * <p>Pagination via the GReader continuation token. New items are persisted
+     * in batches via {@code saveAll} so Hibernate can emit JDBC batch INSERTs
+     * (issue B16) instead of one round-trip per item.
      */
     public int syncArticles(User user) {
         var clicks = clickService.tagClicks(
@@ -334,9 +370,10 @@ public class GReaderSyncService {
             if (items == null || items.isEmpty()) break;
 
             List<FeedItem> batch = new ArrayList<>(items.size());
+            List<String> existingUnscored = new ArrayList<>();
             for (GReaderStreamItem item : items) {
                 try {
-                    FeedItem prepared = processArticle(item, user, clicks);
+                    FeedItem prepared = processArticle(item, user, existingUnscored);
                     if (prepared != null) {
                         batch.add(prepared);
                         totalNew++;
@@ -352,10 +389,25 @@ public class GReaderSyncService {
                 feedItemRepository.saveAll(batch);
             }
 
+            List<String> enrichmentIds = new ArrayList<>(batch.size() + existingUnscored.size());
+            for (FeedItem fi : batch) {
+                enrichmentIds.add(fi.getId());
+            }
+            enrichmentIds.addAll(existingUnscored);
+            if (!enrichmentIds.isEmpty()) {
+                // Falls back to a direct call when the Spring proxy is not
+                // wired (e.g. plain-JUnit unit tests instantiating this
+                // service manually). In production the @Lazy self-reference
+                // dispatches to the @Async task executor.
+                GReaderSyncService target = self != null ? self : this;
+                target.enrichBatchAsync(enrichmentIds, user);
+            }
+
             continuation = page.getContinuation();
         } while (continuation != null && !continuation.isBlank());
 
-        logger.info("Processed {} new articles from GReader for user {}", totalNew, user.getUsername());
+        logger.info("Persisted {} new articles from GReader for user {} (AI enrichment runs in background)",
+                totalNew, user.getUsername());
         return totalNew;
     }
 
@@ -403,19 +455,25 @@ public class GReaderSyncService {
     }
 
     /**
-     * Prepares (and re-scores when necessary) a single GReader article. New
-     * items are returned un-persisted so the caller can batch them via
-     * {@code saveAll}. Re-scoring of pre-existing items is still persisted
-     * individually because it flips a single row in-place.
+     * Prepares a single GReader article for persistence. The returned item is
+     * un-persisted so the caller can batch them via {@code saveAll}. AI
+     * scoring is intentionally NOT performed here — items are saved without
+     * importance/reasoning/short title/teaser/tags first so they show up in
+     * the feed view immediately, and {@link #enrichBatchAsync(List, User)}
+     * back-fills those fields asynchronously. importance defaults to 0; the
+     * ranking query filters by {@code user.minimumImportance}, so items
+     * remain visible for users who have not raised that threshold.
      *
      * @return the new {@link FeedItem} to batch-persist, or {@code null} if
      *         the item already exists or its feed is not yet synced.
      */
     @Transactional
-    protected FeedItem processArticle(GReaderStreamItem item, User user, List<com.github.lamarios.newsku.models.TagClickStat> clicks) {
+    protected FeedItem processArticle(GReaderStreamItem item, User user, List<String> existingUnscored) {
         FeedItem existing = feedItemRepository.findByGReaderItemId(item.getId());
         if (existing != null) {
-            rescoreIfNeeded(existing, item, user, clicks);
+            if (existing.getReasoning() == null) {
+                existingUnscored.add(existing.getId());
+            }
             return null;
         }
 
@@ -435,8 +493,6 @@ public class GReaderSyncService {
                 ? StringEscapeUtils.unescapeHtml4(HtmlUtils.getTextContent(rawContent))
                 : "no content";
 
-        var analysis = openaiService.processFeedItem(item.getId(), title, content, item.resolveTimestampMs(), user, clicks);
-
         String imageUrl = item.resolveImageUrl();
         if (imageUrl == null && rawContent != null) {
             imageUrl = extractImageFromHtml(rawContent);
@@ -455,72 +511,66 @@ public class GReaderSyncService {
         feedItem.setUrl(item.resolveUrl());
         feedItem.setImageUrl(imageUrl);
         feedItem.setTimeCreated(item.resolveTimestampMs());
-
-        if (analysis.isPresent()) {
-            feedItem.setImportance(analysis.get().importance());
-            feedItem.setReasoning(analysis.get().reasoning());
-            feedItem.setShortTitle(analysis.get().shortTitle());
-            feedItem.setShortTeaser(analysis.get().shortTeaser());
-            feedItem.setTags(analysis.get().tags().stream()
-                    .map(String::toLowerCase)
-                    .map(s -> s.replaceAll("[^a-zA-Z0-9 ]", ""))
-                    .filter(s -> !s.isEmpty())
-                    .toList());
-        } else {
-            // Persist the item even when AI analysis is unavailable (disabled,
-            // quota exhausted, API down) so it still shows up in the feed.
-            // importance defaults to 0; the ranking query filters by
-            // user.minimumImportance, so items remain visible for users who
-            // have not raised that threshold.
-            logger.warn("AI analysis unavailable for GReader item {} (feed {}); persisting without score/tags",
-                    item.getId(), feed.getId());
-            feedItem.setTags(List.of());
-        }
-
+        feedItem.setTags(List.of());
         return feedItem;
+    }
+
+    /**
+     * Runs AI enrichment for the given persisted {@link FeedItem} ids in a
+     * background thread. Items whose {@code reasoning} field is already
+     * populated are skipped (idempotent re-runs are safe). When the AI
+     * service is unavailable, in cooldown, over quota, or simply fails, the
+     * row is left as-is and a future sync will retry.
+     */
+    @Async
+    public void enrichBatchAsync(List<String> feedItemIds, User user) {
+        if (feedItemIds == null || feedItemIds.isEmpty()) return;
+        var clicks = clickService.tagClicks(
+                System.currentTimeMillis() - PROMPT_TAG_TIME_FRAME,
+                System.currentTimeMillis(),
+                user);
+        for (String id : feedItemIds) {
+            try {
+                feedItemRepository.findById(id).ifPresent(item -> enrichSingle(item, user, clicks));
+            } catch (Exception e) {
+                logger.warn("AI enrichment failed for item {}: {}", id, e.getMessage());
+            }
+        }
+    }
+
+    private void enrichSingle(FeedItem item, User user, List<com.github.lamarios.newsku.models.TagClickStat> clicks) {
+        if (item.getReasoning() != null) {
+            return;
+        }
+        var analysis = openaiService.processFeedItem(
+                item.getGReaderItemId() != null ? item.getGReaderItemId() : item.getId(),
+                item.getTitle() != null ? item.getTitle() : "no title",
+                item.getDescription() != null ? item.getDescription() : "no content",
+                item.getTimeCreated(),
+                user,
+                clicks);
+        if (analysis.isEmpty()) {
+            return;
+        }
+        applyAnalysis(item, analysis.get());
+        feedItemRepository.save(item);
+    }
+
+    private static void applyAnalysis(FeedItem item, com.github.lamarios.newsku.models.OpenAiFeedResponse a) {
+        item.setImportance(a.importance());
+        item.setReasoning(a.reasoning());
+        item.setShortTitle(a.shortTitle());
+        item.setShortTeaser(a.shortTeaser());
+        item.setTags(a.tags().stream()
+                .map(String::toLowerCase)
+                .map(s -> s.replaceAll("[^a-zA-Z0-9 ]", ""))
+                .filter(s -> !s.isEmpty())
+                .toList());
     }
 
     // -----------------------------------------------------------------------
     // Helpers
     // -----------------------------------------------------------------------
-
-    /**
-     * Re-runs AI scoring for an article that was previously saved without AI analysis
-     * (reasoning == null indicates the AI pipeline never ran for this article, e.g.
-     * because the endpoint was misconfigured when the article was first imported).
-     * Articles that already have a reasoning value are left untouched.
-     */
-    private void rescoreIfNeeded(FeedItem existing, GReaderStreamItem item, User user,
-                                 List<com.github.lamarios.newsku.models.TagClickStat> clicks) {
-        if (existing.getReasoning() != null) {
-            return;
-        }
-        String rawContent = item.resolveContent();
-        String title = item.getTitle() != null ? item.getTitle() : "no title";
-        String content = rawContent != null
-                ? StringEscapeUtils.unescapeHtml4(HtmlUtils.getTextContent(rawContent))
-                : "no content";
-
-        var analysis = openaiService.processFeedItem(
-                item.getId(), title, content, item.resolveTimestampMs(), user, clicks);
-
-        if (analysis.isEmpty()) {
-            return;
-        }
-
-        var a = analysis.get();
-        existing.setImportance(a.importance());
-        existing.setReasoning(a.reasoning());
-        existing.setShortTitle(a.shortTitle());
-        existing.setShortTeaser(a.shortTeaser());
-        existing.setTags(a.tags().stream()
-                .map(String::toLowerCase)
-                .map(s -> s.replaceAll("[^a-zA-Z0-9 ]", ""))
-                .filter(s -> !s.isEmpty())
-                .toList());
-        feedItemRepository.save(existing);
-        logger.info("Re-scored previously unscored article {} for user {}", existing.getId(), user.getUsername());
-    }
 
     private static String stripFeedPrefix(String streamId) {
         if (streamId != null && streamId.startsWith("feed/")) {
