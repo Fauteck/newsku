@@ -21,6 +21,7 @@ Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 
 ### Fixed
 - Public magazine route now renders the configured layout (Top Stories, grids, headlines) instead of a plain feed list
+- GReader sync no longer blocks the feed view on slow AI backends: items are persisted before AI scoring, enrichment runs asynchronously, sync status surfaces "stale" after 40 min, and overlapping cron ticks are skipped
 
 ### Docs
 - Introduce `CHANGELOG.md` and make it mandatory in `CLAUDE.md` (Doc Index, §12 DoD, §13 Documentation Requirements)
