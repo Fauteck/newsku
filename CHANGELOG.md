@@ -14,6 +14,7 @@ Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 
 ### Added
 - Public magazine endpoint `GET /api/public/magazine/{tabId}` returning tab metadata for the shared link header
+- ASCII art startup banner showing the Feedteck logo in application logs
 
 ### Changed
 - Public magazine view now mirrors the owner's view 1:1: loads the same 3 × 24h time blocks with the tab's minimum importance and AI ranking, and shows the magazine name centered in the header
