@@ -7,6 +7,23 @@
 
 ---
 
+## Wissensquelle: llm-wiki
+
+Zentrale, gepflegte Wissensschicht für projektübergreifendes Wissen: **https://github.com/Fauteck/llm-wiki**
+
+Pflicht vor inhaltlichen Antworten:
+1. [`index.md`](https://github.com/Fauteck/llm-wiki/blob/main/index.md) des Wikis lesen.
+2. Mindestens die Repo-Übersicht öffnen: [`wiki/overview/newsku.md`](https://github.com/Fauteck/llm-wiki/blob/main/wiki/overview/newsku.md).
+3. Bei übergreifenden Themen die jeweilige Konzept-Seite aus [`wiki/concepts/`](https://github.com/Fauteck/llm-wiki/tree/main/wiki/concepts).
+
+Nach faktischen Änderungen mit Wissens-Charakter: betroffene Wiki-Seite + `log.md` pflegen (Spielregeln in [`llm-wiki/CLAUDE.md`](https://github.com/Fauteck/llm-wiki/blob/main/CLAUDE.md)).
+
+Zugriffswege auf dasselbe Repo:
+- **Claude Code (Web/lokal):** `llm-wiki/` ist parallel verfügbar.
+- **Claude-Chat / mobil:** GitHub-Connector → direkt aufs Repo.
+
+---
+
 ## Documentation Index
 
 | Document | Contents |
