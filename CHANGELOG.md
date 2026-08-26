@@ -17,6 +17,9 @@ Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 - ASCII art startup banner showing the Feedteck logo in application logs
 
 ### Changed
+- CI: `build-docker.yml` now follows the same pattern as the sibling repos — `workflow_dispatch` as the only trigger, and `build-and-push` declares `needs: quality`. A merge no longer produces an image on its own; the gate is the dispatch
+- Default branch renamed `master` → `main`, matching every other Fauteck repo
+- Example paths in `docs/testing.md` and `docs/haeufige-aufgaben.md` are now written as placeholders (`<modul>`, `<name>`) instead of look-alike file names
 - Public magazine view now mirrors the owner's view 1:1: loads the same 3 × 24h time blocks with the tab's minimum importance and AI ranking, and shows the magazine name centered in the header
 - Drop default `'Top stories'` title prefill on new `topStories` layout blocks; users opt-in to a heading
 
@@ -24,7 +27,18 @@ Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 - Public magazine route now renders the configured layout (Top Stories, grids, headlines) instead of a plain feed list
 - GReader sync no longer blocks the feed view on slow AI backends: items are persisted before AI scoring, enrichment runs asynchronously, sync status surfaces "stale" after 40 min, and overlapping cron ticks are skipped
 
+### Security
+- Secret scan as a gate: `detect-secrets` runs in the `quality` job against a committed `.secrets.baseline` and fails on any new finding. §6 demanded "no secrets in code" since forever; nothing had ever checked it. The baseline captures the state at introduction — all false positives (test placeholders, ENV defaults, l10n strings); no real secret was found
+
+### Added
+- `scripts/docs-guard.py`: checks that the documentation index and `docs/` cover each other and that every repo path named in the docs exists. Runs in the `quality` job
+- `quality` job in `build-docker.yml` running the JUnit suite — it had never run anywhere, since the JAR is packaged with `-DskipTests`
+
 ### Docs
+- `CLAUDE.md` §3/§4/§5/§11 rewritten to describe the gate that now exists, replacing the statement that nothing checks anything
+- Remove `docs/design-system.md` — labelled "Legacy" by two other documents, zero code references, and a duplicate of `DESIGN.md` plus `docs/frontend-patterns.md`. The shared Fauteck design system lives in the llm-wiki note "Fauteck Design-System (geteilt)"
+- Add `docs/issue-analyse.md` to the documentation index, marked as a point-in-time document
+- Correct the self-hosted runner claim in §2, §4 and §11 — the workflow has always run on GitHub-hosted `ubuntu-latest`
 - Add `CLAUDE.md` §13a "Doku-Hygiene": the three ways docs rot (copy, ought-rule, hand-maintained list) and the binding pointer to the llm-wiki note "Behauptungen, die niemand prüft"
 - Introduce `CHANGELOG.md` and make it mandatory in `CLAUDE.md` (Doc Index, §12 DoD, §13 Documentation Requirements)
 - Backfill pre-2026-04-22 history (PRs #1–#56) from GitHub PR titles

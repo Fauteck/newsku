@@ -1,9 +1,10 @@
 name: Build & Push Docker Image
 
+# Genau ein Ausloeser: workflow_dispatch. Ein Merge erzeugt kein Image — den
+# Workflow startet der Maintainer von Hand (Actions-Tab -> Run workflow).
+# Damit gilt hier dieselbe Regel wie in todo, kassenbuch, tourteck und
+# pruefteck: das Gate ist der Dispatch, nicht der Merge.
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 env:
@@ -12,21 +13,13 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  # Erster Lauf bewusst mit continue-on-error: Die JUnit-Suite lief bisher
-  # nirgends (das JAR wird mit -DskipTests gebaut), ihr Zustand ist deshalb
-  # unbekannt. Lokal am 2026-08-26 geprueft: 67 Tests, 0 Failures, 35 Errors —
-  # alle 35 aus TestContainers-Klassen, die ohne Docker-Daemon nicht starten.
-  # Auf ubuntu-latest gibt es einen Docker-Daemon, hier faellt also zum ersten
-  # Mal ein echtes Ergebnis an.
-  #
-  # Sobald der Job zweimal gruen durchlaeuft: continue-on-error entfernen UND
-  # in build-and-push `needs: quality` ergaenzen. Erst dann ist es ein Gate —
-  # solange beides fehlt, ist dieser Job eine Messung, keine Zusage. Das steht
-  # so auch in CLAUDE.md §5/§5a; wer das eine aendert, aendert das andere mit.
+  # Gate vor jedem Image-Build: JUnit-Suite plus Doku-Kontrakt.
+  # build-and-push deklariert `needs: quality` — ohne gruenes Gate entsteht
+  # kein Image. Ein neues Gate kommt als weiterer Schritt in diesen Job, nie
+  # als zweiter Workflow.
   quality:
-    name: Test (informativ, noch kein Gate)
+    name: Test & Doku-Kontrakt
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     steps:
       - name: Checkout repository
@@ -44,6 +37,9 @@ jobs:
           distribution: 'corretto'
           cache: maven
 
+      - name: Doku-Kontrakt
+        run: python3 scripts/docs-guard.py
+
       - name: Run JUnit suite
         run: mvn --batch-mode --no-transfer-progress test
 
@@ -57,6 +53,7 @@ jobs:
 
   build-and-push:
     name: Build JAR & Docker Image
+    needs: quality
     runs-on: ubuntu-latest
 
     permissions:

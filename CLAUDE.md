@@ -30,6 +30,11 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 
 ## Documentation Index
 
+> Durch `scripts/docs-guard.py` gegen den Ordner `docs/` geprüft (Schritt im
+> `quality`-Job) — die Zaunmarken bitte stehen lassen.
+
+<!-- kontrakt:doku-index -->
+
 | Document | Contents |
 |----------|--------|
 | [README.md](README.md) | Feature overview, architecture diagram, API reference |
@@ -45,6 +50,8 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 | [docs/testing.md](docs/testing.md) | JUnit, TestContainers, Flutter tests, mocking |
 | [docs/haeufige-aufgaben.md](docs/haeufige-aufgaben.md) | How-to guides for common tasks |
 | [docs/issue-analyse.md](docs/issue-analyse.md) | **Zeitpunkt-Dokument** (2026-04-10): Audit-Befunde gegen den damaligen `main`-Stand. Beschreibt einen Zeitpunkt und wird nicht nachgepflegt — offene Punkte gehören nach Todoteck |
+
+<!-- /kontrakt:doku-index -->
 
 ---
 
@@ -137,16 +144,19 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 
 - Development on feature/fix branches
 - Merge via Pull Request
-- `main` is release-ready / production-near and protected
-- **No CI runs on a PR, and nothing blocks a bad merge.** `build-docker.yml` is
-  the only workflow; it triggers on **push to `main`** (and `workflow_dispatch`).
-  Its `quality` job runs the JUnit suite, but non-blocking — `continue-on-error`
-  is set and `build-and-push` declares no `needs:`, so the image is published
-  from whatever landed on `main` (§5). The gate before the merge is therefore
-  the **PR review** plus a local run, nothing else.
+- `main` is release-ready **as of the last green dispatch** (§5) — not
+  continuously, because a merge runs no check
+- **No CI runs on a PR.** `build-docker.yml` is the only workflow and its only
+  trigger is `workflow_dispatch` (§4), so there is no green check to wait for.
+  The gate before the merge is the **PR review**; the automated gates run inside
+  the dispatched workflow (§5).
 - Before merging, run what covers the change locally — `mvn test` for the Spring
   side, `flutter test` for the app — and state in the PR which commands were run
   and their result.
+
+Der Default-Branch heißt **`main`** — seit 2026-08-26; vorher `master`. newsku
+war das einzige Fauteck-Repo mit abweichendem Namen, was jeden Doku-Link und
+jedes Skript einen Sonderfall kosten ließ.
 
 Recommended branch naming: `feature/...`, `fix/...`, `chore/...`
 
@@ -160,57 +170,57 @@ Custom images are built via GitHub Actions on GitHub-hosted `ubuntu-latest` —
 **not** on a self-hosted runner.
 
 - **No GitHub Releases / no SemVer / no Git tags** as "release mechanism" for custom images
-- Build trigger: push to `main` (after PR merge) or manually via `workflow_dispatch`
+- **Exactly one trigger: `workflow_dispatch`.** A merge into `main` produces
+  **no** image on its own — the maintainer starts the workflow by hand
+  (Actions tab → Run workflow). Do not add `push`, `pull_request` or `schedule`.
+- The workflow has two jobs: `quality` and `build-and-push`, which declares
+  `needs: quality` — no image is built unless the gate is green
 - Images receive **container tags** `latest` + short SHA commit hash
 - Registry: GHCR (`ghcr.io/<owner>/<image>`)
-- Every merge to `main` automatically produces a new image
 
 ---
 
 ## 5. Quality Requirements (Gates)
 
-> **There is still no gate in this repo — but there is now a measurement.**
-> Since 2026-08-26 `build-docker.yml` has a `quality` job that runs
-> `mvn test`. It carries **`continue-on-error: true`**, and `build-and-push`
-> does **not** declare `needs: quality`. A red suite therefore blocks nothing:
-> a push to `main` still builds and pushes an image, and the JAR is still built
-> with `-DskipTests`.
->
-> That is deliberate and temporary. The suite had never run anywhere, so its
-> state was unknown — turning it into a blocking gate in one step would have
-> risked freezing every release on a failure nobody had seen yet. See §5a for
-> the two lines that turn the measurement into a gate.
+**The gate is the dispatch, not the merge.** This repo has no PR CI (§4), so a
+merge into `main` passes no automated check. What is checked — and what blocks
+every image build — is the `quality` job of `build-docker.yml`:
 
-The list below is what must hold before a merge. Since nothing enforces it, it
-holds only if a human checks it:
+| Schritt | Prüft |
+|---|---|
+| Secret-Scan (`detect-secrets`) | keine neuen Geheimnisse gegenüber `.secrets.baseline` (§6) |
+| Doku-Kontrakt (`scripts/docs-guard.py`) | Katalog deckt `docs/`, jeder genannte Repo-Pfad existiert (§13a) |
+| JUnit (`mvn test`) | die Suite unter `src/test/java/` |
+
+`build-and-push` declares `needs: quality`. A new gate is added as a further
+**step in that job**, never as a separate workflow.
+
+Before dispatching, the following must hold:
 
 - Tests run locally (`mvn test`, `flutter test`)
 - Linting/formatting is consistent
 - No debug output / temporary workarounds
 - No unused ENV variables
 
-### 5a. Turning the measurement into a gate
+Two consequences, both deliberate: `main` is release-ready as of the last green
+dispatch, not continuously; and a regression can reach `main`, but never a
+published image — it does block the release until fixed.
 
-The job exists; two changes make it binding. Do **both** or neither — one alone
-is worse than the current state, because it looks like a gate without being one:
+### 5a. Was sich am 2026-08-26 geändert hat — und was beim ersten Dispatch zu erwarten ist
 
-1. Remove `continue-on-error: true` from the `quality` job.
-2. Add `needs: quality` to `build-and-push`.
+Bis dahin gab es in diesem Repo **kein** Gate: Der Workflow löste auf Push aus,
+hatte kein `needs:`, und das JAR wurde mit `-DskipTests` gebaut. Die JUnit-Suite
+existierte, lief aber nirgends.
 
-**When:** after the job has come back green twice on `main`. Watch the first
-runs — the local run on 2026-08-26 produced 67 tests, 0 failures and 35 errors,
-and all 35 came from `TestContainerTest` subclasses failing to start a Postgres
-container. That was a missing Docker daemon in the local sandbox, not a broken
-test; `ubuntu-latest` has one, so CI is the first place a real verdict exists.
-The `quality` job uploads its surefire reports as an artifact for exactly that
-reason.
+`-DskipTests` bleibt im Packaging-Schritt — richtig so, denn die Suite läuft
+jetzt davor im `quality`-Job; zweimal wäre Verschwendung.
 
-Optional third step, independent of the gate: drop `-DskipTests` from the
-packaging command, or keep it — with a green `quality` job in front, packaging
-does not need to run the suite a second time.
-
-**Until step 1 and 2 are done, no rule in this file may claim that CI checks
-anything.** It measures.
+> **Der erste Dispatch ist der erste echte Testlauf dieser Suite.** Ein lokaler
+> Lauf am 2026-08-26 ergab 67 Tests, 0 Failures, 35 Errors — alle 35 aus
+> `TestContainerTest`-Klassen, die ohne Docker-Daemon nicht starten. Das war die
+> Sandbox, kein kaputter Test; `ubuntu-latest` hat einen Daemon. Sollte die
+> Suite dort trotzdem rot sein, blockiert sie ab sofort den Image-Build — das
+> ist die Absicht, aber es kann beim ersten Mal überraschen.
 
 ---
 
@@ -313,10 +323,10 @@ Sitemap: https://example.com/sitemap.xml
 
 ### Custom Images (GitHub-hosted Runner)
 
-- PR → merge to `main` → GitHub Actions builds the image on GitHub-hosted
-  `ubuntu-latest`
-- Push to GHCR (container tags: `latest` + SHA)
-- Manual trigger via `workflow_dispatch` possible
+- PR → merge into `main` → **someone dispatches the workflow** (Actions tab →
+  Run workflow). Nothing happens automatically.
+- The `quality` job runs first; only if it is green does `build-and-push` push
+  to GHCR (container tags: `latest` + SHA)
 
 ### Deployment in docker-configs (GitOps)
 
@@ -336,7 +346,7 @@ Sitemap: https://example.com/sitemap.xml
 A change is "done" when:
 
 - Code implemented
-- Tests green **locally** — CI runs them since 2026-08-26, but non-blocking (§5)
+- Tests green — seit 2026-08-26 prüft der `quality`-Job sie beim Dispatch (§5)
 - Documentation updated (at minimum README, if affected)
 - `CHANGELOG.md` updated (entry under `[Unreleased]` or under a date block — see §13)
 - PR reviewed and merged
@@ -387,7 +397,12 @@ Kurzfassung für dieses Repo:
 - Eine Regel hier beschreibt, was **tatsächlich passiert**. Weicht sie von
   der Praxis ab, wird die Regel korrigiert — nicht die Praxis behauptet.
 - Was sich aus dem Code aufzählen lässt (Modul-, Route-, Tabellenlisten,
-  Verzeichnisbäume), gehört in einen Test, nicht in Prosa.
+  Verzeichnisbäume), gehört in einen Test, nicht in Prosa. Den gibt es:
+  `scripts/docs-guard.py` prüft, dass der Dokumentations-Index und der Ordner
+  `docs/` deckungsgleich sind und jeder genannte Repo-Pfad existiert. Er läuft
+  im `quality`-Job. Beispielpfade in How-to-Doku werden als Platzhalter
+  geschrieben (`<modul>`, `<name>`) — dadurch bleibt der Guard streng und die
+  Anleitung wird nebenbei lesbarer.
 - Status („X von Y umgesetzt", „noch kein PR") gehört nach Todoteck oder in
   git — nicht in eine Datei, die beim Erledigen niemand anfasst.
 
@@ -439,7 +454,7 @@ Three homes, no fourth:
 - **What holds across all Fauteck applications** — the wiki note
   „Fauteck Design-System (geteilt)" in the Todoteck project `llm-wiki`.
 
-> Until 2026-08-26 a `docs/design-system.md` sat beside these, labelled „Legacy"
+> Until 2026-08-26 a file *docs/design-system.md* sat beside these, labelled „Legacy"
 > by both DESIGN.md and this file. It had zero code references and repeated what
 > the other two already say — typography, colours, breakpoints, icons from
 > DESIGN.md, M3 styling from frontend-patterns.md. Removed under §13a.
