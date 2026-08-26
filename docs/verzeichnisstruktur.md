@@ -33,7 +33,6 @@
 │   ├── code-konventionen.md
 │   ├── testing.md
 │   ├── haeufige-aufgaben.md
-│   ├── design-system.md
 │   ├── issue-analyse.md
 │   └── assets/                        # Screenshots and logos
 ├── mkdocs/                            # Public documentation website

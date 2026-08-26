@@ -1,9 +1,10 @@
 name: Build & Push Docker Image
 
+# Genau ein Ausloeser: workflow_dispatch. Ein Merge erzeugt kein Image — den
+# Workflow startet der Maintainer von Hand (Actions-Tab -> Run workflow).
+# Damit gilt hier dieselbe Regel wie in todo, kassenbuch, tourteck und
+# pruefteck: das Gate ist der Dispatch, nicht der Merge.
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 env:
@@ -12,8 +13,47 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
+  # Gate vor jedem Image-Build: JUnit-Suite plus Doku-Kontrakt.
+  # build-and-push deklariert `needs: quality` — ohne gruenes Gate entsteht
+  # kein Image. Ein neues Gate kommt als weiterer Schritt in diesen Job, nie
+  # als zweiter Workflow.
+  quality:
+    name: Test & Doku-Kontrakt
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Secret-Scan (detect-secrets)
+        run: |
+          python3 -m pip install --quiet detect-secrets==1.5.0
+          detect-secrets-hook --baseline .secrets.baseline $(git ls-files)
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'corretto'
+          cache: maven
+
+      - name: Doku-Kontrakt
+        run: python3 scripts/docs-guard.py
+
+      - name: Run JUnit suite
+        run: mvn --batch-mode --no-transfer-progress test
+
+      - name: Testberichte sichern
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/
+          if-no-files-found: warn
+
   build-and-push:
     name: Build JAR & Docker Image
+    needs: quality
     runs-on: ubuntu-latest
 
     permissions:

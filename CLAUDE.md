@@ -30,6 +30,11 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 
 ## Documentation Index
 
+> Durch `scripts/docs-guard.py` gegen den Ordner `docs/` geprüft (Schritt im
+> `quality`-Job) — die Zaunmarken bitte stehen lassen.
+
+<!-- kontrakt:doku-index -->
+
 | Document | Contents |
 |----------|--------|
 | [README.md](README.md) | Feature overview, architecture diagram, API reference |
@@ -44,7 +49,9 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 | [docs/code-konventionen.md](docs/code-konventionen.md) | Style guide, naming, Java and Dart patterns |
 | [docs/testing.md](docs/testing.md) | JUnit, TestContainers, Flutter tests, mocking |
 | [docs/haeufige-aufgaben.md](docs/haeufige-aufgaben.md) | How-to guides for common tasks |
-| [docs/design-system.md](docs/design-system.md) | Legacy Flutter/M3 design reference (see DESIGN.md for canonical tokens) |
+| [docs/issue-analyse.md](docs/issue-analyse.md) | **Zeitpunkt-Dokument** (2026-04-10): Audit-Befunde gegen den damaligen `main`-Stand. Beschreibt einen Zeitpunkt und wird nicht nachgepflegt — offene Punkte gehören nach Todoteck |
+
+<!-- /kontrakt:doku-index -->
 
 ---
 
@@ -54,7 +61,7 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 1a. [Working Style for Long Sessions (API Stability)](#1a-working-style-for-long-sessions-api-stability)
 2. [Permitted / Not Permitted](#2-permitted--not-permitted)
 3. [Branching, Merge, Reviews](#3-branching-merge-reviews)
-4. [Image Builds (Local Runner)](#4-image-builds-local-runner)
+4. [Image Builds (GitHub-hosted Runner)](#4-image-builds-github-hosted-runner)
 5. [Quality Requirements (Gates)](#5-quality-requirements-gates)
 6. [Security & Secrets](#6-security--secrets)
 7. [OWASP Top 10](#7-owasp-top-10)
@@ -119,7 +126,7 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 - Change and refactor code (within the existing architecture)
 - Create/modify files (including tests and documentation)
 - Adjust build/CI configuration (if necessary and justified)
-- Adapt CI/CD workflows for Local Runner (self-hosted runner)
+- Adjust CI/CD workflows (runner choice, gates, build steps)
 
 ### The AI Must NOT
 
@@ -137,8 +144,19 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 
 - Development on feature/fix branches
 - Merge via Pull Request
-- `main` is release-ready / production-near and protected
-- CI must be green before merging
+- `main` is release-ready **as of the last green dispatch** (§5) — not
+  continuously, because a merge runs no check
+- **No CI runs on a PR.** `build-docker.yml` is the only workflow and its only
+  trigger is `workflow_dispatch` (§4), so there is no green check to wait for.
+  The gate before the merge is the **PR review**; the automated gates run inside
+  the dispatched workflow (§5).
+- Before merging, run what covers the change locally — `mvn test` for the Spring
+  side, `flutter test` for the app — and state in the PR which commands were run
+  and their result.
+
+Der Default-Branch heißt **`main`** — seit 2026-08-26; vorher `master`. newsku
+war das einzige Fauteck-Repo mit abweichendem Namen, was jeden Doku-Link und
+jedes Skript einen Sonderfall kosten ließ.
 
 Recommended branch naming: `feature/...`, `fix/...`, `chore/...`
 
@@ -146,29 +164,63 @@ PR includes: purpose, scope, test notes, possible breaking changes
 
 ---
 
-## 4. Image Builds (Local Runner)
+## 4. Image Builds (GitHub-hosted Runner)
 
-Custom images are built via GitHub Actions with a self-hosted runner.
+Custom images are built via GitHub Actions on GitHub-hosted `ubuntu-latest` —
+**not** on a self-hosted runner.
 
 - **No GitHub Releases / no SemVer / no Git tags** as "release mechanism" for custom images
-- Build trigger: push to `main` (after PR merge) or manually via `workflow_dispatch`
+- **Exactly one trigger: `workflow_dispatch`.** A merge into `main` produces
+  **no** image on its own — the maintainer starts the workflow by hand
+  (Actions tab → Run workflow). Do not add `push`, `pull_request` or `schedule`.
+- The workflow has two jobs: `quality` and `build-and-push`, which declares
+  `needs: quality` — no image is built unless the gate is green
 - Images receive **container tags** `latest` + short SHA commit hash
 - Registry: GHCR (`ghcr.io/<owner>/<image>`)
-- Every merge to `main` automatically produces a new image
 
 ---
 
 ## 5. Quality Requirements (Gates)
 
-Before a merge to `main`:
+**The gate is the dispatch, not the merge.** This repo has no PR CI (§4), so a
+merge into `main` passes no automated check. What is checked — and what blocks
+every image build — is the `quality` job of `build-docker.yml`:
 
-- Tests run (unit/integration if available)
+| Schritt | Prüft |
+|---|---|
+| Secret-Scan (`detect-secrets`) | keine neuen Geheimnisse gegenüber `.secrets.baseline` (§6) |
+| Doku-Kontrakt (`scripts/docs-guard.py`) | Katalog deckt `docs/`, jeder genannte Repo-Pfad existiert (§13a) |
+| JUnit (`mvn test`) | die Suite unter `src/test/java/` |
+
+`build-and-push` declares `needs: quality`. A new gate is added as a further
+**step in that job**, never as a separate workflow.
+
+Before dispatching, the following must hold:
+
+- Tests run locally (`mvn test`, `flutter test`)
 - Linting/formatting is consistent
 - No debug output / temporary workarounds
 - No unused ENV variables
-- Build in CI successful and reproducible
 
-Recommended CI jobs: `lint`, `test`, `build`, optional `security` (dependency/secret scan)
+Two consequences, both deliberate: `main` is release-ready as of the last green
+dispatch, not continuously; and a regression can reach `main`, but never a
+published image — it does block the release until fixed.
+
+### 5a. Was sich am 2026-08-26 geändert hat — und was beim ersten Dispatch zu erwarten ist
+
+Bis dahin gab es in diesem Repo **kein** Gate: Der Workflow löste auf Push aus,
+hatte kein `needs:`, und das JAR wurde mit `-DskipTests` gebaut. Die JUnit-Suite
+existierte, lief aber nirgends.
+
+`-DskipTests` bleibt im Packaging-Schritt — richtig so, denn die Suite läuft
+jetzt davor im `quality`-Job; zweimal wäre Verschwendung.
+
+> **Der erste Dispatch ist der erste echte Testlauf dieser Suite.** Ein lokaler
+> Lauf am 2026-08-26 ergab 67 Tests, 0 Failures, 35 Errors — alle 35 aus
+> `TestContainerTest`-Klassen, die ohne Docker-Daemon nicht starten. Das war die
+> Sandbox, kein kaputter Test; `ubuntu-latest` hat einen Daemon. Sollte die
+> Suite dort trotzdem rot sein, blockiert sie ab sofort den Image-Build — das
+> ist die Absicht, aber es kann beim ersten Mal überraschen.
 
 ---
 
@@ -179,6 +231,17 @@ Recommended CI jobs: `lint`, `test`, `build`, optional `security` (dependency/se
 - Never commit `.env` — use `.env.example` instead
 - Secrets exclusively via ENV/secret management
 - No "default admin password" in production images
+
+> **Seit 2026-08-26 ist diese Regel geprüft, nicht nur behauptet.** Der
+> `quality`-Job führt `detect-secrets` gegen `.secrets.baseline` aus und wird rot,
+> sobald ein Fund hinzukommt, den die Baseline nicht kennt. Die Baseline hält den
+> Stand vom Einbau fest — durchweg Fehlalarme (Test-Platzhalter, ENV-Defaults,
+> SRI-Hashes); ein echtes Geheimnis war nicht darunter.
+>
+> **Ein neuer Fehlalarm gehört in die Baseline, nicht in eine Ausnahme im Gate:**
+> `detect-secrets scan --baseline .secrets.baseline` neu erzeugen und den Diff im
+> PR mitschicken, oder die Zeile mit `pragma: allowlist secret` markieren. Wer den
+> Schritt entfernt, nimmt §7 die einzige Instanz, die ihn verletzen sehen kann.
 
 ---
 
@@ -258,11 +321,12 @@ Sitemap: https://example.com/sitemap.xml
 
 ## 11. Build & Deployment
 
-### Custom Images (Local Runner)
+### Custom Images (GitHub-hosted Runner)
 
-- PR → merge to `main` → GitHub Actions builds image on self-hosted runner
-- Push to GHCR (container tags: `latest` + SHA)
-- Manual trigger via `workflow_dispatch` possible
+- PR → merge into `main` → **someone dispatches the workflow** (Actions tab →
+  Run workflow). Nothing happens automatically.
+- The `quality` job runs first; only if it is green does `build-and-push` push
+  to GHCR (container tags: `latest` + SHA)
 
 ### Deployment in docker-configs (GitOps)
 
@@ -282,7 +346,7 @@ Sitemap: https://example.com/sitemap.xml
 A change is "done" when:
 
 - Code implemented
-- Tests green
+- Tests green — seit 2026-08-26 prüft der `quality`-Job sie beim Dispatch (§5)
 - Documentation updated (at minimum README, if affected)
 - `CHANGELOG.md` updated (entry under `[Unreleased]` or under a date block — see §13)
 - PR reviewed and merged
@@ -333,7 +397,12 @@ Kurzfassung für dieses Repo:
 - Eine Regel hier beschreibt, was **tatsächlich passiert**. Weicht sie von
   der Praxis ab, wird die Regel korrigiert — nicht die Praxis behauptet.
 - Was sich aus dem Code aufzählen lässt (Modul-, Route-, Tabellenlisten,
-  Verzeichnisbäume), gehört in einen Test, nicht in Prosa.
+  Verzeichnisbäume), gehört in einen Test, nicht in Prosa. Den gibt es:
+  `scripts/docs-guard.py` prüft, dass der Dokumentations-Index und der Ordner
+  `docs/` deckungsgleich sind und jeder genannte Repo-Pfad existiert. Er läuft
+  im `quality`-Job. Beispielpfade in How-to-Doku werden als Platzhalter
+  geschrieben (`<modul>`, `<name>`) — dadurch bleibt der Guard streng und die
+  Anleitung wird nebenbei lesbarer.
 - Status („X von Y umgesetzt", „noch kein PR") gehört nach Todoteck oder in
   git — nicht in eine Datei, die beim Erledigen niemand anfasst.
 
@@ -376,9 +445,19 @@ Every `README.md` in this repository follows this structure. Sections that do no
 
 ## 15. Design System
 
-→ Canonical token reference: [DESIGN.md](DESIGN.md)
+Three homes, no fourth:
 
-→ Flutter/M3 patterns: [docs/design-system.md](docs/design-system.md)
+- **Token values and their rationale** — [DESIGN.md](DESIGN.md). Code-bound: the
+  importance colours, breakpoints and component tokens are cited from there.
+- **Flutter/M3 implementation patterns** — [docs/frontend-patterns.md](docs/frontend-patterns.md)
+  (routing, BLoC, services, styling).
+- **What holds across all Fauteck applications** — the wiki note
+  „Fauteck Design-System (geteilt)" in the Todoteck project `llm-wiki`.
+
+> Until 2026-08-26 a file *docs/design-system.md* sat beside these, labelled „Legacy"
+> by both DESIGN.md and this file. It had zero code references and repeated what
+> the other two already say — typography, colours, breakpoints, icons from
+> DESIGN.md, M3 styling from frontend-patterns.md. Removed under §13a.
 
 
 ## Compatibility with Other AI Tools

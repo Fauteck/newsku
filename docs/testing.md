@@ -286,21 +286,21 @@ void main() {
 
 ### Backend (Service Test)
 
-1. Create file: `src/test/java/com/github/lamarios/newsku/services/MyServiceTest.java`
+1. Create file: `src/test/java/com/github/lamarios/newsku/services/<Name>ServiceTest.java`
 2. Use `@ExtendWith(MockitoExtension.class)`
 3. Mock dependencies with `@Mock`
 4. Instantiate service with `@InjectMocks`
 
 ### Backend (Integration Test)
 
-1. Create file: `src/test/java/com/github/lamarios/newsku/integration/MyIT.java`
+1. Create file: `src/test/java/com/github/lamarios/newsku/integration/<Name>IT.java`
 2. Use `@SpringBootTest` + `@Testcontainers`
 3. Start PostgreSQL container via `@Container`
 4. Inject properties via `@DynamicPropertySource`
 
 ### Flutter (Unit Test)
 
-1. Create file: `src/main/app/test/my_test.dart`
+1. Create file: `src/main/app/test/<name>_test.dart`
 2. Import `flutter_test`
 3. Use `group()` + `test()` / `testWidgets()`
 

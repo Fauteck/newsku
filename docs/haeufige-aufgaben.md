@@ -15,10 +15,10 @@
 | `src/main/java/.../persistence/repositories/MyRepository.java` | JPA repository |
 | `src/main/java/.../services/MyService.java` | Business logic |
 | `src/main/java/.../controllers/MyController.java` | REST controller |
-| `src/main/app/lib/my_module/models/my_model.dart` | Dart model |
-| `src/main/app/lib/my_module/my_service.dart` | HTTP service |
-| `src/main/app/lib/my_module/my_bloc.dart` | BLoC |
-| `src/main/app/lib/my_module/my_view.dart` | Flutter screen |
+| `src/main/app/lib/<modul>/models/<name>.dart` | Dart model |
+| `src/main/app/lib/<modul>/<name>_service.dart` | HTTP service |
+| `src/main/app/lib/<modul>/<name>_bloc.dart` | BLoC |
+| `src/main/app/lib/<modul>/<name>_view.dart` | Flutter screen |
 | `src/main/app/lib/router.dart` | Register route |
 
 ### Steps
