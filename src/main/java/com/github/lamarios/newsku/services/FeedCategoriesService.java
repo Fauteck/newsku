@@ -82,13 +82,13 @@ public class FeedCategoriesService {
     }
 
     /**
-     * Short-TTL cached by authenticated username (issue B17).
-     * Categories change rarely; the list is requested on every layout render.
-     * Key is derived via SpEL from the SecurityContext because
-     * {@code getCategories()} is zero-argument.
+     * Short-TTL cached per user (issue B17). Categories change rarely; the
+     * list is requested on every layout render. {@code getCategories()} is
+     * zero-argument, so the SpEL key asks the same source the method body
+     * uses — {@code UserService.getCurrentUser()} — rather than reading the
+     * SecurityContext as a second source of truth (see {@code FeedService}).
      */
-    @Cacheable(value = "feedCategoriesByUser",
-            key = "T(org.springframework.security.core.context.SecurityContextHolder).context.authentication.name")
+    @Cacheable(value = "feedCategoriesByUser", key = "@userService.currentUser.username")
     @Transactional(readOnly = true)
     public List<FeedCategory> getCategories() {
         User user = userService.getCurrentUser();

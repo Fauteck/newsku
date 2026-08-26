@@ -36,7 +36,9 @@ public class ClickControllerTest extends TestContainerTest {
 
         feedItemService.refreshFeedWorker(feed);
 
-        var items = feedItemController.getItems(0L, System.currentTimeMillis(), 0, 9999999, null, null, null, null);
+        // 2000 is the @Max on getItems' pageSize (see PageSizeBoundsTest) —
+        // anything larger is rejected by method validation before the call.
+        var items = feedItemController.getItems(0L, System.currentTimeMillis(), 0, 2000, null, null, null, null);
 
         assertTrue(items.hasContent());
 
