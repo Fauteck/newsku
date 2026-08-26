@@ -25,6 +25,7 @@ Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 - GReader sync no longer blocks the feed view on slow AI backends: items are persisted before AI scoring, enrichment runs asynchronously, sync status surfaces "stale" after 40 min, and overlapping cron ticks are skipped
 
 ### Docs
+- Add `CLAUDE.md` §13a "Doku-Hygiene": the three ways docs rot (copy, ought-rule, hand-maintained list) and the binding pointer to the llm-wiki note "Behauptungen, die niemand prüft"
 - Introduce `CHANGELOG.md` and make it mandatory in `CLAUDE.md` (Doc Index, §12 DoD, §13 Documentation Requirements)
 - Backfill pre-2026-04-22 history (PRs #1–#56) from GitHub PR titles
 
