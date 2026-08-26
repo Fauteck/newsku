@@ -222,6 +222,12 @@ jetzt davor im `quality`-Job; zweimal wäre Verschwendung.
 > Suite dort trotzdem rot sein, blockiert sie ab sofort den Image-Build — das
 > ist die Absicht, aber es kann beim ersten Mal überraschen.
 
+Und genau so kam es: Der erste Dispatch am 2026-08-26 war rot — 67 Tests, 8
+Errors, drei echte Defekte, die seit dem jeweiligen Merge unbemerkt in `main`
+lagen (SpEL-Cache-Key gegen einen leeren SecurityContext, ein Fixture auf Port
+`0`, ein Testaufruf oberhalb der `@Max`-Grenze). Das Gate hat beim ersten
+Einsatz getan, wofür es gebaut wurde.
+
 ---
 
 ## 6. Security & Secrets

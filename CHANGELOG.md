@@ -13,6 +13,7 @@ Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 ## [Unreleased]
 
 ### Added
+- `UserScopedCacheKeyTest`: guards the SpEL keys of the two zero-argument, user-scoped caches. Needs neither database nor Docker, so the regression is caught even where the TestContainers-backed tests cannot start
 - Public magazine endpoint `GET /api/public/magazine/{tabId}` returning tab metadata for the shared link header
 - ASCII art startup banner showing the Feedteck logo in application logs
 
@@ -24,6 +25,9 @@ Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 - Drop default `'Top stories'` title prefill on new `topStories` layout blocks; users opt-in to a heading
 
 ### Fixed
+- `feedsByUser` / `feedCategoriesByUser` cache keys no longer read the username straight out of the `SecurityContextHolder`. That was a second source of truth beside `UserService.getCurrentUser()` and blew up with `EL1007E: Property or field 'name' cannot be found on null` for every caller that resolves its user differently — which took six controller tests down in the first dispatched `quality` run. The key now asks `getCurrentUser()`, the same source the method bodies use
+- `SavedItemsPaginationTest` pointed its second fixture feed at `http://localhost:0/...` instead of the injected random port, so the feed could never be read
+- `ClickControllerTest` requested `pageSize=9999999`, above the `@Max(2000)` that `PageSizeBoundsTest` pins on `getItems`
 - Public magazine route now renders the configured layout (Top Stories, grids, headlines) instead of a plain feed list
 - GReader sync no longer blocks the feed view on slow AI backends: items are persisted before AI scoring, enrichment runs asynchronously, sync status surfaces "stale" after 40 min, and overlapping cron ticks are skipped
 

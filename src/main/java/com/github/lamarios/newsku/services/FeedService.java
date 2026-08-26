@@ -107,14 +107,16 @@ public class FeedService {
     }
 
     /**
-     * Cached per authenticated username — every request chain hits the feed
-     * list several times (controllers + services). Short TTL + explicit
-     * eviction on mutating calls keeps it fresh (issue B17). The SpEL key
-     * reads from the SecurityContext rather than method args because
-     * {@code getFeeds()} itself is zero-argument.
+     * Cached per user — every request chain hits the feed list several times
+     * (controllers + services). Short TTL + explicit eviction on mutating
+     * calls keeps it fresh (issue B17). {@code getFeeds()} is zero-argument,
+     * so the SpEL key asks the same source the method body uses:
+     * {@code UserService.getCurrentUser()}. Reading the SecurityContext
+     * directly would be a second, divergent source of truth — it blows up
+     * with {@code EL1007E … 'name' cannot be found on null} whenever the
+     * caller resolves its user some other way (every test does).
      */
-    @Cacheable(value = "feedsByUser",
-            key = "T(org.springframework.security.core.context.SecurityContextHolder).context.authentication.name")
+    @Cacheable(value = "feedsByUser", key = "@userService.currentUser.username")
     @Transactional(readOnly = true)
     public List<Feed> getFeeds() {
         return feedRepository.getFeedsByUser(userService.getCurrentUser());

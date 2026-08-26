@@ -58,7 +58,7 @@ public class SavedItemsPaginationTest extends TestContainerTest {
 
     @Test
     public void savedPaged_unknownSortField_fallsBackToSavedAt() throws SQLException, NewskuException {
-        var feed = feedController.addFeed("http://localhost:0/test/rss/one-month-feed", true);
+        var feed = feedController.addFeed("http://localhost:" + port + "/test/rss/one-month-feed", true);
         feedItemService.refreshFeedWorker(feed);
         var items = feedItemController.getItems(0L, System.currentTimeMillis(), 0, 500, null, null, null, null);
         if (!items.getContent().isEmpty()) {
