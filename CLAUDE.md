@@ -44,7 +44,7 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 | [docs/code-konventionen.md](docs/code-konventionen.md) | Style guide, naming, Java and Dart patterns |
 | [docs/testing.md](docs/testing.md) | JUnit, TestContainers, Flutter tests, mocking |
 | [docs/haeufige-aufgaben.md](docs/haeufige-aufgaben.md) | How-to guides for common tasks |
-| [docs/design-system.md](docs/design-system.md) | Legacy Flutter/M3 design reference (see DESIGN.md for canonical tokens) |
+| [docs/issue-analyse.md](docs/issue-analyse.md) | **Zeitpunkt-Dokument** (2026-04-10): Audit-Befunde gegen den damaligen `main`-Stand. Beschreibt einen Zeitpunkt und wird nicht nachgepflegt — offene Punkte gehören nach Todoteck |
 
 ---
 
@@ -138,7 +138,15 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 - Development on feature/fix branches
 - Merge via Pull Request
 - `main` is release-ready / production-near and protected
-- CI must be green before merging
+- **No CI runs on a PR, and no test runs anywhere.** `build-docker.yml` is the
+  only workflow; it triggers on **push to `main`** (and `workflow_dispatch`) and
+  builds the JAR with `mvn ... package -DskipTests`. There is no `quality`/`test`
+  job and no `needs:` gate — the image is published from whatever landed on
+  `main`. The gate before the merge is therefore the **PR review** plus a local
+  run, nothing else.
+- Before merging, run what covers the change locally — `mvn test` for the Spring
+  side, `flutter test` for the app — and state in the PR which commands were run
+  and their result.
 
 Recommended branch naming: `feature/...`, `fix/...`, `chore/...`
 
@@ -160,15 +168,27 @@ Custom images are built via GitHub Actions with a self-hosted runner.
 
 ## 5. Quality Requirements (Gates)
 
-Before a merge to `main`:
+> **There is no automated gate in this repo.** Unlike the sibling repos
+> (`todo`, `kassenbuch`, `tourteck`, `pruefteck`), `build-docker.yml` has no
+> `quality` job and no `needs:` dependency: a push to `main` builds and pushes an
+> image directly, and the JAR is built with `-DskipTests`. The JUnit suite under
+> `src/test/java/` therefore never runs in CI. This is a statement of fact, not
+> an endorsement — see §5a for what it would take to close it.
 
-- Tests run (unit/integration if available)
+The list below is what must hold before a merge. Since nothing enforces it, it
+holds only if a human checks it:
+
+- Tests run locally (`mvn test`, `flutter test`)
 - Linting/formatting is consistent
 - No debug output / temporary workarounds
 - No unused ENV variables
-- Build in CI successful and reproducible
 
-Recommended CI jobs: `lint`, `test`, `build`, optional `security` (dependency/secret scan)
+### 5a. The open gap
+
+Closing it means adding a `quality` job to `build-docker.yml` (checkout, JDK 25,
+`mvn --batch-mode test`) and making `build-and-push` declare `needs: quality`,
+plus dropping `-DskipTests` or keeping it only in the packaging step. Until that
+happens, no rule in this file may claim that CI checks anything.
 
 ---
 
@@ -282,7 +302,7 @@ Sitemap: https://example.com/sitemap.xml
 A change is "done" when:
 
 - Code implemented
-- Tests green
+- Tests green **locally** (nothing runs them in CI — §5)
 - Documentation updated (at minimum README, if affected)
 - `CHANGELOG.md` updated (entry under `[Unreleased]` or under a date block — see §13)
 - PR reviewed and merged
@@ -376,9 +396,19 @@ Every `README.md` in this repository follows this structure. Sections that do no
 
 ## 15. Design System
 
-→ Canonical token reference: [DESIGN.md](DESIGN.md)
+Three homes, no fourth:
 
-→ Flutter/M3 patterns: [docs/design-system.md](docs/design-system.md)
+- **Token values and their rationale** — [DESIGN.md](DESIGN.md). Code-bound: the
+  importance colours, breakpoints and component tokens are cited from there.
+- **Flutter/M3 implementation patterns** — [docs/frontend-patterns.md](docs/frontend-patterns.md)
+  (routing, BLoC, services, styling).
+- **What holds across all Fauteck applications** — the wiki note
+  „Fauteck Design-System (geteilt)" in the Todoteck project `llm-wiki`.
+
+> Until 2026-08-26 a `docs/design-system.md` sat beside these, labelled „Legacy"
+> by both DESIGN.md and this file. It had zero code references and repeated what
+> the other two already say — typography, colours, breakpoints, icons from
+> DESIGN.md, M3 styling from frontend-patterns.md. Removed under §13a.
 
 
 ## Compatibility with Other AI Tools

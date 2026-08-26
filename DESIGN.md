@@ -513,6 +513,6 @@ User-selectable preferences stored in `SharedPreferences`:
 ## Related Documents
 
 - [CLAUDE.md](CLAUDE.md) — Development rules, documentation index
-- [docs/design-system.md](docs/design-system.md) — Legacy design system reference (Flutter patterns)
+- [docs/frontend-patterns.md](docs/frontend-patterns.md) — Flutter/BLoC patterns, routing, M3 styling
 - [docs/frontend-patterns.md](docs/frontend-patterns.md) — BLoC, routing, services
 - [docs/code-conventions.md](docs/code-conventions.md) — Dart/Flutter code style
