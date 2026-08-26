@@ -54,7 +54,7 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 1a. [Working Style for Long Sessions (API Stability)](#1a-working-style-for-long-sessions-api-stability)
 2. [Permitted / Not Permitted](#2-permitted--not-permitted)
 3. [Branching, Merge, Reviews](#3-branching-merge-reviews)
-4. [Image Builds (Local Runner)](#4-image-builds-local-runner)
+4. [Image Builds (GitHub-hosted Runner)](#4-image-builds-github-hosted-runner)
 5. [Quality Requirements (Gates)](#5-quality-requirements-gates)
 6. [Security & Secrets](#6-security--secrets)
 7. [OWASP Top 10](#7-owasp-top-10)
@@ -119,7 +119,7 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 - Change and refactor code (within the existing architecture)
 - Create/modify files (including tests and documentation)
 - Adjust build/CI configuration (if necessary and justified)
-- Adapt CI/CD workflows for Local Runner (self-hosted runner)
+- Adjust CI/CD workflows (runner choice, gates, build steps)
 
 ### The AI Must NOT
 
@@ -138,12 +138,12 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 - Development on feature/fix branches
 - Merge via Pull Request
 - `main` is release-ready / production-near and protected
-- **No CI runs on a PR, and no test runs anywhere.** `build-docker.yml` is the
-  only workflow; it triggers on **push to `main`** (and `workflow_dispatch`) and
-  builds the JAR with `mvn ... package -DskipTests`. There is no `quality`/`test`
-  job and no `needs:` gate — the image is published from whatever landed on
-  `main`. The gate before the merge is therefore the **PR review** plus a local
-  run, nothing else.
+- **No CI runs on a PR, and nothing blocks a bad merge.** `build-docker.yml` is
+  the only workflow; it triggers on **push to `main`** (and `workflow_dispatch`).
+  Its `quality` job runs the JUnit suite, but non-blocking — `continue-on-error`
+  is set and `build-and-push` declares no `needs:`, so the image is published
+  from whatever landed on `main` (§5). The gate before the merge is therefore
+  the **PR review** plus a local run, nothing else.
 - Before merging, run what covers the change locally — `mvn test` for the Spring
   side, `flutter test` for the app — and state in the PR which commands were run
   and their result.
@@ -154,9 +154,10 @@ PR includes: purpose, scope, test notes, possible breaking changes
 
 ---
 
-## 4. Image Builds (Local Runner)
+## 4. Image Builds (GitHub-hosted Runner)
 
-Custom images are built via GitHub Actions with a self-hosted runner.
+Custom images are built via GitHub Actions on GitHub-hosted `ubuntu-latest` —
+**not** on a self-hosted runner.
 
 - **No GitHub Releases / no SemVer / no Git tags** as "release mechanism" for custom images
 - Build trigger: push to `main` (after PR merge) or manually via `workflow_dispatch`
@@ -168,12 +169,17 @@ Custom images are built via GitHub Actions with a self-hosted runner.
 
 ## 5. Quality Requirements (Gates)
 
-> **There is no automated gate in this repo.** Unlike the sibling repos
-> (`todo`, `kassenbuch`, `tourteck`, `pruefteck`), `build-docker.yml` has no
-> `quality` job and no `needs:` dependency: a push to `main` builds and pushes an
-> image directly, and the JAR is built with `-DskipTests`. The JUnit suite under
-> `src/test/java/` therefore never runs in CI. This is a statement of fact, not
-> an endorsement — see §5a for what it would take to close it.
+> **There is still no gate in this repo — but there is now a measurement.**
+> Since 2026-08-26 `build-docker.yml` has a `quality` job that runs
+> `mvn test`. It carries **`continue-on-error: true`**, and `build-and-push`
+> does **not** declare `needs: quality`. A red suite therefore blocks nothing:
+> a push to `main` still builds and pushes an image, and the JAR is still built
+> with `-DskipTests`.
+>
+> That is deliberate and temporary. The suite had never run anywhere, so its
+> state was unknown — turning it into a blocking gate in one step would have
+> risked freezing every release on a failure nobody had seen yet. See §5a for
+> the two lines that turn the measurement into a gate.
 
 The list below is what must hold before a merge. Since nothing enforces it, it
 holds only if a human checks it:
@@ -183,12 +189,28 @@ holds only if a human checks it:
 - No debug output / temporary workarounds
 - No unused ENV variables
 
-### 5a. The open gap
+### 5a. Turning the measurement into a gate
 
-Closing it means adding a `quality` job to `build-docker.yml` (checkout, JDK 25,
-`mvn --batch-mode test`) and making `build-and-push` declare `needs: quality`,
-plus dropping `-DskipTests` or keeping it only in the packaging step. Until that
-happens, no rule in this file may claim that CI checks anything.
+The job exists; two changes make it binding. Do **both** or neither — one alone
+is worse than the current state, because it looks like a gate without being one:
+
+1. Remove `continue-on-error: true` from the `quality` job.
+2. Add `needs: quality` to `build-and-push`.
+
+**When:** after the job has come back green twice on `main`. Watch the first
+runs — the local run on 2026-08-26 produced 67 tests, 0 failures and 35 errors,
+and all 35 came from `TestContainerTest` subclasses failing to start a Postgres
+container. That was a missing Docker daemon in the local sandbox, not a broken
+test; `ubuntu-latest` has one, so CI is the first place a real verdict exists.
+The `quality` job uploads its surefire reports as an artifact for exactly that
+reason.
+
+Optional third step, independent of the gate: drop `-DskipTests` from the
+packaging command, or keep it — with a green `quality` job in front, packaging
+does not need to run the suite a second time.
+
+**Until step 1 and 2 are done, no rule in this file may claim that CI checks
+anything.** It measures.
 
 ---
 
@@ -278,9 +300,10 @@ Sitemap: https://example.com/sitemap.xml
 
 ## 11. Build & Deployment
 
-### Custom Images (Local Runner)
+### Custom Images (GitHub-hosted Runner)
 
-- PR → merge to `main` → GitHub Actions builds image on self-hosted runner
+- PR → merge to `main` → GitHub Actions builds the image on GitHub-hosted
+  `ubuntu-latest`
 - Push to GHCR (container tags: `latest` + SHA)
 - Manual trigger via `workflow_dispatch` possible
 
@@ -302,7 +325,7 @@ Sitemap: https://example.com/sitemap.xml
 A change is "done" when:
 
 - Code implemented
-- Tests green **locally** (nothing runs them in CI — §5)
+- Tests green **locally** — CI runs them since 2026-08-26, but non-blocking (§5)
 - Documentation updated (at minimum README, if affected)
 - `CHANGELOG.md` updated (entry under `[Unreleased]` or under a date block — see §13)
 - PR reviewed and merged
