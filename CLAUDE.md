@@ -222,6 +222,17 @@ anything.** It measures.
 - Secrets exclusively via ENV/secret management
 - No "default admin password" in production images
 
+> **Seit 2026-08-26 ist diese Regel geprüft, nicht nur behauptet.** Der
+> `quality`-Job führt `detect-secrets` gegen `.secrets.baseline` aus und wird rot,
+> sobald ein Fund hinzukommt, den die Baseline nicht kennt. Die Baseline hält den
+> Stand vom Einbau fest — durchweg Fehlalarme (Test-Platzhalter, ENV-Defaults,
+> SRI-Hashes); ein echtes Geheimnis war nicht darunter.
+>
+> **Ein neuer Fehlalarm gehört in die Baseline, nicht in eine Ausnahme im Gate:**
+> `detect-secrets scan --baseline .secrets.baseline` neu erzeugen und den Diff im
+> PR mitschicken, oder die Zeile mit `pragma: allowlist secret` markieren. Wer den
+> Schritt entfernt, nimmt §7 die einzige Instanz, die ihn verletzen sehen kann.
+
 ---
 
 ## 7. OWASP Top 10
