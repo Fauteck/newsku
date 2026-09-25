@@ -153,7 +153,7 @@ Per call:
 ```
 Developer
   │
-  ├─ Feature branch → PR → merge to main
+  ├─ Feature branch → PR → merge to master
   │
   ├─ GitHub Actions (self-hosted runner)
   │     → mvn clean package -DskipTests
