@@ -153,16 +153,19 @@ Per call:
 ```
 Developer
   │
-  ├─ Feature branch → PR → merge to main
+  ├─ Feature branch → PR → merge to master   (no CI on merge)
   │
-  ├─ GitHub Actions (self-hosted runner)
-  │     → mvn clean package -DskipTests
-  │     → Docker build (docker/Dockerfile)
-  │     → Push to GHCR (tags: latest + SHA)
+  ├─ Manual dispatch: .github/workflows/build-docker.yml (ubuntu-latest)
+  │     quality:        detect-secrets → scripts/docs-guard.py → mvn test
+  │     build-and-push: needs quality
+  │                     → mvn clean package -DskipTests (tests already ran)
+  │                     → Docker build (docker/Dockerfile)
+  │                     → Push to GHCR (tags: latest + SHA)
   │
-  └─ Portainer (GitOps polling)
-       → docker-compose.yml from docker-configs repo
-       → Automatic redeploy on changes
+  └─ Portainer stack from the docker-configs repo
+       → a new image under the same :latest tag needs an explicit
+         "Pull and redeploy"; whether GitOps polling is on for this
+         stack is not documented here (see wiki note „docker-configs")
 ```
 
 - **Registry:** `ghcr.io/fauteck/newsku`

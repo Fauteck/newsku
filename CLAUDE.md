@@ -20,7 +20,16 @@ Pflicht vor inhaltlichen Antworten:
 
 Nach faktischen Änderungen mit Wissens-Charakter: betroffene Wiki-Notiz pflegen. Spielregeln stehen in der Notiz **`_schema`** — insbesondere „eine Heimat pro Fakt", das Lifecycle-Vokabular und die Log-Rotation.
 
-Ein `_log`-Eintrag nur bei **Entscheidungen und Korrekturen** — nicht bei reinen Inhalts-Aktualisierungen, die zeigt die Versionshistorie der Notiz ohnehin. Im Zweifel weglassen. (Experiment bis 2026-09-21, bewusst noch nicht im `_schema`.)
+**Der `_log` bekommt nicht jede Änderung.** Ein Eintrag (Präfix `## [YYYY-MM-DD] <art> | <Titel>`,
+neueste oben) wird geschrieben, wenn eine **Entscheidung** oder eine **Korrektur** festzuhalten
+ist — etwas, das eine spätere Session sonst erneut ausdiskutieren oder wiederholt falsch machen
+würde. Reine Inhalts-Aktualisierungen einer Wiki-Seite bekommen **keinen** Eintrag: sie stehen
+auf der Seite, und die Versionshistorie der Notiz zeigt ohnehin, was sich wann geändert hat. Im
+Zweifel weglassen.
+
+Seit dem 2026-09-24 **Konvention** und im `_schema` des Wikis unter „Workflows" geführt — nach
+einem Experiment ab dem 2026-08-24, in dem nichts gefehlt hat. Maßgeblich ist das `_schema`;
+dieser Absatz ist die Kurzfassung für Sessions, die das Wiki nicht zuerst lesen.
 
 Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzungen (kein Markdown-Round-Trip), `update_note` nur für echte Korrekturen im Bestand, danach `sync_wikilinks` und `lint_wiki`.
 
@@ -49,7 +58,7 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 | [docs/code-konventionen.md](docs/code-konventionen.md) | Style guide, naming, Java and Dart patterns |
 | [docs/testing.md](docs/testing.md) | JUnit, TestContainers, Flutter tests, mocking |
 | [docs/haeufige-aufgaben.md](docs/haeufige-aufgaben.md) | How-to guides for common tasks |
-| [docs/issue-analyse.md](docs/issue-analyse.md) | **Zeitpunkt-Dokument** (2026-04-10): Audit-Befunde gegen den damaligen `main`-Stand. Beschreibt einen Zeitpunkt und wird nicht nachgepflegt — offene Punkte gehören nach Todoteck |
+| [docs/issue-analyse.md](docs/issue-analyse.md) | **Zeitpunkt-Dokument** (2026-04-10): Audit-Befunde gegen den damaligen `master`-Stand. Beschreibt einen Zeitpunkt und wird nicht nachgepflegt — offene Punkte gehören nach Todoteck |
 
 <!-- /kontrakt:doku-index -->
 
@@ -144,7 +153,7 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 
 - Development on feature/fix branches
 - Merge via Pull Request
-- `main` is release-ready **as of the last green dispatch** (§5) — not
+- `master` is release-ready **as of the last green dispatch** (§5) — not
   continuously, because a merge runs no check
 - **No CI runs on a PR.** `build-docker.yml` is the only workflow and its only
   trigger is `workflow_dispatch` (§4), so there is no green check to wait for.
@@ -154,9 +163,11 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
   side, `flutter test` for the app — and state in the PR which commands were run
   and their result.
 
-Der Default-Branch heißt **`main`** — seit 2026-08-26; vorher `master`. newsku
-war das einzige Fauteck-Repo mit abweichendem Namen, was jeden Doku-Link und
-jedes Skript einen Sonderfall kosten ließ.
+Der Default-Branch heißt **`master`** — anders als in den übrigen Fauteck-Repos
+(`main`). Bis zum 2026-09-25 stand hier, er sei am 2026-08-26 auf `main`
+umbenannt worden; das ist nie geschehen (`git ls-remote --symref origin HEAD`
+zeigt `refs/heads/master`, einen Branch `main` gibt es nicht). Doku-Links auf
+GitHub zeigen deshalb auf `blob/master/…`.
 
 Recommended branch naming: `feature/...`, `fix/...`, `chore/...`
 
@@ -170,7 +181,7 @@ Custom images are built via GitHub Actions on GitHub-hosted `ubuntu-latest` —
 **not** on a self-hosted runner.
 
 - **No GitHub Releases / no SemVer / no Git tags** as "release mechanism" for custom images
-- **Exactly one trigger: `workflow_dispatch`.** A merge into `main` produces
+- **Exactly one trigger: `workflow_dispatch`.** A merge into `master` produces
   **no** image on its own — the maintainer starts the workflow by hand
   (Actions tab → Run workflow). Do not add `push`, `pull_request` or `schedule`.
 - The workflow has two jobs: `quality` and `build-and-push`, which declares
@@ -183,7 +194,7 @@ Custom images are built via GitHub Actions on GitHub-hosted `ubuntu-latest` —
 ## 5. Quality Requirements (Gates)
 
 **The gate is the dispatch, not the merge.** This repo has no PR CI (§4), so a
-merge into `main` passes no automated check. What is checked — and what blocks
+merge into `master` passes no automated check. What is checked — and what blocks
 every image build — is the `quality` job of `build-docker.yml`:
 
 | Schritt | Prüft |
@@ -202,8 +213,8 @@ Before dispatching, the following must hold:
 - No debug output / temporary workarounds
 - No unused ENV variables
 
-Two consequences, both deliberate: `main` is release-ready as of the last green
-dispatch, not continuously; and a regression can reach `main`, but never a
+Two consequences, both deliberate: `master` is release-ready as of the last green
+dispatch, not continuously; and a regression can reach `master`, but never a
 published image — it does block the release until fixed.
 
 ### 5a. Was sich am 2026-08-26 geändert hat — und was beim ersten Dispatch zu erwarten ist
@@ -223,7 +234,7 @@ jetzt davor im `quality`-Job; zweimal wäre Verschwendung.
 > ist die Absicht, aber es kann beim ersten Mal überraschen.
 
 Und genau so kam es: Der erste Dispatch am 2026-08-26 war rot — 67 Tests, 8
-Errors, drei echte Defekte, die seit dem jeweiligen Merge unbemerkt in `main`
+Errors, drei echte Defekte, die seit dem jeweiligen Merge unbemerkt in `master`
 lagen (SpEL-Cache-Key gegen einen leeren SecurityContext, ein Fixture auf Port
 `0`, ein Testaufruf oberhalb der `@Max`-Grenze). Das Gate hat beim ersten
 Einsatz getan, wofür es gebaut wurde.
@@ -315,13 +326,18 @@ Sitemap: https://example.com/sitemap.xml
 
 ## 10a. Sync Cadence with External Services
 
-> Applies when this repo polls data from an external service (e.g. FreshRSS via GReader API).
+newsku polls FreshRSS (GReader API). The rule in one line: **never poll more
+often than FreshRSS fetches, and run a few minutes after its cron** — anything
+more only produces idle load on both sides. Why, and how the two services hang
+together, lives outside this repo: wiki note **„newsku (Feedteck)"** in the
+Todoteck project `llm-wiki`, section on the FreshRSS dependency.
 
-- **Align poll interval with the source:** Sync interval must not be shorter than the update cadence of the upstream service. Shorter intervals only generate idle load + unnecessary API load.
-- **Time offset:** When the upstream service works at fixed times (e.g. FreshRSS cron), set your own sync via cron expression to run a few minutes after the upstream fetch.
-- **Configuration via ENV:** Sync schedules are configurable via ENV variable (not hardcoded) so adjustments are possible without rebuild.
-- **Documentation requirement:** Every sync cadence is documented in `README.md` (ENV table) with justification — including a note on the upstream cadence it is aligned with.
-- **Currently relevant:** FreshRSS `CRON_MIN=10,30,50` (3×/hour) → newsku default `FEED_SYNC_CRON=0 15,35,55 * * * *` (sync 5 min after each FreshRSS fetch).
+In this repo:
+
+- The schedule is set via ENV (`FEED_SYNC_CRON`), never hardcoded.
+- The current values — default cron and the FreshRSS cadence it is aligned
+  with — live in exactly one place: [README.md → Sync-Kadenz](README.md#sync-kadenz).
+  Do not repeat the numbers here.
 
 ---
 
@@ -329,7 +345,7 @@ Sitemap: https://example.com/sitemap.xml
 
 ### Custom Images (GitHub-hosted Runner)
 
-- PR → merge into `main` → **someone dispatches the workflow** (Actions tab →
+- PR → merge into `master` → **someone dispatches the workflow** (Actions tab →
   Run workflow). Nothing happens automatically.
 - The `quality` job runs first; only if it is green does `build-and-push` push
   to GHCR (container tags: `latest` + SHA)
@@ -372,10 +388,10 @@ For every change that can go to production:
 
 ### CHANGELOG.md (mandatory)
 
-- **Every PR that lands on `main` MUST update `CHANGELOG.md`.**
+- **Every PR that lands on `master` MUST update `CHANGELOG.md`.**
 - Add the entry under `## [Unreleased]` while the PR is open. On merge, either
   the PR itself or a follow-up housekeeping PR moves the `[Unreleased]` items
-  into a dated block `## [YYYY-MM-DD]` (the merge date on `main`).
+  into a dated block `## [YYYY-MM-DD]` (the merge date on `master`).
 - Format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/)
   with the categories **Added / Changed / Fixed / Security / Removed /
   Deprecated / Docs / Chore**.

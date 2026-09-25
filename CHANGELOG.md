@@ -5,7 +5,7 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/).
 This project does not use SemVer or Git tags — production images are tagged
 `latest` + commit SHA via GitOps (see [CLAUDE.md](CLAUDE.md) §4, §11). Sections
-are grouped by merge date on `main` instead of by version.
+are grouped by merge date on `master` instead of by version.
 
 Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 **Deprecated**, **Docs**, **Chore**.
@@ -19,7 +19,6 @@ Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 
 ### Changed
 - CI: `build-docker.yml` now follows the same pattern as the sibling repos — `workflow_dispatch` as the only trigger, and `build-and-push` declares `needs: quality`. A merge no longer produces an image on its own; the gate is the dispatch
-- Default branch renamed `master` → `main`, matching every other Fauteck repo
 - Example paths in `docs/testing.md` and `docs/haeufige-aufgaben.md` are now written as placeholders (`<modul>`, `<name>`) instead of look-alike file names
 - Public magazine view now mirrors the owner's view 1:1: loads the same 3 × 24h time blocks with the tab's minimum importance and AI ranking, and shows the magazine name centered in the header
 - Drop default `'Top stories'` title prefill on new `topStories` layout blocks; users opt-in to a heading
@@ -39,6 +38,9 @@ Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 - `quality` job in `build-docker.yml` running the JUnit suite — it had never run anywhere, since the JAR is packaged with `-DskipTests`
 
 ### Docs
+- Correct the default-branch claim: the branch was never renamed to `main` (remote `HEAD` is `refs/heads/master`). `CLAUDE.md`, `docs/architektur.md` and this changelog's header now say `master`; the earlier entry "Default branch renamed `master` → `main`" is removed
+- `CLAUDE.md`: the `_log` rule is now the wiki convention (since 2026-09-24, in `_schema`), no longer an experiment
+- `CLAUDE.md` §10a: the sync-cadence rule shrinks to one line plus a pointer to the llm-wiki note "newsku (Feedteck)"; the concrete cron values live only in `README.md` → Sync-Kadenz
 - `CLAUDE.md` §3/§4/§5/§11 rewritten to describe the gate that now exists, replacing the statement that nothing checks anything
 - Remove `docs/design-system.md` — labelled "Legacy" by two other documents, zero code references, and a duplicate of `DESIGN.md` plus `docs/frontend-patterns.md`. The shared Fauteck design system lives in the llm-wiki note "Fauteck Design-System (geteilt)"
 - Add `docs/issue-analyse.md` to the documentation index, marked as a point-in-time document
