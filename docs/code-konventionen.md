@@ -1,3 +1,4 @@
+<!-- heimat: repo — ändert sich mit: src/main/java/com/github/lamarios/newsku/, src/main/app/lib/, src/main/app/analysis_options.yaml -->
 # Code Conventions
 
 ← [Back to Index](../CLAUDE.md)

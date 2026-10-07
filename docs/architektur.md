@@ -1,3 +1,4 @@
+<!-- heimat: repo — ändert sich mit: src/main/java/com/github/lamarios/newsku/, src/main/app/lib/, pom.xml, docker-compose.yml -->
 # Architecture
 
 ← [Back to Index](../CLAUDE.md)

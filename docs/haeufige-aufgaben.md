@@ -1,3 +1,4 @@
+<!-- heimat: repo — ändert sich mit: src/main/java/com/github/lamarios/newsku/controllers/, src/main/resources/db/migration/, src/main/app/lib/ -->
 # Common Tasks
 
 ← [Back to Index](../CLAUDE.md)

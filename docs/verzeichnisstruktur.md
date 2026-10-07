@@ -1,3 +1,4 @@
+<!-- heimat: repo — ändert sich mit: src/, scripts/, docker/, mkdocs/ -->
 # Directory Structure
 
 ← [Back to Index](../CLAUDE.md)
@@ -33,7 +34,6 @@
 │   ├── code-konventionen.md
 │   ├── testing.md
 │   ├── haeufige-aufgaben.md
-│   ├── issue-analyse.md
 │   └── assets/                        # Screenshots and logos
 ├── mkdocs/                            # Public documentation website
 │   ├── mkdocs.yml

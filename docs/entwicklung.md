@@ -1,3 +1,4 @@
+<!-- heimat: repo — ändert sich mit: pom.xml, src/main/app/pubspec.yaml, docker-compose.yml, Makefile -->
 # Development
 
 ← [Back to Index](../CLAUDE.md)

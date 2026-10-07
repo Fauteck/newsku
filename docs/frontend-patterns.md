@@ -1,3 +1,4 @@
+<!-- heimat: repo — ändert sich mit: src/main/app/lib/ -->
 # Frontend Patterns
 
 ← [Back to Index](../CLAUDE.md)
