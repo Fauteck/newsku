@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Doku-Aussagen, die sich aus dem Bestand aufzaehlen lassen.
 
-Anlass (2026-08-26): `docs/issue-analyse.md` war aus dem Katalog der CLAUDE.md
+Anlass (2026-08-26): `docs/issue-analyse.md` (heute Wiki „Feedteck: Issue-Analyse (2026-04)“) war aus dem Katalog der CLAUDE.md
 gefallen und `docs/design-system.md` stand darin, obwohl es als „Legacy" galt.
 In den Schwesterprojekten hat dieselbe Pruefung auf Anhieb tote Verweise
 gefunden — pruefteck fuenf, todo sechzehn. Eine Tabelle in einer Markdown-Datei
@@ -98,14 +98,60 @@ def pruefe_pfade() -> None:
                 fehler(f'{rel} nennt den Pfad {pfad} — den gibt es nicht.')
 
 
+# Heimat-Regel (2026-10-07): Konzepte, Entscheidungen und Zeitpunkt-Dokumente
+# leben im Wiki `llm-wiki`; im Repo bleibt nur, was mit dem Code geaendert oder
+# von einem Guard geprueft wird. Jede Datei in docs/ sagt deshalb in ihrer
+# ersten Zeile, womit sie sich aendert — oder bis wann sie als Konzept in
+# Arbeit ist.
+MARKE = re.compile(
+    r'<!--\s*heimat:\s*repo\s*[—–-]+\s*(ändert sich mit|aendert sich mit|in Arbeit bis):\s*(.+?)\s*-->')
+WIKI_HINWEIS = ('Konzepte, Entscheidungen und Zeitpunkt-Dokumente gehoeren ins Wiki '
+                '`llm-wiki` (Heimat-Regel in der CLAUDE.md).')
+
+
+def pruefe_heimat() -> None:
+    import datetime
+
+    if not re.search(r'<!--\s*heimat-regel v\d+\s*-->.*?<!--\s*/heimat-regel\s*-->',
+                     lies('CLAUDE.md'), re.DOTALL):
+        fehler('CLAUDE.md: Regelblock <!-- heimat-regel vN --> … <!-- /heimat-regel --> fehlt. '
+               + WIKI_HINWEIS)
+
+    for p in sorted((REPO / 'docs').rglob('*.md')):
+        rel = str(p.relative_to(REPO))
+        if rel.startswith(AUSGENOMMEN) or p.name == 'README.md':
+            continue
+        erste = next((z for z in p.read_text(encoding='utf-8').splitlines() if z.strip()), '')
+        treffer = MARKE.search(erste)
+        if not treffer:
+            fehler(f'{rel}: erste Zeile traegt keine Heimat-Marke '
+                   f'<!-- heimat: repo — ändert sich mit: … -->. {WIKI_HINWEIS}')
+            continue
+        art, wert = treffer.group(1), treffer.group(2)
+        if art == 'in Arbeit bis':
+            try:
+                bis = datetime.date.fromisoformat(wert)
+            except ValueError:
+                fehler(f'{rel}: „in Arbeit bis“ ist kein Datum JJJJ-MM-TT ({wert!r}). {WIKI_HINWEIS}')
+                continue
+            if bis < datetime.date.today():
+                fehler(f'{rel}: „in Arbeit bis {wert}“ ist vorbei — Konzept ins Wiki umziehen. '
+                       f'{WIKI_HINWEIS}')
+            continue
+        for teil in (t.strip() for t in wert.split(',')):
+            if teil and not any(True for _ in REPO.glob(teil.rstrip('/'))):
+                fehler(f'{rel}: Pfad hinter „ändert sich mit“ trifft nichts: {teil}. {WIKI_HINWEIS}')
+
+
 def main() -> int:
     vorhanden, gelistet = pruefe_katalog()
     pruefe_pfade()
+    pruefe_heimat()
     print(f'Dokumente: {vorhanden} · Index-Eintraege: {gelistet}')
     if probleme:
         print('\n'.join(f'  ✗ {p}' for p in probleme))
         return 1
-    print('✔ Index deckt den Ordner, alle genannten Code-Pfade existieren.')
+    print('✔ Index deckt den Ordner, alle genannten Code-Pfade existieren, Heimat-Marken stimmen.')
     return 0
 
 

@@ -1,3 +1,4 @@
+<!-- heimat: repo — ändert sich mit: src/main/resources/db/migration/, src/main/java/com/github/lamarios/newsku/persistence/, src/main/java/com/github/lamarios/newsku/models/ -->
 # Database
 
 ← [Back to Index](../CLAUDE.md)

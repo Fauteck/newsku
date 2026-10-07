@@ -38,6 +38,7 @@ Categories: **Added**, **Changed**, **Fixed**, **Security**, **Removed**,
 - `quality` job in `build-docker.yml` running the JUnit suite — it had never run anywhere, since the JAR is packaged with `-DskipTests`
 
 ### Docs
+- Heimat-Regel: `docs/issue-analyse.md` (point-in-time audit of 2026-04-10) moved to the llm-wiki page „Feedteck: Issue-Analyse (2026-04)“ and removed from the repo. `CLAUDE.md` carries the rule block `<!-- heimat-regel v1 -->`, every remaining file in `docs/` starts with a `<!-- heimat: repo — ändert sich mit: … -->` marker, and `scripts/docs-guard.py` checks block, markers, named paths and deadlines
 - Correct the default-branch claim: the branch was never renamed to `main` (remote `HEAD` is `refs/heads/master`). `CLAUDE.md`, `docs/architektur.md` and this changelog's header now say `master`; the earlier entry "Default branch renamed `master` → `main`" is removed
 - `CLAUDE.md`: the `_log` rule is now the wiki convention (since 2026-09-24, in `_schema`), no longer an experiment
 - `CLAUDE.md` §10a: the sync-cadence rule shrinks to one line plus a pointer to the llm-wiki note "newsku (Feedteck)"; the concrete cron values live only in `README.md` → Sync-Kadenz

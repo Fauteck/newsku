@@ -1,3 +1,4 @@
+<!-- heimat: repo — ändert sich mit: src/main/java/com/github/lamarios/newsku/controllers/, src/main/java/com/github/lamarios/newsku/services/, src/main/java/com/github/lamarios/newsku/persistence/ -->
 # API Patterns
 
 ← [Back to Index](../CLAUDE.md)

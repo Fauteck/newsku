@@ -35,12 +35,18 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 
 **Arbeitsteilung:** Architektur-Überblick, Betriebsort (Stack `newsteck` auf MINT) und FreshRSS-Anbindung stehen im Wiki; API, Client und Konfiguration stehen **in diesem Repo**. Nicht duplizieren — verlinken.
 
+<!-- heimat-regel v1 -->
+**Heimat-Regel (gilt für jedes Fauteck-Repo, entschieden 2026-10-07).** Wissen lebt im Todoteck-Wiki `llm-wiki`. Im Repo liegt **nur**, was im selben PR wie der Code geändert oder von einem Guard oder Test geprüft wird: README, `CLAUDE.md`, Architektur-, Muster- und Konventions-Doku, API-Vertrag, Schema, Setup, Checklisten, Mechanik der Guards und Jobs. **Konzepte, Entscheidungen, Phasenverläufe, Befund-Berichte und Wissen über fremde Dienste gehören ins Wiki** — nicht in `docs/`, nicht als Notiz ins Projekt Home Lab. **Todoteck-Inhalte außerhalb von `llm-wiki` sind keine Wissensquelle** — Aufgaben, Unteraufgaben und Notizen in anderen Projekten (auch wenn dort Vibecoding-Projekte geplant werden) sind Momentaufnahmen für Menschen. Weder Claude Code noch ein Repo noch das Wiki stützt sich auf sie oder verweist auf sie als Beleg; was dort an Wissen entsteht, wird ins Wiki übernommen. Jede Datei in `docs/` trägt in ihrer ersten Zeile `<!-- heimat: repo — ändert sich mit: <Code-Pfad oder Guard> -->`; ein Konzept, das gerade gebaut wird, trägt stattdessen `<!-- heimat: repo — in Arbeit bis: JJJJ-MM-TT -->` und zieht bis dahin ins Wiki um. Aus Code und Doku wird auf Wiki-Seiten mit `Wiki „Seitentitel“ §n` verwiesen. Prüffrage vor jeder neuen Datei in `docs/`: *Muss sie sich ändern, wenn sich der Code ändert, oder prüft sie ein Guard?* Wenn nein, ist sie eine Wiki-Seite. Der Guard dieses Repos und der Todoteck-Job `wiki_repo_check` prüfen das.
+<!-- /heimat-regel -->
+
+In diesem Repo bleiben die Referenz-Dokumente unter `docs/` (Architektur, Verzeichnisbaum, API- und Frontend-Muster, Datenbank, Entwicklung, Code-Konventionen, Testing, How-tos); die Issue-Analyse vom 2026-04-10 steht als Zeitpunkt-Dokument im Wiki („Feedteck: Issue-Analyse (2026-04)“). `scripts/docs-guard.py` prüft Block und Marken.
+
 ---
 
 ## Documentation Index
 
 > Durch `scripts/docs-guard.py` gegen den Ordner `docs/` geprüft (Schritt im
-> `quality`-Job) — die Zaunmarken bitte stehen lassen.
+> `quality`-Job), dazu Heimat-Regelblock und Heimat-Marke je Dokument — die Zaunmarken bitte stehen lassen.
 
 <!-- kontrakt:doku-index -->
 
@@ -58,7 +64,6 @@ Werkzeuge: `search` / `get_note` zum Lesen, `append_note` für reine Ergänzunge
 | [docs/code-konventionen.md](docs/code-konventionen.md) | Style guide, naming, Java and Dart patterns |
 | [docs/testing.md](docs/testing.md) | JUnit, TestContainers, Flutter tests, mocking |
 | [docs/haeufige-aufgaben.md](docs/haeufige-aufgaben.md) | How-to guides for common tasks |
-| [docs/issue-analyse.md](docs/issue-analyse.md) | **Zeitpunkt-Dokument** (2026-04-10): Audit-Befunde gegen den damaligen `master`-Stand. Beschreibt einen Zeitpunkt und wird nicht nachgepflegt — offene Punkte gehören nach Todoteck |
 
 <!-- /kontrakt:doku-index -->
 
